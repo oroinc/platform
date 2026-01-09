@@ -157,8 +157,7 @@ define(function(require, exports, module) {
          * @inheritdoc
          */
         listen: {
-            'filters:update mediator': '_onChangeFilterSelect',
-            'filters:reset mediator': '_onReset'
+            'filters:update mediator': '_onChangeFilterSelect'
         },
 
         noWrap: true,
@@ -260,6 +259,10 @@ define(function(require, exports, module) {
         delegateListeners: function() {
             if (!_.isEmpty(this.filters)) {
                 this.listenTo(mediator, 'datagrid:metadata-loaded', this.updateFilters);
+            }
+
+            if (this.collection?.inputName) {
+                this.listenTo(mediator, 'filters:reset:' + this.collection.inputName, this._onReset);
             }
 
             return FiltersManager.__super__.delegateListeners.call(this);
@@ -886,7 +889,8 @@ define(function(require, exports, module) {
             e.preventDefault();
             const dialogWidget = new FilterDialogWidget({
                 title: this.filterDialogTitle,
-                content: this.dropdownContainer
+                content: this.dropdownContainer,
+                gridName: this.collection?.inputName
             });
 
             dialogWidget.render();

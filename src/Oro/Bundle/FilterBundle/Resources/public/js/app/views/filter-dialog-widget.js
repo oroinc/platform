@@ -23,6 +23,11 @@ define(function(require) {
         content: null,
 
         /**
+         * @property {String}
+         */
+        gridName: null,
+
+        /**
          * @property {Object}
          */
         dialogOptions: {
@@ -46,7 +51,7 @@ define(function(require) {
             if (_.isEmpty(options.content)) {
                 throw new TypeError('"content" property should be not empty');
             }
-            _.extend(this, _.pick(options, ['content']));
+            _.extend(this, _.pick(options, ['content', 'gridName']));
 
             options.dialogOptions = _.extend({}, this.dialogOptions, options.dialogOptions);
 
@@ -72,6 +77,8 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onResetAll: function(e) {
+            mediator.trigger('filters:reset:' + this.gridName, e);
+            // @deprecated trigger generic event for BC, will be removed in next LTS
             mediator.trigger('filters:reset', e);
         },
 
