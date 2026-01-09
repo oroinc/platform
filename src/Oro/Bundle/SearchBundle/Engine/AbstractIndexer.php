@@ -164,6 +164,11 @@ abstract class AbstractIndexer implements IndexerInterface
         return self::BATCH_SIZE;
     }
 
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
     protected function checkMappingErrors(): void
     {
         $errors = $this->mapper->getLastMappingErrors();
