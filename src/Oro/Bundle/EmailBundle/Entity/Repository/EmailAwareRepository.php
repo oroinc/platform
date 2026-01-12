@@ -4,6 +4,12 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Defines the contract for repositories that provide email address queries.
+ *
+ * Repositories implementing this interface must provide methods to retrieve primary and secondary
+ * email addresses for entities, supporting filtering by excluded emails and search queries.
+ */
 interface EmailAwareRepository
 {
     /**

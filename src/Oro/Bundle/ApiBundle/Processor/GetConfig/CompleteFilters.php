@@ -116,7 +116,8 @@ class CompleteFilters extends CompleteSection
                 $filter->setDataType($dataType);
             }
         }
-        if (!$filter->hasCollection()
+        if (
+            !$filter->hasCollection()
             && $propertyPath !== $fieldName
             && $this->isCollectionValuedAssociation($metadata, $propertyPath)
         ) {
@@ -210,7 +211,8 @@ class CompleteFilters extends CompleteSection
                 }
                 $this->setFilterArrayAllowed($filter);
                 $this->setFilterRangeAllowed($filter);
-                if (!$filter->hasType()
+                if (
+                    !$filter->hasType()
                     && !$filter->hasCollection()
                     && $this->isCollectionValuedAssociation($metadata, $propertyPath)
                 ) {

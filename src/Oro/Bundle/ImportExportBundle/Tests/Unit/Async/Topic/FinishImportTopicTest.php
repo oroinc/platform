@@ -63,7 +63,7 @@ class FinishImportTopicTest extends AbstractTopicTestCase
                     'options' => 123,
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "rootImportJobId" with value "1" is expected to be of type "int",'.
+                'exceptionMessage' => '/The option "rootImportJobId" with value "1" is expected to be of type "int",' .
                     ' but is of type "string"./'
             ],
             'parameters with invalid "processorAlias" option' => [

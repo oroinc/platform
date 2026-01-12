@@ -8,6 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Provides a form type for managing individual phone number entries.
+ *
+ * This form type handles the creation and editing of single phone number records,
+ * including a phone field and a primary flag. It allows users to specify which phone
+ * number is the primary contact method and includes a hidden identifier field for
+ * proper entity tracking and management.
+ */
 class PhoneType extends AbstractType
 {
     #[\Override]

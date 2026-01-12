@@ -7,6 +7,14 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
+/**
+ * Provides API access to activities through full-text search capabilities.
+ *
+ * This manager enables searching for activities via the search engine, allowing clients
+ * to query activities by text content and filter results by target entity types. It integrates
+ * with the search indexer to perform efficient full-text searches and maps search results
+ * to the appropriate activity types and their associated target entities.
+ */
 class ActivitySearchApiEntityManager extends ApiEntityManager
 {
     /** @var SearchIndexer */

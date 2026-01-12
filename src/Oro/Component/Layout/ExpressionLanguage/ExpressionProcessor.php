@@ -246,7 +246,8 @@ class ExpressionProcessor
         $deps = [];
         if ($node instanceof NameNode) {
             $name = $node->attributes['name'];
-            if (\array_key_exists($name, $this->values) &&
+            if (
+                \array_key_exists($name, $this->values) &&
                 !\array_key_exists($name, $this->processedValues)
             ) {
                 $deps[$name] = $this->values[$name];

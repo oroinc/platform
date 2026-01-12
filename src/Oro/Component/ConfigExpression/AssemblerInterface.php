@@ -2,6 +2,13 @@
 
 namespace Oro\Component\ConfigExpression;
 
+/**
+ * Defines the contract for assembling expressions from configuration arrays.
+ *
+ * Implementations of this interface are responsible for converting configuration data
+ * into executable expression objects. This is a core component of the expression system
+ * that enables declarative configuration of complex business logic.
+ */
 interface AssemblerInterface
 {
     /**

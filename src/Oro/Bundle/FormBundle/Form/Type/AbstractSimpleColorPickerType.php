@@ -93,7 +93,8 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
             ->setNormalizer(
                 'translatable',
                 function (Options $options, $translatable) {
-                    if (isset(static::$colorSchema[$options['color_schema']])
+                    if (
+                        isset(static::$colorSchema[$options['color_schema']])
                         && static::$colorSchema[$options['color_schema']]['translatable']
                     ) {
                         $translatable = true;

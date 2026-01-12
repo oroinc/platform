@@ -39,7 +39,7 @@ class UserRoleViewForm extends Form
             $permission = $this->find(
                 'xpath',
                 sprintf(
-                    '//div[contains(@class, "entity-permission-container")'.
+                    '//div[contains(@class, "entity-permission-container")' .
                     ' and descendant::div[@class="entity-name" and text()="%s"]]',
                     $name
                 )
@@ -73,7 +73,7 @@ class UserRoleViewForm extends Form
             $permission = $this->find(
                 'xpath',
                 sprintf(
-                    '//div[contains(@class, "entity-permission-container")'.
+                    '//div[contains(@class, "entity-permission-container")' .
                     ' and descendant::div[@class="entity-name" and text()="%s"]]',
                     $name
                 )

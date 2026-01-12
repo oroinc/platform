@@ -8,6 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\CountryType as SymfonyCountryType
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting countries with localized names.
+ *
+ * This form type extends Symfony's {@see CountryType} to provide a customized country
+ * selector that loads country names dynamically in English locale. It uses a
+ * callback choice loader to fetch the list of countries from the Intl component,
+ * allowing for flexible country selection in forms.
+ */
 class CountryType extends AbstractType
 {
     #[\Override]

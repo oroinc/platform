@@ -12,6 +12,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Builds the main form for merging multiple entities into a single master entity.
+ *
+ * Constructs a form that allows users to select a master entity and configure how each
+ * field should be merged from the source entities. It dynamically adds merge field forms
+ * for all displayable fields in the entity metadata, and automatically defaults the master
+ * entity to the first entity in the list if not explicitly set.
+ */
 class MergeType extends AbstractType
 {
     #[\Override]

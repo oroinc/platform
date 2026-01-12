@@ -23,7 +23,8 @@ class AddApiDocViewAnnotationHandler implements ApiDocAnnotationHandlerInterface
     public function handle(ApiDoc $annotation, Route $route): void
     {
         $views = $annotation->getViews();
-        if (!empty($views)
+        if (
+            !empty($views)
             && \in_array($this->existingView, $views, true)
             && !\in_array($this->additionalView, $views, true)
         ) {

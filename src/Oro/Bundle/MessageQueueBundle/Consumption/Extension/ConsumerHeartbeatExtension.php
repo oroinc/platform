@@ -46,7 +46,8 @@ class ConsumerHeartbeatExtension extends AbstractExtension
         }
 
         $currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
-        if (!self::$lastUpdatedTime
+        if (
+            !self::$lastUpdatedTime
             || (
                 ($currentTime->getTimestamp() - self::$lastUpdatedTime->getTimestamp()) / 60
                 >= $this->updateHeartbeatPeriod

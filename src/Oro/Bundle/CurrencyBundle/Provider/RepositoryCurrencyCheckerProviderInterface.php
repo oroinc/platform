@@ -4,6 +4,14 @@ namespace Oro\Bundle\CurrencyBundle\Provider;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
+/**
+ * Defines the contract for providers that check currency usage in entity repositories.
+ *
+ * Implement this interface to create providers that can verify whether specific currencies
+ * are being used by entities in the database. This is particularly useful for preventing
+ * the removal of currencies that are actively referenced by existing records, ensuring
+ * data integrity when managing the system's currency configuration.
+ */
 interface RepositoryCurrencyCheckerProviderInterface
 {
     /**

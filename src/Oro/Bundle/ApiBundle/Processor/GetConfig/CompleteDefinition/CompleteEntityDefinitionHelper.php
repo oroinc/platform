@@ -182,7 +182,8 @@ class CompleteEntityDefinitionHelper
         ClassMetadata $metadata,
         ?string $targetAction
     ): void {
-        if ($metadata->usesIdGenerator()
+        if (
+            $metadata->usesIdGenerator()
             && (ApiAction::CREATE === $targetAction || ApiAction::UPDATE === $targetAction)
             && !$this->entityIdHelper->isEntityIdentifierEqual($metadata->getIdentifierFieldNames(), $definition)
         ) {
@@ -250,7 +251,8 @@ class CompleteEntityDefinitionHelper
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath($fieldName);
-            if (\in_array($propertyPath, $idFieldNames, true)
+            if (
+                \in_array($propertyPath, $idFieldNames, true)
                 || (
                     $field->isMetaProperty()
                     && (
@@ -288,7 +290,8 @@ class CompleteEntityDefinitionHelper
     ): void {
         $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
         foreach ($metadata->fieldMappings as $propertyPath => $mapping) {
-            if ($skipNotConfiguredCustomFields
+            if (
+                $skipNotConfiguredCustomFields
                 && !isset($existingFields[$propertyPath])
                 && $this->entityFieldFilteringHelper->isCustomField($metadata->name, $propertyPath)
             ) {
@@ -306,7 +309,8 @@ class CompleteEntityDefinitionHelper
                 $field->setDataType(DataType::ENUM . DataType::DETAIL_DELIMITER . $mapping['enumType']);
             }
 
-            if (!$field->hasExcluded()
+            if (
+                !$field->hasExcluded()
                 && !$field->isExcluded()
                 && $exclusionProvider->isIgnoredField($metadata, $propertyPath)
             ) {
@@ -338,7 +342,8 @@ class CompleteEntityDefinitionHelper
     ): void {
         $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
         foreach ($metadata->associationMappings as $propertyPath => $mapping) {
-            if ($skipNotConfiguredCustomFields
+            if (
+                $skipNotConfiguredCustomFields
                 && !isset($existingFields[$propertyPath])
                 && $this->entityFieldFilteringHelper->isCustomAssociation($metadata->name, $propertyPath)
             ) {
@@ -358,7 +363,8 @@ class CompleteEntityDefinitionHelper
                 continue;
             }
 
-            if (!$field->hasExcluded()
+            if (
+                !$field->hasExcluded()
                 && !$field->isExcluded()
                 && $exclusionProvider->isIgnoredRelation($metadata, $propertyPath)
             ) {
@@ -771,7 +777,8 @@ class CompleteEntityDefinitionHelper
 
     private function completeDisableMetaProperties(EntityDefinitionConfig $definition, ClassMetadata $metadata): void
     {
-        if (!$definition->hasDisableMetaProperties()
+        if (
+            !$definition->hasDisableMetaProperties()
             && $this->dictionaryProvider->isSupportedEntityClass($metadata->name)
         ) {
             $definition->disableMetaProperties();

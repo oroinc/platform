@@ -167,7 +167,7 @@ class SendEmailNotificationProcessorTest extends TestCase
                     'contentType' => 'text/plain',
                 ],
                 'exception' => $rfcComplianceException,
-                'errorMessage' => 'Failed to send an email notification to test@gmail.com.: '.
+                'errorMessage' => 'Failed to send an email notification to test@gmail.com.: ' .
                     $rfcComplianceException->getMessage(),
             ]
         ];

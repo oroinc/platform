@@ -178,7 +178,8 @@ class FormUtil
 
         $constraintIndex = null;
         foreach ($constraints as $index => $constraint) {
-            if ($constraint instanceof AccessGranted
+            if (
+                $constraint instanceof AccessGranted
                 || (
                     $constraint instanceof All
                     && \count($constraint->constraints) === 1

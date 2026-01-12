@@ -122,7 +122,8 @@ class WorkflowAclMetadataProvider
             }
         }
         foreach ($transitions as $transitionName => $transitionConfig) {
-            if (!isset($addedStartTransitions[$transitionName])
+            if (
+                !isset($addedStartTransitions[$transitionName])
                 && (
                     $this->getAttribute($transitionConfig, self::IS_START, false)
                     || TransitionManager::DEFAULT_START_TRANSITION_NAME === $transitionName

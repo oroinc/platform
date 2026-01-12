@@ -95,7 +95,8 @@ trait SpecialFieldsConsistencyTestTrait
         string $expectedFieldName
     ): void {
         $field = $metadata->getField($fieldName);
-        if (null !== $field
+        if (
+            null !== $field
             && $fieldName === $field->getPropertyPath()
             && $dataType === $field->getDataType()
             && !$metadata->hasProperty($expectedFieldName)

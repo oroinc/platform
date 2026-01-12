@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
+/**
+ * Defines search query modes for handling entity inheritance hierarchies.
+ */
 final class Mode
 {
     /**

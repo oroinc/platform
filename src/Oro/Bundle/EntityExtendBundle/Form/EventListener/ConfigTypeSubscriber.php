@@ -11,6 +11,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Handles form submission events for entity configuration forms.
+ *
+ * This subscriber monitors `POST_SUBMIT` events on configuration forms and detects when
+ * configuration values change. When a change is detected that requires a schema update
+ * (as determined by the provided callback), it updates the entity's extend configuration
+ * state to 'update' and records the pending changes for later processing.
+ */
 class ConfigTypeSubscriber implements EventSubscriberInterface
 {
     /** @var ConfigManager $configManager */
@@ -77,7 +85,8 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
                     $this->configManager->persist($extendConfig);
                 }
 
-                if ($configId instanceof FieldConfigId &&
+                if (
+                    $configId instanceof FieldConfigId &&
                     $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM) &&
                     $extendConfig->is('state', ExtendScope::STATE_ACTIVE)
                 ) {

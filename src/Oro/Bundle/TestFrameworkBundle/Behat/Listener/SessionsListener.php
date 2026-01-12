@@ -9,6 +9,13 @@ use Behat\Mink\Mink;
 use Behat\MinkExtension\Listener\SessionsListener as MinkSessionsListener;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 
+/**
+ * Manages Mink browser sessions across Behat features and scenarios.
+ *
+ * This listener extends the Mink sessions listener to handle session lifecycle events,
+ * including stopping sessions between features and cleaning up resources. It supports
+ * multiple JavaScript-capable sessions for parallel or multi-browser testing.
+ */
 class SessionsListener extends MinkSessionsListener
 {
     protected $mink;

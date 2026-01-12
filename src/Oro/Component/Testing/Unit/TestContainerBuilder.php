@@ -50,7 +50,8 @@ class TestContainerBuilder
         $container->expects(TestCase::any())
             ->method('get')
             ->willReturnCallback(function ($id) {
-                if (!array_key_exists($id, $this->serviceMap)
+                if (
+                    !array_key_exists($id, $this->serviceMap)
                     || (
                         null === $this->serviceMap[$id][1]
                         && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $this->serviceMap[$id][1]

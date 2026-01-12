@@ -112,7 +112,8 @@ class FieldHelper
     {
         $key = $this->getCacheKey($entityName, $fieldName);
 
-        if (array_key_exists($key, $this->fieldsConfigCache)
+        if (
+            array_key_exists($key, $this->fieldsConfigCache)
             && array_key_exists($parameter, $this->fieldsConfigCache[$key])
         ) {
             return $this->fieldsConfigCache[$key][$parameter];
@@ -277,7 +278,7 @@ class FieldHelper
 
         try {
             $this->propertyAccessor->setValue($object, $propertyPath, $value);
-        } catch (NoSuchPropertyException|\TypeError|\ErrorException|InvalidArgumentException $e) {
+        } catch (NoSuchPropertyException | \TypeError | \ErrorException | InvalidArgumentException $e) {
             $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
         }
     }
@@ -375,7 +376,8 @@ class FieldHelper
             );
             foreach ($fields as $field) {
                 $fieldName = $field['name'];
-                if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)
+                if (
+                    !$this->getConfigValue($entityName, $fieldName, 'excluded', false)
                     && $this->getConfigValue($entityName, $fieldName, 'identity', false)
                 ) {
                     $this->identityFieldsCache[$entityName][] = $fieldName;

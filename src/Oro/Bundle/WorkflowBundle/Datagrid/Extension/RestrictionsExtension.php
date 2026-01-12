@@ -11,6 +11,12 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
+/**
+ * Extends datagrid functionality to apply workflow restrictions to displayed records.
+ *
+ * This extension filters datagrid results based on workflow restrictions, adding restriction
+ * information to each record and preventing display of records that violate workflow restrictions.
+ */
 class RestrictionsExtension extends AbstractExtension
 {
     public const ENTITY_RESTRICTIONS = 'entity_restrictions';
@@ -128,7 +134,7 @@ class RestrictionsExtension extends AbstractExtension
      *
      * @return array
      */
-    protected function addRestrictionsToData(array  $rows, array $restrictions, $identifier, $restrictionColumnId)
+    protected function addRestrictionsToData(array $rows, array $restrictions, $identifier, $restrictionColumnId)
     {
         return array_map(
             function (ResultRecord $item) use ($restrictions, $identifier, $restrictionColumnId) {

@@ -44,9 +44,9 @@ class StrategyValidationEventListener
                 continue;
             }
 
-            $oldError = $propertyPath.StrategyValidationEvent::DELIMITER.$violation->getMessage();
-            $newError = $this->replaceIndexWithKey($root, $propertyPath).
-                StrategyValidationEvent::DELIMITER.$violation->getMessage();
+            $oldError = $propertyPath . StrategyValidationEvent::DELIMITER . $violation->getMessage();
+            $newError = $this->replaceIndexWithKey($root, $propertyPath) .
+                StrategyValidationEvent::DELIMITER . $violation->getMessage();
             if ($oldError !== $newError) {
                 $event->removeError($oldError);
                 $event->addError($newError);
@@ -90,8 +90,8 @@ class StrategyValidationEventListener
             }
 
             if (false !== $this->getLeftPosition($part)) {
-                $part = substr($part, 0, $this->getLeftPosition($part)).
-                    LocalizationCodeFormatter::formatName($value->getLocalization()).
+                $part = substr($part, 0, $this->getLeftPosition($part)) .
+                    LocalizationCodeFormatter::formatName($value->getLocalization()) .
                     substr($part, $this->getRightPosition($part));
             }
 

@@ -125,7 +125,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
     }
 
     private function getEnumOptionsExpr(
-        FilterDatasourceAdapterInterface$ds,
+        FilterDatasourceAdapterInterface $ds,
         $parameterValue,
         $fieldPath,
         $fieldName,

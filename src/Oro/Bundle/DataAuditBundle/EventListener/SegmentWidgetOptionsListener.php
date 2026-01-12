@@ -6,6 +6,14 @@ use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Handles {@see WidgetOptionsLoadEvent} to extend segment widgets with data audit functionality.
+ *
+ * This listener enhances segment widgets by adding the data audit component extension when the user
+ * has appropriate permissions and the context allows it. The extension provides UI capabilities for
+ * viewing and filtering audit history within segment widgets, enabling users to analyze entity changes
+ * directly from the segment interface.
+ */
 class SegmentWidgetOptionsListener
 {
     /** @var AuthorizationCheckerInterface */

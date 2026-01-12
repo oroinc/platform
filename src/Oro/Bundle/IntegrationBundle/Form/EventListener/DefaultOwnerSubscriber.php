@@ -13,6 +13,15 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Manages default owner field selection in integration channel forms based on integration type.
+ *
+ * This form event subscriber dynamically adds either a user owner or business unit owner field
+ * to the channel form, depending on the integration type's default owner type configuration.
+ * It also sets the current user as the default owner when creating new integrations.
+ * This allows different integration types to have different ownership models while maintaining
+ * a consistent form interface.
+ */
 class DefaultOwnerSubscriber implements EventSubscriberInterface
 {
     /** @var TokenAccessorInterface */

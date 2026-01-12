@@ -6,6 +6,14 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Mass action for resetting translations in datagrids.
+ *
+ * Extends the base mass action to provide translation-specific reset functionality,
+ * allowing users to reset multiple translation entries to their default values through
+ * the datagrid interface. Configures default handler, route, and request method for
+ * the reset operation.
+ */
 class ResetTranslationsMassAction extends AbstractMassAction
 {
     /** @var array */

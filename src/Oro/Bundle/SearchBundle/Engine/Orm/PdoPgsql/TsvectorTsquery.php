@@ -48,7 +48,7 @@ class TsvectorTsquery extends FunctionNode
         }
 
         $query = "to_tsvector(" . $haystack .
-            ") @@ to_tsquery (" . $this->needle->dispatch($sqlWalker).   " )";
+            ") @@ to_tsquery (" . $this->needle->dispatch($sqlWalker) .   " )";
 
         return $query;
     }

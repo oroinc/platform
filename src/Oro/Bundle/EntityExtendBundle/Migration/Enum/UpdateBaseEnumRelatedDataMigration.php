@@ -45,7 +45,8 @@ class UpdateBaseEnumRelatedDataMigration implements Migration, ConnectionAwareIn
         $nameGenerator = $this->getNameGenerator();
         foreach ($entityConfigs as $entityConfig) {
             $entityConfigData = $this->connection->convertToPHPValue($entityConfig['data'], 'array');
-            if (!isset($entityConfigData['extend']['is_extend'])
+            if (
+                !isset($entityConfigData['extend']['is_extend'])
                 || !$entityConfigData['extend']['is_extend']
                 || $entityConfig['class_name'] === EnumOption::class
                 || ExtendHelper::isOutdatedEnumOptionEntity($entityConfig['class_name'])
@@ -61,8 +62,10 @@ class UpdateBaseEnumRelatedDataMigration implements Migration, ConnectionAwareIn
             $entityTableName = $metadataHelper->getTableNameByEntityClass($entityConfig['class_name']);
             foreach ($fieldConfigs as $fieldConfig) {
                 $fieldConfigData = $this->connection->convertToPHPValue($fieldConfig['data'], Types::ARRAY);
-                if (!isset($fieldConfigData['enum']['enum_code'])
-                    || !isset($fieldConfigData['extend']['target_entity'])) {
+                if (
+                    !isset($fieldConfigData['enum']['enum_code'])
+                    || !isset($fieldConfigData['extend']['target_entity'])
+                ) {
                     continue;
                 }
                 // remove enum oro_entity_config field and move to serialized field config

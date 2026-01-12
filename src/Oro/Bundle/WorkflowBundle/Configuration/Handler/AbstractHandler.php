@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
+/**
+ * Provides common functionality for workflow configuration handlers.
+ *
+ * This base class implements helper methods for checking entity presence in configuration groups.
+ * Subclasses should extend this to implement specific configuration handling logic
+ * for different workflow configuration aspects.
+ */
 abstract class AbstractHandler implements ConfigurationHandlerInterface
 {
     /**
@@ -18,7 +25,8 @@ abstract class AbstractHandler implements ConfigurationHandlerInterface
         }
 
         foreach ($entities as $key => $entity) {
-            if (!empty($entity['name']) && $entity['name'] == $entityName
+            if (
+                !empty($entity['name']) && $entity['name'] == $entityName
                 || $key === $entityName
             ) {
                 return true;

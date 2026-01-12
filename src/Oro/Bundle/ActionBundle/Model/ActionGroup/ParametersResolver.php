@@ -118,7 +118,8 @@ class ParametersResolver
         $type = $parameter->getType();
         $type = array_key_exists($type, self::$typeAliases) ? self::$typeAliases[$type] : $type;
 
-        if ((function_exists($isFunction = 'is_' . $type) && $isFunction($value)) ||
+        if (
+            (function_exists($isFunction = 'is_' . $type) && $isFunction($value)) ||
             ($value instanceof $type)
         ) {
             return true;

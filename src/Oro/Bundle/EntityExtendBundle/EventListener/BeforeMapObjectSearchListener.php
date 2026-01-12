@@ -69,7 +69,8 @@ class BeforeMapObjectSearchListener
                     $mapConfig = $this->addCustomEntityMapping($mapConfig, $extendConfig);
                 }
 
-                if (isset($mapConfig[$className])
+                if (
+                    isset($mapConfig[$className])
                     && (
                         $extendConfig->get('owner') === ExtendScope::OWNER_SYSTEM
                         || (

@@ -4,6 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
 
+/**
+ * Writes data using `INSERT FROM SELECT` SQL queries.
+ *
+ * This writer uses native SQL `INSERT FROM SELECT` queries to efficiently bulk-insert
+ * data into the database. It supports optional cleanup of outdated records before
+ * insertion and allows configuration of which fields to insert. This approach is
+ * more efficient than inserting records one by one, especially for large datasets.
+ */
 class InsertFromSelectWriter extends AbstractNativeQueryWriter
 {
     /**

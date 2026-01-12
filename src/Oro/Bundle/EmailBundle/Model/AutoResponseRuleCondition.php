@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+/**
+ * Represents a condition for auto-response rules.
+ *
+ * Encapsulates a single condition in an auto-response rule, including the field being filtered,
+ * the filter type (comparison operator), and the filter value for matching incoming emails.
+ */
 class AutoResponseRuleCondition
 {
     /** @var string */

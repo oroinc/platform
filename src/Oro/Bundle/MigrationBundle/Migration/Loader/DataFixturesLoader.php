@@ -125,7 +125,8 @@ class DataFixturesLoader extends Loader
         $fixtureClassName = \get_class($fixtureObject);
 
         if (isset($this->loadedFixtures[$fixtureClassName])) {
-            if (!$fixtureObject instanceof VersionedFixtureInterface
+            if (
+                !$fixtureObject instanceof VersionedFixtureInterface
                 || version_compare($this->loadedFixtures[$fixtureClassName], $fixtureObject->getVersion()) !== -1
             ) {
                 return;

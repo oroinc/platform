@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:ignoreFile
+
 /**
  * To run this test (from this file's directory):
  *
@@ -71,6 +73,7 @@ class OroControlStructureSpacingSniffTest extends TestCase
         );
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public static function validCodeDataProvider(): array
     {
         return [
@@ -169,9 +172,28 @@ try {
     echo $e->getMessage();
 }',
             ],
+            'multi-line negated namespaced function call' => [
+                '<?php
+if (!\in_array(
+    $needle,
+    $haystack
+)) {
+    return;
+}',
+            ],
+            'multi-line negated function call' => [
+                '<?php
+if (!in_array(
+    $needle,
+    $haystack
+)) {
+    return;
+}',
+            ],
         ];
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public static function invalidCodeDataProvider(): array
     {
         return [
@@ -262,6 +284,38 @@ if (
     break;
 }',
                 'CloseParenthesisLine',
+            ],
+            'call-like construct with closing parens on separate lines' => [
+                '<?php
+if (!in_array(
+    $needle,
+    $haystack
+)
+) {
+    return;
+}',
+                'CallClosingParensSameLine',
+            ],
+            'method call with closing parens on separate lines' => [
+                '<?php
+if ($connection->getSchemaManager()->listTableColumns(
+    $connection->quoteIdentifier(\'oro_calendar_event\')
+)
+) {
+    return;
+}',
+                'CallClosingParensSameLine',
+            ],
+            'callable invocation with closing parens on separate lines' => [
+                '<?php
+if (($factory)(
+    $arg1,
+    $arg2
+)
+) {
+    return;
+}',
+                'CallClosingParensSameLine',
             ],
         ];
     }

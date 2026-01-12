@@ -196,7 +196,8 @@ class PreciseOrderByWalker extends TreeWalkerAdapter
                 }
             } elseif (null === $selectExpr->fieldIdentificationVariable) {
                 if ($selectExpr->expression instanceof AST\PartialObjectExpression) {
-                    if ($entityAlias === $selectExpr->expression->identificationVariable
+                    if (
+                        $entityAlias === $selectExpr->expression->identificationVariable
                         && in_array($fieldName, $selectExpr->expression->partialFieldSet, true)
                     ) {
                         $result = true;

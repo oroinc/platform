@@ -9,6 +9,12 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Repository for {@see GridViewUser} entities.
+ *
+ * This repository provides methods for querying user-specific datagrid view settings,
+ * including finding default views and user-view associations with ACL support.
+ */
 class GridViewUserRepository extends EntityRepository
 {
     /**

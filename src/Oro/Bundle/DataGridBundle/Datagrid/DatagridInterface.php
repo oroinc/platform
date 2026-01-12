@@ -8,6 +8,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 
+/**
+ * Defines the contract for datagrid components.
+ *
+ * This is the core interface that all datagrid implementations must follow. It provides methods
+ * for managing datasources, extensions, parameters, and retrieving grid data and metadata.
+ * Datagrids are the primary mechanism for displaying tabular data throughout the application,
+ * supporting features like filtering, sorting, pagination, and custom actions.
+ */
 interface DatagridInterface
 {
     /**

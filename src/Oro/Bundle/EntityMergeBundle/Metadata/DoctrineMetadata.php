@@ -4,6 +4,15 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+/**
+ * Provides Doctrine ORM metadata information for entity fields and associations.
+ *
+ * This class extends the base {@see Metadata} class to add Doctrine-specific functionality
+ * for inspecting and working with Doctrine field and association mappings. It provides
+ * methods to determine field types, check association relationships (one-to-many,
+ * many-to-many, many-to-one, one-to-one), and inspect association properties like
+ * orphan removal settings.
+ */
 class DoctrineMetadata extends Metadata implements MetadataInterface
 {
     /**

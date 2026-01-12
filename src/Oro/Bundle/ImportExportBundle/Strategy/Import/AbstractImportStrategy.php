@@ -112,7 +112,8 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
         }
 
         // find by identity fields
-        if (!$existingEntity
+        if (
+            !$existingEntity
             && (!$searchContext || $this->databaseHelper->getIdentifier(current($searchContext)))
         ) {
             $existingEntity = $this->findExistingEntityByIdentityFields($entity, $searchContext);

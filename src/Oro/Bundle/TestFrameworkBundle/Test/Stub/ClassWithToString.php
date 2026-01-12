@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Stub;
 
+/**
+ * Stub class with a configurable string representation for testing.
+ *
+ * This stub allows tests to verify behavior with objects that have custom `__toString()`
+ * implementations, with a configurable string representation for flexible testing scenarios.
+ */
 class ClassWithToString
 {
     /** @var string */

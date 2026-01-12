@@ -57,7 +57,8 @@ class DashboardTypeExtension extends AbstractTypeExtension
             $enumId = $enumOption->getId();
 
             foreach ($this->dashboardTypeProviders as $provider) {
-                if ($provider->isSupported($enumId)
+                if (
+                    $provider->isSupported($enumId)
                     && $provider instanceof CloneableDashboardTypeInterface
                     && $provider->isCloneable()
                 ) {

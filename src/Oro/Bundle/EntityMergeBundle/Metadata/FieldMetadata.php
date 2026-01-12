@@ -4,6 +4,15 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
+/**
+ * Encapsulates merge metadata for a single field within an entity.
+ *
+ * This class manages field-specific merge configuration including the parent entity metadata,
+ * Doctrine field/association metadata, available merge modes, and field properties. It provides
+ * methods to determine field characteristics such as whether it is a collection, whether it
+ * should be cloned, and how it relates to the source entity. Developers can customize field
+ * merge behavior by modifying merge modes or other metadata properties through event listeners.
+ */
 class FieldMetadata extends Metadata implements MetadataInterface
 {
     /**

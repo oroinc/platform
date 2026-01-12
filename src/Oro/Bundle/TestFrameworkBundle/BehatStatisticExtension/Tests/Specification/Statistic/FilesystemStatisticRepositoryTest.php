@@ -12,8 +12,8 @@ class FilesystemStatisticRepositoryTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     public static function setUpBeforeClass(): void
     {
-        self::$statFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'feature_duration.json';
-        self::$appDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'app';
+        self::$statFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'feature_duration.json';
+        self::$appDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'app';
         $stat = [
             'path/to/features/1.feature' => 3,
             'path/to/features/2.feature' => 6,

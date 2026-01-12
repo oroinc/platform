@@ -134,7 +134,7 @@ class DateGroupingFilter extends ChoiceFilter
     /**
      * If grouping by Day or Month make sure Year order is in same direction and keep multisort.
      */
-    public function applyOrderBy(OrmDatasource $datasource, String $sortKey, String $direction)
+    public function applyOrderBy(OrmDatasource $datasource, string $sortKey, string $direction)
     {
         QueryBuilderUtil::checkField($sortKey);
         $direction = QueryBuilderUtil::getSortOrder($direction);

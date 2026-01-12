@@ -43,7 +43,8 @@ abstract class AbstractOAuthManager implements OAuthManagerInterface
         $token = $origin->getAccessToken();
 
         // if token had been expired, the new one must be generated and saved to the database
-        if ($this->isAccessTokenExpired($origin)
+        if (
+            $this->isAccessTokenExpired($origin)
             && $this->isOAuthEnabled()
             && $origin->getRefreshToken()
         ) {

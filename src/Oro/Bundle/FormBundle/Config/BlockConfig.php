@@ -4,6 +4,14 @@ namespace Oro\Bundle\FormBundle\Config;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Manages configuration for a form block.
+ *
+ * A block is a logical grouping of form fields that can contain multiple sub-blocks.
+ * This class handles the block's metadata (code, title, description, CSS class, priority)
+ * and manages its collection of sub-blocks. It provides methods to add, retrieve, and
+ * check for the existence of sub-blocks, and can serialize its configuration to an array.
+ */
 class BlockConfig implements FormConfigInterface
 {
     /**

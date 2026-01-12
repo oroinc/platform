@@ -10,6 +10,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting available integration types with icon support.
+ *
+ * This form type extends {@see Select2ChoiceType} to provide a user-friendly selection interface
+ * for available integration types. It retrieves all registered integration types from the
+ * types registry and displays them with their associated icons, allowing users to visually
+ * identify and select the integration type they want to configure.
+ */
 class IntegrationTypeSelectType extends AbstractType
 {
     /** @var TypesRegistry */

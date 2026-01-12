@@ -51,7 +51,7 @@ class UniqueJobHandlerTest extends WebTestCase
 
         $job = new Job();
         $job->setOwnerId($existingJob->getOwnerId());
-        $job->setName($existingJob->getName().'.1');
+        $job->setName($existingJob->getName() . '.1');
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
@@ -65,7 +65,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
         $job = new Job();
-        $job->setOwnerId($existingJob->getOwnerId().'.1');
+        $job->setOwnerId($existingJob->getOwnerId() . '.1');
         $job->setName($existingJob->getName());
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
@@ -83,7 +83,7 @@ class UniqueJobHandlerTest extends WebTestCase
 
         $job = new Job();
         $job->setOwnerId($existingJob->getOwnerId());
-        $job->setName($existingJob->getName().'.1');
+        $job->setName($existingJob->getName() . '.1');
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
@@ -99,7 +99,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
         $job = new Job();
-        $job->setOwnerId($existingJob->getOwnerId().'.1');
+        $job->setOwnerId($existingJob->getOwnerId() . '.1');
         $job->setName($existingJob->getName());
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
@@ -115,7 +115,7 @@ class UniqueJobHandlerTest extends WebTestCase
 
         $job = new Job();
         $job->setOwnerId($existingJob->getOwnerId());
-        $job->setName($existingJob->getName().'.1');
+        $job->setName($existingJob->getName() . '.1');
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
@@ -129,7 +129,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
         $job = new Job();
-        $job->setOwnerId($existingJob->getOwnerId().'.1');
+        $job->setOwnerId($existingJob->getOwnerId() . '.1');
         $job->setName($existingJob->getName());
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
@@ -147,7 +147,7 @@ class UniqueJobHandlerTest extends WebTestCase
 
         $job = new Job();
         $job->setOwnerId($existingJob->getOwnerId());
-        $job->setName($existingJob->getName().'.1');
+        $job->setName($existingJob->getName() . '.1');
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
@@ -163,7 +163,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
         $job = new Job();
-        $job->setOwnerId($existingJob->getOwnerId().'.1');
+        $job->setOwnerId($existingJob->getOwnerId() . '.1');
         $job->setName($existingJob->getName());
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);

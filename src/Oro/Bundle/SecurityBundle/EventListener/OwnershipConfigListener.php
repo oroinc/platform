@@ -6,6 +6,14 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
+/**
+ * Handles entity configuration changes related to ownership metadata.
+ *
+ * This listener monitors entity configuration changes and manages the ownership
+ * metadata cache. It clears the cache when ownership configuration changes and
+ * warms up the cache for new or modified entities to ensure ownership decisions
+ * are based on current configuration.
+ */
 class OwnershipConfigListener
 {
     /** @var OwnershipMetadataProviderInterface */

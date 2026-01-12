@@ -8,6 +8,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Form type for configuring data audit filters in segments and grids.
+ *
+ * This form type handles the configuration of audit-specific filters, allowing users to filter
+ * entities based on their audit history. It provides two main filter components: `auditFilter`
+ * for audit-specific criteria (field changes, timestamps) and `filter` for standard filtering
+ * options. The form validates the structure of filter data to ensure proper query construction
+ * when filtering by audit history.
+ */
 class FilterType extends AbstractType
 {
     public const NAME = 'oro_type_audit_filter';

@@ -277,7 +277,7 @@ class PdoMysql extends BaseDriver
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
             QueryBuilderUtil::checkIdentifier($valueParameter);
-            $result->add($qb->expr()->like($joinAlias. '.value', ':' . $valueParameter));
+            $result->add($qb->expr()->like($joinAlias . '.value', ':' . $valueParameter));
             $qb->setParameter($valueParameter, "%$value%");
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {

@@ -8,6 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for configuring reminder intervals.
+ *
+ * This form type provides fields for specifying a reminder interval, consisting of
+ * a numeric value and a unit of time (minute, hour, day, or week). It is used to
+ * allow users to define how frequently a reminder should be triggered, and is
+ * typically embedded within the {@see ReminderType} form.
+ */
 class ReminderIntervalType extends AbstractType
 {
     #[\Override]

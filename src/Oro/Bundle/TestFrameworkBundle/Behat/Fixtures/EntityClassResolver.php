@@ -5,6 +5,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
+/**
+ * Resolves entity class names from human-readable entity names.
+ *
+ * This resolver converts entity names (in plural or singular form, e.g., "Tasks", "Calendar Event")
+ * to their corresponding fully qualified class names using the entity alias resolver and inflector.
+ */
 class EntityClassResolver
 {
     /**

@@ -7,6 +7,13 @@ use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\QueueCollection;
 
+/**
+ * Ensures that message queues are created on the broker before message consumption begins.
+ *
+ * This extension is responsible for creating queues on the message broker during the consumption
+ * process. It tracks which queues have already been created to avoid redundant creation attempts,
+ * and logs the queue creation process for debugging purposes.
+ */
 class CreateQueueExtension extends AbstractExtension
 {
     /** @var DriverInterface */

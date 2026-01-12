@@ -4,6 +4,12 @@ namespace Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Registers condition services tagged with `oro_action.condition` into the expression extension.
+ *
+ * This compiler pass collects all services tagged with the condition tag and
+ * registers them with the expression extension factory for use in action conditions.
+ */
 class ConditionPass extends AbstractPass
 {
     public const EXPRESSION_TAG = 'oro_action.condition';

@@ -323,7 +323,8 @@ class Form extends Element
 
         if (!$field && in_array('control-group-choice', $classes, true)) {
             $checkboxes = $sndParent->find('css', '.controls');
-            if ($checkboxes
+            if (
+                $checkboxes
                 && (
                     $sndParent->findAll('css', 'input[type=radio]')
                     || $sndParent->findAll('css', 'input[type=checkbox]')
@@ -379,7 +380,8 @@ class Form extends Element
             return $this->elementFactory->wrapElement('ExternalFileField', $field);
         }
 
-        if ('datetime' === $type
+        if (
+            'datetime' === $type
             || (string) $field->getAttribute('data-bound-view') === 'oroui/js/app/views/datepicker/datepicker-view'
             || in_array('datepicker-input', $classes, true)
         ) {
@@ -477,8 +479,9 @@ class Form extends Element
             }
         }
 
-        if ('orodigitalasset/js/app/views/digital-asset-choose-form-view'
-            === (string) $field->getParent()->getAttribute('data-bound-view')
+        if (
+            'orodigitalasset/js/app/views/digital-asset-choose-form-view'
+                === (string) $field->getParent()->getAttribute('data-bound-view')
         ) {
             return $this->elementFactory->wrapElement('DigitalAssetManagerField', $field);
         }

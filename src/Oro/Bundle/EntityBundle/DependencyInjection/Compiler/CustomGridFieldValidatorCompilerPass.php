@@ -6,6 +6,13 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers custom grid field validators in the dependency injection container.
+ *
+ * This compiler pass collects all services tagged with `oro_entity.custom_grid_field_validator`
+ * and registers them with the entity field validator manager. It enables the system to validate
+ * custom entity fields in datagrids using pluggable validators.
+ */
 class CustomGridFieldValidatorCompilerPass implements CompilerPassInterface
 {
     #[\Override]

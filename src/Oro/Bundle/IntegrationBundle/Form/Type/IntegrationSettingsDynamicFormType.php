@@ -6,6 +6,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for dynamically building integration-specific settings forms.
+ *
+ * This form type accepts a `fields` option containing field definitions and dynamically
+ * creates form fields based on those definitions. This allows integration providers to define
+ * custom settings forms without creating dedicated form type classes, enabling flexible
+ * configuration of integration-specific parameters.
+ */
 class IntegrationSettingsDynamicFormType extends AbstractType
 {
     public const NAME = 'oro_integration_integration_settings_type';

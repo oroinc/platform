@@ -286,7 +286,8 @@ class ActivityListChainProvider implements ResetInterface
             }
 
             $template = $provider->getTemplate();
-            if ($provider instanceof ActivityListGroupProviderInterface
+            if (
+                $provider instanceof ActivityListGroupProviderInterface
                 && $config->get('oro_activity_list.grouping')
             ) {
                 $template = $provider->getGroupedTemplate();

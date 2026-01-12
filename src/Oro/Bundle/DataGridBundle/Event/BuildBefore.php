@@ -7,11 +7,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class BuildBefore
- * @package Oro\Bundle\DataGridBundle\Event
+ * Dispatched before the datagrid builder starts building the datagrid.
  *
- * This event dispatched before datagrid builder starts build datagrid
- * Listeners could apply validation of config and provide changes of config
+ * This event is fired after the datagrid instance is created but before the builder processes the configuration.
+ * Event listeners can validate and modify the datagrid configuration and access the datagrid instance
+ * to apply customizations before the build process begins.
  */
 class BuildBefore extends Event implements GridEventInterface, GridConfigurationEventInterface
 {

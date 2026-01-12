@@ -69,7 +69,8 @@ class ConfigurableLoggerPass implements CompilerPassInterface
 
     private function addDisableDeprecationsWrapper(ContainerBuilder $container, string $handlerId): void
     {
-        if (!$container->hasParameter('oro_platform.collect_deprecations')
+        if (
+            !$container->hasParameter('oro_platform.collect_deprecations')
             || $container->getParameter('oro_platform.collect_deprecations')
         ) {
             return;

@@ -57,7 +57,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('enable_hmr')
                             ->info(
-                                'Enable Webpack Hot Module Replacement. '.
+                                'Enable Webpack Hot Module Replacement. ' .
                                 'To activate HMR run `oro:assets:build --hot`'
                             )
                             ->defaultValue('%kernel.debug%')

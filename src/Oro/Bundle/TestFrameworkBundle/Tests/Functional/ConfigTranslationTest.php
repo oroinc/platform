@@ -51,7 +51,8 @@ class ConfigTranslationTest extends WebTestCase
             foreach ($fieldConfigs as $fieldConfig) {
                 $fieldName = $fieldConfig->getId()->getFieldName();
                 $extendFieldConfig = $this->configManager->getFieldConfig('extend', $entityClass, $fieldName);
-                if ($extendFieldConfig->has('target_entity')
+                if (
+                    $extendFieldConfig->has('target_entity')
                     && $this->isTestEntity($extendFieldConfig->get('target_entity'))
                 ) {
                     continue;
@@ -161,7 +162,8 @@ class ConfigTranslationTest extends WebTestCase
         $associationTranslatedLabel
     ) {
         // label format is "field label (entity label or entity plural label)"
-        if (false === strpos($associationTranslatedLabel, 'extend.entity.test')
+        if (
+            false === strpos($associationTranslatedLabel, 'extend.entity.test')
             && (
                 false !== strpos($associationTranslatedLabel, '.label (')
                 || $this->endsWith($associationTranslatedLabel, '.entity_label)')
@@ -185,7 +187,8 @@ class ConfigTranslationTest extends WebTestCase
         $fieldName,
         $fieldTranslatedLabel
     ) {
-        if (!$this->isTestLabel($fieldTranslatedLabel)
+        if (
+            !$this->isTestLabel($fieldTranslatedLabel)
             && $this->endsWith($fieldTranslatedLabel, '.label')
         ) {
             $missingTranslationKeys[] = $fieldTranslatedLabel

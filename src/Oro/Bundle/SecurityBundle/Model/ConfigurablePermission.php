@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Model;
 
+/**
+ * Represents a configurable permission with entity, capability, and workflow restrictions.
+ *
+ * This model class defines which permissions are configurable for entities, capabilities,
+ * and workflows. It allows fine-grained control over which ACL permissions can be modified
+ * by administrators, with support for default behavior and per-entity/capability/workflow
+ * configuration overrides.
+ */
 class ConfigurablePermission
 {
     /** @var string */

@@ -6,6 +6,12 @@ use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 
+/**
+ * Event dispatched to trigger notifications when a workflow transition is executed.
+ *
+ * This event extends the base notification event to provide workflow-specific context,
+ * including the transition record and the user who performed the transition.
+ */
 class WorkflowNotificationEvent extends NotificationEvent
 {
     /** @var WorkflowTransitionRecord */

@@ -9,6 +9,14 @@ use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Handles post-migration cleanup for removed marketing-related bundles.
+ *
+ * This listener is triggered after database migrations are applied. It checks if certain
+ * marketing-related bundles (Tracking, MarketingList, Campaign) are enabled in the application.
+ * If a bundle is not enabled, it schedules a cleanup migration to remove the associated
+ * database tables and configurations for that bundle.
+ */
 class CleanupMarketingPostUpMigrationListener
 {
     public const TRACKING_BUNDLE_NAME = 'OroTrackingBundle';

@@ -265,7 +265,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
                 $namespace = $this->getNamespace($this->import);
             }
             if ($namespace) {
-                $replacement = $namespace.self::NAMESPACE_SUFFIX;
+                $replacement = $namespace . self::NAMESPACE_SUFFIX;
             }
 
             $id = substr_replace($id, $replacement, 0, strlen(self::NAMESPACE_PLACEHOLDER));

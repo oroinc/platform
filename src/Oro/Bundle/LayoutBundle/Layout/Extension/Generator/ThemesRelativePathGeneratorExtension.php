@@ -34,7 +34,8 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
         if (is_array($source) && $file && array_key_exists($actionsKey, $source)) {
             $source[$actionsKey] = array_map(function ($actionDefinition) use ($file) {
                 $actionName = is_array($actionDefinition) ? key($actionDefinition) : '';
-                if (in_array($actionName, [self::ACTION_SET_BLOCK_THEME, self::ACTION_SET_FORM_THEME], true)
+                if (
+                    in_array($actionName, [self::ACTION_SET_BLOCK_THEME, self::ACTION_SET_FORM_THEME], true)
                     && array_key_exists(self::THEMES_KEY, $actionDefinition[$actionName])
                 ) {
                     $themes = array_map(function ($theme) use ($file) {
@@ -60,7 +61,7 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
     {
         if ($theme && !str_contains($theme, ':') && !str_starts_with($theme, '/') && !str_starts_with($theme, '@')) {
             $directoryPath = \dirname($file);
-            $absolutePath = realpath($directoryPath.'/'.$theme);
+            $absolutePath = realpath($directoryPath . '/' . $theme);
             if ($absolutePath) {
                 $theme = $this->getNamespacedThemeName($directoryPath, $absolutePath) ?? $absolutePath;
             }

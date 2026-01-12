@@ -280,7 +280,8 @@ class EntityIdHelper
         $setterName = 'set' . $this->camelize($propertyName);
         if ($reflClass->hasMethod($setterName)) {
             $setter = $reflClass->getMethod($setterName);
-            if ($setter->isPublic()
+            if (
+                $setter->isPublic()
                 && $setter->getNumberOfParameters() > 0
                 && $setter->getNumberOfRequiredParameters() <= 1
             ) {

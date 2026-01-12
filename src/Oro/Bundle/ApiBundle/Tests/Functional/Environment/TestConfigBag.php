@@ -134,7 +134,8 @@ class TestConfigBag implements ConfigBagInterface
         array $processedFields
     ): ?string {
         foreach ($fields as $field) {
-            if ($fieldConfigs[$field][ConfigUtil::PROPERTY_PATH] === $propertyPath
+            if (
+                $fieldConfigs[$field][ConfigUtil::PROPERTY_PATH] === $propertyPath
                 && !\in_array($field, $processedFields, true)
             ) {
                 return $field;

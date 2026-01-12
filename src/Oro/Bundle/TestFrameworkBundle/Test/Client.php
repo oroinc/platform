@@ -226,7 +226,8 @@ class Client extends BaseKernelBrowser
     protected function filterRequest(InternalRequest $request): Request
     {
         $httpRequest = parent::filterRequest($request);
-        if (str_starts_with($httpRequest->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded')
+        if (
+            str_starts_with($httpRequest->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded')
             && \is_string($httpRequest->getContent())
             && \in_array(
                 strtoupper($httpRequest->server->get('REQUEST_METHOD', 'GET')),

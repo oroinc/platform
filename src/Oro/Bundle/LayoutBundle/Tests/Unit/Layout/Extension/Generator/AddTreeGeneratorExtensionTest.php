@@ -35,8 +35,8 @@ class AddTreeGeneratorExtensionTest extends TestCase
 
     public function prepareDataProvider(): array
     {
-        $source = Yaml::parse(file_get_contents(__DIR__.'/data/layout.yml'))['layouts'];
-        $sourceMultiple = Yaml::parse(file_get_contents(__DIR__.'/data/layout_multiple_add_tree.yml'))['layouts'];
+        $source = Yaml::parse(file_get_contents(__DIR__ . '/data/layout.yml'))['layouts'];
+        $sourceMultiple = Yaml::parse(file_get_contents(__DIR__ . '/data/layout_multiple_add_tree.yml'))['layouts'];
 
         return [
             'tree' => [

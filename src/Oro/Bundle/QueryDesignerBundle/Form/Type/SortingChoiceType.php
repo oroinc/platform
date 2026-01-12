@@ -6,6 +6,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting column sorting direction in query designer.
+ *
+ * This form type provides a choice field for specifying the sorting direction (ascending or descending)
+ * for columns in a query designer query. It offers a user-friendly interface with translatable labels
+ * for the available sorting options.
+ */
 class SortingChoiceType extends AbstractType
 {
     public const NAME = 'oro_sorting_choice';

@@ -121,7 +121,8 @@ class WorkflowEntityValidator extends ConstraintValidator
             $fieldName = $field['name'];
             $isEnumerableType = ExtendHelper::isEnumerableType($field['type']);
             // skip field, its a partially omitted one
-            if (!(isset($originalData[$fieldName]) || \array_key_exists($fieldName, $originalData))
+            if (
+                !(isset($originalData[$fieldName]) || \array_key_exists($fieldName, $originalData))
                 && !($isEnumerableType && isset($originalData['serialized_data'][$fieldName]))
             ) {
                 continue;

@@ -120,7 +120,8 @@ class SystemConfigurationPass implements CompilerPassInterface
     private function replaceServiceIdsWithDefinitions(ContainerBuilder $containerBuilder, array $configSettings): array
     {
         foreach ($configSettings as &$configSetting) {
-            if (isset($configSetting[self::VALUE_KEY])
+            if (
+                isset($configSetting[self::VALUE_KEY])
                 && \is_string($configSetting[self::VALUE_KEY])
                 && str_starts_with($configSetting[self::VALUE_KEY], '@')
             ) {

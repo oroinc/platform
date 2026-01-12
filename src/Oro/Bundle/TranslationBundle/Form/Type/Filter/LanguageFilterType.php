@@ -9,6 +9,13 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Form type for filtering languages in datagrids.
+ *
+ * Extends the entity filter type to provide language-specific filtering capabilities.
+ * Formats language codes using the LanguageCodeFormatter and sorts the available language
+ * choices alphabetically for improved user experience in filter dropdowns.
+ */
 class LanguageFilterType extends AbstractType
 {
     public const NAME = 'oro_translation_filter_language';

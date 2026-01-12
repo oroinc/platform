@@ -10,6 +10,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * API form type for handling related entity references.
+ *
+ * This type manages the relationship between entities in API requests, accepting
+ * entity ID and class information. It validates that the entity class exists and
+ * is manageable by Doctrine, and uses a data transformer to convert between API
+ * format and entity references.
+ */
 class RelatedEntityApiType extends AbstractType
 {
     /** @var DataTransformerInterface */

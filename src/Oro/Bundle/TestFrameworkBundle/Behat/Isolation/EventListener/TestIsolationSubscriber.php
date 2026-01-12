@@ -147,8 +147,10 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     public function beforeFeature(BeforeFeatureTested $event)
     {
-        if (array_search('behat-test-env', $event->getFeature()->getTags()) &&
-            $this->kernel->getEnvironment() !== 'behat_test') {
+        if (
+            array_search('behat-test-env', $event->getFeature()->getTags()) &&
+            $this->kernel->getEnvironment() !== 'behat_test'
+        ) {
             $this->output->writeln(
                 '<error>Tests tagged by @behat-test-env work only in the behat_test application environment</error>'
             );

@@ -131,7 +131,8 @@ class AssociationMetadata extends PropertyMetadata
      */
     public function getTargetMetadata(?string $targetClassName = null): ?EntityMetadata
     {
-        if (null === $this->targetMetadataAccessor
+        if (
+            null === $this->targetMetadataAccessor
             || !$this->associationPath
             || !$targetClassName
             || ($targetClassName === $this->targetClass && !$this->targetMetadataAccessor->isFullMode())

@@ -22,7 +22,7 @@ class SanitizeSqlDumpTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->outputFile = $this->getTempFile('sanitize_sql_dump', 'sanitize_dump'. '.sql');
+        $this->outputFile = $this->getTempFile('sanitize_sql_dump', 'sanitize_dump' . '.sql');
         $metadataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
         $metadataProvider->setEntitiesToFilter([TestSanitizable::class]);
     }
@@ -157,7 +157,7 @@ class SanitizeSqlDumpTest extends WebTestCase
 
     private function getExpectedFromFile(string $file): string
     {
-        $filePath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__. '/DataFixtures/expected_dump_results/' . $file);
+        $filePath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__ . '/DataFixtures/expected_dump_results/' . $file);
 
         return trim(file_get_contents($filePath));
     }

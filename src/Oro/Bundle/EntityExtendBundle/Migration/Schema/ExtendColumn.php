@@ -43,7 +43,8 @@ class ExtendColumn extends Column
             if ($oroOptions instanceof OroOptions) {
                 $oroOptions = $oroOptions->toArray();
             }
-            if (!isset($options['type'])
+            if (
+                !isset($options['type'])
                 && !isset($oroOptions[ExtendOptionsManager::TYPE_OPTION])
                 && null !== $this->getType()
             ) {

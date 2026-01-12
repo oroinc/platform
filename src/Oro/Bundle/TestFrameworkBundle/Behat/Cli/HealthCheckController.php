@@ -14,6 +14,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Handles the `--check` CLI option to run health checks on the test environment.
+ *
+ * This controller manages the execution of health checkers (such as code style and fixture checks)
+ * and displays their results. It allows filtering which health checkers to run via the `--check` option.
+ */
 class HealthCheckController implements Controller, HealthCheckerAwareInterface
 {
     use HealthCheckerAwareTrait;

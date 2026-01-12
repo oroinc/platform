@@ -4,6 +4,13 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
 
+/**
+ * Provides common functionality for assembling action configuration objects.
+ *
+ * This base class implements helper methods for validating required options and safely accessing
+ * configuration values with defaults. Subclasses should extend this to create specific assemblers
+ * for different action configuration types (e.g., operations, buttons, conditions).
+ */
 abstract class AbstractAssembler
 {
     /**

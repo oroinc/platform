@@ -28,7 +28,8 @@ class LoadCustomEntities implements ProcessorInterface
         $resources = $context->getResult();
         $configs = $this->configManager->getConfigs('extend', null, true);
         foreach ($configs as $config) {
-            if ($config->is('is_extend')
+            if (
+                $config->is('is_extend')
                 && $config->is('owner', ExtendScope::OWNER_CUSTOM)
                 && ExtendHelper::isEntityAccessible($config)
             ) {

@@ -6,6 +6,13 @@ use Oro\Bundle\EntityBundle\Form\Type\EntitySelectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting taxonomy entities with autocomplete support.
+ *
+ * This form type provides an entity selection interface for taxonomy entities with autocomplete functionality.
+ * It extends the {@see EntitySelectType} to leverage existing entity selection capabilities and configures
+ * autocomplete with a placeholder for improved user experience.
+ */
 class TaxonomySelectType extends AbstractType
 {
     #[\Override]

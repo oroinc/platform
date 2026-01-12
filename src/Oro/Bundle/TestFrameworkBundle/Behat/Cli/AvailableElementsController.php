@@ -26,7 +26,7 @@ class AvailableElementsController implements Controller
                 '--elements',
                 null,
                 InputOption::VALUE_NONE,
-                'Show all available test elements.'.PHP_EOL.
+                'Show all available test elements.' . PHP_EOL .
                 'Elements can be configured by configuration behat.yml'
             )->addOption(
                 '--write-format',

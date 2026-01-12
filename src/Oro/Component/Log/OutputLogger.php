@@ -7,10 +7,11 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class OutputLogger
- * Allow log message to OutputInterface, e.g. cli
+ * Logs messages to console output with configurable verbosity and formatting.
  *
- * @package Oro\Component\Log
+ * This logger implementation writes log messages to Symfony Console {@see OutputInterface},
+ * supporting verbosity levels, indentation, and optional tag formatting for different log levels.
+ * It is particularly useful for CLI commands and console applications.
  */
 class OutputLogger extends AbstractLogger
 {

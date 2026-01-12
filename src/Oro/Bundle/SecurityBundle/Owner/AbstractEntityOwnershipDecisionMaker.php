@@ -94,7 +94,8 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
         }
 
         $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
-        if (empty($userOrganizationIds)
+        if (
+            empty($userOrganizationIds)
             || ($organizationId && !in_array($organizationId, $userOrganizationIds, true))
         ) {
             return false;
@@ -214,7 +215,8 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
         $userId = $this->getObjectId($user);
-        if ($organization
+        if (
+            $organization
             && !in_array(
                 $this->getObjectId($organization),
                 $this->treeProvider->getTree()->getUserOrganizationIds($userId),
@@ -296,7 +298,8 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
             if ($businessUnitId === $buId) {
                 return true;
             }
-            if ($deep
+            if (
+                $deep
                 && in_array(
                     $businessUnitId,
                     $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),

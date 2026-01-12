@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Fallback\Provider;
 
+/**
+ * Defines the contract for entity fallback value providers.
+ *
+ * Implementations of this interface provide fallback values for entity fields
+ * when the field value is not explicitly set. They determine which entity holds
+ * the fallback value and provide labels and entity class information for the fallback.
+ */
 interface EntityFallbackProviderInterface
 {
     /**

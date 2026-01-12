@@ -177,7 +177,8 @@ abstract class AbstractProvider implements ProviderInterface
     protected function filterDisabledNodes(array $definition): array
     {
         foreach ($definition as $key => $definitionRow) {
-            if (\is_string($definitionRow)
+            if (
+                \is_string($definitionRow)
                 && !$this->featureChecker->isResourceEnabled($definitionRow, 'configuration')
             ) {
                 unset($definition[$key]);

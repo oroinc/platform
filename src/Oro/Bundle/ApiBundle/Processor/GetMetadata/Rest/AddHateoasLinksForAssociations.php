@@ -63,7 +63,8 @@ class AddHateoasLinksForAssociations implements ProcessorInterface
                 continue;
             }
 
-            if (!$association->hasRelationshipLink(ApiDoc::LINK_SELF)
+            if (
+                !$association->hasRelationshipLink(ApiDoc::LINK_SELF)
                 && !$subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
             ) {
                 $association->addRelationshipLink(ApiDoc::LINK_SELF, new RouteLinkMetadata(
@@ -77,7 +78,8 @@ class AddHateoasLinksForAssociations implements ProcessorInterface
                 ));
             }
 
-            if (!$association->hasRelationshipLink(ApiDoc::LINK_RELATED)
+            if (
+                !$association->hasRelationshipLink(ApiDoc::LINK_RELATED)
                 && !$subresource->isExcludedAction(ApiAction::GET_SUBRESOURCE)
             ) {
                 $association->addRelationshipLink(ApiDoc::LINK_RELATED, new RouteLinkMetadata(

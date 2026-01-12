@@ -183,8 +183,8 @@ class SearchIndexRepository extends ServiceEntityRepository implements DBALPersi
             $parameterCounter++;
 
             $entityCondition = $queryBuilder->expr()->andX(
-                $queryBuilder->expr()->eq('item.entity', ':'.$parameterClassName),
-                $queryBuilder->expr()->in('item.recordId', ':'.$parameterIds)
+                $queryBuilder->expr()->eq('item.entity', ':' . $parameterClassName),
+                $queryBuilder->expr()->in('item.recordId', ':' . $parameterIds)
             );
 
             $queryBuilder->orWhere($entityCondition)

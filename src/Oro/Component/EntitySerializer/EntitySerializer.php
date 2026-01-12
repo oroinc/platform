@@ -806,7 +806,8 @@ class EntitySerializer
                         $result[$entityId][] = $items[$relatedEntityId];
                     }
                 }
-                if (null !== $limit
+                if (
+                    null !== $limit
                     && isset($result[$entityId])
                     && $config->getHasMore()
                     && \count($result[$entityId]) === $limit

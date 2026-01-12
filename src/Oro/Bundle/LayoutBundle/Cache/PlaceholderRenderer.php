@@ -39,7 +39,7 @@ class PlaceholderRenderer implements ResetInterface
 
     private function getPlaceholder(string $blockId): string
     {
-        return '<!-- PLACEHOLDER '.$blockId.' -->';
+        return '<!-- PLACEHOLDER ' . $blockId . ' -->';
     }
 
     public function renderPlaceholders(string $html): string

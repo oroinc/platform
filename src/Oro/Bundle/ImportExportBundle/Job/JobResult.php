@@ -4,6 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Job;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
+/**
+ * Encapsulates the result of an import/export job execution.
+ *
+ * This class holds the outcome of a job including success status, job ID and code,
+ * the execution context with operation counters, any failure exceptions that occurred,
+ * and a flag indicating whether the job needs redelivery. It provides a fluent interface
+ * for building the result object.
+ */
 class JobResult
 {
     /**

@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityConfigBundle\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
+/**
+ * Dispatched when an entity field is renamed.
+ *
+ * This event is triggered when a field within an entity is renamed, providing access to the entity class name,
+ * the old field name, the new field name, and the configuration manager. Listeners can use this event to update
+ * related configurations, references, or perform cleanup operations associated with the field rename.
+ */
 class RenameFieldEvent extends Event
 {
     /** @var string */

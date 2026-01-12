@@ -11,6 +11,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting the sender email address in email composition.
+ *
+ * Provides a dropdown field for selecting from available email addresses including user emails
+ * and mailbox emails, with read-only enforcement when only one option is available.
+ */
 class EmailAddressFromType extends AbstractType
 {
     public const NAME = 'oro_email_email_address_from';

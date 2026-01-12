@@ -49,7 +49,7 @@ class ExtendReflectionErrorHandler
         if (self::isInitialized()) {
             $message = "Extend entity $className autoloaded before initialization.";
         } else {
-            $message = "Extend entity $className autoloaded before initialization. ".
+            $message = "Extend entity $className autoloaded before initialization. " .
                 "For additional information run an application with debug true.";
         }
 

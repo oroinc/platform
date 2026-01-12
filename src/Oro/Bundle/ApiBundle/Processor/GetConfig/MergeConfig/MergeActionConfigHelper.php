@@ -136,7 +136,8 @@ class MergeActionConfigHelper
             ];
         } else {
             $upsertConfig = $config[ConfigUtil::UPSERT];
-            if (\array_key_exists(ConfigUtil::UPSERT_ADD, $actionUpsertConfig)
+            if (
+                \array_key_exists(ConfigUtil::UPSERT_ADD, $actionUpsertConfig)
                 && \array_key_exists(ConfigUtil::UPSERT_ADD, $upsertConfig)
             ) {
                 $config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_ADD] = array_merge(
@@ -144,7 +145,8 @@ class MergeActionConfigHelper
                     $actionUpsertConfig[ConfigUtil::UPSERT_ADD]
                 );
             }
-            if (\array_key_exists(ConfigUtil::UPSERT_REMOVE, $actionUpsertConfig)
+            if (
+                \array_key_exists(ConfigUtil::UPSERT_REMOVE, $actionUpsertConfig)
                 && \array_key_exists(ConfigUtil::UPSERT_REMOVE, $upsertConfig)
             ) {
                 $config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REMOVE] = array_merge(
@@ -153,7 +155,8 @@ class MergeActionConfigHelper
                 );
             }
         }
-        if (isset($config[ConfigUtil::UPSERT])
+        if (
+            isset($config[ConfigUtil::UPSERT])
             && ($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_DISABLE] ?? false)
             && !($actionUpsertConfig[ConfigUtil::UPSERT_DISABLE] ?? false)
         ) {

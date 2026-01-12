@@ -17,6 +17,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Handles operation form processing including validation, execution, and response generation.
+ *
+ * This handler manages the complete lifecycle of operation form submission, including
+ * form creation, request handling, operation execution, error handling, and response
+ * generation with appropriate redirects or flash messages.
+ */
 class OperationFormHandler
 {
     /** @var ContextHelper */

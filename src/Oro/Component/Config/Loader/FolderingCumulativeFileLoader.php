@@ -324,8 +324,10 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     ): bool {
         $pathKey = (string)$loader->getResource();
         $split = $this->preparedRelativeFilePaths[$pathKey];
-        if (!$split['folder'] &&
-            !$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
+        if (
+            !$split['folder'] &&
+            !$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)
+        ) {
             return false;
         }
 

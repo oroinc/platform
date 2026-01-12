@@ -5,6 +5,9 @@ namespace Oro\Bundle\ReportBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Repository for {@see Report} entities.
+ */
 class ReportRepository extends EntityRepository
 {
     /**

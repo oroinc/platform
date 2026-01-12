@@ -79,7 +79,8 @@ class SearchAclHelperCondition implements SearchAclHelperConditionInterface
             );
         }
 
-        if (($condition[0] === null && $condition[2] === null)
+        if (
+            ($condition[0] === null && $condition[2] === null)
             || ($condition[0] === null && $condition[1] === null && !$condition[4])
         ) {
             return null;

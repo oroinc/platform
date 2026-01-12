@@ -4,6 +4,12 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Defines the contract for the layout context that holds variables and data during layout building.
+ *
+ * The context provides array-like access to variables, supports resolution of variables through
+ * an options resolver, and manages a data collection for storing context-specific data.
+ */
 interface ContextInterface extends \ArrayAccess
 {
     /**

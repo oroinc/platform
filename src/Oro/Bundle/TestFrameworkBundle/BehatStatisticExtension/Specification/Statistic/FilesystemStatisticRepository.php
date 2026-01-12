@@ -27,7 +27,7 @@ class FilesystemStatisticRepository implements StatisticRepositoryInterface, Obj
      */
     public function __construct($kernelRootDir)
     {
-        $file = $kernelRootDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.self::FEATURE_DURATION_FILE;
+        $file = $kernelRootDir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . self::FEATURE_DURATION_FILE;
 
         if (!is_file($file)) {
             $this->featureDuration = [];

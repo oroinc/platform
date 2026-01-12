@@ -224,7 +224,7 @@ class TitleServiceTest extends TestCase
         $this->titleService->setPrefix('-');
         $this->titleService->loadByRoute($route);
 
-        $this->assertEquals($testTitle.' - '.$parentLabel.' - Suffix', $this->titleService->getTemplate());
+        $this->assertEquals($testTitle . ' - ' . $parentLabel . ' - Suffix', $this->titleService->getTemplate());
         $this->assertEquals($testTitle, $this->titleService->getShortTemplate());
     }
 
@@ -291,7 +291,7 @@ class TitleServiceTest extends TestCase
         $this->titleService->setPrefix('-');
         $this->titleService->loadByRoute($route);
 
-        $this->assertEquals($parentLabel.' - Suffix', $this->titleService->getTemplate());
+        $this->assertEquals($parentLabel . ' - Suffix', $this->titleService->getTemplate());
         $this->assertEquals($parentLabel, $this->titleService->getShortTemplate());
     }
 
@@ -336,7 +336,7 @@ class TitleServiceTest extends TestCase
         $this->titleService->setPrefix('-');
         $this->titleService->loadByRoute($route, $menuName);
 
-        $this->assertEquals($testTitle.' - '.$parentLabel.' - Suffix', $this->titleService->getTemplate());
+        $this->assertEquals($testTitle . ' - ' . $parentLabel . ' - Suffix', $this->titleService->getTemplate());
         $this->assertEquals($testTitle, $this->titleService->getShortTemplate());
     }
 
@@ -385,7 +385,7 @@ class TitleServiceTest extends TestCase
 
         $this->titleService->loadByRoute($childRoute);
 
-        $this->assertEquals($newChildTitle.' - '.$parentTitle, $this->titleService->getTemplate());
+        $this->assertEquals($newChildTitle . ' - ' . $parentTitle, $this->titleService->getTemplate());
         $this->assertEquals($newChildTitle, $this->titleService->getShortTemplate());
     }
 
@@ -435,7 +435,7 @@ class TitleServiceTest extends TestCase
 
         $this->titleService->loadByRoute($childRoute);
 
-        $this->assertEquals($childTitle.' - '.$parentTitle, $this->titleService->getTemplate());
+        $this->assertEquals($childTitle . ' - ' . $parentTitle, $this->titleService->getTemplate());
         $this->assertEquals($childTitle, $this->titleService->getShortTemplate());
     }
 

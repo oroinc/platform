@@ -6,6 +6,13 @@ use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\AbstractColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 
+/**
+ * Provides automatic configuration for currency-type datagrid columns.
+ *
+ * This guesser automatically configures filter options for columns that contain
+ * currency codes. It sets up a choice filter with all available currencies,
+ * allowing users to filter datagrid data by selecting one or more currencies.
+ */
 class CurrencyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     /**

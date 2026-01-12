@@ -94,9 +94,9 @@ class FixturesChecker implements HealthCheckerInterface
     private function addDetails(&$message, BeforeFeatureTested $event, $exception)
     {
         $message = sprintf(
-            $message.PHP_EOL.
-            '   Suite: %s'.PHP_EOL.
-            '   Feature: %s'.PHP_EOL.
+            $message . PHP_EOL .
+            '   Suite: %s' . PHP_EOL .
+            '   Feature: %s' . PHP_EOL .
             '   %s',
             $event->getSuite()->getName(),
             $event->getFeature()->getFile(),

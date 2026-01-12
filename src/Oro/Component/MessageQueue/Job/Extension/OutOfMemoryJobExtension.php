@@ -77,8 +77,9 @@ class OutOfMemoryJobExtension extends AbstractExtension
                     return;
                 }
 
-                if (self::$job &&
-                    (
+                if (
+                    self::$job
+                    && (
                         str_starts_with($error['message'], 'Allowed memory')
                         || str_starts_with($error['message'], 'Out of memory')
                     )

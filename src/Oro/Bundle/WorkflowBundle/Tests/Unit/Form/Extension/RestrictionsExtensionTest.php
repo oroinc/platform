@@ -44,7 +44,8 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $hasRestrictions = !empty($restrictions);
         $data = (object)[1];
 
-        if (!empty($options['data_class']) &&
+        if (
+            !empty($options['data_class']) &&
             empty($options['disable_workflow_restrictions']) &&
             $hasRestrictions
         ) {

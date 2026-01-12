@@ -82,8 +82,8 @@ class InstallOptionCommandEventListener
     ): void {
         if ($input->getOption($option) && $input->getOption($option) !== $defaultOption) {
             throw new \LogicException(
-                'Passing install command options is not supported for the test environment '.
-                'because functional tests rely on exact values. '.
+                'Passing install command options is not supported for the test environment ' .
+                'because functional tests rely on exact values. ' .
                 'To change them, correct the `oro_test_framework.install_options` configuration.'
             );
         }

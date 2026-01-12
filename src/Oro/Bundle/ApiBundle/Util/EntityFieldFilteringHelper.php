@@ -42,12 +42,14 @@ class EntityFieldFilteringHelper
 
             return $filteredFields;
         }
-        if (ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS === $exclusionPolicy
+        if (
+            ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS === $exclusionPolicy
             && $this->isExtendSystemEntity($entityClass)
         ) {
             $filteredFields = [];
             foreach ($fieldNames as $fieldName) {
-                if (\in_array($fieldName, $explicitlyConfiguredFieldNames, true)
+                if (
+                    \in_array($fieldName, $explicitlyConfiguredFieldNames, true)
                     || !$this->isCustomField($entityClass, $fieldName)
                 ) {
                     $filteredFields[] = $fieldName;

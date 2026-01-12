@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
+/**
+ * Defines the contract for entities that track their creation timestamp.
+ *
+ * Entities implementing this interface maintain a createdAt property that records
+ * when the entity was first created. This is typically managed automatically by
+ * the ORM or event listeners.
+ */
 interface CreatedAtAwareInterface
 {
     /**

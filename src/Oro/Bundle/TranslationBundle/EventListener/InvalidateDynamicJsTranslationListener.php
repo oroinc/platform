@@ -12,7 +12,7 @@ use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 class InvalidateDynamicJsTranslationListener
 {
     public function __construct(
-        private JsTranslationDumper        $translationDumper,
+        private JsTranslationDumper $translationDumper,
         private DynamicAssetVersionManager $dynamicAssetVersionManager,
     ) {
     }

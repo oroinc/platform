@@ -173,7 +173,7 @@ class SuiteConfigurationRegistry
     {
         if (!isset($this->suites[$name])) {
             throw new \InvalidArgumentException(sprintf(
-                "Suite with '%s' name does not configured\n".
+                "Suite with '%s' name does not configured\n" .
                 "Configured suites: '%s'",
                 $name,
                 implode(', ', array_keys($this->suites))

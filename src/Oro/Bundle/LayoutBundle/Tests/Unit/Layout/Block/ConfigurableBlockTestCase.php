@@ -93,7 +93,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
                 static::TYPE_NAME,
                 $id
             ],
-            'cache_key' => $id . '_' .static::TYPE_NAME . '_ad7b81dea42cf2ef7525c274471e3ce6',
+            'cache_key' => $id . '_' . static::TYPE_NAME . '_ad7b81dea42cf2ef7525c274471e3ce6',
             'translation_domain' => 'test_translation_domain',
             'option_default' => 'value',
             'option_default_false' => false,

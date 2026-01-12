@@ -285,7 +285,8 @@ HELP
         foreach ($ids as $id) {
             $hidden = true;
             foreach ($notHiddenIds as $notHiddenId) {
-                if ($id->getClassName() === $notHiddenId->getClassName()
+                if (
+                    $id->getClassName() === $notHiddenId->getClassName()
                     && $id->getFieldName() === $notHiddenId->getFieldName()
                 ) {
                     $hidden = false;
@@ -475,7 +476,8 @@ HELP
         if (!empty($scope)) {
             if (isset($data[$scope])) {
                 $res = [$scope => $data[$scope]];
-                if (!empty($attrName)
+                if (
+                    !empty($attrName)
                     && (isset($data[$scope][$attrName]) || array_key_exists($attrName, $data[$scope]))
                 ) {
                     $res = [$scope => [$attrName => $data[$scope][$attrName]]];

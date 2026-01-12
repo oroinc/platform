@@ -65,7 +65,7 @@ HELP
                     $content .= $templateTranslation->getContent();
                 }
             }
-            $output->write($template->getName() . ':'. \md5($content), true);
+            $output->write($template->getName() . ':' . \md5($content), true);
         }
 
         return Command::SUCCESS;

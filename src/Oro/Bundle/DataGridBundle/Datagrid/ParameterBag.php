@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+/**
+ * Container for datagrid parameters.
+ *
+ * This class manages parameters passed to datagrids, including filters, sorters, pagination
+ * settings, and custom parameters. It provides a consistent interface for accessing and
+ * manipulating parameter values throughout the datagrid processing lifecycle.
+ */
 class ParameterBag
 {
     public const ADDITIONAL_PARAMETERS   = '_parameters';

@@ -37,7 +37,8 @@ abstract class AbstractConfigurationProvider
             $finder->filter(
                 function ($file) use ($directoriesWhiteList) {
                     foreach ($directoriesWhiteList as $allowedDirectory) {
-                        if ($allowedDirectory &&
+                        if (
+                            $allowedDirectory &&
                             str_starts_with($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR)
                         ) {
                             return true;

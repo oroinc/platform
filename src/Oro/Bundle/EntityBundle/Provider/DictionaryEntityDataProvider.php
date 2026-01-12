@@ -92,7 +92,8 @@ class DictionaryEntityDataProvider
     private function resolveEntityClass(string $entityName): string
     {
         $entityClass = $this->entityClassNameHelper->resolveEntityClass($entityName, true);
-        if (!isset($this->additionalDictionaries[$entityClass])
+        if (
+            !isset($this->additionalDictionaries[$entityClass])
             && !\in_array($entityClass, $this->dictionaryProvider->getSupportedEntityClasses(), true)
         ) {
             throw new RuntimeException(sprintf('The "%s" entity is not supported.', $entityClass));

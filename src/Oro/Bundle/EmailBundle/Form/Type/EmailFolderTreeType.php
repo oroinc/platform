@@ -11,6 +11,12 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for hierarchical email folder selection.
+ *
+ * Provides a form field for selecting email folders with support for nested folder hierarchies,
+ * including folder synchronization settings and recursive subfolder handling.
+ */
 class EmailFolderTreeType extends AbstractType
 {
     #[\Override]

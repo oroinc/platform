@@ -9,6 +9,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for widget date range input with start and end date fields.
+ *
+ * This form type provides a compound field for selecting date ranges in widget
+ * configurations. It creates separate start and end date inputs with customizable
+ * field options, allowing widgets to filter data by date ranges. The form handles
+ * both field rendering and data transformation for date range values.
+ */
 class WidgetDateRangeValueType extends AbstractType
 {
     public const NAME = 'oro_type_widget_date_range_value';

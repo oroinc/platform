@@ -48,7 +48,8 @@ class UnderlyingAclCache
             $this->entityBatches[$type] = [];
         }
 
-        if (!array_key_exists($type, $this->loadedBatches)
+        if (
+            !array_key_exists($type, $this->loadedBatches)
             || !array_key_exists($batchNumber, $this->loadedBatches[$type])
         ) {
             $batch = $batchCacheItem->isHit() ? $batchCacheItem->get() : [];
@@ -116,7 +117,8 @@ class UnderlyingAclCache
             }
             $this->cache->deleteItem($this->normalizeCacheKey($type));
 
-            if (array_key_exists($type, $this->loadedBatches)
+            if (
+                array_key_exists($type, $this->loadedBatches)
                 && array_key_exists($batchNumber, $this->loadedBatches[$type])
             ) {
                 unset($this->loadedBatches[$type][$batchNumber]);

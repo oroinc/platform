@@ -183,7 +183,8 @@ class ExtendOptionsManager
             $this->validateOption($objectKey, $scope, $values);
             if (isset($this->options[$objectKey][$scope]) && is_array($values)) {
                 foreach ($values as $attrName => $val) {
-                    if ($this->isAppend($objectKey, $scope, $attrName)
+                    if (
+                        $this->isAppend($objectKey, $scope, $attrName)
                         && isset($this->options[$objectKey][$scope][$attrName])
                     ) {
                         $this->options[$objectKey][$scope][$attrName] = array_merge(
@@ -303,7 +304,8 @@ class ExtendOptionsManager
     {
         $this->options = array_filter($this->options, static function ($options, $key) {
             // Filter only columns with only extend options set
-            if (empty($options['extend'])
+            if (
+                empty($options['extend'])
                 || !str_contains($key, '!')
                 || count(array_diff(array_keys($options), ['extend', '_type'])) > 0
             ) {

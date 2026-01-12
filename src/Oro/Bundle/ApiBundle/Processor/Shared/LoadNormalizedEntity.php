@@ -75,7 +75,8 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setParentAction($context->getAction());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
-        if ($context->hasResult()
+        if (
+            $context->hasResult()
             && (
                 $this->reuseExistingEntity
                 || (

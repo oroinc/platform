@@ -14,6 +14,13 @@ use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * Provides common functionality for updating note associations after entity class renames.
+ *
+ * This base class handles the migration of note association configurations when entity classes are renamed,
+ * ensuring that existing note associations continue to work with the new entity names.
+ * Subclasses must provide the mapping of old entity class names to new ones.
+ */
 abstract class UpdateNoteAssociationKindForRenamedEntitiesMigration implements
     Migration,
     ExtendExtensionAwareInterface,

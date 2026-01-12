@@ -4,6 +4,15 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
+/**
+ * Handles workflow step configuration normalization.
+ *
+ * Processes raw step configurations from workflow definitions, ensuring each step has a unique name
+ * and valid transitions. Manages the workflow's starting point by identifying steps marked as start steps
+ * and propagating the `is_start` flag to their allowed transitions. Validates that all referenced transitions
+ * exist in the workflow configuration. This handler is essential for preparing workflow step definitions
+ * for use by the workflow engine and ensures referential integrity within the workflow structure.
+ */
 class StepHandler extends AbstractHandler
 {
     #[\Override]

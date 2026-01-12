@@ -6,7 +6,10 @@ use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
 
 /**
- * Autocomplete search handler for users.
+ * Autocomplete search handler for users with avatar support.
+ *
+ * Extends {@see FullNameSearchHandler} to enrich user search results with avatar images
+ * using {@see PictureSourcesProviderInterface} for responsive picture sources.
  */
 class UserSearchHandler extends FullNameSearchHandler
 {

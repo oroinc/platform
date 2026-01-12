@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Implements the builder interface for constructing layout blocks.
+ *
+ * This class provides methods for configuring and building layout blocks, including setting block types, options,
+ * and managing the block hierarchy.
+ * It serves as the primary interface for programmatically constructing layout structures.
+ */
 final class BlockBuilder implements BlockBuilderInterface
 {
     /** @var LayoutManipulatorInterface */

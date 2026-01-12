@@ -6,6 +6,14 @@ use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Applies custom sorting to widget data grid queries based on widget configuration.
+ *
+ * This listener intercepts ORM query builder events and modifies the `ORDER BY` clause
+ * according to the `sortBy` option configured in widget options. It validates that the
+ * specified property exists in the entity metadata before applying the sort order,
+ * ensuring safe and predictable sorting behavior for dashboard widgets.
+ */
 class WidgetSortByListener
 {
     /** @var WidgetConfigs */

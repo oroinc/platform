@@ -45,7 +45,8 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
             return false;
         }
 
-        if ($extendConfig->has('target_entity')
+        if (
+            $extendConfig->has('target_entity')
             && !ExtendHelper::isEntityAccessible(
                 $this->configManager->getEntityConfig('extend', $extendConfig->get('target_entity'))
             )

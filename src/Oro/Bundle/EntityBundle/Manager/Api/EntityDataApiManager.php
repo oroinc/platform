@@ -8,6 +8,13 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Manages entity field updates through the API with authorization checks.
+ *
+ * This manager handles `PATCH` requests to update entity fields, performing authorization
+ * checks to ensure the user has `EDIT` permission on the entity before allowing field updates.
+ * It delegates the actual field update to the {@see EntityFieldManager}.
+ */
 class EntityDataApiManager
 {
     /** @var  EntityFieldManager */

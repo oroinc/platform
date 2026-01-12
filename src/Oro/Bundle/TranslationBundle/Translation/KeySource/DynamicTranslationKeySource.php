@@ -5,6 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Translation\KeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
+/**
+ * Dynamic translation key source that allows configuration after instantiation.
+ *
+ * Implements the translation key source interface with support for deferred configuration.
+ * Allows setting a key template and data after object creation through the configure() method,
+ * enabling flexible construction patterns. Validates that all required keys from the template
+ * are present in the provided data before allowing use.
+ */
 class DynamicTranslationKeySource implements TranslationKeySourceInterface
 {
     /**

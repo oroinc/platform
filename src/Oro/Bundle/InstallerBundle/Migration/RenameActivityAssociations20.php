@@ -59,7 +59,8 @@ class RenameActivityAssociations20
         foreach ($rows as $row) {
             $className = $row['class_name'];
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
-            if (!empty($data['grouping']['groups'])
+            if (
+                !empty($data['grouping']['groups'])
                 && in_array(ActivityScope::GROUP_ACTIVITY, $data['grouping']['groups'], true)
             ) {
                 $activityClassNames[] = $className;

@@ -6,6 +6,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
+/**
+ * Filters entity and field configurations based on their initial state.
+ *
+ * This filter compares the current state of entity and field configurations against their
+ * initial states and determines whether a configuration should be included in the result set.
+ * It filters out configurations that have not changed from their initial state, unless the
+ * initial state was 'active' or the configuration was deleted.
+ */
 class ByInitialStateFilter extends AbstractFilter
 {
     /**

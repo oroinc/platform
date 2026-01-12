@@ -32,7 +32,8 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
         array $config = [],
         array $options = []
     ): mixed {
-        if (null === $value
+        if (
+            null === $value
             && isset($config['converter_attributes']['default_selected'])
             && \is_array($config['converter_attributes']['default_selected'])
         ) {
@@ -48,7 +49,8 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
             $value['value']['end'] = $end->format('Y-m-d H:i:s');
         }
 
-        if (isset($value['value']['start'], $value['value']['end'])
+        if (
+            isset($value['value']['start'], $value['value']['end'])
             && $value['value']['start'] > $value['value']['end']
         ) {
             $end = $value['value']['end'];
@@ -62,7 +64,8 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
     #[\Override]
     public function getFormValue(array $config, mixed $value): mixed
     {
-        if (null === $value
+        if (
+            null === $value
             && isset($config['converter_attributes']['default_selected'])
             && \is_array($config['converter_attributes']['default_selected'])
         ) {

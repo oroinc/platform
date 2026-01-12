@@ -22,9 +22,11 @@ class OriginalFileNamesConfigurationListener
         $changeSet = $event->getChangeSet();
         $request = $this->requestStack->getCurrentRequest();
         foreach ($changeSet as $configKey => $change) {
-            if ($configKey === self::ATTACHMENT_ORIGINAL_FILE_NAMES_ENABLED
+            if (
+                $configKey === self::ATTACHMENT_ORIGINAL_FILE_NAMES_ENABLED
                 && null !== $request
-                && $request->hasSession()) {
+                && $request->hasSession()
+            ) {
                 $request->getSession()->getFlashBag()->add(
                     'warning',
                     $this->translator->trans('oro.attachment.config.notice.storage_check_space')

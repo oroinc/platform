@@ -43,7 +43,8 @@ class RangeConstraintConverter implements ConstraintConverterInterface
 
     private function setMaxValue(Range $constraint, object $formData): void
     {
-        if (null !== $constraint->maxPropertyPath
+        if (
+            null !== $constraint->maxPropertyPath
             && null === $constraint->max
             && $this->propertyAccessor->isReadable($formData, $constraint->maxPropertyPath)
         ) {
@@ -54,7 +55,8 @@ class RangeConstraintConverter implements ConstraintConverterInterface
 
     private function setMinValue(Range $constraint, object $formData): void
     {
-        if (null !== $constraint->minPropertyPath
+        if (
+            null !== $constraint->minPropertyPath
             && null === $constraint->min
             && $this->propertyAccessor->isReadable($formData, $constraint->minPropertyPath)
         ) {

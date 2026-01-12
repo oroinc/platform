@@ -99,7 +99,8 @@ class ExpandRelatedEntities implements ProcessorInterface
         $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
         $associations = $this->splitExpandedEntities($expandedEntities);
         foreach ($associations as $fieldName => $targetExpandedEntities) {
-            if (!$definition->hasField($fieldName)
+            if (
+                !$definition->hasField($fieldName)
                 && null !== $definition->findFieldNameByPropertyPath($fieldName)
             ) {
                 continue;
@@ -261,7 +262,8 @@ class ExpandRelatedEntities implements ProcessorInterface
             }
             $existingFields = $existingTargetEntity->getFields();
             foreach ($existingFields as $existingFieldName => $existingField) {
-                if ($existingField->isMetaProperty()
+                if (
+                    $existingField->isMetaProperty()
                     && (
                         ConfigUtil::isRequiredMetaProperty($existingFieldName)
                         || ConfigUtil::isRequiredMetaProperty($existingField->getPropertyPath($existingFieldName))

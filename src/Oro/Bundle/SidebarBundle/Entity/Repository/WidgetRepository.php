@@ -6,6 +6,9 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Repository for sidebar widget entities.
+ */
 class WidgetRepository extends EntityRepository
 {
     /**

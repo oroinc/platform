@@ -71,13 +71,13 @@ abstract class AbstractConfigControllerTest extends WebTestCase
             '<option value="" selected="selected"></option> ' .
             '<option value="username">' .
             'Username' .
-            '</option> </select> '.
+            '</option> </select> ' .
             '<select required="required" name="oro_entity_config_type[extend][relation][target_title][]"' .
             ' id="oro_entity_config_type_extend_relation_target_title" >' .
             '<option value="" selected="selected"></option> ' .
             '<option value="username">' .
             'Username' .
-            '</option> </select> '.
+            '</option> </select> ' .
             '<select required="required" name="oro_entity_config_type[extend][relation][target_detailed][]"' .
             ' id="oro_entity_config_type_extend_relation_target_detailed" >' .
             '<option value="" selected="selected"></option> ' .

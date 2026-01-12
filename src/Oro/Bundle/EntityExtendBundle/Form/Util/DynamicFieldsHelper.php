@@ -105,7 +105,8 @@ class DynamicFieldsHelper
      */
     public function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
-        if ($extendConfig->has('target_entity')
+        if (
+            $extendConfig->has('target_entity')
             && !$this->featureChecker->isResourceEnabled($extendConfig->get('target_entity'), 'entities')
         ) {
             return false;

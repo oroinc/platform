@@ -7,6 +7,12 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
+/**
+ * Handles email activity grid configuration and data filtering.
+ *
+ * Listens to datagrid build events to apply email-specific filtering and data updates
+ * based on the related entity context, including special handling for user entities.
+ */
 class ActivityGridListener
 {
     /** @var EmailGridHelper */

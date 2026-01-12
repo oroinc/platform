@@ -32,10 +32,10 @@ class StrategyValidationEventListener
                     ClassUtils::getClass($violation->getRoot()),
                     $propertyPath
                 );
-                $propertyPath = ($fieldHeader ?: $propertyPath).StrategyValidationEvent::DELIMITER;
+                $propertyPath = ($fieldHeader ?: $propertyPath) . StrategyValidationEvent::DELIMITER;
             }
 
-            $event->addError($propertyPath.$violation->getMessage());
+            $event->addError($propertyPath . $violation->getMessage());
         }
     }
 }

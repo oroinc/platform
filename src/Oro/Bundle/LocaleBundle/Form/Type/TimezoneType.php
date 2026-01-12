@@ -74,7 +74,7 @@ class TimezoneType extends AbstractType
 
                 if (count($parts) > 2) {
                     $region = $parts[0];
-                    $name = $parts[1].' - '.$parts[2];
+                    $name = $parts[1] . ' - ' . $parts[2];
                 } elseif (count($parts) > 1) {
                     $region = $parts[0];
                     $name = $parts[1];

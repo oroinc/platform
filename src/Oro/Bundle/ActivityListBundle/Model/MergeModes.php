@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
+/**
+ * Defines merge mode constants for activity list merging operations.
+ */
 final class MergeModes
 {
     /**

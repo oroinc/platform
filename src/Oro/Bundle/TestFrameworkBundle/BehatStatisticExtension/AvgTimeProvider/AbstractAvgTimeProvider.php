@@ -4,6 +4,13 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider
 
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\StatisticRepository;
 
+/**
+ * Provides common functionality for calculating average execution times from test statistics.
+ *
+ * This base class manages the retrieval and calculation of average execution times for Behat tests,
+ * using historical statistics to estimate test durations. Subclasses should implement
+ * specific calculation strategies for different test granularities (e.g., features, scenarios).
+ */
 abstract class AbstractAvgTimeProvider implements StatisticRepositoryAwareInterface, AvgTimeProviderInterface
 {
     /**

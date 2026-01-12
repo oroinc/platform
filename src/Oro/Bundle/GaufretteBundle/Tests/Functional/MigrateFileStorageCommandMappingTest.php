@@ -20,7 +20,8 @@ class MigrateFileStorageCommandMappingTest extends WebTestCase
 
         $gaufretteFileSystemMap = self::getContainer()->get('knp_gaufrette.filesystem_map');
         foreach ($gaufretteFileSystemMap->getIterator() as $fileSystemName => $fileSystem) {
-            if (str_starts_with($fileSystemName, 'test_')
+            if (
+                str_starts_with($fileSystemName, 'test_')
                 || $skippedFilesystemsProvider->isFileSystemSkipped($fileSystemName)
             ) {
                 continue;

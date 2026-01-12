@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Defines the contract for creating layout-related components.
+ *
+ * A layout factory is responsible for creating and providing access to the layout registry,
+ * renderer registry, and various builders needed to construct and manipulate layouts.
+ */
 interface LayoutFactoryInterface
 {
     /**

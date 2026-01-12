@@ -75,7 +75,8 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
         // if object have owner type OWNER_TYPE_BUSINESS_UNIT, OWNER_TYPE_USER or OWNER_TYPE_ORGANIZATION.
         if (AccessLevel::SYSTEM_LEVEL === $accessLevel && $className) {
             $metadata = $this->getMetadata($className);
-            if ($metadata->hasOwner()
+            if (
+                $metadata->hasOwner()
                 && (
                     OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT === $metadata->getOwnerType()
                     || OwnershipMetadata::OWNER_TYPE_USER === $metadata->getOwnerType()
@@ -123,11 +124,13 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
             return;
         }
 
-        if (!isset(
-            $this->owningEntityNames['organization'],
-            $this->owningEntityNames['business_unit'],
-            $this->owningEntityNames['user']
-        )) {
+        if (
+            !isset(
+                $this->owningEntityNames['organization'],
+                $this->owningEntityNames['business_unit'],
+                $this->owningEntityNames['user']
+            )
+        ) {
             throw new \InvalidArgumentException(
                 'The $owningEntityNames must contains "organization", "business_unit" and "user" keys.'
             );

@@ -8,6 +8,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Copy of https://github.com/symfony/doctrine-bridge/blob/6.4/Logger/DbalLogger.php#L1
+ * phpcs:ignoreFile
  *
  * Copyright (c) 2004-present Fabien Potencier
  *

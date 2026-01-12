@@ -122,7 +122,8 @@ class RenameExtendedManyToOneAssociation20
                 $relationPrefix = sprintf('manyToOne|%s|', $entityClass);
                 $relations = $data['extend']['relation'];
                 foreach ($relations as $relationName => $relation) {
-                    if (str_starts_with($relationName, $relationPrefix)
+                    if (
+                        str_starts_with($relationName, $relationPrefix)
                         && array_key_exists('owner', $relation)
                         && $relation['owner']
                         && array_key_exists('target_entity', $relation)

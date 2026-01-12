@@ -53,7 +53,7 @@ abstract class MaintenanceModeIsolator implements IsolatorInterface
     {
         $command = [
             $this->phpExecutablePath,
-            realpath($this->kernel->getProjectDir()).DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'console',
+            realpath($this->kernel->getProjectDir()) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'console',
             $name,
             '-n',
             sprintf('--env=%s', $this->kernel->getEnvironment()),

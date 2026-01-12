@@ -61,7 +61,8 @@ abstract class AbstractButtonProviderExtension implements
         }
 
         // Skip if custom buttons group defined
-        if ($groups &&
+        if (
+            $groups &&
             !in_array(ButtonInterface::DEFAULT_GROUP, $groups, true) &&
             !in_array('datagridRowAction', $groups, true)
         ) {

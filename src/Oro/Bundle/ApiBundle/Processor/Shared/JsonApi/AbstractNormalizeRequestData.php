@@ -186,7 +186,8 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     ): mixed {
         // keep the id of the primary and an included entity as is
         $includedEntities = $this->context->getIncludedEntities();
-        if (null !== $includedEntities
+        if (
+            null !== $includedEntities
             && (
                 $includedEntities->isPrimaryEntity($entityClass, $entityId)
                 || null !== $includedEntities->get($entityClass, $entityId)

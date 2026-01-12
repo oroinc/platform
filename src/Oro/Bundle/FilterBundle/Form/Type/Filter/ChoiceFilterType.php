@@ -7,6 +7,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for choice filters.
+ *
+ * This form type provides a filter interface for selecting from a list of predefined
+ * choices. It supports `contains` and `not contains` operators, allowing users to
+ * filter records based on whether they match or exclude specific choice values.
+ * The type extends {@see AbstractChoiceType} and provides options for populating default
+ * values, handling null values, and applying CSS classes to the filter.
+ */
 class ChoiceFilterType extends AbstractChoiceType
 {
     public const TYPE_CONTAINS     = 1;

@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Provides common functionality for actions that create or manipulate DateTime objects.
+ *
+ * This base class handles the execution flow for date-related actions, setting the created DateTime object
+ * to a context attribute. Subclasses must implement the `createDateTime` method to define how the DateTime object
+ * should be created or calculated.
+ */
 abstract class AbstractDateAction extends AbstractAction
 {
     /**

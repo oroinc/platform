@@ -115,7 +115,8 @@ class WorkflowAssembler extends BaseAbstractAssembler implements ServiceSubscrib
      */
     protected function prepareDefaultStartTransition(WorkflowDefinition $workflowDefinition, array $configuration)
     {
-        if ($workflowDefinition->getStartStep()
+        if (
+            $workflowDefinition->getStartStep()
             && !array_key_exists(
                 TransitionManager::DEFAULT_START_TRANSITION_NAME,
                 $configuration[WorkflowConfiguration::NODE_TRANSITIONS]
@@ -125,8 +126,7 @@ class WorkflowAssembler extends BaseAbstractAssembler implements ServiceSubscrib
             if (!array_key_exists(
                 $startTransitionDefinitionName,
                 $configuration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS]
-            )
-            ) {
+            )) {
                 $configuration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS][$startTransitionDefinitionName] =
                     [];
             }

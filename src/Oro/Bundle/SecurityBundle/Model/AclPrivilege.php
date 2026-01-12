@@ -4,6 +4,14 @@ namespace Oro\Bundle\SecurityBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Represents an ACL privilege for an entity or capability.
+ *
+ * This model class encapsulates all information about a privilege, including the
+ * identity (entity or capability), permissions, group, extension key, description,
+ * category, and field-level permissions. It is used to manage and display ACL
+ * privilege configurations in the system.
+ */
 class AclPrivilege
 {
     /**

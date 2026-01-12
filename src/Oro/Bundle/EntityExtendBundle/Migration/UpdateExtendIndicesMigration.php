@@ -113,7 +113,8 @@ class UpdateExtendIndicesMigration implements
     protected function buildIndex($columnName, $options, $className, $table)
     {
         $columnType = $this->fieldTypeHelper->getUnderlyingType($options[ExtendOptionsManager::TYPE_OPTION]);
-        if ($this->fieldTypeHelper->isRelation($columnType)
+        if (
+            $this->fieldTypeHelper->isRelation($columnType)
             || \is_a(Type::getType($columnType), TextType::class, true)
             || \is_a(Type::getType($columnType), JsonType::class, true)
         ) {
@@ -124,7 +125,8 @@ class UpdateExtendIndicesMigration implements
             $className,
             $columnName
         );
-        if ($this->isEnabled($options)
+        if (
+            $this->isEnabled($options)
             && $this->isExtended($options)
             && !$table->hasIndex($indexName)
         ) {

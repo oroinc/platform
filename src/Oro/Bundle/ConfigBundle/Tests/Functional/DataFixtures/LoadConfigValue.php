@@ -40,7 +40,7 @@ class LoadConfigValue extends AbstractFixture
      */
     protected function getConfigValuesData()
     {
-        return Yaml::parse(file_get_contents(__DIR__.'/data/'.static::FILENAME));
+        return Yaml::parse(file_get_contents(__DIR__ . '/data/' . static::FILENAME));
     }
 
     /**

@@ -4,6 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Layout\DataProvider;
 
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
+/**
+ * Provides breadcrumb navigation data for layout templates.
+ *
+ * This data provider retrieves breadcrumb information for a given menu, enabling the rendering of
+ * breadcrumb navigation trails in layout templates. It acts as a bridge between the breadcrumb manager
+ * and the layout system, making breadcrumb data accessible to frontend templates.
+ */
 class BreadcrumbProvider
 {
     /**

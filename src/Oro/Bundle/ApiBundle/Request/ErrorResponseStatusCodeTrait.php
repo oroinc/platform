@@ -16,7 +16,8 @@ trait ErrorResponseStatusCodeTrait
         foreach ($statusCodes as $code) {
             /** @var int $groupCode */
             $groupCode = (int)floor($code / 100) * 100;
-            if (!\array_key_exists($groupCode, $groupedCodes)
+            if (
+                !\array_key_exists($groupCode, $groupedCodes)
                 || !\in_array($code, $groupedCodes[$groupCode], true)
             ) {
                 $groupedCodes[$groupCode][] = $code;
@@ -29,7 +30,8 @@ trait ErrorResponseStatusCodeTrait
             $statusCode = $maxGroup;
             if (\count($groupedCodes[$maxGroup]) === 1) {
                 $statusCode = reset($groupedCodes[$maxGroup]);
-            } elseif (Response::HTTP_BAD_REQUEST === $maxGroup
+            } elseif (
+                Response::HTTP_BAD_REQUEST === $maxGroup
                 && \in_array(Response::HTTP_CONFLICT, $groupedCodes[$maxGroup], true)
             ) {
                 $statusCode = Response::HTTP_CONFLICT;

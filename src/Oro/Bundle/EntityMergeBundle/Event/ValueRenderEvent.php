@@ -5,6 +5,14 @@ namespace Oro\Bundle\EntityMergeBundle\Event;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when a field value is being rendered for display during merge.
+ *
+ * This event allows listeners to intercept and modify how field values are converted
+ * to their display representation. Listeners can access the original value, the converted
+ * (rendered) value, and the field metadata to customize the rendering based on field type
+ * or other contextual information.
+ */
 class ValueRenderEvent extends Event
 {
     /**

@@ -4,6 +4,14 @@ namespace Oro\Bundle\TranslationBundle\ImportExport\Strategy;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
+/**
+ * Strategy for resetting translations to their default state.
+ *
+ * Extends the translation import strategy to provide reset-specific functionality.
+ * Deletes all existing translations for a language before importing new ones, ensuring
+ * a clean reset. Tracks processed languages to avoid duplicate deletions and counts
+ * deleted translations for reporting purposes.
+ */
 class TranslationResetStrategy extends TranslationImportStrategy
 {
     /** @var array */

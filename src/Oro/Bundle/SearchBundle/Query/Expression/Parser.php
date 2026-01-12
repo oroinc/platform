@@ -53,7 +53,8 @@ class Parser
             if ($keyword) {
                 $this->parseExpression($keyword);
             } else {
-                while (!$this->stream->isEOF()
+                while (
+                    !$this->stream->isEOF()
                     && $this->stream->current->test(Token::KEYWORD_TYPE)
                     && in_array($this->stream->current->value, TokenInfo::getKeywords(), true)
                 ) {

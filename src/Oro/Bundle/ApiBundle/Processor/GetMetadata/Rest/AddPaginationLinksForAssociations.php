@@ -78,7 +78,8 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
                 continue;
             }
 
-            if (!$association->hasRelationshipLink(ApiDoc::LINK_NEXT)
+            if (
+                !$association->hasRelationshipLink(ApiDoc::LINK_NEXT)
                 && !$subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
             ) {
                 $association->addRelationshipLink(ApiDoc::LINK_NEXT, new NextPageLinkMetadata(

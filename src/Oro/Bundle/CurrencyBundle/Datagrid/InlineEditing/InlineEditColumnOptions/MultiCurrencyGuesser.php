@@ -8,6 +8,14 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
 
+/**
+ * Provides inline editing configuration for multi-currency datagrid columns.
+ *
+ * This guesser automatically configures inline editing options for columns that display
+ * multi-currency values. It sets up the appropriate editor view, save API accessor, and
+ * currency choices, enabling users to edit both the monetary value and currency directly
+ * within the datagrid interface.
+ */
 class MultiCurrencyGuesser implements GuesserInterface
 {
     public const MULTI_CURRENCY_TYPE   = 'multi-currency';
@@ -51,8 +59,10 @@ class MultiCurrencyGuesser implements GuesserInterface
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];
-        if (array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
-            && $column[PropertyInterface::FRONTEND_TYPE_KEY] === self::MULTI_CURRENCY_TYPE) {
+        if (
+            array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
+            && $column[PropertyInterface::FRONTEND_TYPE_KEY] === self::MULTI_CURRENCY_TYPE
+        ) {
             $result = $this->getColumnConvertationOptions($column);
 
             if (empty($column[Configuration::CHOICES_KEY])) {

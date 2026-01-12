@@ -60,7 +60,8 @@ class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
         foreach ($rows as $row) {
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
 
-            if (array_key_exists('extend', $data)
+            if (
+                array_key_exists('extend', $data)
                 && array_key_exists('inherit', $data['extend'])
                 && $data['extend']['inherit'] == 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
             ) {
@@ -112,7 +113,8 @@ class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
     protected function processChange(LoggerInterface $logger, array $entities, $dryRun = false)
     {
         foreach ($entities as $enumEntity) {
-            if (array_key_exists(self::FIELD_FROM, $enumEntity)
+            if (
+                array_key_exists(self::FIELD_FROM, $enumEntity)
                 && array_key_exists('data', $enumEntity[self::FIELD_FROM])
                 && array_key_exists('importexport', $enumEntity[self::FIELD_FROM]['data'])
                 && array_key_exists('identity', $enumEntity[self::FIELD_FROM]['data']['importexport'])

@@ -75,7 +75,8 @@ class MapPrimaryField implements ProcessorInterface
             return;
         }
 
-        if (!\array_key_exists($this->associationName, $submittedData)
+        if (
+            !\array_key_exists($this->associationName, $submittedData)
             && \array_key_exists($this->primaryFieldName, $submittedData)
         ) {
             [$collectionSubmitData, $primaryItemKey] = $this->getAssociationSubmitData(
@@ -88,7 +89,8 @@ class MapPrimaryField implements ProcessorInterface
             if (null !== $primaryItemKey) {
                 $context->set(self::PRIMARY_ITEM_KEY, $primaryItemKey);
             }
-        } elseif (\array_key_exists($this->associationName, $submittedData)
+        } elseif (
+            \array_key_exists($this->associationName, $submittedData)
             && !\array_key_exists($this->primaryFieldName, $submittedData)
         ) {
             $context->set(

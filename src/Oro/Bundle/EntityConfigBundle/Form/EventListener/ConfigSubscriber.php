@@ -101,7 +101,8 @@ class ConfigSubscriber implements EventSubscriberInterface
 
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
-                    if ($configModel->getId() &&
+                    if (
+                        $configModel->getId() &&
                         $configModel instanceof FieldConfigModel &&
                         isset($changeSet[$code][static::NEW_PENDING_VALUE_KEY])
                     ) {

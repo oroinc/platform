@@ -204,7 +204,8 @@ class ConfigurationType extends AbstractType
                     }
                 );
                 if (count($filtered) > 0) {
-                    if ($entity instanceof UserEmailOrigin
+                    if (
+                        $entity instanceof UserEmailOrigin
                         && $entity->getImapHost() !== null
                         && array_key_exists('imapHost', $data) && $data['imapHost'] !== null
                         && array_key_exists('user', $data) && $data['user'] !== null
@@ -216,7 +217,8 @@ class ConfigurationType extends AbstractType
                          *  - When imap or smtp was disabled, don't create new configuration
                          *  - If imap or smtp are still enabled create a new one.
                          */
-                        if ((!array_key_exists('useImap', $data) || $data['useImap'] === 0)
+                        if (
+                            (!array_key_exists('useImap', $data) || $data['useImap'] === 0)
                             && (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0)
                         ) {
                             $newConfiguration = null;

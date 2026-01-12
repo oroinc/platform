@@ -183,7 +183,8 @@ class ValidateEntityFallback implements ProcessorInterface
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $associationMetadata) {
             $propertyPath = $associationMetadata->getPropertyPath();
-            if ($propertyPath
+            if (
+                $propertyPath
                 && is_a($associationMetadata->getTargetClassName(), EntityFieldFallbackValue::class, true)
                 && $this->propertyAccessor->getValue($entity, $propertyPath) === $fallbackValue
             ) {

@@ -22,7 +22,8 @@ class CheckRequestType extends BaseCheckRequestType
     {
         $detected = false;
         $requestType = $context->getRequestType();
-        if (!$requestType->contains(RequestType::JSON_API)
+        if (
+            !$requestType->contains(RequestType::JSON_API)
             && $this->checkJsonApiRequest($context->getRequestHeaders())
         ) {
             $requestType->add(RequestType::JSON_API);
@@ -146,7 +147,8 @@ class CheckRequestType extends BaseCheckRequestType
         }
         foreach ($acceptHeaderValues as $value) {
             [$mediaType] = MediaTypeHeaderUtil::parseMediaType($value);
-            if (self::JSON_API_MEDIA_TYPE !== $mediaType
+            if (
+                self::JSON_API_MEDIA_TYPE !== $mediaType
                 && ('application/json' === $mediaType || 'application/*' === $mediaType || '*/*' === $mediaType)
             ) {
                 return true;

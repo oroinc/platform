@@ -100,9 +100,11 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         $groups = ['Default'];
         $options = $form->getConfig()->getOptions();
         if ($options['checkEmptyFile']) {
-            if (!$options['dam_widget_enabled']
+            if (
+                !$options['dam_widget_enabled']
                 || !($attachmentConfig = $this->getAttachmentConfig($form))
-                || !$attachmentConfig->is('use_dam')) {
+                || !$attachmentConfig->is('use_dam')
+            ) {
                 $groups[] = 'DamWidgetDisabled';
             } else {
                 $groups[] = 'DamWidgetEnabled';

@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+/**
+ * Represents a workflow step with transitions and entity ACL configuration.
+ *
+ * This class defines a step in a workflow, including its label, order, allowed transitions,
+ * and entity ACL settings that control field access when the workflow is in this step.
+ */
 class Step
 {
     /**

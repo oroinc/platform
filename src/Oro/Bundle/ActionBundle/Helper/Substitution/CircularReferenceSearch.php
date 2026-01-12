@@ -4,6 +4,12 @@ namespace Oro\Bundle\ActionBundle\Helper\Substitution;
 
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 
+/**
+ * Detects circular references in key-value pair mappings.
+ *
+ * This utility class provides static methods to detect and assert the absence of
+ * circular references in substitution mappings, throwing an exception if a cycle is found.
+ */
 class CircularReferenceSearch
 {
     /**

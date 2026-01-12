@@ -46,9 +46,11 @@ class EmailTemplateRawDataParser
                 $value = trim($matches['value'][$i]);
                 if (str_starts_with($name, 'is')) {
                     $value = (bool)$value;
-                } elseif ((str_starts_with($value, '[') && str_ends_with($value, ']')) ||
+                } elseif (
+                    (str_starts_with($value, '[') && str_ends_with($value, ']')) ||
                     (str_starts_with($value, '{') && str_ends_with($value, '}')) &&
-                    !str_starts_with($value, '{{')) {
+                    !str_starts_with($value, '{{')
+                ) {
                     $value = $this->parseArrayString($value);
                 }
 

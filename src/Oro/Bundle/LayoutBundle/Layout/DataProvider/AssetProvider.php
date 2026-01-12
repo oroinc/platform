@@ -70,7 +70,7 @@ class AssetProvider
                 $trimmedPath
             );
             if ($normalizedPath && $normalizedPath !== $trimmedPath) {
-                $path = 'bundles/'.$normalizedPath;
+                $path = 'bundles/' . $normalizedPath;
             }
         }
 

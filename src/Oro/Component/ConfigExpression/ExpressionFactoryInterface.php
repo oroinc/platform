@@ -2,6 +2,13 @@
 
 namespace Oro\Component\ConfigExpression;
 
+/**
+ * Defines the contract for creating expression instances from registered types.
+ *
+ * The expression factory is responsible for instantiating expressions by name and initializing
+ * them with provided options. It manages the registration of expression types through extensions
+ * and ensures that created expressions are properly configured before being returned.
+ */
 interface ExpressionFactoryInterface
 {
     /**

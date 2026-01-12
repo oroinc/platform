@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification;
 
+/**
+ * Defines the contract for dividing test specifications into smaller chunks.
+ *
+ * Implementations of this interface split feature files into multiple suites based on
+ * various strategies (count, execution time, etc.) for parallel test execution.
+ */
 interface SpecificationDividerInterface
 {
     /**

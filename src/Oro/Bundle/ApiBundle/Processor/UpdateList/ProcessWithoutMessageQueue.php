@@ -271,7 +271,8 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
         } elseif (!$response->hasUnexpectedErrors()) {
             $rawItems = $response->getData();
             $processedItemStatuses = $response->getProcessedItemStatuses();
-            if ($rawItems
+            if (
+                $rawItems
                 && $processedItemStatuses
                 && $this->retryHelper->hasItemsToRetry($rawItems, $processedItemStatuses)
             ) {
@@ -362,7 +363,8 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
     private function hasFailedItems(array $processedItemStatuses): bool
     {
         foreach ($processedItemStatuses as $status) {
-            if (BatchUpdateItemStatus::HAS_PERMANENT_ERRORS === $status
+            if (
+                BatchUpdateItemStatus::HAS_PERMANENT_ERRORS === $status
                 || BatchUpdateItemStatus::NOT_PROCESSED === $status
             ) {
                 return true;

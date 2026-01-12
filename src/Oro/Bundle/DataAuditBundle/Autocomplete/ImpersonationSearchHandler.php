@@ -82,7 +82,7 @@ class ImpersonationSearchHandler implements SearchHandlerInterface
                         $impersonationQB->expr()->like('i.token', ':query')
                     )
                 )
-                ->setParameter('query', '%'.trim($query).'%');
+                ->setParameter('query', '%' . trim($query) . '%');
         }
 
         $auditQB = $this->doctrineHelper->getEntityRepository(AbstractAudit::class)->createQueryBuilder('a');

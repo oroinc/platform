@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Exception;
 
+/**
+ * Thrown when an invalid workflow transition is referenced or attempted.
+ *
+ * This exception indicates that a transition does not exist, is not a start transition,
+ * or is not allowed from the current workflow step. Factory methods provide specific
+ * error messages for different transition validation failures.
+ */
 class InvalidTransitionException extends WorkflowException
 {
     public const UNKNOWN_TRANSITION = 1;

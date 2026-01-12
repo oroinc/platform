@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider as AttributeProvider;
 
+/**
+ * Provides utility methods for checking attribute configuration on entities and fields.
+ *
+ * This helper class offers convenient methods to determine whether a field is configured as an attribute
+ * and whether an entity supports attributes. It abstracts the attribute configuration provider to simplify
+ * attribute-related checks throughout the application.
+ */
 class AttributeConfigHelper
 {
     public const CODE_IS_ATTRIBUTE = 'is_attribute';

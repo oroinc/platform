@@ -14,6 +14,13 @@ use Oro\Component\Layout\ImportLayoutManipulator;
 use Oro\Component\Layout\Util\BlockUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Layout block type for rendering datagrids.
+ *
+ * This block type integrates datagrids into the layout system, supporting both standard grid
+ * rendering and cell-by-cell splitting for custom layouts. It handles grid configuration,
+ * ACL checks, and dynamic block generation for grid components.
+ */
 class DatagridType extends AbstractContainerType
 {
     public const NAME = 'datagrid';

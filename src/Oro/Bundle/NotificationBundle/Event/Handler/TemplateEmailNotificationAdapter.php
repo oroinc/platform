@@ -87,7 +87,8 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
     protected function removeDisabledUsers(array &$recipients)
     {
         foreach ($recipients as $key => $recipient) {
-            if (($recipient instanceof AbstractUser && !$recipient->isEnabled())
+            if (
+                ($recipient instanceof AbstractUser && !$recipient->isEnabled())
                 || ($recipient instanceof EmailAddressWithContext
                     && $recipient->getContext() instanceof AbstractUser
                     && !$recipient->getContext()->isEnabled())

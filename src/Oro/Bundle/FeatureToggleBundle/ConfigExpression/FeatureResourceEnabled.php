@@ -9,6 +9,15 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Config expression condition that evaluates whether a resource is enabled for a feature.
+ *
+ * This condition can be used in workflow and action configurations to conditionally
+ * execute steps or transitions based on whether a specific resource is enabled for a
+ * feature. It requires both a resource identifier and a resource type, with an optional
+ * scope identifier. The condition supports both named and positional arguments, and
+ * resolves property paths and context values at evaluation time.
+ */
 class FeatureResourceEnabled extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;

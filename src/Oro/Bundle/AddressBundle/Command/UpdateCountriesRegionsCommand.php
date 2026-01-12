@@ -447,7 +447,8 @@ HELP
 
         foreach ($internalCountries as $country) {
             $countryCode = $country['iso2_code'];
-            if (isset($translationData[$countryCode]) &&
+            if (
+                isset($translationData[$countryCode]) &&
                 $country['name'] !== $translationData[$countryCode]
             ) {
                 $newName = $translationData[$countryCode];
@@ -505,7 +506,8 @@ HELP
         $internalRegions = $queryBuilder->execute()->fetchAllAssociative();
         foreach ($internalRegions as $region) {
             $regionCode = $region['combined_code'];
-            if (isset($translationData[$regionCode]) &&
+            if (
+                isset($translationData[$regionCode]) &&
                 $region['name'] !== $translationData[$regionCode]
             ) {
                 $newName = $translationData[$regionCode];

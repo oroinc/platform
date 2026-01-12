@@ -6,6 +6,13 @@ use Oro\Component\ConfigExpression\Exception;
 use Oro\Component\ConfigExpression\Func\AbstractFunction;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Retrieves values from the layout context with optional default fallback.
+ *
+ * This config expression function provides access to layout context variables
+ * using property path notation. It supports an optional default value that is
+ * returned when the requested context value is null or undefined.
+ */
 class GetContextValue extends AbstractFunction
 {
     public const PROPERTY_PATH_PREFIX = 'context.';
@@ -92,6 +99,6 @@ class GetContextValue extends AbstractFunction
      */
     protected function createPropertyPath($value)
     {
-        return new PropertyPath(self::PROPERTY_PATH_PREFIX.$value);
+        return new PropertyPath(self::PROPERTY_PATH_PREFIX . $value);
     }
 }

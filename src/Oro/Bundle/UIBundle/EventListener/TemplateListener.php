@@ -53,7 +53,8 @@ class TemplateListener implements ServiceSubscriberInterface
     private function getTemplateReference(ViewEvent $event): ?Template
     {
         $template = $event->getRequest()->attributes->get('_template');
-        if (!$template instanceof Template
+        if (
+            !$template instanceof Template
             && !$template = $event->controllerArgumentsEvent?->getAttributes()[Template::class][0] ?? null
         ) {
             return null;
@@ -101,7 +102,8 @@ class TemplateListener implements ServiceSubscriberInterface
 
         $loader = $this->container->get('twig.loader.native_filesystem');
         foreach ($loader->getPaths($bundle) as $path) {
-            if (file_exists(rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $controller) &&
+            if (
+                file_exists(rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $controller) &&
                 in_array($controller, scandir($path), true)
             ) {
                 return;
@@ -158,7 +160,7 @@ class TemplateListener implements ServiceSubscriberInterface
                 /**
                  * Checks if legacy template file is exists
                  */
-                $templateName = $parts['path'] . $parts['widget'] . '/'. $container . '/' . $parts['template'];
+                $templateName = $parts['path'] . $parts['widget'] . '/' . $container . '/' . $parts['template'];
                 if ($this->getTwig()->getLoader()->exists($templateName)) {
                     $templateReference->template = $templateName;
 

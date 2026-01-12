@@ -172,14 +172,17 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 foreach ($fieldConfigs as $fieldConfig) {
                     /** @var FieldConfigId $fieldConfigId */
                     $fieldConfigId = $fieldConfig->getId();
-                    if (!ExtendHelper::isMultiEnumType($fieldConfigId->getFieldType()) ||
+                    if (
+                        !ExtendHelper::isMultiEnumType($fieldConfigId->getFieldType()) ||
                         $fieldConfig->is('is_serialized')
                     ) {
                         continue;
                     }
-                    if ($fieldConfig->get('state') === ExtendScope::STATE_DELETE
+                    if (
+                        $fieldConfig->get('state') === ExtendScope::STATE_DELETE
                         && $reflectionEntityClass
-                        && !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())) {
+                        && !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())
+                    ) {
                         continue;
                     }
 

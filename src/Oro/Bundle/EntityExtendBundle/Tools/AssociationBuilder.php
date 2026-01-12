@@ -11,6 +11,15 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
+/**
+ * Builder for creating and configuring entity associations.
+ *
+ * This class provides utilities for programmatically creating many-to-many and many-to-one
+ * associations between entities. It handles the creation of relation fields, configuration
+ * of extend metadata, and setup of appropriate form and view configurations for the new
+ * associations. It automatically determines primary key columns and handles exceptions
+ * gracefully when dealing with custom or newly created entities.
+ */
 class AssociationBuilder
 {
     /** @var ManagerRegistry */

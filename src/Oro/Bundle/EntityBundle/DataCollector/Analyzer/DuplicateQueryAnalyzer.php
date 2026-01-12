@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\DataCollector\Analyzer;
 
+/**
+ * Analyzes database queries to identify duplicate and similar queries.
+ *
+ * This analyzer tracks executed queries and provides methods to detect identical queries
+ * (same SQL with same parameters) and similar queries (same SQL with different parameters).
+ * It helps identify potential performance issues caused by redundant or inefficient query patterns.
+ */
 class DuplicateQueryAnalyzer
 {
     /**
@@ -93,7 +100,7 @@ class DuplicateQueryAnalyzer
      */
     protected function generateQueryKey($sql, array $parameters)
     {
-        return $this->generateSqlKey($sql).':'.$this->generateParametersKey($parameters);
+        return $this->generateSqlKey($sql) . ':' . $this->generateParametersKey($parameters);
     }
 
     /**

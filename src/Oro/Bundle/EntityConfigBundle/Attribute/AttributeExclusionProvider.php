@@ -40,7 +40,8 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
 
     private function isOwningSideOfOneToManyAttribute(string $entityClass, array $associationMapping): bool
     {
-        if (!$associationMapping['isOwningSide']
+        if (
+            !$associationMapping['isOwningSide']
             || ClassMetadata::MANY_TO_ONE !== $associationMapping['type']
             || empty($associationMapping['inversedBy'])
             || !$this->configManager->hasConfig($entityClass)
@@ -65,7 +66,8 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
 
     private function isTargetSideOfManyToOneAttribute(string $entityClass, array $associationMapping): bool
     {
-        if ($associationMapping['isOwningSide']
+        if (
+            $associationMapping['isOwningSide']
             || ClassMetadata::ONE_TO_MANY !== $associationMapping['type']
             || empty($associationMapping['mappedBy'])
             || !$this->configManager->hasConfig($entityClass)
@@ -90,7 +92,8 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
 
     private function isTargetSideOfManyToManyAttribute(string $entityClass, array $associationMapping): bool
     {
-        if ($associationMapping['isOwningSide']
+        if (
+            $associationMapping['isOwningSide']
             || ClassMetadata::MANY_TO_MANY !== $associationMapping['type']
             || empty($associationMapping['mappedBy'])
             || !$this->configManager->hasConfig($entityClass)

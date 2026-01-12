@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Duplicator;
 
+/**
+ * Provides common functionality for object duplication factories.
+ *
+ * This base class manages registration of object types and provides factory methods for creating instances
+ * based on keywords.
+ * Subclasses must define the supported class name and implement the creation logic for their specific object types.
+ */
 abstract class AbstractFactory
 {
     /**

@@ -23,7 +23,8 @@ class CreateTest extends RestJsonApiTestCase
             }
 
             $entityType = $this->getEntityType($entityClass);
-            if (is_a($entityClass, TestFrameworkEntityInterface::class, true)
+            if (
+                is_a($entityClass, TestFrameworkEntityInterface::class, true)
                 || str_starts_with($entityType, 'testapi')
                 || $this->isSkippedEntity($entityClass, ApiAction::CREATE)
             ) {
@@ -38,7 +39,8 @@ class CreateTest extends RestJsonApiTestCase
             );
             self::assertResponseStatusCodeNotEquals($response, Response::HTTP_INTERNAL_SERVER_ERROR);
 
-            if ($response->getStatusCode() === Response::HTTP_OK
+            if (
+                $response->getStatusCode() === Response::HTTP_OK
                 || $response->getStatusCode() === Response::HTTP_CREATED
             ) {
                 $responseContent = self::jsonToArray($response->getContent());

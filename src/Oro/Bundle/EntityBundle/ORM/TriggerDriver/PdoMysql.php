@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\ORM\TriggerDriver;
 
+/**
+ * MySQL trigger driver for enabling and disabling foreign key checks.
+ *
+ * This driver implements trigger management for MySQL by controlling the `FOREIGN_KEY_CHECKS` setting,
+ * which effectively disables and enables foreign key constraint enforcement.
+ */
 class PdoMysql extends AbstractDriver
 {
     #[\Override]

@@ -5,6 +5,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
+/**
+ * Excludes test framework entities from normal entity processing.
+ *
+ * This provider marks all entities implementing {@see TestFrameworkEntityInterface} as ignored,
+ * preventing them from being processed in normal entity operations and searches.
+ */
 class EntityExclusionProvider implements ExclusionProviderInterface
 {
     #[\Override]

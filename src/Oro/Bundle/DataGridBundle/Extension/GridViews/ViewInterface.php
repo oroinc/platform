@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
+/**
+ * Defines the contract for datagrid views.
+ *
+ * Datagrid views represent saved configurations of filters, sorters, and column settings that
+ * users can create and apply to customize their datagrid display. This interface provides methods
+ * for managing view data and associating views with specific datagrids.
+ */
 interface ViewInterface
 {
     /**

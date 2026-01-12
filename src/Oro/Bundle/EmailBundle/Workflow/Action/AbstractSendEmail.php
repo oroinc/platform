@@ -121,7 +121,8 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
             return;
         }
 
-        if (!is_array($options['to'])
+        if (
+            !is_array($options['to'])
             || array_key_exists('name', $options['to'])
             || array_key_exists('email', $options['to'])
         ) {

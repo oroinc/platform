@@ -12,6 +12,13 @@ use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 
+/**
+ * Verifies the validity of cron-based transition triggers.
+ *
+ * This verifier validates cron expressions and optional filter expressions in transition cron triggers.
+ * It uses registered option verifiers to check each expression and can build query builders for filter
+ * validation. It also manages the workflow and entity metadata needed for comprehensive trigger validation.
+ */
 class TransitionTriggerCronVerifier
 {
     /** @var array */

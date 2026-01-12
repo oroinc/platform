@@ -7,6 +7,13 @@ use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendIndicesMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
+/**
+ * Handles post-migration updates for extended entity indices.
+ *
+ * This listener is triggered after database migrations are applied. It schedules a migration
+ * to update database indices for extended entities based on their field type configurations,
+ * ensuring that appropriate indices are created for searchable and indexed fields.
+ */
 class UpdateExtendIndicesPostUpMigrationListener
 {
     /** @var EntityMetadataHelper */

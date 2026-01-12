@@ -29,7 +29,8 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     #[\Override]
     protected function matches($other): bool
     {
-        if (parent::matches($other)
+        if (
+            parent::matches($other)
             && \is_array($this->expected)
             && \is_array($other)
             && \array_key_exists(JsonApiDoc::DATA, $this->expected)
@@ -101,7 +102,8 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
 
         // test items count for array attributes and to-many relationship
         $indexOfLastPathItem = \count($path) - 1;
-        if ($indexOfLastPathItem >= 2
+        if (
+            $indexOfLastPathItem >= 2
             && (
                 JsonApiDoc::ATTRIBUTES === $path[$indexOfLastPathItem - 1]
                 || (

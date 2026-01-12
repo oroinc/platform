@@ -26,7 +26,8 @@ class ExcludeUpdateListAction implements ProcessorInterface
         $resources = $context->getResult();
         foreach ($resources as $resource) {
             $excludedActions = $resource->getExcludedActions();
-            if (!\in_array(ApiAction::UPDATE_LIST, $excludedActions, true)
+            if (
+                !\in_array(ApiAction::UPDATE_LIST, $excludedActions, true)
                 && $this->shouldUpdateListActionBeExcluded(
                     $excludedActions,
                     $actionsConfig[$resource->getEntityClass()] ?? null

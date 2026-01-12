@@ -14,6 +14,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for creating and editing attribute families.
+ *
+ * This form type provides a comprehensive interface for managing attribute families, including configuration
+ * of family code, localized labels, enabled status, image, and the collection of attribute groups that define
+ * which attributes are available for entities using this family.
+ */
 class AttributeFamilyType extends AbstractType
 {
     public const NAME = 'oro_attribute_family';

@@ -4,6 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification;
 
 use Behat\Testwork\Suite\Suite;
 
+/**
+ * Divides test specifications (features) into chunks by count.
+ *
+ * This divider splits a suite's feature files into multiple smaller suites, each containing
+ * approximately the same number of features, enabling balanced parallel test execution.
+ */
 class SpecificationCountDivider implements SpecificationDividerInterface
 {
     /**
@@ -31,7 +37,7 @@ class SpecificationCountDivider implements SpecificationDividerInterface
 
         $chunks = $this->getChunks($array, $divider);
         foreach ($chunks as $index => $chunk) {
-            $generatedSuiteName = $baseName.'_'.$index;
+            $generatedSuiteName = $baseName . '_' . $index;
             $generatedSuites[$generatedSuiteName] = $chunk;
         }
 

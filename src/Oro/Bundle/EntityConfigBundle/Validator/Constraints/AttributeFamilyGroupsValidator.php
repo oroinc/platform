@@ -7,6 +7,12 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validator for the {@see AttributeFamilyGroups} constraint.
+ *
+ * This validator enforces that attribute families have at least one group and that group labels are unique,
+ * preventing invalid attribute family configurations that would cause issues in attribute management.
+ */
 class AttributeFamilyGroupsValidator extends ConstraintValidator
 {
     public const ALIAS = 'oro_entity_config.validator.attribute_family_groups';

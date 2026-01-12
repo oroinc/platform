@@ -18,6 +18,12 @@ use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides workflow permission data for role privilege management in datagrids.
+ *
+ * This datasource extends the role privilege provider to supply workflow-specific permission
+ * information, enabling administrators to manage workflow access levels and permissions for roles.
+ */
 class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
     /** @var PermissionManager */

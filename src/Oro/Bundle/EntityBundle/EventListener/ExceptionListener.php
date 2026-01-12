@@ -22,7 +22,8 @@ class ExceptionListener
     {
         $exception = $event->getThrowable();
         // handle the situation when we try to get the entity with id that the database doesn't support
-        if ($exception instanceof DriverException
+        if (
+            $exception instanceof DriverException
             && self::SQL_STATE_NUMERIC_VALUE_OUT_OF_RANGE === $exception->getSQLState()
         ) {
             $event->setThrowable(new NotFoundHttpException('Object not found.'));

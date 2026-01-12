@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
+/**
+ * Extracts and filters PHPDoc comments from class definitions.
+ *
+ * This utility class provides methods to retrieve and parse PHPDoc comments from
+ * class definitions, with support for extracting full comments or just the brief
+ * description, while filtering out package and suppression annotations.
+ */
 class DocCommentParser
 {
     /**

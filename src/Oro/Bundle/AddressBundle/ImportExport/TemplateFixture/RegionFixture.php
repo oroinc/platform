@@ -5,6 +5,14 @@ namespace Oro\Bundle\AddressBundle\ImportExport\TemplateFixture;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 
+/**
+ * Provides template fixture data for {@see Region} entities during import/export operations.
+ *
+ * This fixture generates sample region records with region codes prefixed with country
+ * codes (e.g., 'US-NY' for New York). It handles the special case of New York (NY) by
+ * associating it with the United States country, while providing standard data generation
+ * for other regions.
+ */
 class RegionFixture extends AbstractTemplateRepository
 {
     #[\Override]

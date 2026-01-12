@@ -477,7 +477,8 @@ class ImportExportController extends AbstractController
         return array_filter(
             $configurationsByAlias,
             function (ImportExportConfigurationInterface $configuration) use ($featureChecker) {
-                if ($configuration->getFeatureName()
+                if (
+                    $configuration->getFeatureName()
                     && !$featureChecker->isFeatureEnabled($configuration->getFeatureName())
                 ) {
                     return null;

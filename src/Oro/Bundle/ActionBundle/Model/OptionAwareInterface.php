@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+/**
+ * Defines the contract for objects that manage options.
+ */
 interface OptionAwareInterface
 {
     /**

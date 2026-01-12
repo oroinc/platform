@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
+/**
+ * Model for SMTP server configuration settings.
+ *
+ * Encapsulates SMTP connection parameters including host, port, encryption type, and credentials,
+ * providing validation and string representation for use in email configuration forms and services.
+ */
 class SmtpSettings
 {
     /**

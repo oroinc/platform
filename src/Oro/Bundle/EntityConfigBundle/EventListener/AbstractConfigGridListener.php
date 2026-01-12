@@ -368,7 +368,8 @@ abstract class AbstractConfigGridListener
      */
     protected function mapEntityConfigTypes(array $gridConfig)
     {
-        if (isset($gridConfig['type'])
+        if (
+            isset($gridConfig['type'])
             && $gridConfig['type'] === self::TYPE_HTML
             && isset($gridConfig['template'])
         ) {

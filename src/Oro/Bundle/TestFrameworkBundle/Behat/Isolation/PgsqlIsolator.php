@@ -193,7 +193,7 @@ class PgsqlIsolator implements IsolatorInterface
 
     private function dump(): void
     {
-        $this->dbTemp = $this->dbName.TokenGenerator::generateToken('db');
+        $this->dbTemp = $this->dbName . TokenGenerator::generateToken('db');
 
         $this->createDB($this->dbTemp, $this->dbName);
     }

@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Assigns one or more values to context attributes.
+ *
+ * This action supports both single and mass assignment operations. It can assign a single value
+ * to a single attribute, or perform multiple assignments in a single execution. Each assignment
+ * requires both an attribute (target property path) and a value to be assigned.
+ */
 class AssignValue extends AbstractAction
 {
     /**

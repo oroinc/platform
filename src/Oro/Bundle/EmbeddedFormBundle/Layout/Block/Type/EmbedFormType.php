@@ -118,7 +118,7 @@ class EmbedFormType extends AbstractType
         $options = $options->toArray();
         if (isset($options['additional_block_prefixes'])) {
             foreach ($options['additional_block_prefixes'] as &$blockPrefix) {
-                $blockPrefix .= self::FIELD_SEPARATOR.$shortName;
+                $blockPrefix .= self::FIELD_SEPARATOR . $shortName;
             }
             unset($blockPrefix);
         }

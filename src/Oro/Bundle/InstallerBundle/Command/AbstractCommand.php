@@ -75,7 +75,8 @@ HELP
             $commandExecutor->setDefaultOption('process-timeout', $timeout);
         }
 
-        if (!$input->getOption('force-debug')
+        if (
+            !$input->getOption('force-debug')
             && (true === $input->getOption('no-debug') || $container->get('kernel')->isDebug())
         ) {
             $commandExecutor->setDefaultOption('no-debug');

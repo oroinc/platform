@@ -46,7 +46,7 @@ class BuildVersionStrategy implements VersionStrategyInterface
         $versioned = sprintf(self::FORMAT, ltrim($path, '/'), $version);
 
         if ($path && '/' == $path[0]) {
-            return '/'.$versioned;
+            return '/' . $versioned;
         }
 
         return $versioned;

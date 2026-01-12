@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Model;
 
+/**
+ * Represents a single permission within an ACL privilege.
+ *
+ * This model class encapsulates a permission name and its associated access level.
+ * It is used to define what level of access is granted for a specific permission
+ * within an ACL privilege configuration.
+ */
 class AclPermission
 {
     /**

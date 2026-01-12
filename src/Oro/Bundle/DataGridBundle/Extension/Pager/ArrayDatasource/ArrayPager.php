@@ -5,6 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
+/**
+ * Pager implementation for array datasources.
+ *
+ * This class handles pagination logic for array-based data, calculating offsets and slicing
+ * arrays to return the appropriate page of results. It tracks total results and provides
+ * navigation information for pagination controls.
+ */
 class ArrayPager implements PagerInterface
 {
     /**

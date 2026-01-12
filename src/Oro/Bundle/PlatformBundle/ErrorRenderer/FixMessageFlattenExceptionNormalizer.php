@@ -36,7 +36,8 @@ class FixMessageFlattenExceptionNormalizer implements NormalizerInterface
         if (\is_array($result) && isset($result[self::CODE], $result[self::MESSAGE])) {
             $code = $result[self::CODE];
             $message = $result[self::MESSAGE];
-            if ((isset(Response::$statusTexts[$code]) && $message === Response::$statusTexts[$code])
+            if (
+                (isset(Response::$statusTexts[$code]) && $message === Response::$statusTexts[$code])
                 || 'error' === $message
             ) {
                 unset($result[self::MESSAGE]);

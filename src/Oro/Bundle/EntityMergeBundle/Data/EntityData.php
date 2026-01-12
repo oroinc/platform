@@ -7,6 +7,15 @@ use Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
+/**
+ * Encapsulates a collection of entities to be merged along with their merge metadata and field data.
+ *
+ * This class serves as a container for managing the merge operation on multiple entities.
+ * It maintains the merge metadata for the entity class, the list of entities to be merged,
+ * the master entity (which will be updated with values from other entities), and field-level
+ * merge data for each field of the entity. It provides methods to access and manipulate
+ * entities and their associated field merge data.
+ */
 class EntityData
 {
     /**

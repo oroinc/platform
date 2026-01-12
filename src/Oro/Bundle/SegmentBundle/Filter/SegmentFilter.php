@@ -78,7 +78,8 @@ class SegmentFilter extends EntityFilter
     #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        if (!$ds instanceof OrmFilterDatasourceAdapter
+        if (
+            !$ds instanceof OrmFilterDatasourceAdapter
             || !(isset($data['value']) && $data['value'] instanceof Segment)
         ) {
             return false;

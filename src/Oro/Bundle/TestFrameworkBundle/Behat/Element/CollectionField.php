@@ -5,6 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 
+/**
+ * Represents a collection field element that manages multiple rows of input values.
+ *
+ * This element handles setting multiple values in a collection, removing rows, and marking
+ * specific values as primary (useful for fields like phone numbers or email addresses that
+ * support a primary selection via radio buttons).
+ */
 class CollectionField extends Element
 {
     #[\Override]
@@ -70,12 +77,12 @@ class CollectionField extends Element
         return $this->findAll(
             'css',
             'input:not([type=button])'
-            .':not([type=checkbox])'
-            .':not([type=hidden])'
-            .':not([type=image])'
-            .':not([type=radio])'
-            .':not([type=reset])'
-            .':not([type=submit])'
+            . ':not([type=checkbox])'
+            . ':not([type=hidden])'
+            . ':not([type=image])'
+            . ':not([type=radio])'
+            . ':not([type=reset])'
+            . ':not([type=submit])'
         );
     }
 

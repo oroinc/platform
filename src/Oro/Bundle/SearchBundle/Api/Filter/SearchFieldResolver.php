@@ -34,7 +34,8 @@ class SearchFieldResolver implements FieldResolverInterface
     public function resolveFieldType(string $fieldName): string
     {
         $fieldName = $this->resolveFieldByFieldMappings($fieldName, true);
-        if (isset($this->searchFieldMappings[$fieldName]['type'])
+        if (
+            isset($this->searchFieldMappings[$fieldName]['type'])
             && $this->searchFieldMappings[$fieldName]['type']
         ) {
             return $this->searchFieldMappings[$fieldName]['type'];

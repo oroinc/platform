@@ -6,6 +6,15 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDec
 use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides access to system configuration definitions and data transformers.
+ *
+ * This class acts as a container for the parsed system configuration structure,
+ * including field definitions, tree definitions, and group definitions. It also
+ * manages the retrieval of data transformers for specific configuration fields.
+ * The configuration data is typically loaded from YAML files and processed by
+ * the SystemConfiguration processor.
+ */
 class ConfigBag
 {
     /** @var array */
@@ -65,7 +74,8 @@ class ConfigBag
      */
     public function getFieldsRoot($node)
     {
-        if (isset($this->config[ProcessorDecorator::FIELDS_ROOT]) &&
+        if (
+            isset($this->config[ProcessorDecorator::FIELDS_ROOT]) &&
             isset($this->config[ProcessorDecorator::FIELDS_ROOT][$node])
         ) {
             return $this->config[ProcessorDecorator::FIELDS_ROOT][$node];
@@ -83,7 +93,8 @@ class ConfigBag
      */
     public function getTreeRoot($treeName)
     {
-        if (isset($this->config[ProcessorDecorator::TREE_ROOT]) &&
+        if (
+            isset($this->config[ProcessorDecorator::TREE_ROOT]) &&
             isset($this->config[ProcessorDecorator::TREE_ROOT][$treeName])
         ) {
             return $this->config[ProcessorDecorator::TREE_ROOT][$treeName];
@@ -101,7 +112,8 @@ class ConfigBag
      */
     public function getGroupsNode($name)
     {
-        if (isset($this->config[ProcessorDecorator::GROUPS_NODE]) &&
+        if (
+            isset($this->config[ProcessorDecorator::GROUPS_NODE]) &&
             isset($this->config[ProcessorDecorator::GROUPS_NODE][$name])
         ) {
             return $this->config[ProcessorDecorator::GROUPS_NODE][$name];

@@ -6,6 +6,13 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Represents an event dispatched during data fixtures loading in the migration process.
+ *
+ * This event provides access to the entity manager, fixtures type (main or demo), and a logger
+ * for recording messages during fixture execution. It allows listeners to hook into the data
+ * fixtures loading process and perform custom operations or logging.
+ */
 class MigrationDataFixturesEvent extends Event
 {
     /** @var ObjectManager */

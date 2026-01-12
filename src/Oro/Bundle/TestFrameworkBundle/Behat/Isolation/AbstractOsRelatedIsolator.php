@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+/**
+ * Provides common functionality for Behat isolators that are operating system-specific.
+ *
+ * This base class implements OS detection and applicability checking, allowing isolators to declare
+ * which operating systems they support. Subclasses should extend this to create isolators
+ * that perform OS-specific operations during Behat test isolation.
+ */
 abstract class AbstractOsRelatedIsolator
 {
     public const WINDOWS_OS = 'WINDOWS';

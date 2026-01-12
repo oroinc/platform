@@ -91,7 +91,8 @@ class CreateRelatedEntity extends ComponentAbstractAction
     #[\Override]
     public function initialize(array $options)
     {
-        if (!empty($options[ComponentCreateObject::OPTION_KEY_DATA]) &&
+        if (
+            !empty($options[ComponentCreateObject::OPTION_KEY_DATA]) &&
             !is_array($options[ComponentCreateObject::OPTION_KEY_DATA])
         ) {
             throw new InvalidParameterException('Object data must be an array.');

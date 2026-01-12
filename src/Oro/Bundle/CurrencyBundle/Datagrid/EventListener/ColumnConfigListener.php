@@ -7,6 +7,14 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+/**
+ * Handles datagrid column configuration for multi-currency fields.
+ *
+ * This listener processes datagrid build events to automatically configure columns
+ * that display multi-currency values. It sets up the necessary field mappings for
+ * the original field, value field, and currency field, enabling proper display and
+ * inline editing of multi-currency data in datagrids.
+ */
 class ColumnConfigListener
 {
     /** @var array  */
@@ -48,8 +56,10 @@ class ColumnConfigListener
 
         foreach ($columns as $columnName => $columnConfig) {
             $newColumnsSet[$columnName] = $columnConfig;
-            if (isset($columnConfig[PropertyInterface::FRONTEND_TYPE_KEY]) &&
-                $columnConfig[PropertyInterface::FRONTEND_TYPE_KEY] == Guesser::MULTI_CURRENCY_TYPE) {
+            if (
+                isset($columnConfig[PropertyInterface::FRONTEND_TYPE_KEY]) &&
+                $columnConfig[PropertyInterface::FRONTEND_TYPE_KEY] == Guesser::MULTI_CURRENCY_TYPE
+            ) {
                 $multiCurrencyConfigOptions = $this->guessMultiCurrencyConfigOptions(
                     $columnName,
                     $columnConfig

@@ -36,7 +36,7 @@ class RemoveAuditDuplicatesQuery extends ParametrizedMigrationQuery
      */
     private function doExecute(LoggerInterface $logger, $dryRun = false): void
     {
-        $sql = 'SELECT object_id, object_class, transaction_id FROM oro_audit '.
+        $sql = 'SELECT object_id, object_class, transaction_id FROM oro_audit ' .
             'GROUP BY object_id, object_class, transaction_id HAVING COUNT(*) > 1';
         $this->logQuery($logger, $sql);
         $duplicatedGroups = $this->connection->fetchAllAssociative($sql);

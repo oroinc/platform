@@ -46,7 +46,8 @@ class AddHateoasLinksForEntity implements ProcessorInterface
         }
 
         $requestType = $context->getRequestType();
-        if (!$entityMetadata->hasLink(ApiDoc::LINK_SELF)
+        if (
+            !$entityMetadata->hasLink(ApiDoc::LINK_SELF)
             && !$this->isGetActionExcluded($entityMetadata->getClassName(), $context->getVersion(), $requestType)
         ) {
             $entityMetadata->addLink(ApiDoc::LINK_SELF, new RouteLinkMetadata(

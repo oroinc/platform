@@ -363,7 +363,8 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     {
         if (!\is_array($item)) {
             $item = [self::ID => $item];
-        } elseif (!empty($item[DataAccessorInterface::ENTITY_CLASS])
+        } elseif (
+            !empty($item[DataAccessorInterface::ENTITY_CLASS])
             && !\array_key_exists(DataAccessorInterface::ENTITY_TYPE, $item)
         ) {
             $item[DataAccessorInterface::ENTITY_TYPE] = $this->getEntityAlias(

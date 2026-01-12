@@ -171,7 +171,7 @@ abstract class AbstractFieldsExtensionTestCase extends TestCase
                     'sorters' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => 'o.'.self::FIELD_NAME,
+                                'data_name' => 'o.' . self::FIELD_NAME,
                             ],
                         ],
                     ],
@@ -179,7 +179,7 @@ abstract class AbstractFieldsExtensionTestCase extends TestCase
                         'columns' => [
                             self::FIELD_NAME => [
                                 'type' => 'string',
-                                'data_name' => 'o.'.self::FIELD_NAME,
+                                'data_name' => 'o.' . self::FIELD_NAME,
                                 'renderable' => true,
                             ],
                         ],
@@ -226,7 +226,7 @@ abstract class AbstractFieldsExtensionTestCase extends TestCase
                     'sorters' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => 'e.'.self::FIELD_NAME,
+                                'data_name' => 'e.' . self::FIELD_NAME,
                             ],
                         ],
                     ],
@@ -234,7 +234,7 @@ abstract class AbstractFieldsExtensionTestCase extends TestCase
                         'columns' => [
                             self::FIELD_NAME => [
                                 'type' => 'string',
-                                'data_name' => 'e.'.self::FIELD_NAME,
+                                'data_name' => 'e.' . self::FIELD_NAME,
                                 'renderable' => true,
                             ],
                         ],
@@ -323,7 +323,7 @@ abstract class AbstractFieldsExtensionTestCase extends TestCase
                     'filters' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => $alias.'.'.self::FIELD_NAME,
+                                'data_name' => $alias . '.' . self::FIELD_NAME,
                                 'type' => 'enum',
                                 'renderable' => true,
                             ],
@@ -332,7 +332,7 @@ abstract class AbstractFieldsExtensionTestCase extends TestCase
                     'fields_acl' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => $alias.'.'.self::FIELD_NAME,
+                                'data_name' => $alias . '.' . self::FIELD_NAME,
                             ],
                         ],
                     ],

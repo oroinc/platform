@@ -4,6 +4,12 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\Parameter;
 
+/**
+ * Assembles action parameters from configuration.
+ *
+ * This assembler converts parameter configuration arrays into {@see Parameter} objects,
+ * extracting type, message, and default value information for each parameter.
+ */
 class ParameterAssembler extends AbstractAssembler
 {
     /**

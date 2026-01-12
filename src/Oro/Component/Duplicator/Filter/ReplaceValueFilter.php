@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Duplicator\Filter;
 
+/**
+ * Replaces a property value with a specified value during object duplication.
+ *
+ * This filter is used to override the value of a specific property when
+ * duplicating an object, allowing customization of which properties are
+ * copied and what values they should have.
+ */
 class ReplaceValueFilter implements Filter
 {
     /**

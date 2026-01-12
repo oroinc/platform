@@ -6,6 +6,13 @@ use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Subscribes to segment-related events to extend report functionality with aggregated field support.
+ *
+ * This subscriber listens to widget options load and condition builder options load events
+ * from the SegmentBundle. When a report widget is being configured, it injects JavaScript
+ * extensions that enable support for aggregated field conditions in the report builder UI.
+ */
 class SegmentSubscriber implements EventSubscriberInterface
 {
     #[\Override]

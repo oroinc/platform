@@ -12,6 +12,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Form type for setting a new password.
+ *
+ * This form type provides a single password field with password complexity
+ * validation and suggestions. It is used in scenarios where users need to
+ * set a new password without providing their current password.
+ */
 class SetPasswordType extends AbstractType
 {
     /** @var PasswordTooltipProvider */

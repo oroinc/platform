@@ -552,7 +552,8 @@ class ExtendHelper
                 return false;
             }
             // check if a new entity has been requested to be deleted before schema is updated
-            if (ExtendScope::STATE_DELETE === $state
+            if (
+                ExtendScope::STATE_DELETE === $state
                 && !class_exists($extendConfig->getId()->getClassName())
             ) {
                 return false;

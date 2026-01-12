@@ -42,7 +42,8 @@ class CommentAssociationProvider implements ResetInterface
         }
 
         $result = null;
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)
+        if (
+            $this->doctrineHelper->isManageableEntityClass($entityClass)
             && $this->configManager->hasConfig($entityClass)
         ) {
             $entityConfig = $this->configManager->getEntityConfig('comment', $entityClass);

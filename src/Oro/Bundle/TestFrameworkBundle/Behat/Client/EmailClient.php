@@ -29,10 +29,10 @@ class EmailClient
      */
     public function getMessages(): array
     {
-        $data = $this->getJson($this->url.'/messages');
+        $data = $this->getJson($this->url . '/messages');
         $messages = [];
         foreach ($data as $message) {
-            $messageDetails = $this->getJson($this->url.'/messages/'.$message['id'].'.json');
+            $messageDetails = $this->getJson($this->url . '/messages/' . $message['id'] . '.json');
             if (!isset($messageDetails['source'])) {
                 $plainMessage = $this->client->get($this->url . '/messages/' . $message['id'] . '.source');
                 $messageDetails['source'] = $plainMessage->getBody()->getContents();

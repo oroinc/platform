@@ -6,6 +6,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
+/**
+ * Provides virtual tag field support for taggable entities.
+ *
+ * This provider enables the tag field to be treated as a virtual field in queries and
+ * entity configurations, allowing tags to be accessed and queried as if they were a
+ * regular entity field. It integrates with the entity bundle's virtual field system
+ * to provide seamless tag field access across the application.
+ */
 class TagVirtualFieldProvider implements VirtualFieldProviderInterface
 {
     public const TAG_FIELD = 'tag_field';

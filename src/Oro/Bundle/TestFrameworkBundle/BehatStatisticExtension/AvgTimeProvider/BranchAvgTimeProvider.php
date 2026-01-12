@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider;
 
+/**
+ * Provides average test execution times for a specific Git branch.
+ *
+ * This provider calculates average execution times based on historical data from builds
+ * on a specific Git branch, allowing test suite distribution to be optimized per branch.
+ */
 class BranchAvgTimeProvider extends AbstractAvgTimeProvider
 {
     #[\Override]

@@ -34,7 +34,7 @@ class FormAccessorTest extends TestCase
     public function testToString(): void
     {
         $formAccessor = new FormAccessor($this->form);
-        $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
+        $this->assertEquals('name:' . self::FORM_NAME, $formAccessor->toString());
     }
 
     public function testGetHash(): void
@@ -79,7 +79,7 @@ class FormAccessorTest extends TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertNull($formAccessor->getEnctype());
-        $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
+        $this->assertEquals('name:' . self::FORM_NAME, $formAccessor->toString());
     }
 
     public function testParamsInitializerForMultipartForm(): void
@@ -110,7 +110,7 @@ class FormAccessorTest extends TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertEquals('multipart/form-data', $formAccessor->getEnctype());
-        $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
+        $this->assertEquals('name:' . self::FORM_NAME, $formAccessor->toString());
     }
 
     public function testGetView(): void

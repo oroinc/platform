@@ -6,6 +6,14 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\MigrationBundle\Migrations\Schema\v1_0\OroMigrationBundle as MigrationBundleMigration10;
 
+/**
+ * Registers data fixtures in the migration tracking table.
+ *
+ * This migration is responsible for recording which data fixtures have been loaded by
+ * inserting fixture records into the migration data table. It processes fixture data
+ * organized by bundle and type (`main` or `demo`), and registers fixtures that match the
+ * specified versions. This ensures the system knows which fixtures have been applied.
+ */
 class ReleaseDataFixtureMigration implements Migration
 {
     /**

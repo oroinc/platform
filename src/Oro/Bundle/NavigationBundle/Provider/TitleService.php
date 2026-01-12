@@ -144,7 +144,8 @@ class TitleService implements TitleServiceInterface
     #[\Override]
     public function setData(array $values)
     {
-        if (isset($values['titleTemplate'])
+        if (
+            isset($values['titleTemplate'])
             && ($this->getTemplate() == null
                 || (isset($values['force']) && $values['force']))
         ) {

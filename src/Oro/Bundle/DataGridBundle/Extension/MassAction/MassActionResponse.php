@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+/**
+ * Standard implementation of mass action response.
+ *
+ * This class provides a concrete implementation of {@see MassActionResponseInterface}, encapsulating
+ * the result of a mass action operation including success status, message, and optional metadata.
+ */
 class MassActionResponse implements MassActionResponseInterface
 {
     /** @var boolean */

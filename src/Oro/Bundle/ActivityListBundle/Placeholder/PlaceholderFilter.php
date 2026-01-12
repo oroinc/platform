@@ -50,7 +50,8 @@ class PlaceholderFilter
      */
     public function isApplicable($entity = null, $pageType = null)
     {
-        if (null === $pageType
+        if (
+            null === $pageType
             || !is_object($entity)
             || !$this->doctrineHelper->isManageableEntity($entity)
             || $this->doctrineHelper->isNewEntity($entity)
@@ -64,7 +65,8 @@ class PlaceholderFilter
         }
 
         $result = false;
-        if ($this->configManager->hasConfig($entityClass)
+        if (
+            $this->configManager->hasConfig($entityClass)
             && $this->isAllowedOnPage($entityClass, $pageType)
             && $this->hasApplicableActivityAssociations($entityClass)
         ) {
@@ -86,7 +88,8 @@ class PlaceholderFilter
         $entity   = $event->getEntity();
         $pageType = $event->getPageType();
 
-        if ($pageType === null
+        if (
+            $pageType === null
             || !is_object($entity)
             || !$this->configManager->hasConfig($this->doctrineHelper->getEntityClass($entity))
             || !$this->isAllowedOnPage($this->doctrineHelper->getEntityClass($entity), $pageType)

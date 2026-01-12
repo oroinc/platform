@@ -135,13 +135,15 @@ abstract class NormalizeSection implements ProcessorInterface
             // skip identifier fields to avoid duplicates
             $targetMetadata = $this->getEntityMetadata($entityClass, $fieldPath);
             $targetFieldName = $this->getLastFieldName($fieldPath);
-            if (null !== $targetMetadata
+            if (
+                null !== $targetMetadata
                 && \in_array($targetFieldName, $targetMetadata->getIdentifierFieldNames(), true)
             ) {
                 continue;
             }
 
-            if (!$isCollectionValuedAssociation
+            if (
+                !$isCollectionValuedAssociation
                 && !$this->isCollectionValuedAssociation($targetMetadata, $targetFieldName)
             ) {
                 $fieldKey = $fieldPrefix . $fieldName;

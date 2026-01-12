@@ -71,7 +71,8 @@ class AllEntityHierarchyProvider extends AbstractEntityHierarchyProvider
             if ($metadata->isMappedSuperclass) {
                 continue;
             }
-            if ($this->extendConfigProvider->hasConfig($metadata->name)
+            if (
+                $this->extendConfigProvider->hasConfig($metadata->name)
                 && !ExtendHelper::isEntityAccessible($this->extendConfigProvider->getConfig($metadata->name))
             ) {
                 continue;

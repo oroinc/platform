@@ -32,7 +32,8 @@ class RetryHelper
         $result = false;
         if (\count($rawItems) > 1) {
             foreach ($processedItemStatuses as $status) {
-                if (BatchUpdateItemStatus::NOT_PROCESSED === $status
+                if (
+                    BatchUpdateItemStatus::NOT_PROCESSED === $status
                     || BatchUpdateItemStatus::HAS_ERRORS === $status
                 ) {
                     $result = true;
@@ -56,7 +57,8 @@ class RetryHelper
         $lastNoErrorsItemIndex = -1;
         foreach ($processedItemStatuses as $index => $status) {
             if (BatchUpdateItemStatus::NOT_PROCESSED === $status) {
-                if (-1 === $lastNoErrorsItemIndex
+                if (
+                    -1 === $lastNoErrorsItemIndex
                     || \count($result[$lastNoErrorsItemIndex][1]) !== ($index - $result[$lastNoErrorsItemIndex][0])
                 ) {
                     $lastNoErrorsItemIndex = \count($result);

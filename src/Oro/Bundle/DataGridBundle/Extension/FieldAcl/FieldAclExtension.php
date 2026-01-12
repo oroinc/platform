@@ -79,7 +79,8 @@ class FieldAclExtension extends AbstractExtension
             foreach ($this->fieldAclConfig as $fieldData) {
                 [$entityAlias, $fieldName, $columnName] = $fieldData;
                 $entityReference = $this->getEntityReference($record, $entityAlias);
-                if (null !== $entityReference
+                if (
+                    null !== $entityReference
                     && !$this->authorizationChecker->isGranted('VIEW', new FieldVote($entityReference, $fieldName))
                 ) {
                     // set column value to null if user does not have an access to view this value
@@ -107,7 +108,8 @@ class FieldAclExtension extends AbstractExtension
         );
 
         foreach ($fieldAclConfig as $columnName => $fieldConfig) {
-            if (array_key_exists(PropertyInterface::DISABLED_KEY, $fieldConfig)
+            if (
+                array_key_exists(PropertyInterface::DISABLED_KEY, $fieldConfig)
                 && $fieldConfig[PropertyInterface::DISABLED_KEY]
             ) {
                 continue;

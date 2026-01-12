@@ -7,6 +7,13 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+/**
+ * Guesses form types for action attributes based on their type and metadata.
+ *
+ * This guesser determines appropriate form types and options for action attributes,
+ * supporting both simple type mappings and entity-based attributes with custom
+ * form configuration lookup.
+ */
 class AttributeGuesser extends AbstractGuesser
 {
     /**

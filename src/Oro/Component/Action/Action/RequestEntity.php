@@ -75,8 +75,10 @@ class RequestEntity extends AbstractAction
             );
         }
 
-        if (!empty($options['where']) && !is_array($options['where']) &&
-                !$options['where'] instanceof PropertyPathInterface) {
+        if (
+            !empty($options['where']) && !is_array($options['where']) &&
+                !$options['where'] instanceof PropertyPathInterface
+        ) {
             throw new InvalidParameterException('Parameter "where" must be array or property');
         } elseif (empty($options['where'])) {
             $options['where'] = [];

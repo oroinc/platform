@@ -30,7 +30,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
     private const ACTIVE_JOB_STATUSES = [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
     private \DateTime $startDateTime;
     private string $phpExecutablePath;
-    private bool   $shouldNotRunConsumer = false;
+    private bool $shouldNotRunConsumer = false;
     /** @var array|Process[] */
     private array $processes = [];
     private int $countConsumers;
@@ -132,8 +132,10 @@ class JobStatusSubscriber implements EventSubscriberInterface
     private function hasSearchReindexJobs(array $activeJobs): bool
     {
         foreach ($activeJobs as $job) {
-            if (str_contains($job['name'], 'search_reindex')
-                || str_contains($job['name'], 'oro.search.reindex')) {
+            if (
+                str_contains($job['name'], 'search_reindex')
+                || str_contains($job['name'], 'oro.search.reindex')
+            ) {
                 return true;
             }
         }
@@ -203,7 +205,8 @@ class JobStatusSubscriber implements EventSubscriberInterface
         $container = $this->kernel->getContainer();
         $clientFactory = $container->get('oro_elasticsearch.client.factory');
 
-        if ($container->has('oro_website_elasticsearch.engine.parameters_provider')
+        if (
+            $container->has('oro_website_elasticsearch.engine.parameters_provider')
             && $this->websiteElasticsearchClient === null
         ) {
             $parameters = $container->get('oro_website_elasticsearch.engine.parameters_provider')
@@ -213,7 +216,8 @@ class JobStatusSubscriber implements EventSubscriberInterface
             }
         }
 
-        if ($container->has('oro_elasticsearch.engine.parameters_provider')
+        if (
+            $container->has('oro_elasticsearch.engine.parameters_provider')
             && $this->elasticsearchClient === null
         ) {
             $parameters = $container->get('oro_elasticsearch.engine.parameters_provider')->getEngineParameters();

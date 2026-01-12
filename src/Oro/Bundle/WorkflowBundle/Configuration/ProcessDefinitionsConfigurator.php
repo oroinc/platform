@@ -10,6 +10,13 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
+/**
+ * Configures process definitions by synchronizing definition configurations with the database.
+ *
+ * This configurator manages the lifecycle of process definitions, including creation, update,
+ * and removal of definitions based on provided configurations. It maintains a dirty flag to
+ * track changes requiring persistence and supports logging of configuration operations.
+ */
 class ProcessDefinitionsConfigurator implements LoggerAwareInterface
 {
     use LoggerAwareTrait;

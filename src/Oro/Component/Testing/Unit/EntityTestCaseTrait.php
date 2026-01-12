@@ -7,6 +7,14 @@ use Oro\Component\Testing\Unit\Constraint\PropertyGetterReturnsDefaultValue;
 use Oro\Component\Testing\Unit\Constraint\PropertyGetterReturnsSetValue;
 use Oro\Component\Testing\Unit\PropertyAccess\CollectionAccessor;
 
+/**
+ * Provides assertion methods for testing entity property getters and setters.
+ *
+ * This trait offers convenient assertion methods for verifying that entity
+ * properties have correct default values, can be set and retrieved properly,
+ * and handle collection properties correctly. It simplifies the testing of
+ * entity accessor methods.
+ */
 trait EntityTestCaseTrait
 {
     /**

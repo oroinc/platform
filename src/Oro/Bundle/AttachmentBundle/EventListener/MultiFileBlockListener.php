@@ -137,8 +137,10 @@ class MultiFileBlockListener
         }
 
         // Removes Additional section if no subblocks left
-        if ($scrollData->hasBlock(UiExtension::ADDITIONAL_SECTION_KEY)
-            && $scrollData->isEmptyBlock(UiExtension::ADDITIONAL_SECTION_KEY)) {
+        if (
+            $scrollData->hasBlock(UiExtension::ADDITIONAL_SECTION_KEY)
+            && $scrollData->isEmptyBlock(UiExtension::ADDITIONAL_SECTION_KEY)
+        ) {
             $scrollData->removeNamedBlock(UiExtension::ADDITIONAL_SECTION_KEY);
         }
 

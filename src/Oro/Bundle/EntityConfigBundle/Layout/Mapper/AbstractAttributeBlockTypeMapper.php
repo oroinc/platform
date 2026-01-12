@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Layout\Mapper;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
+/**
+ * Maps attribute types and target classes to layout block types.
+ *
+ * This mapper provides a registry-based approach to determine which layout block type should be used
+ * to render a specific attribute. It supports mapping by attribute type directly or by inspecting the
+ * target class of association attributes using Doctrine metadata.
+ */
 class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
 {
     /** @var array */

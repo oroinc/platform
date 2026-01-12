@@ -357,7 +357,8 @@ class CountQueryBuilderOptimizer
 
             // skip joins that is not left joins or was not used in GROUP BY statement,
             // if it was a GROUP BY statement at all
-            if ($join->getJoinType() !== Expr\Join::LEFT_JOIN
+            if (
+                $join->getJoinType() !== Expr\Join::LEFT_JOIN
                 || (!empty($groupByAliases) && !in_array($alias, $groupByAliases, true))
             ) {
                 continue;

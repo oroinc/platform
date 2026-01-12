@@ -27,7 +27,8 @@ class ExtendMigrationExecutor extends MigrationExecutorWithNameGenerator
     public function setExtensionManager(MigrationExtensionManager $extensionManager): void
     {
         parent::setExtensionManager($extensionManager);
-        if (null !== $this->extendOptionsManager
+        if (
+            null !== $this->extendOptionsManager
             && $this->extensionManager instanceof ExtendMigrationExtensionManager
         ) {
             $this->extensionManager->setExtendOptionsManager($this->extendOptionsManager);

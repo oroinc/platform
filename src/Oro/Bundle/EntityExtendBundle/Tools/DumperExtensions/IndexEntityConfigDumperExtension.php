@@ -76,8 +76,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
                 $fieldType = $fieldConfigId->getFieldType();
                 if ($this->isIndexRequired($fieldConfig, $fieldConfigId->getClassName(), $fieldName, $fieldType)) {
                     if (!isset($indexes[$fieldName]) || !$indexes[$fieldName]) {
-                        // TODO: need to be changed to fieldName => columnName
-                        // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3940
+                        // see BAP-3940
                         $indexes[$fieldName] = IndexScope::INDEX_SIMPLE;
                         if ($fieldConfig->is('unique')) {
                             $indexes[$fieldName] = IndexScope::INDEX_UNIQUE;

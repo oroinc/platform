@@ -145,7 +145,8 @@ class EmailActivityManager
     private function isInContext(object $item, array $contexts): bool
     {
         foreach ($contexts as $context) {
-            if (ClassUtils::getClass($item) === ClassUtils::getClass($context)
+            if (
+                ClassUtils::getClass($item) === ClassUtils::getClass($context)
                 && $item->getId() === $context->getId()
             ) {
                 return true;

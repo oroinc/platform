@@ -6,6 +6,9 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Repository for sidebar state entities.
+ */
 class SidebarStateRepository extends EntityRepository
 {
     /**

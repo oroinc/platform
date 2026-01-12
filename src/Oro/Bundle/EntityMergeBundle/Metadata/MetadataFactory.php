@@ -4,6 +4,15 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
+/**
+ * Factory for creating metadata objects used in entity merge operations.
+ *
+ * This factory provides methods to instantiate {@see EntityMetadata}, {@see FieldMetadata}, and
+ * {@see DoctrineMetadata} objects. It handles the conversion of Doctrine mapping arrays to
+ * {@see DoctrineMetadata} instances and validates that provided metadata is of the correct type.
+ * Developers can extend this factory to customize metadata creation or apply additional
+ * initialization logic.
+ */
 class MetadataFactory
 {
     /**

@@ -210,7 +210,7 @@ class PreExportMessageProcessorAbstractTest extends TestCase
 
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
-            ->with($jobUniqueName.'.chunk.1');
+            ->with($jobUniqueName . '.chunk.1');
 
         $user = $this->createMock(User::class);
         $user->expects(self::once())
@@ -278,8 +278,8 @@ class PreExportMessageProcessorAbstractTest extends TestCase
         $this->jobRunner->expects(self::exactly(2))
             ->method('createDelayed')
             ->withConsecutive(
-                [$jobUniqueName.'.chunk.1'],
-                [$jobUniqueName.'.chunk.2']
+                [$jobUniqueName . '.chunk.1'],
+                [$jobUniqueName . '.chunk.2']
             );
 
         $user = $this->createMock(User::class);

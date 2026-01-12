@@ -91,21 +91,21 @@ class CollectionCalculatorTest extends WebTestCase
         }
 
         $child = new Job();
-        $child->setName($job->getName().'.child_new');
+        $child->setName($job->getName() . '.child_new');
         $child->setStatus(Job::STATUS_NEW);
         $child->setRootJob($job);
         $child->setCreatedAt(new \DateTime());
         $jobManager->saveJob($child);
 
         $child = new Job();
-        $child->setName($job->getName().'.child_failed');
+        $child->setName($job->getName() . '.child_failed');
         $child->setStatus(Job::STATUS_FAILED);
         $child->setRootJob($job);
         $child->setCreatedAt(new \DateTime());
         $jobManager->saveJob($child);
 
         $child = new Job();
-        $child->setName($job->getName().'.child_complete');
+        $child->setName($job->getName() . '.child_complete');
         $child->setStatus(Job::STATUS_SUCCESS);
         $child->setRootJob($job);
         $child->setCreatedAt(new \DateTime());

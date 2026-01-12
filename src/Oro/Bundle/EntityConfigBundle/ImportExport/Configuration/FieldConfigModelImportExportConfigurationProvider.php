@@ -7,6 +7,13 @@ use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
 
+/**
+ * Provides import/export configuration for field configuration models.
+ *
+ * This provider defines the import and export jobs and processors used for handling field configuration
+ * data in CSV format, enabling administrators to bulk import field configurations and export templates
+ * for field configuration management.
+ */
 class FieldConfigModelImportExportConfigurationProvider implements ImportExportConfigurationProviderInterface
 {
     #[\Override]

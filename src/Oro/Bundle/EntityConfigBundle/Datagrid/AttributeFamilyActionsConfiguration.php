@@ -7,6 +7,13 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Configures visibility of datagrid actions for attribute families based on user permissions.
+ *
+ * This class determines which actions (view, edit, delete) should be visible for each attribute family
+ * record in a datagrid, using authorization checks to ensure users can only perform actions they are
+ * permitted to execute.
+ */
 class AttributeFamilyActionsConfiguration
 {
     /** @var AuthorizationCheckerInterface */

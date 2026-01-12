@@ -29,7 +29,8 @@ class DefaultRelationFieldValidator extends AbstractFieldValidator
             if (!empty($guessedName)) {
                 // note, that we cant create ONE_TO_MANY & MANY_TO_MANY fields via CSV import, so next search is enough
                 $fieldConfig = $this->validationHelper->findFieldConfig($className, $guessedName);
-                if ($fieldConfig
+                if (
+                    $fieldConfig
                     && \in_array(
                         $fieldConfig->getId()->getFieldType(),
                         [RelationType::ONE_TO_MANY, RelationType::MANY_TO_MANY],

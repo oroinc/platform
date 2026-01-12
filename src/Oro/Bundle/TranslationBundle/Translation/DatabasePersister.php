@@ -113,7 +113,8 @@ class DatabasePersister
         Language $language,
         int $scope = Translation::SCOPE_INSTALLED
     ): void {
-        if ($scope === Translation::SCOPE_SYSTEM
+        if (
+            $scope === Translation::SCOPE_SYSTEM
             && !$language->isLocalFilesLanguage()
             && $this->fileBasedLanguageHelper->isFileBasedLocale($language->getCode())
         ) {
@@ -195,7 +196,8 @@ class DatabasePersister
                     'language_id' => $languageId
                 ]
             );
-        } elseif ($translationDataItem['scope'] !== Translation::SCOPE_SYSTEM
+        } elseif (
+            $translationDataItem['scope'] !== Translation::SCOPE_SYSTEM
             && $scope === Translation::SCOPE_SYSTEM
             && $translationDataItem['value'] === $value
         ) {

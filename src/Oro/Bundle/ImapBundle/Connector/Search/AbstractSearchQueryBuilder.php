@@ -4,6 +4,13 @@ namespace Oro\Bundle\ImapBundle\Connector\Search;
 
 use Closure;
 
+/**
+ * Provides common functionality for building IMAP search queries.
+ *
+ * This base class implements a fluent interface for constructing IMAP search queries with support
+ * for logical operators (AND, OR, NOT) and nested expressions.
+ * Subclasses should extend this to provide specific search criteria methods for different IMAP search keys.
+ */
 abstract class AbstractSearchQueryBuilder
 {
     protected $query;

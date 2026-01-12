@@ -79,7 +79,8 @@ class PropertyPathSecurityHelper
             if ($hasAssociation && ($stepsCount - 1) !== $id) {
                 // get object from the relation to make checks on it
                 $object = $propertyAccessor->getValue($object, $field);
-                if (!$this->checkIsGranted($permission, $object, $className)
+                if (
+                    !$this->checkIsGranted($permission, $object, $className)
                 ) {
                     return false;
                 }

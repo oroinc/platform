@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+/**
+ * Manages workflow steps and their relationships.
+ *
+ * This manager provides access to workflow steps, manages the start step, and provides
+ * methods to query step relationships and transitions.
+ */
 class StepManager
 {
     public const DEFAULT_START_STEP_NAME = 'step:starting_point';

@@ -10,6 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
+ * phpcs:ignore
  * Change oro_message_queue_job.data type from deprecated json_array to json.
  */
 class ChangeJsonArrayToJsonType implements Migration, DatabasePlatformAwareInterface

@@ -7,6 +7,12 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
 
+/**
+ * Listens to workflow definition changes to validate workflow configurations.
+ *
+ * This listener responds to workflow creation and update events by assembling and validating
+ * the workflow definition, ensuring that only valid configurations are persisted.
+ */
 class WorkflowDefinitionValidateListener
 {
     /** @var WorkflowAssembler */

@@ -24,7 +24,7 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
     /** @var array [processor name => TRUE, ...] */
     private array $securityAgnosticProcessors;
     private TokenStorageInterface $tokenStorage;
-    private TokenSerializerInterface  $tokenSerializer;
+    private TokenSerializerInterface $tokenSerializer;
 
     public function __construct(
         array $securityAgnosticProcessors,

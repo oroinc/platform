@@ -22,7 +22,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
                 'settings' => [
                     'extra_key' => 'extra_value',
                     'paths' => array_map(function ($n) {
-                        return '/tmp/'.$n;
+                        return '/tmp/' . $n;
                     }, range(1, 3))
                 ],
             ],
@@ -30,7 +30,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
                 'type' => null,
                 'settings' => [
                     'paths' => array_map(function ($n) {
-                        return '/tmp/'.$n;
+                        return '/tmp/' . $n;
                     }, range(1, 5))
                 ],
             ],
@@ -72,7 +72,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
             [
                 'divider' => 10,
                 'expectedSets' => [
-                    SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0' => [
+                    SuiteConfigurationRegistry::PREFIX_SUITE_SET . '_0' => [
                         'AcmeSuite3_0',
                         'AcmeSuite3_1',
                         'AcmeSuite3_2',
@@ -87,13 +87,13 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
             [
                 'divider' => 5,
                 'expectedSets' => [
-                    SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0' => [
+                    SuiteConfigurationRegistry::PREFIX_SUITE_SET . '_0' => [
                         'AcmeSuite5_2',
                         'AcmeSuite5_3',
                         'AcmeSuite5_4',
                         'AcmeSuite3_0',
                     ],
-                    SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_1' => [
+                    SuiteConfigurationRegistry::PREFIX_SUITE_SET . '_1' => [
                         'AcmeSuite3_1',
                         'AcmeSuite3_2',
                         'AcmeSuite5_0',
@@ -104,17 +104,17 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
             [
                 'divider' => 3,
                 'expectedSets' => [
-                    SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0' => [
+                    SuiteConfigurationRegistry::PREFIX_SUITE_SET . '_0' => [
                         'AcmeSuite3_0',
                         'AcmeSuite3_1',
                         'AcmeSuite3_2',
                     ],
-                    SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_1' => [
+                    SuiteConfigurationRegistry::PREFIX_SUITE_SET . '_1' => [
                         'AcmeSuite5_3',
                         'AcmeSuite5_4',
                         'AcmeSuite5_0',
                     ],
-                    SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_2' => [
+                    SuiteConfigurationRegistry::PREFIX_SUITE_SET . '_2' => [
                         'AcmeSuite5_1',
                         'AcmeSuite5_2',
                     ],
@@ -189,7 +189,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->generateSetsDividedByCount(8);
 
-        $this->assertIsArray($suiteConfigRegistry->getSet(SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0'));
+        $this->assertIsArray($suiteConfigRegistry->getSet(SuiteConfigurationRegistry::PREFIX_SUITE_SET . '_0'));
     }
 
     public function testFilterConfiguration()

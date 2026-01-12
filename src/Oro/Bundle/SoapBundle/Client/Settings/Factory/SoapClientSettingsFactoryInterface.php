@@ -4,6 +4,11 @@ namespace Oro\Bundle\SoapBundle\Client\Settings\Factory;
 
 use Oro\Bundle\SoapBundle\Client\Settings\SoapClientSettingsInterface;
 
+/**
+ * Defines the contract for factories that create SOAP client settings.
+ *
+ * Implementing factories produce SoapClientSettings instances from WSDL paths, method names, and SOAP options.
+ */
 interface SoapClientSettingsFactoryInterface
 {
     /**

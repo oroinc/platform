@@ -7,7 +7,12 @@ use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * The base class for entity field configuration validators.
+ * Provides common functionality for validators of entity field configuration.
+ *
+ * This base class implements helper methods for validating {@see FieldConfigModel} instances,
+ * including type checking and violation reporting. It provides access to the field name validation helper
+ * for checking field name conflicts and restrictions.
+ * Subclasses should extend this to implement specific field configuration validation rules.
  */
 abstract class AbstractFieldValidator extends ConstraintValidator
 {

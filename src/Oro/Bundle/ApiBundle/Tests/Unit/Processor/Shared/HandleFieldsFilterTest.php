@@ -164,7 +164,8 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
                     bool $isArrayAllowed,
                     bool $isRangeAllowed
                 ) use ($exception) {
-                    if ('entity' === $value
+                    if (
+                        'entity' === $value
                         && DataType::ENTITY_CLASS === $dataType
                         && $this->context->getRequestType() === $requestType
                         && !$isArrayAllowed
@@ -172,7 +173,8 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
                     ) {
                         return 'Test\Entity';
                     }
-                    if ('field1' === $value
+                    if (
+                        'field1' === $value
                         && DataType::STRING === $dataType
                         && $this->context->getRequestType() === $requestType
                         && $isArrayAllowed

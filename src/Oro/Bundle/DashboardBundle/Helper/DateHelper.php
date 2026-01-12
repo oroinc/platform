@@ -383,7 +383,8 @@ class DateHelper
         $start = $dateRange['start'];
         $end   = $dateRange['end'];
 
-        if ($dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN
+        if (
+            $dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN
             || $dateRange['type'] === AbstractDateFilterType::TYPE_ALL_TIME
         ) {
             QueryBuilderUtil::checkIdentifier($field);

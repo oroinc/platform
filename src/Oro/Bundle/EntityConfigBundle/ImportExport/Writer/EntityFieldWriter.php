@@ -124,7 +124,8 @@ class EntityFieldWriter implements ItemWriterInterface
                 // check if a label text was changed
                 $labelKey = (string)$config->get($code);
 
-                if ($state === ExtendScope::STATE_NEW ||
+                if (
+                    $state === ExtendScope::STATE_NEW ||
                     !$this->translationHelper->isTranslationEqual($labelKey, (string)$value)
                 ) {
                     $translations[$labelKey] = $value;

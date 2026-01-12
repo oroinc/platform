@@ -27,8 +27,8 @@ class InputOutputController implements Controller
                 '--skip-isolators',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "Comma separated list of isolator tags to skip. If the value is not provided, all are skipped. \n".
-                '(available isolator tags are: <comment>'.implode(',', $this->getIsolatorTags()).'</comment>)',
+                "Comma separated list of isolator tags to skip. If the value is not provided, all are skipped. \n" .
+                '(available isolator tags are: <comment>' . implode(',', $this->getIsolatorTags()) . '</comment>)',
                 false
             )
             ->addOption(

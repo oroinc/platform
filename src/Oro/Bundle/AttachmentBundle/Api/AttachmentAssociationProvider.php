@@ -44,7 +44,8 @@ class AttachmentAssociationProvider implements ResetInterface
         }
 
         $result = null;
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)
+        if (
+            $this->doctrineHelper->isManageableEntityClass($entityClass)
             && $this->attachmentAssociationHelper->isAttachmentAssociationEnabled($entityClass)
         ) {
             $result = ExtendHelper::buildAssociationName($entityClass);

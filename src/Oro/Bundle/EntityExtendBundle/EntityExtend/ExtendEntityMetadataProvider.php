@@ -22,7 +22,7 @@ class ExtendEntityMetadataProvider implements ExtendEntityMetadataProviderInterf
     protected array $entityManageable = [];
 
     public function __construct(
-        private ConfigManager  $configManager,
+        private ConfigManager $configManager,
         private DoctrineHelper $doctrineHelper,
     ) {
     }

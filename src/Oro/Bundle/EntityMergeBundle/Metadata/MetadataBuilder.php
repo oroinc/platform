@@ -15,6 +15,16 @@ use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Builds merge metadata for entity classes from Doctrine ORM metadata.
+ *
+ * This class is responsible for constructing complete {@see EntityMetadata} objects by analyzing
+ * Doctrine class metadata and entity configuration. It discovers and configures merge metadata
+ * for all fields and associations, including regular Doctrine fields, associations, inverse
+ * associations, and unmapped dynamic fields. It dispatches the {@see MergeEvents::BUILD_METADATA} event to allow
+ * listeners to customize the metadata before it is cached. Developers can extend this class
+ * or use event listeners to customize how metadata is built for specific entities or fields.
+ */
 class MetadataBuilder
 {
     /** @var MetadataFactory */

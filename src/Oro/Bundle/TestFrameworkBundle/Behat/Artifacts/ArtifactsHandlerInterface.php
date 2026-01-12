@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Artifacts;
 
+/**
+ * Defines the contract for handling test artifacts (screenshots, logs, etc.) and uploading them to remote storage.
+ */
 interface ArtifactsHandlerInterface
 {
     /**

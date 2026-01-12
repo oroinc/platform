@@ -281,8 +281,8 @@ class AclCache implements AclCacheInterface
      */
     private function getDataKeyByIdentity(ObjectIdentityInterface $oid): string
     {
-        return md5($oid->getType()).sha1($oid->getType())
-            .'_'.md5($oid->getIdentifier()).sha1($oid->getIdentifier());
+        return md5($oid->getType()) . sha1($oid->getType())
+            . '_' . md5($oid->getIdentifier()) . sha1($oid->getIdentifier());
     }
 
     private function getSidKey(SecurityIdentityInterface $sid): string

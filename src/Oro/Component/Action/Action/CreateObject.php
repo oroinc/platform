@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Creates an object instance and stores it in a context attribute.
+ *
+ * This action instantiates an object of a specified class, optionally passing constructor arguments
+ * and assigning initial property values. The created object is stored in a specified context attribute
+ * for use by subsequent actions. Supports dynamic class names and argument resolution from context.
+ */
 class CreateObject extends AbstractAction
 {
     public const OPTION_KEY_ATTRIBUTE = 'attribute';

@@ -164,7 +164,8 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->validate()
                 ->always(function ($value) {
-                    if (!empty($value['service'])
+                    if (
+                        !empty($value['service'])
                         && (
                             !empty($value[OperationDefinition::PRECONDITIONS])
                             || !empty($value[OperationDefinition::PREACTIONS])

@@ -7,6 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for email address input in API contexts.
+ *
+ * Provides a form field for entering email addresses in API requests with support for
+ * both single and multiple addresses through a view transformer.
+ */
 class EmailAddressApiType extends AbstractType
 {
     #[\Override]

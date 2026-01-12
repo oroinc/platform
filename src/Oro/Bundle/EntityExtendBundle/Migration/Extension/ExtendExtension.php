@@ -982,8 +982,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $options = $this->extendOptionsManager->getExtendOptions();
         $tableName = $this->getTableName($table);
         $keyName = $tableName . '!' . $associationName;
-        if (!empty($options[$keyName][ExtendOptionsManager::MODE_OPTION])
-            && $options[$keyName][ExtendOptionsManager::MODE_OPTION] === ConfigModel::MODE_HIDDEN) {
+        if (
+            !empty($options[$keyName][ExtendOptionsManager::MODE_OPTION])
+            && $options[$keyName][ExtendOptionsManager::MODE_OPTION] === ConfigModel::MODE_HIDDEN
+        ) {
             throw new \InvalidArgumentException('Target field can\'t be hidden.');
         }
     }

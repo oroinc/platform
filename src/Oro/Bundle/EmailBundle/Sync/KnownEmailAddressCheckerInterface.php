@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
+/**
+ * Defines the contract for checking if an email address is known in the system.
+ *
+ * Implementations provide methods to verify whether an email address has been previously
+ * encountered or registered in the system, supporting email synchronization optimization.
+ */
 interface KnownEmailAddressCheckerInterface
 {
     /**

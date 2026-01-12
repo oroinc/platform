@@ -4,6 +4,12 @@ namespace Oro\Bundle\EntityConfigBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Constraint for validating attribute family group configuration.
+ *
+ * This constraint validates that an attribute family has at least one group, that group labels are unique,
+ * that there is exactly one default group, and that the default group exists in the family's groups.
+ */
 class AttributeFamilyGroups extends Constraint
 {
     /**

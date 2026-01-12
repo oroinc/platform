@@ -124,7 +124,7 @@ class Foo {
         $shortNames = [];
         foreach ($namespaceUseAnalyzer->getDeclarationsFromTokens($tokens) as $namespaceUseAnalysis) {
             $shortNames[strtolower($namespaceUseAnalysis->getShortName())] =
-                '\\'.strtolower($namespaceUseAnalysis->getFullName());
+                '\\' . strtolower($namespaceUseAnalysis->getFullName());
         }
 
         foreach ($tokens as $index => $token) {
@@ -179,7 +179,7 @@ class Foo {
                     ->getOption(),
                 (new FixerOptionBuilder(
                     'allow_unused_params',
-                    'Whether `param` annotation without actual signature is allowed (`true`) '.
+                    'Whether `param` annotation without actual signature is allowed (`true`) ' .
                     'or considered superfluous (`false`)'
                 ))
                     ->setAllowedTypes(['bool'])
@@ -272,8 +272,10 @@ class Foo {
                 continue;
             }
 
-            if (!array_key_exists($argumentName, $argumentsInfo) ||
-                !$this->annotationIsSuperfluous($annotation, $argumentsInfo[$argumentName], $shortNames)) {
+            if (
+                !array_key_exists($argumentName, $argumentsInfo) ||
+                !$this->annotationIsSuperfluous($annotation, $argumentsInfo[$argumentName], $shortNames)
+            ) {
                 $removeAnnotations = false;
                 break;
             }
@@ -357,8 +359,10 @@ class Foo {
 
             if (!$info['allows_null']) {
                 $nextIndex = $tokens->getNextMeaningfulToken($index);
-                if ($tokens[$nextIndex]->equals('=')
-                    && $tokens[$tokens->getNextMeaningfulToken($nextIndex)]->equals([T_STRING, 'null'])) {
+                if (
+                    $tokens[$nextIndex]->equals('=')
+                    && $tokens[$tokens->getNextMeaningfulToken($nextIndex)]->equals([T_STRING, 'null'])
+                ) {
                     $info['allows_null'] = true;
                 }
             }

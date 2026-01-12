@@ -1071,7 +1071,8 @@ abstract class WebTestCase extends BaseWebTestCase
         try {
             \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            if ($statusCode < 400
+            if (
+                $statusCode < 400
                 && $response->getStatusCode() >= 400
                 && $response->headers->contains('Content-Type', 'application/json')
             ) {

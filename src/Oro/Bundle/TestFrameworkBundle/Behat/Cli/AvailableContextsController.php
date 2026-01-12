@@ -26,7 +26,7 @@ class AvailableContextsController implements Controller
                 '--contexts',
                 null,
                 InputOption::VALUE_NONE,
-                'Show all available test contexts.'.PHP_EOL.
+                'Show all available test contexts.' . PHP_EOL .
                 'Contexts can be configured automatically by extensions, and manually by configuration'
             )
             ->addOption(

@@ -77,7 +77,8 @@ class FilterFieldsByExtra implements ProcessorInterface
         $result = false;
         if (!empty($normalizedFieldFilters) && $context->getParentClassName() && $context->getAssociationName()) {
             $parentClass = $context->getParentClassName();
-            if (isset($normalizedFieldFilters[$parentClass])
+            if (
+                isset($normalizedFieldFilters[$parentClass])
                 && \count($normalizedFieldFilters) === 1
                 && \count($normalizedFieldFilters[$parentClass]) === 1
                 && $normalizedFieldFilters[$parentClass][0] === $context->getAssociationName()
@@ -127,7 +128,8 @@ class FilterFieldsByExtra implements ProcessorInterface
             $idFieldNames = $this->getEntityIdentifierFieldNames($metadata, $definition);
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
-                if (!$field->isExcluded()
+                if (
+                    !$field->isExcluded()
                     && !(
                         $field->isMetaProperty()
                         && (
@@ -189,7 +191,8 @@ class FilterFieldsByExtra implements ProcessorInterface
             $idFieldNames = $definition->getIdentifierFieldNames();
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
-                if (!$field->isExcluded()
+                if (
+                    !$field->isExcluded()
                     && !\in_array($fieldName, $allowedFields, true)
                     && !\in_array($fieldName, $idFieldNames, true)
                 ) {

@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\EntityConfig;
 
+/**
+ * Defines visibility scope constants for entity fields in datagrids.
+ *
+ * This class provides constants that control how entity fields are displayed and managed
+ * in datagrids. The visibility levels range from completely hidden to mandatory display,
+ * allowing fine-grained control over field visibility and editability in grid configurations.
+ */
 class DatagridScope
 {
     public const IS_VISIBLE_FALSE     = 0; // do not show on grid and do not allow to manage

@@ -146,7 +146,8 @@ class EmbedFormController extends AbstractController
     protected function setCorsHeaders(EmbeddedForm $formEntity, Request $request, Response $response)
     {
         // skip if not a CORS request
-        if (!$request->headers->has('Origin')
+        if (
+            !$request->headers->has('Origin')
             || $request->headers->get('Origin') == $request->getSchemeAndHttpHost()
         ) {
             return;

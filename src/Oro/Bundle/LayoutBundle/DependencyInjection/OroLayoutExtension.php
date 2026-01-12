@@ -109,7 +109,7 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
         }
 
         foreach (scandir($layoutsPath) as $themeDir) {
-            if ('.' !== $themeDir[0] && is_dir($layoutsPath.'/'.$themeDir)) {
+            if ('.' !== $themeDir[0] && is_dir($layoutsPath . '/' . $themeDir)) {
                 $emailTemplatesPath = $layoutsPath . '/' . $themeDir . '/email-templates/';
                 if (is_dir($emailTemplatesPath)) {
                     $paths[$themeDir][] = $emailTemplatesPath;

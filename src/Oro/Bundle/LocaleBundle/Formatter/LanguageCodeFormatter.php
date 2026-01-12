@@ -55,7 +55,7 @@ class LanguageCodeFormatter
         $diff = \count($codePieces) - \count(explode(' ', $languageName));
 
         if ($diff > 0) {
-            $languageName .= ' '.ucwords(implode(' ', array_slice($codePieces, -$diff)));
+            $languageName .= ' ' . ucwords(implode(' ', array_slice($codePieces, -$diff)));
         }
 
         return $languageName;

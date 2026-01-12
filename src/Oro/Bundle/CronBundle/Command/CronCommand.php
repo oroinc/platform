@@ -107,7 +107,8 @@ HELP
             if ($command instanceof LazyCommand) {
                 $command = $command->getCommand();
             }
-            if (($command instanceof CronCommandActivationInterface && !$command->isActive())
+            if (
+                ($command instanceof CronCommandActivationInterface && !$command->isActive())
                 || !$command->isEnabled()
             ) {
                 $output->writeln(

@@ -30,9 +30,11 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
             return true;
         }
         $fieldsMetadata = $transport->getFieldsMetadata();
-        if (isset($fieldsMetadata[$transport->getName()])
+        if (
+            isset($fieldsMetadata[$transport->getName()])
             && $fieldsMetadata[$transport->getName()]['is_extend']
-            && !$fieldsMetadata[$transport->getName()]['is_serialized']) {
+            && !$fieldsMetadata[$transport->getName()]['is_serialized']
+        ) {
             $this->setBoolCacheItem($transport, $this, true);
 
             return true;
@@ -258,8 +260,10 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
                     $previousValue = $transport->getStorage()->offsetGet($propertyName);
                     $value = $transport->getArgument(0);
 
-                    if ((!$value instanceof \Traversable && !is_array($value) && !$value instanceof \ArrayAccess) ||
-                        !$previousValue instanceof \Doctrine\Common\Collections\Collection) {
+                    if (
+                        (!$value instanceof \Traversable && !is_array($value) && !$value instanceof \ArrayAccess) ||
+                        !$previousValue instanceof \Doctrine\Common\Collections\Collection
+                    ) {
                         $transport->getStorage()->offsetSet($propertyName, $value);
                         $transport->setProcessed(true);
                         $transport->setResult($transport->getObject());
@@ -323,8 +327,10 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
     #[\Override]
     public function isset(EntityFieldProcessTransport $transport): void
     {
-        if (is_object($transport->getObject()) &&
-            property_exists($transport->getObject(), $transport->getName())) {
+        if (
+            is_object($transport->getObject()) &&
+            property_exists($transport->getObject(), $transport->getName())
+        ) {
             $reflectionProperty = new \ReflectionProperty($transport->getObject(), $transport->getName());
             if (!$reflectionProperty->isPublic()) {
                 return;

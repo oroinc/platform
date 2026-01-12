@@ -86,7 +86,8 @@ class AssociationManager
             if ($this->isSupportedRelation($relation, $associationType, $associationKind)) {
                 $targetClass = $relation['target_entity'];
 
-                if (null === $filter
+                if (
+                    null === $filter
                     || call_user_func($filter, $associationOwnerClass, $targetClass, $this->configManager)
                 ) {
                     /** @var FieldConfigId $fieldConfigId */

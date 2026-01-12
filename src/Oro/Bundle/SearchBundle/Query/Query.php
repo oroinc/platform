@@ -301,7 +301,7 @@ class Query
         $fromString = '';
         $from = $this->getFrom();
         if ($from) {
-            $fromString .= 'from '.implode(', ', $from);
+            $fromString .= 'from ' . implode(', ', $from);
         }
 
         $whereString = $this->getWhereString();
@@ -311,34 +311,34 @@ class Query
         if ($orderings) {
             $orderByString = ' order by';
             foreach ($orderings as $field => $direction) {
-                $orderByString .= ' '.Criteria::explodeFieldTypeName($field)[1].' '.$direction;
+                $orderByString .= ' ' . Criteria::explodeFieldTypeName($field)[1] . ' ' . $direction;
             }
         }
 
         $limitString = '';
         $maxResults = $this->criteria->getMaxResults();
         if ($maxResults && $maxResults != Query::INFINITY) {
-            $limitString = ' limit '.$maxResults;
+            $limitString = ' limit ' . $maxResults;
         }
 
         $offsetString = '';
         $firstResult = $this->criteria->getFirstResult();
         if ($firstResult) {
-            $offsetString .= ' offset '.$firstResult;
+            $offsetString .= ' offset ' . $firstResult;
         }
 
         $selectString = '';
         $selectColumnsString = $this->getStringColumns();
         if (!empty($selectColumnsString)) {
-            $selectString = trim('select '.$selectColumnsString).' ';
+            $selectString = trim('select ' . $selectColumnsString) . ' ';
         }
 
         return $selectString
-            .$fromString
-            .$whereString
-            .$orderByString
-            .$limitString
-            .$offsetString;
+            . $fromString
+            . $whereString
+            . $orderByString
+            . $limitString
+            . $offsetString;
     }
 
     /**
@@ -460,7 +460,7 @@ class Query
         $whereString = '';
         if (null !== $whereExpr = $this->criteria->getWhereExpression()) {
             $visitor = new QueryStringExpressionVisitor();
-            $whereString = ' where '.$whereExpr->visit($visitor);
+            $whereString = ' where ' . $whereExpr->visit($visitor);
         }
 
         return $whereString;
@@ -480,7 +480,7 @@ class Query
         $result = implode(', ', $selects);
 
         if (count($selects) > 1) {
-            $result = '('.$result.')';
+            $result = '(' . $result . ')';
         }
 
         return $result;

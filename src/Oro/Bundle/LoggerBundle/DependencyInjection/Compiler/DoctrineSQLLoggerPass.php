@@ -7,8 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds setSQLLogger() call to Doctrine DBAL Configuration
- * This restores SQL logging functionality using the deprecated but still working setSQLLogger() method
+ * Adds `setSQLLogger()` call to Doctrine DBAL Configuration to restore the SQL logging functionality
+ * that was available in prior versions.
+ *
+ * @see \Doctrine\DBAL\Configuration::setSQLLogger()
+ * @see https://github.com/doctrine/dbal/pull/4967
  */
 class DoctrineSQLLoggerPass implements CompilerPassInterface
 {

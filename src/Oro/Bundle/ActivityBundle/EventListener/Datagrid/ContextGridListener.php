@@ -43,7 +43,8 @@ class ContextGridListener
         $queryBuilder = $dataSource->getQueryBuilder();
         $alias        = current($queryBuilder->getDQLPart('from'))->getAlias();
 
-        if ($dataSource instanceof OrmDatasource &&
+        if (
+            $dataSource instanceof OrmDatasource &&
             $parameters->has('activityId') &&
             $parameters->has('activityClass')
         ) {

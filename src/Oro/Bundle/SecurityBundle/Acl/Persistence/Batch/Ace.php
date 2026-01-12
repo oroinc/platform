@@ -4,6 +4,14 @@ namespace Oro\Bundle\SecurityBundle\Acl\Persistence\Batch;
 
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
+/**
+ * Represents an Access Control Entry (ACE) in batch ACL operations.
+ *
+ * This class encapsulates all the information needed to define an ACE, including
+ * the security identity, permission mask, field restrictions, and strategy for
+ * comparing masks. It is used during batch ACL updates to specify how permissions
+ * should be granted or denied for specific security identities.
+ */
 class Ace
 {
     /**

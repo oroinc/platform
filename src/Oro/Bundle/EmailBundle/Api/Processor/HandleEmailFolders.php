@@ -83,7 +83,8 @@ class HandleEmailFolders implements ProcessorInterface
     {
         $batchFolders = $batch->getFolders();
         foreach ($batchFolders as $batchFolder) {
-            if ($batchFolder->getType() === $type
+            if (
+                $batchFolder->getType() === $type
                 && (FolderType::OTHER !== $type || $batchFolder->getFullName() === $fullName)
             ) {
                 return $batchFolder;

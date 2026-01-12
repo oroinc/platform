@@ -10,6 +10,14 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Provides common functionality for datagrid extensions.
+ *
+ * This base class implements the extension visitor interface with empty default implementations
+ * for all visitor methods, allowing subclasses to override only the methods they need.
+ * It also provides configuration validation, parameter management, and datagrid mode filtering capabilities.
+ * Subclasses should extend this to create specific datagrid extensions (e.g., sorters, filters, actions).
+ */
 abstract class AbstractExtension implements ExtensionVisitorInterface
 {
     /**

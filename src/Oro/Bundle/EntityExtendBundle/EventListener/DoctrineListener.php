@@ -87,7 +87,8 @@ class DoctrineListener
 
             $class->setDiscriminatorMap($map);
             $this->collectedMaps = array_merge($this->collectedMaps, array_fill_keys(array_values($map), $map));
-        } elseif (isset($this->collectedMaps[$class->name])
+        } elseif (
+            isset($this->collectedMaps[$class->name])
             && $class->discriminatorMap !== $this->collectedMaps[$class->name]
         ) {
             $class->setDiscriminatorMap($this->collectedMaps[$class->name]);

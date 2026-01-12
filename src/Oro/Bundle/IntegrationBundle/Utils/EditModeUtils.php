@@ -4,6 +4,14 @@ namespace Oro\Bundle\IntegrationBundle\Utils;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
+/**
+ * Provides utility methods for managing integration channel edit modes.
+ *
+ * This utility class offers static methods for checking and managing the edit mode of
+ * integration channels. Edit modes control whether channels can be edited, deleted, or
+ * have their enabled/disabled status changed. The system supports three edit modes:
+ * DISALLOW (no modifications), RESTRICTED (limited modifications), and ALLOW (full modifications).
+ */
 class EditModeUtils
 {
     /**

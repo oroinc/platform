@@ -4,6 +4,12 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Extension\ExtensionInterface;
 
+/**
+ * Defines the contract for building a layout factory with extensions, types, and renderers.
+ *
+ * A layout factory builder uses a fluent interface to register extensions, block types, type extensions,
+ * layout updates, and renderers, then builds and returns a fully configured layout factory.
+ */
 interface LayoutFactoryBuilderInterface
 {
     /**

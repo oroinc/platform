@@ -5,6 +5,13 @@ namespace Oro\Bundle\IntegrationBundle\Manager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Entity\FieldsChanges;
 
+/**
+ * Manages tracking of field changes for entities during integration operations.
+ *
+ * This manager stores and retrieves information about which fields have been modified on entities
+ * during import/export operations. It uses a separate {@see FieldsChanges} entity to maintain a record of changes,
+ * allowing integration processes to track what has been modified and act accordingly.
+ */
 class FieldsChangesManager
 {
     /**

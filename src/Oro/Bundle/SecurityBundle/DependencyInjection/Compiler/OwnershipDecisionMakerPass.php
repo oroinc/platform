@@ -6,6 +6,13 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Compiler pass that registers ownership decision makers with the chain service.
+ *
+ * This pass collects all services tagged with `oro_security.owner.ownership_decision_maker`
+ * and registers them with the chain ownership decision maker service, allowing the system
+ * to support multiple ownership decision strategies.
+ */
 class OwnershipDecisionMakerPass implements CompilerPassInterface
 {
     public const TAG_NAME = 'oro_security.owner.ownership_decision_maker';

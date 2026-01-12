@@ -22,10 +22,16 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Adds the following features:
- * * loading bundles based on "Resources/config/oro/bundles.yml" configuration files
- * * loading configuration from "Resources/config/oro/*.yml" configuration files
- * * extended error handling, {@see \Oro\Bundle\DistributionBundle\Error\ErrorHandler}
+ * Extends Symfony Kernel with Oro-specific bundle and configuration loading capabilities.
+ *
+ * This abstract kernel class provides core functionality for the Oro application platform:
+ * - Dynamically loads bundles from "Resources/config/oro/bundles.yml" configuration files
+ * - Loads configuration from "Resources/config/oro/*.yml" configuration files
+ * - Provides extended error handling through {@see ErrorHandler} for better debugging
+ * - Handles Windows junction points and monolithic repository structures
+ * - Manages container initialization with custom caching and deprecation tracking
+ *
+ * Subclasses must implement this kernel to create application-specific kernel instances.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -523,7 +529,8 @@ abstract class OroKernel extends Kernel
         if ($this instanceof CompilerPassInterface) {
             $container->addCompilerPass($this, PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         }
-        if (class_exists('ProxyManager\Configuration')
+        if (
+            class_exists('ProxyManager\Configuration')
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')
         ) {
             $container->setProxyInstantiator(new RuntimeInstantiator());

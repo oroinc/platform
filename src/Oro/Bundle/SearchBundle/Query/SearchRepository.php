@@ -5,6 +5,14 @@ namespace Oro\Bundle\SearchBundle\Query;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
 
+/**
+ * Provides a repository interface for creating and configuring search queries.
+ *
+ * This class acts as a repository for search operations, managing query factory
+ * and mapping provider dependencies. It provides methods to create search queries
+ * for specific entities and manage query configuration, serving as a convenient
+ * interface for building search queries in application code.
+ */
 class SearchRepository
 {
     /**

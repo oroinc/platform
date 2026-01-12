@@ -66,7 +66,8 @@ class ModifyCreatedAndUpdatedPropertiesListener
     {
         $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
         foreach ($metadata->getAssociationMappings() as $associationMapping) {
-            if ($associationMapping['type'] === ClassMetadata::MANY_TO_ONE
+            if (
+                $associationMapping['type'] === ClassMetadata::MANY_TO_ONE
                 && !empty($associationMapping['inversedBy'])
             ) {
                 $ownerClass = $associationMapping['targetEntity'];

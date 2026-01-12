@@ -56,8 +56,10 @@ trait ExtendEntityTrait
      */
     public function set(string $name, mixed $value): static
     {
-        if (!$this instanceof AbstractLocalizedFallbackValue
-            && ExtendEntityStaticCache::isAllowedIgnoreSet($this, $name)) {
+        if (
+            !$this instanceof AbstractLocalizedFallbackValue
+            && ExtendEntityStaticCache::isAllowedIgnoreSet($this, $name)
+        ) {
             $this->getStorage()->offsetSet($name, $value);
 
             return $this;
@@ -100,8 +102,10 @@ trait ExtendEntityTrait
 
     public function __set(string $name, $value)
     {
-        if (!$this instanceof AbstractLocalizedFallbackValue
-            && ExtendEntityStaticCache::isAllowedIgnoreSet($this, $name)) {
+        if (
+            !$this instanceof AbstractLocalizedFallbackValue
+            && ExtendEntityStaticCache::isAllowedIgnoreSet($this, $name)
+        ) {
             $this->getStorage()->offsetSet($name, $value);
 
             return $this;

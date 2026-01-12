@@ -227,7 +227,8 @@ class Job implements JobInterface
             $this->dispatchJobExecutionEvent(EventInterface::JOB_EXECUTION_FATAL_ERROR, $jobExecution);
         }
 
-        if (($jobExecution->getStatus()->getValue() <= BatchStatus::STOPPED)
+        if (
+            ($jobExecution->getStatus()->getValue() <= BatchStatus::STOPPED)
             && (count($jobExecution->getStepExecutions()) === 0)
         ) {
             /* @var ExitStatus */

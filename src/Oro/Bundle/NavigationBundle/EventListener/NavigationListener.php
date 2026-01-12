@@ -7,6 +7,14 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Manages menu visibility based on user permissions.
+ *
+ * This listener handles menu configuration events to control the visibility of menu items
+ * based on the current user's security permissions. It specifically manages the visibility
+ * of the menu management interface, ensuring that only users with appropriate permissions
+ * can access menu administration features.
+ */
 class NavigationListener
 {
     /** @var AuthorizationCheckerInterface */
@@ -30,7 +38,8 @@ class NavigationListener
         }
 
         $manageMenusItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'menu_list_default');
-        if (null !== $manageMenusItem
+        if (
+            null !== $manageMenusItem
             && (
                 !$this->authorizationChecker->isGranted('oro_config_system')
                 || !$this->authorizationChecker->isGranted('oro_navigation_manage_menus')

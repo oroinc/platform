@@ -43,7 +43,7 @@ class DependencyInjectionFormAccessorTest extends TestCase
     public function testToString(): void
     {
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
-        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:' . self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
     public function testGetHash(): void
@@ -94,7 +94,7 @@ class DependencyInjectionFormAccessorTest extends TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertNull($formAccessor->getEnctype());
-        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:' . self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
     public function testParamsInitializerForMultipartForm(): void
@@ -130,7 +130,7 @@ class DependencyInjectionFormAccessorTest extends TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertEquals('multipart/form-data', $formAccessor->getEnctype());
-        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:' . self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
     public function testGetView(): void

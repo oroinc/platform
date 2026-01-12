@@ -134,7 +134,8 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      */
     protected function checkOptions(Options $options)
     {
-        if (($options['currencies_list'] !== null && !is_array($options['currencies_list']))
+        if (
+            ($options['currencies_list'] !== null && !is_array($options['currencies_list']))
             || (is_array($options['currencies_list']) && empty($options['currencies_list']))
         ) {
             throw new LogicException('The option "currencies_list" must be null or not empty array.');

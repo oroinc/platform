@@ -77,7 +77,7 @@ class SyncCommandTest extends WebTestCase
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
 
-        $result = self::runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
+        $result = self::runCommand('oro:cron:integration:sync', ['--integration=' . $integration->getId()]);
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
@@ -98,7 +98,7 @@ class SyncCommandTest extends WebTestCase
         $result = self::runCommand(
             'oro:cron:integration:sync',
             [
-                '--integration='.$integration->getId(),
+                '--integration=' . $integration->getId(),
                 '--connector' => 'theConnector',
                 'fooConnectorOption=fooValue',
                 'barConnectorOption=barValue',
@@ -136,12 +136,12 @@ class SyncCommandTest extends WebTestCase
 
         self::assertNull(
             $this->getJobRepository()->findRootJobByJobNameAndStatuses(
-                'oro_integration:sync_integration:'.$integration->getId(),
+                'oro_integration:sync_integration:' . $integration->getId(),
                 [Job::STATUS_STALE]
             )
         );
 
-        $result = self::runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
+        $result = self::runCommand('oro:cron:integration:sync', ['--integration=' . $integration->getId()]);
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
@@ -155,7 +155,7 @@ class SyncCommandTest extends WebTestCase
 
         self::assertNotEmpty(
             $this->getJobRepository()->findRootJobByJobNameAndStatuses(
-                'oro_integration:sync_integration:'.$integration->getId(),
+                'oro_integration:sync_integration:' . $integration->getId(),
                 [Job::STATUS_STALE]
             )
         );

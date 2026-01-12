@@ -7,6 +7,13 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for editing ACL privilege identities.
+ *
+ * This form type provides fields for configuring an ACL privilege identity, including
+ * the identity ID and name. It is used to identify which entity or capability the
+ * privilege applies to.
+ */
 class AclPrivilegeIdentityType extends AbstractType
 {
     #[\Override]

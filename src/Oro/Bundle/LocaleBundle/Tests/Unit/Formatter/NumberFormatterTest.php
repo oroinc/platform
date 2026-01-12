@@ -286,7 +286,7 @@ class NumberFormatterTest extends TestCase
 
         $this->intlNumberFormatterFactory->expects($this->once())
             ->method('create')
-            ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
+            ->with($locale . '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
             ->willReturn($intlNumberFormatter);
 
         $currency = $this->formatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);
@@ -350,7 +350,7 @@ class NumberFormatterTest extends TestCase
 
         $this->intlNumberFormatterFactory->expects($this->once())
             ->method('create')
-            ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
+            ->with($locale . '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
             ->willReturn($intlNumberFormatter);
 
         $currency = $this->formatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);

@@ -7,6 +7,15 @@ use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 
+/**
+ * Creates workflow import processor supervisors for handling workflow import operations.
+ *
+ * Factory implementation that creates and configures {@see WorkflowImportProcessorSupervisor} instances
+ * for processing workflow imports with the format: `{workflow: <resource>, as: <target>, replace: <replacements>}`.
+ * Validates import format applicability and wraps {@see WorkflowImportProcessor} instances with supervision
+ * to manage import processing state and prevent circular references. This factory is responsible for
+ * instantiating the appropriate import processor infrastructure for workflow configuration imports.
+ */
 class WorkflowImportProcessorSupervisorFactory implements ImportProcessorFactoryInterface
 {
     /** @var ConfigFileReaderInterface */

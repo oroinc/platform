@@ -5,8 +5,10 @@ namespace Oro\Bundle\UserBundle\Autocomplete\QueryCriteria;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Class SearchUserCriteria
- * @package Oro\Bundle\UserBundle\Autocomplete
+ * Implements search criteria for user autocomplete functionality.
+ *
+ * This class adds search conditions to query builders for finding users by name or email, supporting
+ * autocomplete widgets that need to search across user first name, last name, and email address fields.
  */
 class SearchUserCriteria extends SearchCriteria
 {

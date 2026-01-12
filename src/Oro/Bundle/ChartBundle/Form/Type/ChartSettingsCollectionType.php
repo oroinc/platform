@@ -6,6 +6,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing a collection of chart settings.
+ *
+ * This form type dynamically builds form fields for each chart configuration provided
+ * in the 'chart_configs' option. Each chart configuration is rendered as a separate
+ * {@see ChartSettingsType} field, allowing users to configure settings for multiple charts
+ * within a single form.
+ */
 class ChartSettingsCollectionType extends AbstractType
 {
     #[\Override]

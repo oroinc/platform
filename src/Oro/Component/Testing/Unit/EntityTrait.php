@@ -71,7 +71,8 @@ trait EntityTrait
 
             // Looking for the property in parent classes
             // because it's impossible to get parent properties from the derived class
-            while (!$reflectionClass->hasProperty($property)
+            while (
+                !$reflectionClass->hasProperty($property)
                 && $parentReflectionClass = $reflectionClass->getParentClass()
             ) {
                 $reflectionClass = $parentReflectionClass;

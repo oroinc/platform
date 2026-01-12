@@ -66,17 +66,20 @@ class EntityDefinitionConfig extends EntityConfig
         if ($this->identifierFieldNames) {
             $result[ConfigUtil::IDENTIFIER_FIELD_NAMES] = $this->identifierFieldNames;
         }
-        if (isset($result[ConfigUtil::DISABLE_INCLUSION])
+        if (
+            isset($result[ConfigUtil::DISABLE_INCLUSION])
             && false === $result[ConfigUtil::DISABLE_INCLUSION]
         ) {
             unset($result[ConfigUtil::DISABLE_INCLUSION]);
         }
-        if (isset($result[ConfigUtil::DISABLE_FIELDSET])
+        if (
+            isset($result[ConfigUtil::DISABLE_FIELDSET])
             && false === $result[ConfigUtil::DISABLE_FIELDSET]
         ) {
             unset($result[ConfigUtil::DISABLE_FIELDSET]);
         }
-        if (isset($result[ConfigUtil::DISABLE_META_PROPERTIES])
+        if (
+            isset($result[ConfigUtil::DISABLE_META_PROPERTIES])
             && false === $result[ConfigUtil::DISABLE_META_PROPERTIES]
         ) {
             unset($result[ConfigUtil::DISABLE_META_PROPERTIES]);
@@ -84,7 +87,8 @@ class EntityDefinitionConfig extends EntityConfig
         if ($this->disabledMetaProperties) {
             $result[ConfigUtil::DISABLED_META_PROPERTIES] = $this->disabledMetaProperties;
         }
-        if (isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
+        if (
+            isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
             && false === $result[ConfigUtil::DISABLE_PARTIAL_LOAD]
         ) {
             unset($result[ConfigUtil::DISABLE_PARTIAL_LOAD]);
@@ -317,7 +321,8 @@ class EntityDefinitionConfig extends EntityConfig
      */
     public function isIdentifierOnlyRequested(): bool
     {
-        if (empty($this->identifierFieldNames)
+        if (
+            empty($this->identifierFieldNames)
             || \count($this->fields) !== \count($this->identifierFieldNames)
         ) {
             return false;

@@ -101,7 +101,8 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
             foreach ($keys as $objectKey) {
                 $objectIndex = $toCheck[$objectKey];
                 foreach ($checked as $checkedObjectKey => $checkedObjectIndex) {
-                    if ($this->isDependentObject($includedData[$checkedObjectIndex], $objectKey)
+                    if (
+                        $this->isDependentObject($includedData[$checkedObjectIndex], $objectKey)
                         || $this->isDependentObject($includedData[$objectIndex], $checkedObjectKey)
                     ) {
                         unset($toCheck[$objectKey]);
@@ -147,7 +148,8 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
 
     private function getObjectKey(mixed $object): ?string
     {
-        if (\is_array($object)
+        if (
+            \is_array($object)
             && \array_key_exists(JsonApiDoc::TYPE, $object)
             && \array_key_exists(JsonApiDoc::ID, $object)
             && \is_string($object[JsonApiDoc::TYPE])

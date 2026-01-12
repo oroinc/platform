@@ -461,7 +461,8 @@ class WorkflowManager implements LoggerAwareInterface
         $this->inTransaction(
             function (EntityManager $em) use (&$data) {
                 foreach ($data as $row) {
-                    if (empty($row['workflowItem']) || !$row['workflowItem'] instanceof WorkflowItem
+                    if (
+                        empty($row['workflowItem']) || !$row['workflowItem'] instanceof WorkflowItem
                         || empty($row['transition'])
                     ) {
                         continue;

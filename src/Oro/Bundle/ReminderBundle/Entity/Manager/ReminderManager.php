@@ -113,7 +113,8 @@ class ReminderManager
      */
     public function applyReminders(array &$items, $entityClassName)
     {
-        if (empty($items)
+        if (
+            empty($items)
             || !is_subclass_of($entityClassName, RemindableInterface::class)
         ) {
             return;

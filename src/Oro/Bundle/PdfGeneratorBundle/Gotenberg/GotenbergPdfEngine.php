@@ -119,8 +119,10 @@ class GotenbergPdfEngine implements PdfEngineInterface, LoggerAwareInterface
             $builder->paperSize((string)$pdfOptions['page_width'], (string)$pdfOptions['page_height']);
         }
 
-        if (isset($pdfOptions['margin_top'], $pdfOptions['margin_bottom']) &&
-            isset($pdfOptions['margin_left'], $pdfOptions['margin_right'])) {
+        if (
+            isset($pdfOptions['margin_top'], $pdfOptions['margin_bottom']) &&
+            isset($pdfOptions['margin_left'], $pdfOptions['margin_right'])
+        ) {
             $builder->margins(
                 (string)$pdfOptions['margin_top'],
                 (string)$pdfOptions['margin_bottom'],

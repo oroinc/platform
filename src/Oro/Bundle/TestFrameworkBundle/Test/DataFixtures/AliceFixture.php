@@ -6,6 +6,13 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\Common\DataFixtures\SharedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
+/**
+ * Provides common functionality for data fixtures using the Alice library.
+ *
+ * This base class integrates Alice fixture loading with Doctrine's data fixtures framework,
+ * managing reference repositories and providing a bridge between Alice and Doctrine.
+ * Subclasses must implement the loadData method to return Alice fixture data.
+ */
 abstract class AliceFixture implements
     SharedFixtureInterface,
     AliceFixtureLoaderAwareInterface

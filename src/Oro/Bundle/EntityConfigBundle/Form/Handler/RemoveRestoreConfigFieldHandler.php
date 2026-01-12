@@ -67,7 +67,8 @@ class RemoveRestoreConfigFieldHandler
          * Without this check, after first table column field deleting without schema update, we will hide
          * update schema button and set entityConfig as not upgradeable
          */
-        if ($entityConfig->in('state', [ExtendScope::STATE_UPDATE, ExtendScope::STATE_NEW])
+        if (
+            $entityConfig->in('state', [ExtendScope::STATE_UPDATE, ExtendScope::STATE_NEW])
             && $fieldConfig->is('state', ExtendScope::STATE_NEW)
             && !$entityConfig->get('pending_changes')
             && !$otherFieldsRequireUpdate

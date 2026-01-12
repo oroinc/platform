@@ -5,7 +5,11 @@ namespace Oro\Bundle\SearchBundle\Event;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * This event allow to change search mapping config before the first usage of this mapping config
+ * Dispatched to allow modification of search mapping configuration before it is used.
+ *
+ * This event is fired when the search mapping configuration is being collected and before it is cached or
+ * used for the first time. Event listeners can modify the mapping configuration to add, remove, or alter
+ * entity search mappings, fields, and aliases dynamically.
  */
 class SearchMappingCollectEvent extends Event
 {

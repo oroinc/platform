@@ -48,7 +48,8 @@ abstract class AbstractHashEmailMigration extends AbstractEmailFixture
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $arrayData)
     {
         foreach ($this->getEmailHashesToUpdate() as $templateName => $contentHashes) {
-            if ($emailTemplate->getName() === $templateName
+            if (
+                $emailTemplate->getName() === $templateName
                 && ($contentHashes === true || \in_array(md5($emailTemplate->getContent()), $contentHashes, true))
             ) {
                 parent::updateExistingTemplate($emailTemplate, $arrayData);

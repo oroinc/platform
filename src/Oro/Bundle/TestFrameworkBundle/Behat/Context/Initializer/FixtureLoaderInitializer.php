@@ -7,6 +7,12 @@ use Behat\Behat\Context\Initializer\ContextInitializer;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 
+/**
+ * Initializes Behat contexts with the fixture loader.
+ *
+ * This initializer injects the {@see FixtureLoader} into any Behat context that implements
+ * {@see FixtureLoaderAwareInterface}, enabling contexts to load test fixtures during scenario execution.
+ */
 class FixtureLoaderInitializer implements ContextInitializer
 {
     /**

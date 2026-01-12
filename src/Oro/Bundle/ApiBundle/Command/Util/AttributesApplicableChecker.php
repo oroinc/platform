@@ -26,7 +26,8 @@ class AttributesApplicableChecker extends MatchApplicableChecker
         $result = self::ABSTAIN;
 
         foreach ($this->attributes as $attrName) {
-            if (\array_key_exists($attrName, $processorAttributes) && $context->has($attrName)
+            if (
+                \array_key_exists($attrName, $processorAttributes) && $context->has($attrName)
                 && !$this->isMatch($processorAttributes[$attrName], $context->get($attrName), $attrName)
             ) {
                 $result = self::NOT_APPLICABLE;

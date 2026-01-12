@@ -9,6 +9,14 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Validates that a workflow is enabled before allowing transition processing.
+ *
+ * This processor checks whether the workflow is enabled through the feature toggle system.
+ * If the workflow is not enabled, it sets a ForbiddenTransitionException error in the context
+ * and redirects processing to the normalize group to handle the error appropriately.
+ * This ensures that disabled workflows cannot be executed even if directly accessed.
+ */
 class FeatureCheckProcessor implements ProcessorInterface
 {
     /** @var FeatureChecker */

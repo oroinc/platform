@@ -73,12 +73,12 @@ class JsLogSubscriberTest extends TestCase
                     ],
                 ],
                 'expected result' =>
-                    '[ERROR - 2017-07-10T19:04:21+00:00] [URL: "example.com"] '.
-                        '[Feature: "Feature Example", On line: 0, Step: "Test JsLogger Mock Step"] '.
-                        'Something went wrong'.PHP_EOL.
-                    '[WARNING - 2017-07-10T19:04:21+00:00] [URL: "example.com"] '.
-                        '[Feature: "Feature Example", On line: 0, Step: "Test JsLogger Mock Step"] '.
-                        'Check your environment'.PHP_EOL
+                    '[ERROR - 2017-07-10T19:04:21+00:00] [URL: "example.com"] ' .
+                        '[Feature: "Feature Example", On line: 0, Step: "Test JsLogger Mock Step"] ' .
+                        'Something went wrong' . PHP_EOL .
+                    '[WARNING - 2017-07-10T19:04:21+00:00] [URL: "example.com"] ' .
+                        '[Feature: "Feature Example", On line: 0, Step: "Test JsLogger Mock Step"] ' .
+                        'Check your environment' . PHP_EOL
             ],
             'irregular log' => [
                 'logs' => [
@@ -87,9 +87,9 @@ class JsLogSubscriberTest extends TestCase
                     ],
                 ],
                 'expected result' =>
-                    '[UNKNOWN_LEVEL - 2017-07-10T19:04:21+00:00] [URL: "example.com"] '.
-                        '[Feature: "Feature Example", On line: 0, Step: "Test JsLogger Mock Step"] '.
-                        'UNKNOWN_MESSAGE'.PHP_EOL
+                    '[UNKNOWN_LEVEL - 2017-07-10T19:04:21+00:00] [URL: "example.com"] ' .
+                        '[Feature: "Feature Example", On line: 0, Step: "Test JsLogger Mock Step"] ' .
+                        'UNKNOWN_MESSAGE' . PHP_EOL
             ],
         ];
     }

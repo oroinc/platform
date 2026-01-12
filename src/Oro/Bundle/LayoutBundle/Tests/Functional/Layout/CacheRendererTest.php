@@ -55,7 +55,7 @@ class CacheRendererTest extends LayoutTestCase
     {
         $this->context->data()->set('text', 'ORIGINAL TEXT.');
         // layout context must be unique for each test, otherwise layout tree is cached and new options are not applied
-        $this->context->set('route_name', 'layout_cache:non_cached_blocks'.sha1(serialize($cache)));
+        $this->context->set('route_name', 'layout_cache:non_cached_blocks' . sha1(serialize($cache)));
 
         $this->layoutManager->getLayoutBuilder()
             ->add('root', null, 'container')
@@ -119,7 +119,7 @@ class CacheRendererTest extends LayoutTestCase
     {
         $this->context->data()->set('text', 'ORIGINAL TEXT.');
         // layout context must be unique for each test, otherwise layout tree is cached and new options are not applied
-        $this->context->set('route_name', 'layout_cache:cached_blocks'.sha1(serialize($cache)));
+        $this->context->set('route_name', 'layout_cache:cached_blocks' . sha1(serialize($cache)));
 
         $this->layoutManager->getLayoutBuilder()
             ->add('root', null, 'container')
@@ -377,7 +377,7 @@ THIRD UPDATED.</li>
         $this->context->data()->set('text', 'ORIGINAL TEXT.');
         $this->context->data()->set('visible', true);
         // layout context must be unique for each test, otherwise layout tree is cached and new options are not applied
-        $this->context->set('route_name', 'layout_cache:max_age'.rand());
+        $this->context->set('route_name', 'layout_cache:max_age' . rand());
 
         $this->layoutManager->getLayoutBuilder()
             ->add('root', null, 'container')
@@ -445,7 +445,7 @@ THIRD UPDATED.</li>
         $this->context->data()->set('text', 'ORIGINAL TEXT.');
         $this->context->data()->set('object', new stdClass());
         // layout context must be unique for each test, otherwise layout tree is cached and new options are not applied
-        $this->context->set('route_name', 'layout_cache:invalid_cache_metadata'.sha1(serialize($cache).rand()));
+        $this->context->set('route_name', 'layout_cache:invalid_cache_metadata' . sha1(serialize($cache) . rand()));
 
         $this->layoutManager->getLayoutBuilder()
             ->add('root', null, 'container')
@@ -476,7 +476,7 @@ THIRD UPDATED.</li>
         $this->cache->clear();
         $this->context->data()->set('text', 'ORIGINAL TEXT.');
         // layout context must be unique for each test, otherwise layout tree is cached and new options are not applied
-        $this->context->set('route_name', 'layout_cache:invalidation_during_request'.rand(0, 4903943094));
+        $this->context->set('route_name', 'layout_cache:invalidation_during_request' . rand(0, 4903943094));
 
         $this->layoutManager->getLayoutBuilder()
             ->add('root', null, 'container')

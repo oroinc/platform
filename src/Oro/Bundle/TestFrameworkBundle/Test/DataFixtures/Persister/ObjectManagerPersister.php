@@ -95,7 +95,8 @@ class ObjectManagerPersister implements PersisterInterface
 
         foreach ($allMetadata as $metadata) {
             /** @var ORMClassMetadataInfo $metadata */
-            if (false === $metadata->isMappedSuperclass
+            if (
+                false === $metadata->isMappedSuperclass
                 && false === (isset($metadata->isEmbeddedClass) && $metadata->isEmbeddedClass)
             ) {
                 $persistableClasses[] = $metadata->getName();

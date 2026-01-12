@@ -32,7 +32,8 @@ class NextPageLinkMetadata extends LinkMetadataDecorator
         }
 
         $pageNumber = null;
-        if (!$dataAccessor->tryGetValue(ConfigUtil::PAGE_NUMBER, $pageNumber)
+        if (
+            !$dataAccessor->tryGetValue(ConfigUtil::PAGE_NUMBER, $pageNumber)
             && null !== $this->queryStringAccessor
         ) {
             // the pagination is not supported

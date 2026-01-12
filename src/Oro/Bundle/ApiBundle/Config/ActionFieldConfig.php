@@ -142,7 +142,8 @@ class ActionFieldConfig implements FieldConfigInterface
     public function setDirection(?string $direction): void
     {
         if ($direction) {
-            if (ConfigUtil::DIRECTION_INPUT_ONLY !== $direction
+            if (
+                ConfigUtil::DIRECTION_INPUT_ONLY !== $direction
                 && ConfigUtil::DIRECTION_OUTPUT_ONLY !== $direction
                 && ConfigUtil::DIRECTION_BIDIRECTIONAL !== $direction
             ) {

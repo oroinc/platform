@@ -6,6 +6,12 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
+/**
+ * Repository for managing email attachments.
+ *
+ * Provides specialized queries for retrieving email attachments, including methods
+ * to fetch all attachments associated with a specific email thread.
+ */
 class EmailAttachmentRepository extends EntityRepository
 {
     /**

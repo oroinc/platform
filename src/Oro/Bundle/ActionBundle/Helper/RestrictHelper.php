@@ -4,6 +4,13 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Oro\Bundle\ActionBundle\Model\Operation;
 
+/**
+ * Filters operations based on group restrictions.
+ *
+ * This helper class provides functionality to restrict a list of operations
+ * based on their assigned groups, supporting flexible group matching including
+ * null (no restriction), false (only ungrouped), array, or string group values.
+ */
 class RestrictHelper
 {
     /**

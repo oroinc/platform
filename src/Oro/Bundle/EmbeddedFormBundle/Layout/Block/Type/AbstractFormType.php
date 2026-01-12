@@ -12,6 +12,12 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * Provides common functionality for layout block types that render forms.
+ *
+ * This base class handles form accessor configuration and provides methods for building form-related block views in
+ * the layout system. Subclasses should extend this to create specific form block types for embedded forms in layouts.
+ */
 abstract class AbstractFormType extends AbstractType
 {
     public const SHORT_NAME = '';

@@ -21,7 +21,7 @@ class EmailOwnerManagerTest extends TestCase
     private array $fixtures;
     private EmailOwnerProviderStorage&MockObject $emailOwnerProviderStorage;
     private EmailAddressManager&MockObject $emailAddressManager;
-    private EmailOwnerManager$emailOwnerManager;
+    private EmailOwnerManager $emailOwnerManager;
 
     #[\Override]
     protected function setUp(): void

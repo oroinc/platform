@@ -6,6 +6,13 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Retrieves the class name of an object and stores it in a context attribute.
+ *
+ * This action extracts the fully qualified class name from an object using Doctrine's {@see ClassUtils},
+ * which properly handles proxy objects. If the value is not an object, `null` is stored instead.
+ * Useful for dynamic type checking and conditional logic based on object types.
+ */
 class GetClassName extends AbstractAction
 {
     /**

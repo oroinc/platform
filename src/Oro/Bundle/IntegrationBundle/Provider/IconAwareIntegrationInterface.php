@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+/**
+ * Defines the contract for integration types that provide custom icons for UI display.
+ *
+ * Integration types implementing this interface can supply a custom icon path that will be
+ * displayed in the user interface to visually represent the integration type. This enhances
+ * the user experience by providing recognizable branding for different integration types.
+ */
 interface IconAwareIntegrationInterface
 {
     /**

@@ -8,6 +8,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting entities applicable to workflows.
+ *
+ * This form type provides a filtered list of entities that can be used with workflows,
+ * excluding entities that are not applicable for workflow management.
+ */
 class ApplicableEntitiesType extends AbstractType
 {
     public const NAME = 'oro_workflow_applicable_entities';

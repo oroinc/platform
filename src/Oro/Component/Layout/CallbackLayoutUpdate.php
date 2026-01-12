@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Applies layout updates using a callback function.
+ *
+ * This class wraps a callable that receives a layout manipulator and layout item, allowing custom
+ * layout update logic to be executed during the layout building process.
+ */
 class CallbackLayoutUpdate implements LayoutUpdateInterface
 {
     /**

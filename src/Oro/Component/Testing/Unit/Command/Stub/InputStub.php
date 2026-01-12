@@ -46,7 +46,8 @@ class InputStub implements InputInterface
                 return true;
             }
 
-            if (!$onlyParams
+            if (
+                !$onlyParams
                 && (array_key_exists($str, $this->arguments) || in_array($str, $this->arguments, true))
             ) {
                 return true;

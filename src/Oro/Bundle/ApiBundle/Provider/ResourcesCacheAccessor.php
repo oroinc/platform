@@ -48,7 +48,8 @@ class ResourcesCacheAccessor
         $cacheItem = $this->cache->getItem($cacheKey);
         if ($cacheItem->isHit()) {
             [$timestamp, $value] = $cacheItem->get();
-            if (null === $this->configCacheStateRegistry
+            if (
+                null === $this->configCacheStateRegistry
                 || $this->getConfigCacheState($requestType)->isCacheFresh($timestamp)
             ) {
                 return $value;

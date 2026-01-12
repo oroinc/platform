@@ -10,6 +10,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for configuring query designer filters.
+ *
+ * This form type provides a user interface for defining filter conditions in a query designer query.
+ * It allows users to select a column to filter on and specify the filter criterion. The form
+ * dynamically adds a column choice field based on the configured column choice type, enabling
+ * context-aware field selection for the filter condition.
+ */
 class FilterType extends AbstractType
 {
     public const NAME = 'oro_query_designer_filter';

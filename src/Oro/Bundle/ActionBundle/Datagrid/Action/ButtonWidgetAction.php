@@ -5,6 +5,12 @@ namespace Oro\Bundle\ActionBundle\Datagrid\Action;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides a datagrid action that launches a button widget with translated dialog options.
+ *
+ * This action extends the base {@see AbstractAction} to support widget-based button actions
+ * in datagrids, with automatic translation of dialog titles and customizable launcher options.
+ */
 class ButtonWidgetAction extends AbstractAction
 {
     /**

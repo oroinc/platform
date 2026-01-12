@@ -26,7 +26,8 @@ class DecimalValidator extends ConstraintValidator
         $bigDecimalValue = BigDecimal::of($value)->abs();
         $intPart = $bigDecimalValue->getIntegralPart();
 
-        if (($intPart > 0 && \strlen($intPart) > ($constraint->precision - $constraint->scale))
+        if (
+            ($intPart > 0 && \strlen($intPart) > ($constraint->precision - $constraint->scale))
             || ($bigDecimalValue->getScale() > $constraint->scale)
         ) {
             $this->context->addViolation(

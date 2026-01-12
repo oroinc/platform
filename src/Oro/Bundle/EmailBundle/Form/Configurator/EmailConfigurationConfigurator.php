@@ -59,7 +59,8 @@ class EmailConfigurationConfigurator
         if (!$this->isSmtpFieldsExist($data)) {
             return;
         }
-        if ($this->getParentScopeValue($data, 'smtp_settings_host')
+        if (
+            $this->getParentScopeValue($data, 'smtp_settings_host')
             && $this->getParentScopeValue($data, 'smtp_settings_port')
             && $this->getParentScopeValue($data, 'smtp_settings_encryption')
             && $this->getParentScopeValue($data, 'smtp_settings_username')

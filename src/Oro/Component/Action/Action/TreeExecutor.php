@@ -4,6 +4,13 @@ namespace Oro\Component\Action\Action;
 
 use Psr\Log\LoggerInterface;
 
+/**
+ * Executes a sequence of actions with optional error handling and logging.
+ *
+ * This action manages the execution of multiple child actions in sequence. Each action can be
+ * configured to either break execution on failure or continue with optional error logging.
+ * Useful for complex workflows that require multiple steps with conditional error handling.
+ */
 class TreeExecutor extends AbstractAction
 {
     public const ALIAS = 'tree';

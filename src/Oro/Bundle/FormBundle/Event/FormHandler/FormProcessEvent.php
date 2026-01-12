@@ -5,6 +5,14 @@ namespace Oro\Bundle\FormBundle\Event\FormHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched during form processing to allow listeners to intervene.
+ *
+ * This event is triggered at key points in the form processing lifecycle, such as
+ * before form data is set or before form submission. Listeners can interrupt the
+ * form processing by calling {@see FormProcessEvent::interruptFormProcess()}, preventing
+ * further processing and allowing for custom handling or validation logic.
+ */
 class FormProcessEvent extends Event implements FormAwareInterface
 {
     /**

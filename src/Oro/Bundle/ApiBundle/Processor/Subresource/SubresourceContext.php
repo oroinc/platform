@@ -370,7 +370,8 @@ class SubresourceContext extends Context
                 $this->parentMetadataExtras = new MetadataExtraCollection();
             }
             $this->parentMetadataExtras->setMetadataExtras($extras);
-            if ($this->isHateoasEnabled()
+            if (
+                $this->isHateoasEnabled()
                 && !$this->parentMetadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)
             ) {
                 $this->parentMetadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));

@@ -8,6 +8,26 @@ use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 
+/**
+ * Manages CRON job schedule entities in the database.
+ *
+ * This manager provides operations for creating, checking existence, and retrieving
+ * Schedule entities that define when and how console commands should be executed by the cron system.
+ * It handles the complexity of matching schedules by command name, cron definition, and command arguments,
+ * using argument hashing to ensure accurate identification of schedules even when arguments are
+ * provided in different orders.
+ *
+ * Key responsibilities:
+ * - Checking if a schedule already exists for a given command, arguments, and cron definition
+ * - Creating new schedule entities with validation to prevent duplicates
+ * - Retrieving schedules filtered by command name and arguments
+ * - Delegating argument-based filtering to {@see SchedulesByArgumentsFilterInterface}
+ *
+ * This manager is typically used by:
+ * - {@see DeferredScheduler} for batch schedule operations
+ * - Cron command definition loaders
+ * - Workflow and process trigger schedulers
+ */
 class ScheduleManager
 {
     /** @var ManagerRegistry */

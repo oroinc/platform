@@ -5,6 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Import;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 
+/**
+ * Supervises and manages workflow import processing with circular reference detection.
+ *
+ * Coordinates the execution of multiple workflow import processors, tracking their processing state
+ * and preventing circular import references. Maintains collections of pending imports and processed imports
+ * to detect and prevent infinite recursion when workflows import other workflows. Delegates actual import
+ * processing to {@see WorkflowImportProcessor} instances while providing supervision and validation. This supervisor
+ * ensures safe and controlled workflow import execution within the configuration loading pipeline.
+ */
 class WorkflowImportProcessorSupervisor implements ConfigImportProcessorInterface
 {
     /** @var WorkflowImportProcessor[]|ArrayCollection */

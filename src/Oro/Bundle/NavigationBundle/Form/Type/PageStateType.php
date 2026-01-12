@@ -8,6 +8,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for page state data.
+ *
+ * This form type defines the structure and configuration for page state forms. It includes fields
+ * for the page identifier and the serialized state data. Page state forms are used to capture and
+ * persist user interface preferences and layout configurations for specific pages.
+ */
 class PageStateType extends AbstractType
 {
     #[\Override]

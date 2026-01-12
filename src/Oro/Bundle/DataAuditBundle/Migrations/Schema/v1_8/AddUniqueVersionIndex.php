@@ -82,7 +82,7 @@ EOD
     private function resolveDuplicatesMysql()
     {
         while (true) {
-            $sql = 'SELECT object_id, object_class FROM oro_audit '.
+            $sql = 'SELECT object_id, object_class FROM oro_audit ' .
                 'GROUP BY object_id, object_class, version HAVING COUNT(*) > 1 LIMIT 100';
             $rows = $this->connection->fetchAllAssociative($sql);
             if (!$rows) {

@@ -9,6 +9,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Handles CLI options for grouping test suites into sets for parallel execution.
+ *
+ * This controller supports two strategies for grouping suites: by count (fixed number of suites per set)
+ * or by maximum execution time (based on historical test duration statistics).
+ */
 class SuiteSetDividerController implements Controller
 {
     /**
@@ -35,7 +41,7 @@ class SuiteSetDividerController implements Controller
                 '--max_suite_set_execution_time',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Group suites in sets based on feature duration statistics.'.PHP_EOL.
+                'Group suites in sets based on feature duration statistics.' . PHP_EOL .
                 'Maximum time in seconds of execution one suite set'
             )
         ;

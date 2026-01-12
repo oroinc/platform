@@ -8,6 +8,12 @@ use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Processes transition context to prepare layout page result data.
+ *
+ * This processor builds the result data structure for page-based workflow transitions,
+ * including workflow and transition information, form view, and workflow item details.
+ */
 class LayoutPageDataTransitionProcessor implements ProcessorInterface
 {
     /** @var TransitionTranslationHelper */

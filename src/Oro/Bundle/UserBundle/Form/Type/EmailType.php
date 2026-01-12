@@ -7,6 +7,12 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType as SymfonyEmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing user email addresses.
+ *
+ * This form type provides an email field for user email management. It is
+ * configured to work with the Email entity and allows optional email input.
+ */
 class EmailType extends AbstractType
 {
     #[\Override]

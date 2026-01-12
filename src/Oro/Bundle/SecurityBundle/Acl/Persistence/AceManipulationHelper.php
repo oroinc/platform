@@ -93,7 +93,8 @@ class AceManipulationHelper
         $hasChanges = false;
         $aces = $this->getAces($acl, $type, $field);
         foreach ($aces as $index => $ace) {
-            if ($sid->equals($ace->getSecurityIdentity()) && $granting === $ace->isGranting()
+            if (
+                $sid->equals($ace->getSecurityIdentity()) && $granting === $ace->isGranting()
                 && $mask === $ace->getMask() && ($strategy === null || $strategy === $ace->getStrategy())
             ) {
                 $this->deleteAce($acl, $type, $field, $index);

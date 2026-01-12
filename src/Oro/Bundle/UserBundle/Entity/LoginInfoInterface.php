@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+/**
+ * Defines the contract for entities that track user login information.
+ *
+ * This interface provides methods to manage and retrieve login-related data
+ * such as the last login timestamp and the total count of logins. Entities
+ * implementing this interface can track user authentication history.
+ */
 interface LoginInfoInterface
 {
     /**

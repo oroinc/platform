@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Oro\Component\Action\Model\AbstractStorage;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Stores workflow attribute data with field mapping support.
+ *
+ * This class extends {@see AbstractStorage} to provide a container for workflow attribute values
+ * with support for mapping between different field names.
+ */
 class WorkflowData extends AbstractStorage
 {
     /**

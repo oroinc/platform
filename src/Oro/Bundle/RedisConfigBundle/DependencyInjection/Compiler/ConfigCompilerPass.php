@@ -22,7 +22,8 @@ class ConfigCompilerPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        if ($this->isRedisEnabledForCache($container)
+        if (
+            $this->isRedisEnabledForCache($container)
             && $container->hasParameter(self::URL_CACHE_TYPE)
             && $container->getParameter(self::URL_CACHE_TYPE) === self::URL_CACHE_STORAGE
         ) {

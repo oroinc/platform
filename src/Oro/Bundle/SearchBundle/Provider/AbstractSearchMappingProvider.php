@@ -5,7 +5,11 @@ namespace Oro\Bundle\SearchBundle\Provider;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
- * The base class for search mapping providers.
+ * Provides common functionality for search mapping providers.
+ *
+ * This base class implements methods for accessing and querying search mapping configuration,
+ * including entity aliases, field mappings, and entity class lookups.
+ * Subclasses must implement the `getMappingConfig` method to provide the actual mapping configuration data.
  */
 abstract class AbstractSearchMappingProvider
 {

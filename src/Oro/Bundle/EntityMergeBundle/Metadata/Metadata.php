@@ -4,6 +4,16 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
+/**
+ * Base implementation of metadata storage for entity merge operations.
+ *
+ * This class provides a generic key-value storage mechanism for metadata options used
+ * throughout the merge process. It implements the {@see MetadataInterface} contract and serves
+ * as the base class for {@see EntityMetadata}, {@see FieldMetadata}, and {@see DoctrineMetadata}.
+ * It supports getting, setting, checking existence, and merging metadata values, as well as filtering
+ * metadata through closures. Developers can extend this class to add specialized metadata
+ * handling for custom merge scenarios.
+ */
 class Metadata implements MetadataInterface
 {
     /**

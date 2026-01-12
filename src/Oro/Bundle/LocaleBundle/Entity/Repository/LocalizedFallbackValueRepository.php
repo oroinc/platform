@@ -125,7 +125,7 @@ FROM oro_fallback_localization_val
 WHERE lfv.id = id AND %1\$s IS NOT NULL
 )
 SQL,
-                $associationMapping['mappedBy'].'_id'
+                $associationMapping['mappedBy'] . '_id'
             ),
             default => null,
         };

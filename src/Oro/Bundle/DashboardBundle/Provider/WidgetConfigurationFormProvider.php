@@ -8,6 +8,15 @@ use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Provides dynamically generated configuration forms for dashboard widgets.
+ *
+ * This provider creates form instances based on widget configuration definitions,
+ * allowing widgets to have customizable settings without requiring separate form
+ * type classes for each widget. It reads field definitions from widget configuration
+ * and builds forms dynamically using the form factory, supporting a wide variety of
+ * field types and options for flexible widget customization.
+ */
 class WidgetConfigurationFormProvider
 {
     public const FORM_FIELDS_KEY = 'configuration';

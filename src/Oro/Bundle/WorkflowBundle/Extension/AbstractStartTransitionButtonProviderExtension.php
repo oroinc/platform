@@ -8,6 +8,13 @@ use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Provides common functionality for start transition button provider extensions.
+ *
+ * This abstract class extends the base button provider extension to handle start transition buttons specifically.
+ * It filters workflows based on exclusive record groups to ensure only compatible workflows are displayed
+ * as available start transitions.
+ */
 abstract class AbstractStartTransitionButtonProviderExtension extends AbstractButtonProviderExtension
 {
     #[\Override]

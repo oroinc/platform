@@ -100,7 +100,8 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 
             $fieldType = $this->getFieldType($row['entity_id'], $field);
             $dataType = null;
-            if (!AuditFieldTypeRegistry::hasType($fieldType)
+            if (
+                !AuditFieldTypeRegistry::hasType($fieldType)
                 || !array_key_exists('old', $values)
                 || !array_key_exists('new', $values)
             ) {

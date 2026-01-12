@@ -108,7 +108,7 @@ class ControllerListener implements EventSubscriberInterface
         foreach ($annotations as $configuration) {
             /** Customization start */
             if ($configuration instanceof PHPAttributeConfigurationInterface) {
-                $key = '_'.$configuration->getAliasName();
+                $key = '_' . $configuration->getAliasName();
                 if ($configuration->allowArray()) {
                     $configurations[$key][] = $configuration;
                 } elseif (!isset($configurations[$key])) {
@@ -135,7 +135,7 @@ class ControllerListener implements EventSubscriberInterface
     private static function getRealClass(string $class): string
     {
         if (class_exists(Proxy::class)) {
-            if (false === $pos = strrpos($class, '\\'.Proxy::MARKER.'\\')) {
+            if (false === $pos = strrpos($class, '\\' . Proxy::MARKER . '\\')) {
                 return $class;
             }
 

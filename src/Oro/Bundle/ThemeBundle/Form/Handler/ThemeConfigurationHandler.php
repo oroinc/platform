@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ThemeConfigurationHandler implements FormHandlerInterface
 {
-    use  RequestHandlerTrait;
+    use RequestHandlerTrait;
 
     public const WITHOUT_SAVING_KEY = 'reloadWithoutSaving';
 

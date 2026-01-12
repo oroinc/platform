@@ -38,7 +38,7 @@ class GetSetMethodNormalizer extends SymfonyGetSetMethodNormalizer
         array $context = []
     ): void {
         parent::setAttributeValue($object, $attribute, $value, $format, $context);
-        $setter = 'set'.$attribute;
+        $setter = 'set' . $attribute;
 
         if (!method_exists($object, $setter)  && (\is_callable([$object, '__set']))) {
             $object->__set($attribute, $value);
@@ -73,7 +73,7 @@ class GetSetMethodNormalizer extends SymfonyGetSetMethodNormalizer
 
         if ($context['_read_attributes'] ?? true) {
             foreach (['get', 'is', 'has'] as $getterPrefix) {
-                $getter = $getterPrefix.$attribute;
+                $getter = $getterPrefix . $attribute;
                 $reflectionMethod = $reflection->hasMethod($getter) ? $reflection->getMethod($getter) : null;
 
                 if ($reflectionMethod && $this->isGetMethod($reflectionMethod)) {
@@ -84,7 +84,7 @@ class GetSetMethodNormalizer extends SymfonyGetSetMethodNormalizer
             return false;
         }
 
-        $setter = 'set'.$attribute;
+        $setter = 'set' . $attribute;
         if ($reflection->hasMethod($setter) && $this->isSetMethod($reflection->getMethod($setter))) {
             return true;
         }

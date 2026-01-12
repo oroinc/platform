@@ -45,7 +45,8 @@ class AddHateoasLinks implements ProcessorInterface
 
         $requestType = $context->getRequestType();
         $entityClass = $context->getClassName();
-        if (ApiAction::GET_LIST !== $context->getAction()
+        if (
+            ApiAction::GET_LIST !== $context->getAction()
             && $this->isGetListActionExcluded($entityClass, $context->getVersion(), $requestType)
         ) {
             return;

@@ -35,7 +35,8 @@ class ReminderController extends AbstractFOSRestController
          * @var Reminder $reminder
          */
         foreach ($reminders as $reminder) {
-            if ($reminder->getState() == Reminder::STATE_REQUESTED &&
+            if (
+                $reminder->getState() == Reminder::STATE_REQUESTED &&
                 $reminder->getRecipient()->getId() == $userId
             ) {
                 $reminder->setState(Reminder::STATE_SENT);

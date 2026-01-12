@@ -8,6 +8,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Retrieves an available workflow for a given entity and record group.
+ *
+ * This action searches through all applicable workflows for the specified entity class
+ * and returns the first workflow that belongs to the given exclusive record group.
+ * The result is stored in the specified attribute for use in subsequent workflow operations.
+ */
 class GetAvailableWorkflowByRecordGroup extends AbstractAction
 {
     /** @var WorkflowManager */

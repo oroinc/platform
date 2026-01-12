@@ -230,8 +230,10 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function setOrigin($origin = null)
     {
         $currentOrigin = $this->getOrigin();
-        if ($currentOrigin && ($origin === null || $origin->getUser() === null
-                || $currentOrigin->getId() !== $origin->getId())) {
+        if (
+            $currentOrigin && ($origin === null || $origin->getUser() === null
+                || $currentOrigin->getId() !== $origin->getId())
+        ) {
             $currentOrigin->setActive(false);
             $this->origin = null;
         }

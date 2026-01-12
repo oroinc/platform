@@ -63,7 +63,7 @@ class DelayedJobRunnerDecoratingProcessor implements MessageProcessorInterface, 
                 }
             );
             $status = $result ? self::ACK : self::REJECT;
-        } catch (JobRuntimeException|JobRedeliveryException $exception) {
+        } catch (JobRuntimeException | JobRedeliveryException $exception) {
             // Delayed job that is interrupted by an exception is always marked for redelivery, so the message should
             // be re-queued.
             $status = self::REQUEUE;

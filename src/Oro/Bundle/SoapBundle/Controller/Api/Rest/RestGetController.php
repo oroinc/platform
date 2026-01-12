@@ -206,7 +206,8 @@ abstract class RestGetController extends AbstractFOSRestController implements
                     }
 
                     $dataAccessor = $this->getDataAccessor();
-                    if ($dataAccessor->hasGetter($entityClass, $field)
+                    if (
+                        $dataAccessor->hasGetter($entityClass, $field)
                         && $this->isGranted('VIEW', new FieldVote($entity, $field))
                     ) {
                         $value = $dataAccessor->getValue($entity, $field);
@@ -387,8 +388,10 @@ abstract class RestGetController extends AbstractFOSRestController implements
             $value = (string)$value;
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
-        } elseif (is_object($value) && method_exists($value, '__toString') &&
-            $doctrineHelper->isManageableEntity($value)) {
+        } elseif (
+            is_object($value) && method_exists($value, '__toString') &&
+            $doctrineHelper->isManageableEntity($value)
+        ) {
             $value = (string)$value;
         }
     }

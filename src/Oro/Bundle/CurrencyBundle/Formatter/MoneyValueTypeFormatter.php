@@ -8,6 +8,14 @@ use Oro\Bundle\CurrencyBundle\Rounding\AbstractRoundingService;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter as BaseFormatter;
 
+/**
+ * Formats monetary values with proper rounding and locale-specific number formatting.
+ *
+ * This formatter is responsible for converting raw monetary values into properly
+ * formatted strings suitable for display. It applies rounding based on the configured
+ * rounding service and uses locale-aware number formatting to ensure values are
+ * presented according to the user's locale settings.
+ */
 class MoneyValueTypeFormatter implements TypeFormatterInterface
 {
     protected $formatter;

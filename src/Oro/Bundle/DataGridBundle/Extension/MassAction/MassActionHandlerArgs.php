@@ -6,6 +6,12 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 
+/**
+ * Contains arguments passed to mass action handlers.
+ *
+ * This class encapsulates all the data needed by mass action handlers to process bulk operations,
+ * including the mass action configuration, selected results, request data, and the datagrid instance.
+ */
 class MassActionHandlerArgs
 {
     /** @var MassActionInterface */

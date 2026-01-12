@@ -10,4 +10,5 @@
     <exclude-pattern>*/Rector/*</exclude-pattern>
     <exclude-pattern>*/sets/*</exclude-pattern>
     <exclude-pattern>*/doctrine-em-loader.php</exclude-pattern>
+    <exclude-pattern>*/src/Oro/Bundle/MakerBundle/Resources/skeleton/*</exclude-pattern>
 </ruleset>

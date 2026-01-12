@@ -5,6 +5,13 @@ namespace Oro\Component\Layout;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
+/**
+ * Resolves and validates block options against their block type definitions.
+ *
+ * This class manages the resolution of block options by consulting the layout registry for block type
+ * definitions and their parent types. It caches option resolvers to improve performance when resolving
+ * options for the same block type multiple times.
+ */
 class BlockOptionsResolver
 {
     /** @var LayoutRegistryInterface */

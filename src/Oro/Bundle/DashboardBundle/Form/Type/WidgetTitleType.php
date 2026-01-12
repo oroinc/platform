@@ -9,6 +9,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Form type for configuring widget title with optional default value.
+ *
+ * This form type provides a title input field along with a "Use Default" checkbox,
+ * allowing users to either specify a custom title for a widget or use the default
+ * title defined in the widget configuration. The form automatically manages the
+ * relationship between the checkbox state and the title field, ensuring proper
+ * default value handling.
+ */
 class WidgetTitleType extends AbstractType
 {
     public const NAME = 'oro_type_widget_title';

@@ -69,7 +69,8 @@ class ComputePrimaryField implements ProcessorInterface
     {
         $result = null;
         foreach ($items as $item) {
-            if (\is_array($item)
+            if (
+                \is_array($item)
                 && \array_key_exists($primaryFlagFieldName, $item)
                 && $item[$primaryFlagFieldName]
                 && \array_key_exists($dataFieldName, $item)

@@ -27,7 +27,8 @@ class SetCustomAssociationsQuery implements ProcessorInterface
         $definition = $context->getResult();
 
         $customArticlesField = $definition->getField('customArticles');
-        if (null !== $customArticlesField
+        if (
+            null !== $customArticlesField
             && !$customArticlesField->isExcluded()
             && null === $customArticlesField->getAssociationQuery()
         ) {
@@ -37,7 +38,8 @@ class SetCustomAssociationsQuery implements ProcessorInterface
         }
 
         $customBestArticleField = $definition->getField('customBestArticle');
-        if (null !== $customBestArticleField
+        if (
+            null !== $customBestArticleField
             && !$customBestArticleField->isExcluded()
             && null === $customBestArticleField->getAssociationQuery()
         ) {

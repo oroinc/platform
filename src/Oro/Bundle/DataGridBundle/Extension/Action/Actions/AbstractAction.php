@@ -5,6 +5,14 @@ namespace Oro\Bundle\DataGridBundle\Extension\Action\Actions;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 
+/**
+ * Provides common functionality for datagrid actions.
+ *
+ * This base class implements the core action configuration management, including option handling,
+ * ACL resource access, and required option validation. It provides infrastructure for defining actions
+ * that can be performed on datagrid rows or the grid itself. Subclasses should extend this to create
+ * specific action types with their own behavior and frontend rendering.
+ */
 abstract class AbstractAction implements ActionInterface
 {
     /** @var ActionConfiguration */

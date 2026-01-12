@@ -5,6 +5,12 @@ namespace Oro\Bundle\EmailBundle\Event;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when an email user association is added.
+ *
+ * This event is triggered when a new email user record is created, allowing listeners
+ * to perform additional processing such as updating related data or triggering workflows.
+ */
 class EmailUserAdded extends Event
 {
     public const NAME = 'oro_email.email_user_added';

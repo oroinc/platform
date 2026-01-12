@@ -54,7 +54,8 @@ class AddHateoasLinksForRelationship implements ProcessorInterface
             $context->getVersion(),
             $requestType
         );
-        if (null === $subresource
+        if (
+            null === $subresource
             || (
                 $subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
                 && $subresource->isExcludedAction(ApiAction::GET_SUBRESOURCE)

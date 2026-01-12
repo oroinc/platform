@@ -58,7 +58,8 @@ class OroEmailExtension extends Extension implements PrependExtensionInterface
             '/email/emailtemplate/preview' => 'ALLOW',
         ];
 
-        if (isset($securityConfig[0]['clickjacking']['paths'])
+        if (
+            isset($securityConfig[0]['clickjacking']['paths'])
             && \is_array($securityConfig[0]['clickjacking']['paths'])
         ) {
             $securityConfig[0]['clickjacking']['paths']

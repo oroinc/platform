@@ -6,6 +6,13 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Maps properties between contexts and action group execution arguments.
+ *
+ * This mapper facilitates bidirectional property mapping between action contexts
+ * and action group execution arguments, supporting nested property paths and
+ * recursive array value resolution.
+ */
 class PropertyMapper
 {
     /** @var ContextAccessor */

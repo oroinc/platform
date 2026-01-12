@@ -60,7 +60,8 @@ class LimitIdentifierWalker extends TreeWalkerAdapter
                         $conditionalPrimary
                     ])
                 ]);
-            } elseif ($AST->whereClause->conditionalExpression instanceof AST\ConditionalExpression
+            } elseif (
+                $AST->whereClause->conditionalExpression instanceof AST\ConditionalExpression
                 || $AST->whereClause->conditionalExpression instanceof AST\ConditionalFactor
             ) {
                 $tmpPrimary = new AST\ConditionalPrimary();

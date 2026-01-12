@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Defines the contract for manipulating block options in a raw layout.
+ *
+ * This interface provides methods for setting, appending, removing, and replacing block options,
+ * allowing dynamic modification of block configuration during layout building.
+ */
 interface BlockOptionsManipulatorInterface
 {
     /**

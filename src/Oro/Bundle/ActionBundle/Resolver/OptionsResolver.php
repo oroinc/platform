@@ -5,6 +5,13 @@ namespace Oro\Bundle\ActionBundle\Resolver;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
+/**
+ * Resolves action options by assembling and evaluating them against context data.
+ *
+ * This resolver assembles options through the options assembler and then resolves
+ * all values against the provided context data, supporting nested arrays and
+ * property path expressions.
+ */
 class OptionsResolver
 {
     /** @var OptionsAssembler */

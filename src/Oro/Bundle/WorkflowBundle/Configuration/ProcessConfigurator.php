@@ -9,6 +9,13 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * Orchestrates the configuration of process definitions and triggers.
+ *
+ * This configurator delegates to specialized configurators for managing process definitions
+ * and their associated triggers, providing a unified interface for configuring and removing
+ * process configurations from the system.
+ */
 class ProcessConfigurator implements LoggerAwareInterface
 {
     /** @var ManagerRegistry */

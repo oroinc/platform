@@ -4,6 +4,13 @@ namespace Oro\Bundle\UIBundle\Provider;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Provides access to widget context information from the current request.
+ *
+ * Determines whether the current request is executing within a widget context and
+ * retrieves the widget identifier. This is useful for components that need to behave
+ * differently when rendered as part of a widget versus a full page.
+ */
 class WidgetContextProvider
 {
     /**

@@ -41,7 +41,7 @@ class SelectorManipulator extends Manipulator
         $selector = implode(',', array_map(function ($variant) use ($locator) {
             $containsSuffix = implode(':', array_map([$this, 'getContainsFromString'], explode(' ', $variant)));
 
-            return $locator.':'.$containsSuffix;
+            return $locator . ':' . $containsSuffix;
         }, self::getVariants($text)));
 
         return $selector;

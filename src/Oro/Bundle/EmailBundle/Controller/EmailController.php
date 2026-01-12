@@ -505,7 +505,7 @@ class EmailController extends AbstractController
                     $entity->getEmailBody(),
                     $entity->getFileName()
                 );
-            } catch (EmailBodyNotFoundException|EmailAttachmentNotFoundException) {
+            } catch (EmailBodyNotFoundException | EmailAttachmentNotFoundException) {
                 return new Response('', Response::HTTP_NOT_FOUND);
             }
         }
@@ -591,7 +591,7 @@ class EmailController extends AbstractController
             if (count($attachmentWithoutContent) > 0) {
                 try {
                     $attachments = $this->getImapEmailAttachmentLoader()->loadEmailAttachments($entity);
-                } catch (EmailBodyNotFoundException|EmailAttachmentNotFoundException) {
+                } catch (EmailBodyNotFoundException | EmailAttachmentNotFoundException) {
                     return new Response('', Response::HTTP_NOT_FOUND);
                 }
             }

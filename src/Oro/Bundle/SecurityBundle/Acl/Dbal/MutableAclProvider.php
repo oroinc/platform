@@ -413,7 +413,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 if (null === $propertyChanges['parentAcl'][1]) {
                     $sets[] = 'parent_object_identity_id = NULL';
                 } else {
-                    $sets[] = 'parent_object_identity_id = '.(int) $propertyChanges['parentAcl'][1]->getId();
+                    $sets[] = 'parent_object_identity_id = ' . (int) $propertyChanges['parentAcl'][1]->getId();
                 }
 
                 $this->regenerateAncestorRelations($acl);
@@ -489,7 +489,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
                 foreach ($this->loadedAcls[$oidKey] as $sidKey => $sameTypeAcl) {
                     if (isset($sharedPropertyChanges['classAces'])) {
-                        if ($acl !== $sameTypeAcl
+                        if (
+                            $acl !== $sameTypeAcl
                             && $classAcesProperty->getValue($sameTypeAcl) !== $sharedPropertyChanges['classAces'][0]
                         ) {
                             throw new ConcurrentModificationException(
@@ -501,7 +502,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                     }
 
                     if (isset($sharedPropertyChanges['classFieldAces'])) {
-                        if ($acl !== $sameTypeAcl
+                        if (
+                            $acl !== $sameTypeAcl
                             && $classFieldAcesProperty->getValue($sameTypeAcl)
                                 !== $sharedPropertyChanges['classFieldAces'][0]
                         ) {
@@ -920,8 +922,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             throw new \InvalidArgumentException('There are no changes.');
         }
 
-        $oldIdentifier = $usid->getClass().'-'.$oldUsername;
-        $newIdentifier = $usid->getClass().'-'.$usid->getUsername();
+        $oldIdentifier = $usid->getClass() . '-' . $oldUsername;
+        $newIdentifier = $usid->getClass() . '-' . $usid->getUsername();
 
         return [
             sprintf(
@@ -1282,9 +1284,11 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $propertyChanges = $aces->offsetGet($ace);
         $sets = [];
 
-        if (isset($propertyChanges['aceOrder'])
+        if (
+            isset($propertyChanges['aceOrder'])
             && $propertyChanges['aceOrder'][1] > $propertyChanges['aceOrder'][0]
-            && $propertyChanges == $aces->offsetGet($ace)) {
+            && $propertyChanges == $aces->offsetGet($ace)
+        ) {
             $aces->next();
             if ($aces->valid()) {
                 $this->updateAce($aces, $aces->current());

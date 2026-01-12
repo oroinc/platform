@@ -77,7 +77,8 @@ class DraftAccessRule implements AccessRuleInterface
         $alias = $criteria->getAlias();
 
         // No access
-        if (null === $ownerField
+        if (
+            null === $ownerField
             && null === $ownerValue
             && null === $organizationField
             && null === $organizationValue

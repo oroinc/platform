@@ -60,8 +60,10 @@ class MappingDriverChain extends BaseMappingDriverChain
             return false;
         }
         $extendMappingDriver = $this->getExtendEntityDriver();
-        if (null !== $extendMappingDriver
-            && in_array($className, $extendMappingDriver->getAllClassNames())) {
+        if (
+            null !== $extendMappingDriver
+            && in_array($className, $extendMappingDriver->getAllClassNames())
+        ) {
             $extendMappingDriver->loadMetadataForClass($className, $metadata);
 
             return true;

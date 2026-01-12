@@ -66,13 +66,17 @@ class RedisRequirementsProvider extends AbstractRequirementsProvider
                 $collection->addRequirement(
                     version_compare($version, self::REQUIRED_VERSION, '>='),
                     'Connection for "' . $id . '" service has required Redis version (' . $version . ')',
-                    'Redis version of connection for "'.$id.'" service must be '.self::REQUIRED_VERSION.' or higher'
+                    \sprintf(
+                        'Redis version of connection for "%s" service must be %s or higher',
+                        $id,
+                        self::REQUIRED_VERSION
+                    )
                 );
             } else {
                 $collection->addRequirement(
                     false,
                     'Connection for "' . $id . '" service has invalid configuration.',
-                    'Connection for "' . $id . '" service has invalid configuration. '. $errorMessage
+                    'Connection for "' . $id . '" service has invalid configuration. ' . $errorMessage
                 );
             }
 

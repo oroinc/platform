@@ -54,7 +54,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
 
             /** @var FieldConfigId $fieldId */
             $fieldId = $relation['field_id'];
-            if ($fieldId
+            if (
+                $fieldId
                 && isset($schema['relation'][$fieldId->getFieldName()])
                 && !$configRelationEntity->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])
             ) {
@@ -123,7 +124,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
 
         $builder->build();
 
-        if (!$relation['owner']
+        if (
+            !$relation['owner']
             && RelationType::ONE_TO_MANY === ExtendHelper::getRelationType($relationKey)
             && $this->isDefaultRelationRequired($fieldId)
         ) {

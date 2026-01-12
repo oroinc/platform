@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityBundle\ORM;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 
+/**
+ * Handles Doctrine class metadata loading to populate discriminator maps.
+ *
+ * This listener automatically adds supported entity classes to the discriminator map
+ * of single-table inheritance entities. It enables dynamic registration of entity
+ * subclasses in the discriminator map during metadata loading.
+ */
 class DiscriminatorMapListener
 {
     /**

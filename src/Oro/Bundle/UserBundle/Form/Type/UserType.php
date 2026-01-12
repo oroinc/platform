@@ -237,7 +237,8 @@ class UserType extends AbstractType
 
     protected function addOrganizationField(FormBuilderInterface $builder): void
     {
-        if ($this->authorizationChecker->isGranted('oro_organization_view')
+        if (
+            $this->authorizationChecker->isGranted('oro_organization_view')
             && $this->authorizationChecker->isGranted('oro_business_unit_view')
         ) {
             $builder->add(

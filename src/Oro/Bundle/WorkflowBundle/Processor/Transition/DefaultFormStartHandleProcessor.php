@@ -9,6 +9,15 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Handles form submission for workflow start transitions with entity persistence.
+ *
+ * This processor processes form submissions for start transitions using the default form handling mechanism.
+ * It handles POST requests by processing the submitted form data and validating it. For any new entities
+ * created through the form (such as related entities), it persists them to the database to ensure they
+ * can be properly serialized and passed to the workflow start action. This is critical for workflows
+ * that accept complex entity structures as input data.
+ */
 class DefaultFormStartHandleProcessor implements ProcessorInterface
 {
     /** @var DoctrineHelper */

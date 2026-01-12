@@ -38,7 +38,8 @@ trait OpenApiSourceListenerTrait
                 continue;
             }
             $fieldConfig = $model->toArray('extend');
-            if (($fieldConfig['is_serialized'] ?? false)
+            if (
+                ($fieldConfig['is_serialized'] ?? false)
                 || ExtendScope::STATE_ACTIVE === $fieldConfig['state']
             ) {
                 return true;

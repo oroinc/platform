@@ -55,7 +55,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('variable')
                 ->end()
                 ->info(
-                    "List of routes that must not be used as a redirect path after log in. ".
+                    "List of routes that must not be used as a redirect path after log in. " .
                     "See \Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener."
                 )
             ->end()

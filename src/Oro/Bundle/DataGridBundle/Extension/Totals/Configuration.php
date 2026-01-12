@@ -40,7 +40,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode(self::TOTALS_HIDE_IF_ONE_PAGE_KEY)
                         ->info(
                             'Determines whether this total row should not be visible '
-                            .'or not if all a grid has only one page'
+                            . 'or not if all a grid has only one page'
                         )
                         ->defaultFalse()
                     ->end()

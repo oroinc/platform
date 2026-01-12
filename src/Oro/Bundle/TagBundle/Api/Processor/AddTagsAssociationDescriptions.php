@@ -59,7 +59,8 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
         $definition = $context->getResult();
         $this->setDescriptionsForFields($definition, $requestType, $context->getClassName());
         $associationName = $context->getAssociationName();
-        if ($associationName
+        if (
+            $associationName
             && self::TAGS_ASSOCIATION_NAME === $associationName
             && !$definition->hasDocumentation()
         ) {

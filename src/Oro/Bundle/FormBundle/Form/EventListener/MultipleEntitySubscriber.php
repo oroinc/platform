@@ -71,7 +71,8 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         /** @var Collection $children */
         $children = $form->getData();
         foreach ($added as $child) {
-            if (null !== $parentMetadata
+            if (
+                null !== $parentMetadata
                 && $this->isOneToManyAssociation($child, $parentMetadata, $fieldName)
             ) {
                 $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, $parent);
@@ -82,7 +83,8 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
             }
         }
         foreach ($removed as $child) {
-            if (null !== $parentMetadata
+            if (
+                null !== $parentMetadata
                 && $this->isOneToManyAssociation($child, $parentMetadata, $fieldName)
             ) {
                 $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, null);
@@ -124,7 +126,8 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         }
 
         $targetAssociationMapping = $targetMetadata->getAssociationMapping($targetAssociationName);
-        if (ClassMetadata::ONE_TO_MANY !== $targetAssociationMapping['type']
+        if (
+            ClassMetadata::ONE_TO_MANY !== $targetAssociationMapping['type']
             || ClassUtils::getClass($owningEntity) !== $targetAssociationMapping['targetEntity']
         ) {
             return false;

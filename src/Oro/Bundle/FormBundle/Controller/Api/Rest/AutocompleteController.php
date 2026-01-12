@@ -45,7 +45,8 @@ class AutocompleteController extends AbstractFOSRestController
             }
         }
 
-        if (!$this->container->get('oro_form.autocomplete.security')
+        if (
+            !$this->container->get('oro_form.autocomplete.security')
                 ->isAutocompleteGranted($autocompleteRequest->getName())
         ) {
             $result['errors'][] = 'Access denied.';

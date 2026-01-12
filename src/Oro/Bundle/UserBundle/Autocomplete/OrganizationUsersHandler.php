@@ -7,9 +7,11 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 
 /**
- * This user search handler return users that was assigned to current organization and limit by search string
- * excluding current user.
- * This handler does not use ACL helper and search engine because we does not needed any ACL checks
+ * Autocomplete search handler for users in the current organization.
+ *
+ * Extends {@see UserSearchHandler} to return enabled users assigned to the current organization,
+ * excluding the current user. Uses {@see SearchCriteria} for search filtering and {@see TokenAccessorInterface}
+ * for organization and user context. Does not use ACL checks as they are not required.
  */
 class OrganizationUsersHandler extends UserSearchHandler
 {

@@ -162,7 +162,8 @@ class FieldAclHelper
     private function getEntityConfig($entityClass)
     {
         $entityConfig = null;
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)
+        if (
+            $this->doctrineHelper->isManageableEntityClass($entityClass)
             && $this->configManager->hasConfig($entityClass)
         ) {
             $entityConfig = $this->configManager->getEntityConfig('security', $entityClass);

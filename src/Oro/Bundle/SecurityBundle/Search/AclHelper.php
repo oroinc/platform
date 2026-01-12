@@ -172,7 +172,8 @@ class AclHelper
 
         // checking that owner field name and organization field name are not null or
         // checking that owner exists and  property for ignore owner is not false
-        if ($condition[0] === null && $condition[2] === null
+        if (
+            $condition[0] === null && $condition[2] === null
             || ($condition[0] === null && $condition[1] === null && !$condition[4])
         ) {
             return null;

@@ -7,6 +7,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper;
 
+/**
+ * Handles datagrid mixin configuration extension.
+ *
+ * This listener applies mixin configurations to datagrids during the pre-build phase. Mixins
+ * allow reusable configuration fragments to be composed into datagrids, enabling configuration
+ * reuse and reducing duplication across similar datagrids.
+ */
 class MixinListener
 {
     public const MIXINS = 'mixins';

@@ -53,7 +53,8 @@ class GetAttrNode extends GetAttrExpression
         $arrayAccessSandbox = false;
 
         // optimize array calls
-        if ($this->getAttribute('optimizable')
+        if (
+            $this->getAttribute('optimizable')
             && (!$env->isStrictVariables() || $this->getAttribute('ignore_strict_check'))
             && !$this->isDefinedTestEnabled()
             && Template::ARRAY_CALL === $this->getAttribute('type')
@@ -164,7 +165,8 @@ class GetAttrNode extends GetAttrExpression
             $baseMethodExists = EntityPropertyInfo::methodExists($object, $item);
             $getMethodWithPrefixExists = self::isMethodWithPrefixExists($object, 'get', $item);
 
-            if (!$basePropertyExists
+            if (
+                !$basePropertyExists
                 && !$baseMethodExists
                 && !$getMethodWithPrefixExists
                 && !self::isMethodWithPrefixExists($object, 'is', $item)
@@ -217,7 +219,8 @@ class GetAttrNode extends GetAttrExpression
         if (Template::METHOD_CALL !== $type) {
             $arrayItem = \is_bool($item) || \is_float($item) ? (int) $item : $item;
 
-            if ($sandboxed
+            if (
+                $sandboxed
                 && $object instanceof \ArrayAccess
                 && !\in_array($object::class, self::ARRAY_LIKE_CLASSES, true)
             ) {
@@ -361,7 +364,8 @@ class GetAttrNode extends GetAttrExpression
                 return $isDefinedTest ? true : $object();
             }
 
-            if (isset($object->$item)
+            if (
+                isset($object->$item)
                 || ($propertyCheckers[$object::class][$item]
                     ??= self::getPropertyChecker($object::class, $item))($object, $item)
             ) {
@@ -372,7 +376,8 @@ class GetAttrNode extends GetAttrExpression
                 return $object->$item;
             }
 
-            if ($object instanceof \DateTimeInterface
+            if (
+                $object instanceof \DateTimeInterface
                 && \in_array($item, ['date', 'timezone', 'timezone_type'], true)
             ) {
                 if ($isDefinedTest) {

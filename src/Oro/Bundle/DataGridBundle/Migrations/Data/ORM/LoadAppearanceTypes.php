@@ -6,6 +6,12 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 
+/**
+ * Loads default datagrid appearance types into the database.
+ *
+ * This data fixture creates the standard appearance types (grid and board) that control
+ * how datagrids can be displayed in the application.
+ */
 class LoadAppearanceTypes extends AbstractFixture
 {
     /**

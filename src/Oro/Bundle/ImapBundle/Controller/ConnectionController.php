@@ -154,7 +154,8 @@ class ConnectionController extends AbstractController
         $errorMessages = [];
         foreach ($form->getErrors() as $error) {
             $cause = $error->getCause();
-            if ($cause instanceof ConstraintViolation
+            if (
+                $cause instanceof ConstraintViolation
                 && $cause->getConstraint() instanceof Constraint
             ) {
                 $errorMessages[] = $error->getMessage();

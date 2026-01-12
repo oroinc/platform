@@ -1,7 +1,5 @@
 <?php
 
-namespace Oro\Bundle\RedisConfigBundle\Session\Storage\Handler;
-
 /**
  * Copyright (c) Henrik Westphal <henrik.westphal@gmail.com>
  *
@@ -25,6 +23,9 @@ namespace Oro\Bundle\RedisConfigBundle\Session\Storage\Handler;
  *
  * This file is a copy of {@see \Snc\RedisBundle\Session\Storage\Handler\RedisSessionHandler}
  */
+
+namespace Oro\Bundle\RedisConfigBundle\Session\Storage\Handler;
+
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
@@ -294,7 +295,7 @@ LUA;
             return $key;
         }
 
-        return $this->prefix.$key;
+        return $this->prefix . $key;
     }
 
     /**

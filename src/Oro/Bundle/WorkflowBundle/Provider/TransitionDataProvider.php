@@ -8,6 +8,12 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
+/**
+ * Provides transition data for workflow views and UI rendering.
+ *
+ * This provider retrieves and formats transition information for both start and regular
+ * transitions, enabling the display of available workflow transitions in the UI.
+ */
 class TransitionDataProvider
 {
     /** @var WorkflowManager */

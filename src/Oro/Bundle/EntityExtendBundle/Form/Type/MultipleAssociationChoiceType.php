@@ -86,7 +86,8 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
     {
         $disabledValues = $this->getReadOnlyValues($options);
         foreach ($view->children as $choiceView) {
-            if ((isset($view->vars['disabled']) && $view->vars['disabled'])
+            if (
+                (isset($view->vars['disabled']) && $view->vars['disabled'])
                 || (!empty($disabledValues) && \in_array($choiceView->vars['value'], $disabledValues, true))
             ) {
                 $choiceView->vars['disabled'] = true;

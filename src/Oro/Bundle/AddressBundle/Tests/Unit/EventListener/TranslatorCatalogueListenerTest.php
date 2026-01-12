@@ -107,7 +107,7 @@ class TranslatorCatalogueListenerTest extends TestCase
         $this->entityManager->expects(self::exactly(6))
             ->method('getRepository')
             ->willReturnCallback(function (string $className) {
-                $repositoryClass = $className.'Repository';
+                $repositoryClass = $className . 'Repository';
                 $repositoryClassName = substr($repositoryClass, strrpos($repositoryClass, '\\') + 1);
                 $fieldName = lcfirst($repositoryClassName);
 

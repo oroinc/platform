@@ -22,7 +22,8 @@ class FindFieldUtil
                 return $field;
             }
             $fieldPropertyPath = $field->getPropertyPath();
-            if (!$fieldPropertyPath
+            if (
+                !$fieldPropertyPath
                 || $fieldPropertyPath === $fieldName
                 || ConfigUtil::IGNORE_PROPERTY_PATH === $fieldName
             ) {
@@ -69,7 +70,8 @@ class FindFieldUtil
     {
         foreach ($fields as $fieldName => $field) {
             $fieldPropertyPath = $field->getPropertyPath();
-            if ($fieldPropertyPath
+            if (
+                $fieldPropertyPath
                 && $fieldPropertyPath === $propertyPath
                 && ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldPropertyPath
             ) {

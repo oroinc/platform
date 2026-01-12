@@ -17,7 +17,8 @@ class OrmConfigurationConfigurator
 
     public function configure(Configuration $configuration): void
     {
-        if (!$this->applicationState->isInstalled()
+        if (
+            !$this->applicationState->isInstalled()
             || (CommandExecutor::isCurrentCommand('oro:message-queue:consume') && $this->env === 'test')
         ) {
             $configuration->setAutoGenerateProxyClasses(true);

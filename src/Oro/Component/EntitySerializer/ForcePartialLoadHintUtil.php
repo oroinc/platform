@@ -21,7 +21,8 @@ final class ForcePartialLoadHintUtil
 
         $result = true;
         foreach ($hints as $hint) {
-            if (\is_array($hint)
+            if (
+                \is_array($hint)
                 && false === ($hint['value'] ?? false)
                 && self::isForcePartialLoadHint($hint['name'])
             ) {

@@ -109,7 +109,8 @@ class AddMultiFileAssociationDescriptions implements ProcessorInterface
                         self::SORT_ORDER_NONE
                     );
                 }
-                if (false === $associationDefinition->getFormOption('mapped')
+                if (
+                    false === $associationDefinition->getFormOption('mapped')
                     && (ApiAction::CREATE === $targetAction || ApiAction::UPDATE === $targetAction)
                 ) {
                     $associationDocumentation = FieldDescriptionUtil::addReadOnlyFieldNote($associationDocumentation);

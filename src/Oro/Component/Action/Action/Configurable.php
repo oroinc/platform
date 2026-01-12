@@ -4,6 +4,14 @@ namespace Oro\Component\Action\Action;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * Wraps and lazily assembles actions from configuration.
+ *
+ * This action acts as a proxy that defers the assembly of the actual action until execution time.
+ * It accepts a configuration array and uses an {@see ActionAssembler} to construct the appropriate action
+ * instance. This allows for dynamic action creation based on runtime configuration. The action
+ * always allows execution regardless of conditions.
+ */
 class Configurable implements ActionInterface
 {
     public const ALIAS = 'configurable';

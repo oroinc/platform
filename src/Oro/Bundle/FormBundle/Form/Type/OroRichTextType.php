@@ -144,7 +144,8 @@ class OroRichTextType extends AbstractType
                     return $wysiwygOptions;
                 }
 
-                if (empty($wysiwygOptions['toolbar_type'])
+                if (
+                    empty($wysiwygOptions['toolbar_type'])
                     || !array_key_exists($wysiwygOptions['toolbar_type'], self::$toolbars)
                 ) {
                     $toolbarType = self::TOOLBAR_DEFAULT;

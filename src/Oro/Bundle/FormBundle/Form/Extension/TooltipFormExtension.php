@@ -70,7 +70,8 @@ class TooltipFormExtension extends AbstractTypeExtension
     {
         $parentOptions = $field->getParent()->getConfig()->getOptions();
         $parentClassName = $parentOptions['data_class'] ?? null;
-        if (!isset($view->vars['tooltip']) &&
+        if (
+            !isset($view->vars['tooltip']) &&
             $parentClassName &&
             $this->entityConfigProvider->hasConfig($parentClassName, $field->getName())
         ) {

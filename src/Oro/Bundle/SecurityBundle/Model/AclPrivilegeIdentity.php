@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Model;
 
+/**
+ * Represents the identity of an ACL privilege target.
+ *
+ * This model class identifies what an ACL privilege applies to, storing both an
+ * identifier (typically a class name or capability identifier) and a display name.
+ * It is used to uniquely identify entities or capabilities within ACL privilege configurations.
+ */
 class AclPrivilegeIdentity
 {
     /**

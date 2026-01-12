@@ -6,6 +6,14 @@ use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
+/**
+ * Implements the replace merge strategy for entity fields.
+ *
+ * Replaces the master entity's field value with the value from the selected source entity.
+ * For fields marked as needing cloning, creates a deep copy of the value to prevent shared
+ * references. If no source entity is explicitly selected, uses the master entity's value.
+ * This strategy is applicable to all field types.
+ */
 class ReplaceStrategy implements StrategyInterface
 {
     /**

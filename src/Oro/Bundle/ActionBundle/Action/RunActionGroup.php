@@ -12,6 +12,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Executes a registered action group with parameter mapping and result handling.
+ *
+ * This action allows executing a named action group from within another action,
+ * with support for mapping parameters from the current context to the action group's
+ * parameters, and capturing results back into the context. It provides flexible
+ * error handling and supports both single result and multiple results mapping.
+ */
 class RunActionGroup extends AbstractAction
 {
     use OptionsResolverTrait;
@@ -71,7 +79,8 @@ class RunActionGroup extends AbstractAction
             self::OPTION_RESULTS,
             function ($value) {
                 foreach ($value as $target => $source) {
-                    if ((!is_string($target) && !$target instanceof PropertyPathInterface) ||
+                    if (
+                        (!is_string($target) && !$target instanceof PropertyPathInterface) ||
                         (!$source instanceof PropertyPathInterface)
                     ) {
                         return false;

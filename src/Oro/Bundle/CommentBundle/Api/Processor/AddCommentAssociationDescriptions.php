@@ -60,7 +60,8 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
             $targetAction
         );
         $associationName = $context->getAssociationName();
-        if ($associationName
+        if (
+            $associationName
             && self::COMMENTS_ASSOCIATION_NAME === $associationName
             && !$definition->hasDocumentation()
         ) {

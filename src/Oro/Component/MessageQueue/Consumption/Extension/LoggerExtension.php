@@ -6,6 +6,13 @@ use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Injects a logger instance into the message consumption context.
+ *
+ * This extension is responsible for setting up logging during message queue consumption.
+ * It provides the logger to the consumption context at the start of the consumption process,
+ * enabling all other extensions and message processors to log their activities.
+ */
 class LoggerExtension extends AbstractExtension
 {
     /** @var LoggerInterface */

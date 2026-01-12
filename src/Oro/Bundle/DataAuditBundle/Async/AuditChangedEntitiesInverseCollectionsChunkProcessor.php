@@ -68,8 +68,10 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
                 $sourceKey = $entityClass . $entityId;
 
                 foreach ($sourceEntityData['fields'] as $relatedField => $fieldData) {
-                    if (!is_a($entityClass, AbstractLocalizedFallbackValue::class, true)
-                        && !$this->auditConfigProvider->isPropagateField($entityClass, $relatedField)) {
+                    if (
+                        !is_a($entityClass, AbstractLocalizedFallbackValue::class, true)
+                        && !$this->auditConfigProvider->isPropagateField($entityClass, $relatedField)
+                    ) {
                         // If its dynamic relationship between LocalizedFallbackValue, keep ordinary behaviour.
                         continue;
                     }

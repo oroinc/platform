@@ -6,6 +6,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Converts array form data to a delimited string during form submission.
+ *
+ * This listener handles the PRE_SUBMIT event to transform array values into
+ * delimited strings using a configurable delimiter. This is useful for form fields
+ * that accept multiple values but need to be stored or processed as a single string.
+ */
 class FixArrayToStringListener implements EventSubscriberInterface
 {
     private $delimiter;

@@ -7,6 +7,12 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Processes transition context to prepare layout dialog result data.
+ *
+ * This processor builds the result data structure for dialog-based workflow transitions,
+ * including transition information, form view, and workflow item details.
+ */
 class LayoutDialogDataTransitionProcessor implements ProcessorInterface
 {
     /**

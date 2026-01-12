@@ -7,6 +7,13 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides template fixture data for user import/export operations.
+ *
+ * This fixture class generates sample user data for import/export templates,
+ * allowing users to understand the expected format and structure when importing
+ * or exporting user records.
+ */
 class UserFixture extends AbstractTemplateRepository implements TemplateFixtureInterface
 {
     #[\Override]

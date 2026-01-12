@@ -7,6 +7,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for filtering search results by text fields.
+ *
+ * This form type extends the standard {@see TextFilterType} to provide text filtering
+ * capabilities for search-based datagrids. It configures operator choices for
+ * text filtering including contains, does not contain, and equals operations,
+ * with translated labels for user-friendly display.
+ */
 class SearchStringFilterType extends AbstractType
 {
     public const NAME = 'oro_search_type_string_filter';

@@ -9,6 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Listens to form events to apply default values from workflow data.
+ *
+ * This listener populates form fields with default values derived from the workflow item
+ * and configured default values, ensuring forms are pre-filled with appropriate data.
+ */
 class DefaultValuesListener implements EventSubscriberInterface
 {
     /**

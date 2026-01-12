@@ -25,15 +25,22 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 /**
- * Writes and reads values to/from an object/array graph.
+ * Provides unified property access for objects and arrays with extended entity support.
  *
- * This class is mostly a copy of {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
- * but it has the following advantages:
- * * allows using the same syntax of the property path for objects and arrays
- * * magic __get __set methods are always enabled to support ORO extended entities
- * * objects implementing \ArrayAccess are accessed as arrays, getter and setter methods are ignored
- * New features:
- * * 'remove' method is added to allow to remove items from arrays or objects
+ * This class extends Symfony's {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
+ * with Oro-specific enhancements for accessing and modifying object and array properties
+ * using a consistent dot-notation syntax.
+ *
+ * Key features:
+ * - Unified syntax for accessing properties in both objects and arrays
+ * - Always enables magic `__get` and `__set` methods to support Oro extended entities
+ * - Treats objects implementing {@see \ArrayAccess} as arrays, ignoring getter/setter methods
+ * - Provides a `remove` method to delete items from arrays or objects
+ * - Supports property path caching for improved performance
+ * - Handles reflection-based property access for extended entity properties
+ *
+ * This implementation is based on Symfony's {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
+ * but customized for Oro's extended entity system where entities can have dynamic properties and magic methods.
  *
  * @SuppressWarnings(PHPMD)
  */
@@ -201,7 +208,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         $zval = [
             self::VALUE => $objectOrArray,
         ];
-        if (\is_object($objectOrArray)
+        if (
+            \is_object($objectOrArray)
             // customization start
             && !$objectOrArray instanceof \ArrayAccess
             // customization end
@@ -346,8 +354,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             '/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/',
             $message,
             $matches
-        )
-        ) {
+        )) {
             [, $expectedType, $actualType] = $matches;
 
             throw new InvalidArgumentException(
@@ -404,7 +411,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
                     if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
                         return false;
                     }
-                } elseif (!\is_object($zval[self::VALUE])
+                } elseif (
+                    !\is_object($zval[self::VALUE])
                     || !$this->isPropertyWritable($zval[self::VALUE], $propertyPath->getElement($i))
                 ) {
                     return false;
@@ -462,7 +470,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
                 $isKeyExists = \is_array($zval[self::VALUE])
                     && !isset($zval[self::VALUE][$property])
                     && !\array_key_exists($property, $zval[self::VALUE]);
-                if (($zval[self::VALUE] instanceof \ArrayAccess && !$zval[self::VALUE]->offsetExists($property))
+                if (
+                    ($zval[self::VALUE] instanceof \ArrayAccess && !$zval[self::VALUE]->offsetExists($property))
                     || $isKeyExists
                 ) {
                     if (!$ignoreInvalidIndices) {
@@ -507,7 +516,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             }
 
             // the final value of the path must not be validated
-            if ($i + 1 < $propertyPath->getLength()
+            if (
+                $i + 1 < $propertyPath->getLength()
                 && !\is_object($zval[self::VALUE])
                 && !\is_array($zval[self::VALUE])
             ) {
@@ -515,7 +525,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             }
             // customization start
             // if (isset($zval[self::REF]) && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))) {
-            if (!empty($zval[self::REF])
+            if (
+                !empty($zval[self::REF])
                 && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))
             ) {
                 // customization end
@@ -570,7 +581,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
                 $result[self::REF] = $result[self::VALUE];
             }
             // customization start
-        } elseif (null !== $index
+        } elseif (
+            null !== $index
             && is_array($zval[self::VALUE])
             && !array_key_exists($index, $zval[self::VALUE])
             && !$this->ignoreInvalidIndices
@@ -614,7 +626,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
 
                         // handle uninitialized properties in PHP >= 7
                         $pattern = '/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/';
-                        if (__FILE__ === $trace['file']
+                        if (
+                            __FILE__ === $trace['file']
                             && $name === $trace['function']
                             && $object instanceof $trace['class']
                             && preg_match($pattern, $e->getMessage(), $matches)
@@ -640,7 +653,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
-                    if ($access->canBeReference()
+                    if (
+                        $access->canBeReference()
                         && !isset($object->$name)
                         && !\array_key_exists($name, (array)$object)
                         && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())
@@ -920,7 +934,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
     {
         $mutatorForArray = $this->getWriteInfo(\get_class($object), $property, []);
 
-        if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType()
+        if (
+            PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType()
             || ($object instanceof \stdClass && property_exists($object, $property))
         ) {
             return true;
@@ -1052,7 +1067,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         $path = $propertyPath->getElements();
         $values = $this->readPropertiesUntil($zval, $propertyPath, -1);
 
-        if (($object instanceof \ArrayObject || $object instanceof \ArrayAccess)
+        if (
+            ($object instanceof \ArrayObject || $object instanceof \ArrayAccess)
             && $object->count() < count($path) - 1
         ) {
             return;
@@ -1123,7 +1139,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
                 $object->$unsetter();
             } elseif ($this->isMethodAccessible($reflClass, '__unset', 1)) {
                 unset($object->$property);
-            } elseif ($this->magicMethodsFlags
+            } elseif (
+                $this->magicMethodsFlags
                 && $this->isMethodAccessible($reflClass, '__call', 2)
             ) {
                 // we call the unsetter and hope the __call do the job
@@ -1162,7 +1179,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         if ($this->hasPublicMethod($class, $methodName)) {
             $method = $class->getMethod($methodName);
 
-            if ($method->getNumberOfRequiredParameters() <= $parameters
+            if (
+                $method->getNumberOfRequiredParameters() <= $parameters
                 && $method->getNumberOfParameters() >= $parameters
             ) {
                 return true;
@@ -1217,7 +1235,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         }
         //if the value we want to add is not an array and we try to add it to a collection,
         // then we don't want to overwrite the old values, instead add the new value to the collection
-        if ((!is_array($value) && !$value instanceof \Traversable)
+        if (
+            (!is_array($value) && !$value instanceof \Traversable)
             && ($objectValue instanceof \ArrayAccess || is_array($objectValue))
         ) {
             //we try to add a value to a collection and we don't want to remove old items

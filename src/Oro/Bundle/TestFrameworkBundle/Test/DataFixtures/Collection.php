@@ -124,7 +124,7 @@ class Collection extends ArrayCollection
             }
         }
 
-        $getter = 'get'.ucfirst($property);
+        $getter = 'get' . ucfirst($property);
         if (EntityPropertyInfo::methodExists($object, $getter) && is_callable([$object, $getter])) {
             return $object->$getter();
         }

@@ -12,6 +12,12 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
+/**
+ * Helper for managing workflow-related translations.
+ *
+ * This helper provides methods to find, generate, and manage translations for workflow
+ * definitions, transitions, steps, and other workflow components.
+ */
 class WorkflowTranslationHelper
 {
     public const TRANSLATION_DOMAIN = 'workflows';

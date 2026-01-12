@@ -8,6 +8,13 @@ use Oro\Bundle\TagBundle\Entity\Tag;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles form submission and processing for tag entities.
+ *
+ * This handler manages the complete lifecycle of tag form processing, including form data binding,
+ * request validation, and persistence of tag entities to the database. It supports both POST and PUT
+ * HTTP methods for creating and updating tags.
+ */
 class TagHandler
 {
     use RequestHandlerTrait;

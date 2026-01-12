@@ -10,6 +10,13 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
+/**
+ * Provides common functionality for form type guessers that use Doctrine metadata and entity configuration.
+ *
+ * This base class provides access to the Doctrine manager registry and entity configuration provider,
+ * along with helper methods for retrieving entity metadata and creating form type guesses.
+ * Subclasses should implement specific guessing logic for form types, required status, max length, and patterns.
+ */
 abstract class AbstractFormGuesser implements FormTypeGuesserInterface
 {
     /**

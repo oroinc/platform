@@ -82,8 +82,10 @@ class AppearanceExtension extends AbstractExtension
             );
             $processedOptions = [];
             foreach ($configs as $type => $options) {
-                if (isset($options[Configuration::DEFAULT_PROCESSING_KEY]) &&
-                    $options[Configuration::DEFAULT_PROCESSING_KEY]) {
+                if (
+                    isset($options[Configuration::DEFAULT_PROCESSING_KEY]) &&
+                    $options[Configuration::DEFAULT_PROCESSING_KEY]
+                ) {
                     unset($options[Configuration::DEFAULT_PROCESSING_KEY]);
                     $options['label'] = isset($options['label'])
                         ? $this->translator->trans((string) $options['label'])

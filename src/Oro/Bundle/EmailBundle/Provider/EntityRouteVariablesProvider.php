@@ -110,7 +110,8 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
 
     private function getEntityMetadata(string $entityClass): ?EntityMetadata
     {
-        if (!$this->configManager->hasConfig($entityClass)
+        if (
+            !$this->configManager->hasConfig($entityClass)
             || !ExtendHelper::isEntityAccessible($this->configManager->getEntityConfig('extend', $entityClass))
         ) {
             return null;

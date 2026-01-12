@@ -75,7 +75,8 @@ class OrmTotalsExtension extends AbstractExtension
         $totals    = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         if (null !== $totals && $result->getData()) {
             foreach ($totals as $rowName => $rowConfig) {
-                if ($rowConfig[Configuration::TOTALS_DISABLED]
+                if (
+                    $rowConfig[Configuration::TOTALS_DISABLED]
                     || ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY])
                 ) {
                     unset($totals[$rowName]);
@@ -171,7 +172,8 @@ class OrmTotalsExtension extends AbstractExtension
         // this method requires refactoring, see BAP-17427 for details
         $totalQueries = [];
         foreach ($columnsConfig as $field => $totalData) {
-            if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
+            if (
+                isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
                 && $totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY]
             ) {
                 $totalQueries[] = $totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY] . ' AS ' . $field;

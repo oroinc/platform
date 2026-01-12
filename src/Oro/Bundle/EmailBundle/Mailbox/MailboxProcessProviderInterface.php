@@ -4,6 +4,12 @@ namespace Oro\Bundle\EmailBundle\Mailbox;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 
+/**
+ * Defines the contract for mailbox process providers.
+ *
+ * Implementations provide configuration and metadata for mailbox processes, including settings
+ * entity class, form type, label, enablement status, and process definition name for workflow integration.
+ */
 interface MailboxProcessProviderInterface
 {
     /**

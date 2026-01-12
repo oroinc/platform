@@ -8,6 +8,14 @@ use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
+/**
+ * Processes conditional layout updates using expression language.
+ *
+ * This generator extension handles the `conditions` node in layout update configurations,
+ * parsing expressions using Symfony's {@see ExpressionLanguage} component and creating visitor
+ * instances to evaluate conditions at layout build time. This enables conditional block
+ * rendering based on dynamic context values.
+ */
 class ExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
     public const NODE_CONDITIONS = 'conditions';

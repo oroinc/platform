@@ -96,8 +96,8 @@ class YamlToSearchQueryConverter
 
     private function resolveHintName(string $name): string
     {
-        if (\defined(Query::class.'::'.$name)) {
-            return \constant(Query::class.'::'.$name);
+        if (\defined(Query::class . '::' . $name)) {
+            return \constant(Query::class . '::' . $name);
         }
 
         return $name;

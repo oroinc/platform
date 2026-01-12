@@ -95,7 +95,8 @@ class UniqueEnumNameValidator extends ConstraintValidator
             foreach ($fieldConfigs as $fieldConfig) {
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
-                if ($fieldConfigId->getFieldName() === $fieldName
+                if (
+                    $fieldConfigId->getFieldName() === $fieldName
                     && $fieldConfigId->getClassName() === $entityClassName
                 ) {
                     // ignore a field for which the validation was called

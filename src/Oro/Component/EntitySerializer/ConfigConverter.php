@@ -60,7 +60,8 @@ class ConfigConverter
 
     protected function setExclusionPolicy(EntityConfig $result, array $config): void
     {
-        if (!empty($config[ConfigUtil::EXCLUSION_POLICY])
+        if (
+            !empty($config[ConfigUtil::EXCLUSION_POLICY])
             && ConfigUtil::EXCLUSION_POLICY_NONE !== $config[ConfigUtil::EXCLUSION_POLICY]
         ) {
             $result->setExclusionPolicy($config[ConfigUtil::EXCLUSION_POLICY]);
@@ -69,7 +70,8 @@ class ConfigConverter
 
     protected function setPartialLoad(EntityConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::DISABLE_PARTIAL_LOAD, $config)
+        if (
+            \array_key_exists(ConfigUtil::DISABLE_PARTIAL_LOAD, $config)
             && $config[ConfigUtil::DISABLE_PARTIAL_LOAD]
         ) {
             $result->disablePartialLoad();
@@ -105,7 +107,8 @@ class ConfigConverter
 
     protected function setMaxResults(EntityConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::MAX_RESULTS, $config)
+        if (
+            \array_key_exists(ConfigUtil::MAX_RESULTS, $config)
             && null !== $config[ConfigUtil::MAX_RESULTS]
         ) {
             $result->setMaxResults($config[ConfigUtil::MAX_RESULTS]);
@@ -114,7 +117,8 @@ class ConfigConverter
 
     protected function setHasMore(EntityConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::HAS_MORE, $config)
+        if (
+            \array_key_exists(ConfigUtil::HAS_MORE, $config)
             && $config[ConfigUtil::HAS_MORE]
         ) {
             $result->setHasMore(true);
@@ -123,7 +127,8 @@ class ConfigConverter
 
     protected function setPostSerializeHandler(EntityConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::POST_SERIALIZE, $config)
+        if (
+            \array_key_exists(ConfigUtil::POST_SERIALIZE, $config)
             && null !== $config[ConfigUtil::POST_SERIALIZE]
         ) {
             $result->setPostSerializeHandler($config[ConfigUtil::POST_SERIALIZE]);
@@ -132,7 +137,8 @@ class ConfigConverter
 
     protected function setPostSerializeCollectionHandler(EntityConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::POST_SERIALIZE_COLLECTION, $config)
+        if (
+            \array_key_exists(ConfigUtil::POST_SERIALIZE_COLLECTION, $config)
             && null !== $config[ConfigUtil::POST_SERIALIZE_COLLECTION]
         ) {
             $result->setPostSerializeCollectionHandler($config[ConfigUtil::POST_SERIALIZE_COLLECTION]);
@@ -141,7 +147,8 @@ class ConfigConverter
 
     protected function setExcludedFields(EntityConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::EXCLUDED_FIELDS, $config)
+        if (
+            \array_key_exists(ConfigUtil::EXCLUDED_FIELDS, $config)
             && !empty($config[ConfigUtil::EXCLUDED_FIELDS])
         ) {
             $result->set(ConfigUtil::EXCLUDED_FIELDS, $config[ConfigUtil::EXCLUDED_FIELDS]);
@@ -150,7 +157,8 @@ class ConfigConverter
 
     protected function setRenamedFields(EntityConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::RENAMED_FIELDS, $config)
+        if (
+            \array_key_exists(ConfigUtil::RENAMED_FIELDS, $config)
             && !empty($config[ConfigUtil::RENAMED_FIELDS])
         ) {
             $result->set(ConfigUtil::RENAMED_FIELDS, $config[ConfigUtil::RENAMED_FIELDS]);
@@ -166,7 +174,8 @@ class ConfigConverter
 
     protected function setExcluded(FieldConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::EXCLUDE, $config)
+        if (
+            \array_key_exists(ConfigUtil::EXCLUDE, $config)
             && $config[ConfigUtil::EXCLUDE]
         ) {
             $result->setExcluded();
@@ -175,7 +184,8 @@ class ConfigConverter
 
     protected function setCollapsed(FieldConfig $result, array $config): void
     {
-        if (\array_key_exists(ConfigUtil::COLLAPSE, $config)
+        if (
+            \array_key_exists(ConfigUtil::COLLAPSE, $config)
             && $config[ConfigUtil::COLLAPSE]
         ) {
             $result->setCollapsed();
@@ -195,7 +205,8 @@ class ConfigConverter
     protected function setDataTransformers(FieldConfig $result, array $config): void
     {
         if (!empty($config[ConfigUtil::DATA_TRANSFORMER])) {
-            if (\is_string($config[ConfigUtil::DATA_TRANSFORMER])
+            if (
+                \is_string($config[ConfigUtil::DATA_TRANSFORMER])
                 || \is_callable($config[ConfigUtil::DATA_TRANSFORMER])
             ) {
                 $result->addDataTransformer($config[ConfigUtil::DATA_TRANSFORMER]);

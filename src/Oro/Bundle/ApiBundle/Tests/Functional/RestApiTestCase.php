@@ -87,7 +87,8 @@ abstract class RestApiTestCase extends ApiTestCase
         } elseif (null !== $csrfCookie) {
             $server[$csrfHeader] = $csrfCookie->getValue();
         }
-        if (array_key_exists($csrfHeader, $server)
+        if (
+            array_key_exists($csrfHeader, $server)
             && !array_key_exists('HTTP_SESSION', $server)
             && !$this->isStatelessRequest($server)
         ) {

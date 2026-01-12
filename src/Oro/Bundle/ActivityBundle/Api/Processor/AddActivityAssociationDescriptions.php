@@ -108,7 +108,8 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         ?string $associationName
     ): void {
         $this->setDescriptionForActivityTargetsField($definition, $requestType, $definition->getResourceClass());
-        if (self::ACTIVITY_TARGETS_ASSOCIATION_NAME === $associationName
+        if (
+            self::ACTIVITY_TARGETS_ASSOCIATION_NAME === $associationName
             && !$definition->hasDocumentation()
             && $this->activityAssociationProvider->isActivityEntity($parentEntityClass)
         ) {
@@ -163,7 +164,8 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         }
 
         $activityTargetsAssociationDefinition = $definition->getField(self::ACTIVITY_TARGETS_ASSOCIATION_NAME);
-        if (null === $activityTargetsAssociationDefinition
+        if (
+            null === $activityTargetsAssociationDefinition
             || $activityTargetsAssociationDefinition->hasDescription()
         ) {
             return;

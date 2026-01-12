@@ -61,7 +61,7 @@ class IndexEntitiesByIdTopicTest extends AbstractTopicTestCase
             'entityIds' => ['42', '142'],
         ];
         self::assertSame(
-            'search_reindex|'. md5(serialize($messageBody['class']) . serialize($messageBody['entityIds'])),
+            'search_reindex|' . md5(serialize($messageBody['class']) . serialize($messageBody['entityIds'])),
             $this->getTopic()->createJobName($messageBody)
         );
     }

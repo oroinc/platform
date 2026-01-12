@@ -701,7 +701,8 @@ class Context extends NormalizeResultContext implements ContextInterface
             $this->metadataExtras = new MetadataExtraCollection();
         }
         $action = $this->get(self::ACTION);
-        if ($action
+        if (
+            $action
             && (
                 $this->metadataExtras->isEmpty()
                 || !$this->metadataExtras->hasMetadataExtra(ActionMetadataExtra::NAME)

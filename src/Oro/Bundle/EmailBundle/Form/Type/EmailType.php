@@ -203,7 +203,8 @@ class EmailType extends AbstractType
     {
         /** @var Email|array $data */
         $data = $event->getData();
-        if (null === $data ||
+        if (
+            null === $data ||
             is_array($data) && empty($data['entityClass']) ||
             is_object($data) && null === $data->getEntityClass()
         ) {

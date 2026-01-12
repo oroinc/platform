@@ -45,7 +45,8 @@ class MoveBaseEnumOptionsMigration implements Migration, ConnectionAwareInterfac
         $this->prepareEnumTableMap($entityConfigs);
         foreach ($entityConfigs as $entityConfig) {
             $entityConfigData = $this->connection->convertToPHPValue($entityConfig['data'], 'array');
-            if (!isset($entityConfigData['extend']['is_extend'])
+            if (
+                !isset($entityConfigData['extend']['is_extend'])
                 || !$entityConfigData['extend']['is_extend']
                 || $entityConfig['class_name'] === EnumOption::class
                 || ExtendHelper::isOutdatedEnumOptionEntity($entityConfig['class_name'])
@@ -59,8 +60,10 @@ class MoveBaseEnumOptionsMigration implements Migration, ConnectionAwareInterfac
             );
             foreach ($fieldConfigs as $fieldConfig) {
                 $fieldConfigData = $this->connection->convertToPHPValue($fieldConfig['data'], 'array');
-                if (!isset($fieldConfigData['enum']['enum_code'])
-                    || !isset($fieldConfigData['extend']['target_entity'])) {
+                if (
+                    !isset($fieldConfigData['enum']['enum_code'])
+                    || !isset($fieldConfigData['extend']['target_entity'])
+                ) {
                     continue;
                 }
                 $this->createEnumOptions($schema, $fieldConfigData);

@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+/**
+ * Manages workflow variables and their assembly.
+ *
+ * This manager provides access to the variable assembler for creating and configuring
+ * workflow variables from configuration data.
+ */
 class VariableManager
 {
     /**

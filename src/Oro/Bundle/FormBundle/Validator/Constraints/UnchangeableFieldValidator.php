@@ -34,7 +34,8 @@ class UnchangeableFieldValidator extends ConstraintValidator
 
         $fieldName = $this->context->getPropertyName();
         if ($metadata->hasAssociation($fieldName)) {
-            if ((null === $value || is_object($value))
+            if (
+                (null === $value || is_object($value))
                 && $this->isAssociationValueChanged(
                     $value,
                     $this->context->getObject(),
@@ -92,7 +93,8 @@ class UnchangeableFieldValidator extends ConstraintValidator
     ): bool {
         $associationMapping = $metadata->getAssociationMapping($fieldName);
         $associationType = $associationMapping['type'];
-        if ($value instanceof Collection
+        if (
+            $value instanceof Collection
             && $associationType & ClassMetadata::TO_MANY
             && null !== $this->getSingleIdentifierValue($entity, $metadata)
         ) {
@@ -118,7 +120,8 @@ class UnchangeableFieldValidator extends ConstraintValidator
 
         $existingValue = $this->getExistingValue($entity, $fieldName, $em);
 
-        if (!$allowChangeOwner
+        if (
+            !$allowChangeOwner
             && $this->isOwnerChanged(
                 $value,
                 $existingValue,

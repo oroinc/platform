@@ -390,18 +390,21 @@ class ResourcesProvider implements ResetInterface
             $actionsConfig = $context->get(AddExcludedActions::ACTIONS_CONFIG_KEY);
             foreach ($resources as $resource) {
                 $entityClass = $resource->getEntityClass();
-                if (\in_array(ApiAction::GET, $resource->getExcludedActions(), true)
+                if (
+                    \in_array(ApiAction::GET, $resource->getExcludedActions(), true)
                     && !$this->isResourceWithoutIdentifier($entityClass, $version, $requestType)
                 ) {
                     foreach ($actionsDependOnGetAction as $actionName) {
-                        if (!\in_array($actionName, $resource->getExcludedActions(), true)
+                        if (
+                            !\in_array($actionName, $resource->getExcludedActions(), true)
                             && !$this->isActionEnabledInConfig($actionsConfig, $entityClass, $actionName)
                         ) {
                             $resource->addExcludedAction($actionName);
                             $excludedActions[$entityClass] = $resource->getExcludedActions();
                         }
                     }
-                    if (\in_array(ApiAction::GET_LIST, $resource->getExcludedActions(), true)
+                    if (
+                        \in_array(ApiAction::GET_LIST, $resource->getExcludedActions(), true)
                         && !\in_array(ApiAction::DELETE_LIST, $resource->getExcludedActions(), true)
                         && !$this->isActionEnabledInConfig($actionsConfig, $entityClass, ApiAction::DELETE_LIST)
                     ) {
@@ -409,7 +412,8 @@ class ResourcesProvider implements ResetInterface
                         $excludedActions[$entityClass] = $resource->getExcludedActions();
                     }
                 }
-                if (!\in_array(ApiAction::UPDATE_LIST, $resource->getExcludedActions(), true)
+                if (
+                    !\in_array(ApiAction::UPDATE_LIST, $resource->getExcludedActions(), true)
                     && $this->isExcludeUpdateList($resource, $actionsConfig, $entityClass, $version, $requestType)
                 ) {
                     $resource->addExcludedAction(ApiAction::UPDATE_LIST);

@@ -125,7 +125,8 @@ class DateFilterUtility
             $field = $this->getEnforcedTimezoneFunction($this->partToDateFunction[$data['part']], $field, $type);
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
             $field = $this->getEnforcedTimezoneQuarter($field, $type);
-        } elseif ($data['part'] === DateModifierInterface::PART_VALUE
+        } elseif (
+            $data['part'] === DateModifierInterface::PART_VALUE
             && !str_contains($field, 'MONTH')
             && $this->containsMonthVariable($data)
         ) {

@@ -7,6 +7,14 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as Bas
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Form type for selecting multiple activity associations with activity-specific constraints.
+ *
+ * This form type extends the base multiple association choice type to add activity-specific
+ * validation logic. It prevents users from selecting an activity type that matches the target
+ * entity's class, as an entity cannot be associated with an activity of the same type.
+ * This ensures data integrity and prevents invalid activity associations in the UI.
+ */
 class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
 {
     #[\Override]
@@ -21,7 +29,8 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
         /** @var FormView $choiceView */
         foreach ($view->children as $choiceView) {
             // disable activity with same class as target entity
-            if ((isset($view->vars['disabled']) && $view->vars['disabled'])
+            if (
+                (isset($view->vars['disabled']) && $view->vars['disabled'])
                 || ($choiceView->vars['value'] === $targetClassName)
             ) {
                 $choiceView->vars['disabled'] = true;

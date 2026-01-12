@@ -26,7 +26,7 @@ class RuntimeAssetVersionStrategy implements VersionStrategyInterface
         $staticVersion = $this->wrappedStrategy->getVersion($path);
 
         return !empty($dynamicVersion)
-            ? $staticVersion.'-'.$dynamicVersion
+            ? $staticVersion . '-' . $dynamicVersion
             : $staticVersion;
     }
 
@@ -36,7 +36,7 @@ class RuntimeAssetVersionStrategy implements VersionStrategyInterface
         $versionized = sprintf(self::FORMAT, ltrim($path, '/'), $this->getVersion($path));
 
         return $path && '/' === $path[0]
-            ? '/'.$versionized
+            ? '/' . $versionized
             : $versionized;
     }
 }

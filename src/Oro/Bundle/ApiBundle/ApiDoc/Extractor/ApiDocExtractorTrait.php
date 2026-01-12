@@ -94,7 +94,8 @@ trait ApiDocExtractorTrait
                 $annotation = $this->reader->getMethodAnnotation($method, static::ANNOTATION_CLASS);
                 if (null !== $annotation) {
                     $this->apiDocAnnotationHandler->handle($annotation, $route);
-                    if ($this->isApplicableForView($annotation, $view)
+                    if (
+                        $this->isApplicableForView($annotation, $view)
                         && !\in_array($annotation->getSection(), $excludeSections, true)
                     ) {
                         $element = ['annotation' => $this->extractData($annotation, $route, $method)];

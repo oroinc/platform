@@ -69,7 +69,8 @@ class AdditionalMetadataProvider
             $associationMappings = $metadata->getAssociationsByTargetClass($classMetadata->name);
 
             foreach ($associationMappings as $fieldName => $associationMapping) {
-                if ((isset($associationMapping['type']) &&
+                if (
+                    (isset($associationMapping['type']) &&
                         $associationMapping['type'] === ClassMetadataInfo::MANY_TO_MANY) ||
                     isset($associationMapping['mappedBy'])
                 ) {

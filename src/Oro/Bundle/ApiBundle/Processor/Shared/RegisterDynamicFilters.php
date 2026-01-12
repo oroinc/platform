@@ -98,7 +98,8 @@ class RegisterDynamicFilters extends RegisterFilters
                     }
                 } elseif ($filterGroup && $filterCollection->isIncludeInDefaultGroup($filterKey)) {
                     $groupedFilterKey = $filterCollection->getGroupedFilterKey($filterGroup, $filterKey);
-                    if ($filter instanceof StandaloneFilterWithDefaultValue
+                    if (
+                        $filter instanceof StandaloneFilterWithDefaultValue
                         || $filterValueAccessor->has($groupedFilterKey)
                     ) {
                         $knownFilterKeys[$groupedFilterKey] = true;

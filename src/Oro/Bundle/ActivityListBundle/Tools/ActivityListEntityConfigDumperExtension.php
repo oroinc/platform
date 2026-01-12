@@ -9,6 +9,17 @@ use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * Extends entity configuration dumping to create activity list associations.
+ *
+ * This extension is responsible for generating and maintaining many-to-many associations
+ * between the {@see ActivityList} entity and all entities that support activity tracking. It
+ * integrates with the entity configuration dumping process to automatically create the
+ * necessary database associations and extend entity configurations. The extension works
+ * with the {@see ActivityListChainProvider} to identify all target entities and uses the
+ * {@see AssociationBuilder} to establish the relationships during the pre-update phase of
+ * configuration dumping.
+ */
 class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     public const ASSOCIATION_KIND = 'activityList';
@@ -74,7 +85,8 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
 
             $configs = $this->configManager->getProvider('extend')->getConfigs();
             foreach ($configs as $config) {
-                if ($config->is('upgradeable')
+                if (
+                    $config->is('upgradeable')
                     && in_array($config->getId()->getClassName(), $targetEntityClasses)
                 ) {
                     $this->targetEntityConfigs[] = $config;

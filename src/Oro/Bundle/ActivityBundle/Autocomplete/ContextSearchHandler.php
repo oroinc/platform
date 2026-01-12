@@ -227,7 +227,8 @@ class ContextSearchHandler implements ConverterInterface
 
             $target = json_decode($targetJson, true);
 
-            if (!isset($target['entityClass']) || !$target['entityClass']
+            if (
+                !isset($target['entityClass']) || !$target['entityClass']
                 || !isset($target['entityId']) || !$target['entityId']
             ) {
                 continue;

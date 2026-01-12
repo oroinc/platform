@@ -52,8 +52,8 @@ class UserLoginAttemptTest extends WebTestCase
         return [
             [
                 "Mozilla\\/5.0 (iPhone; CPU iPhone OS 17_3_1 like Mac OS X) AppleWebKit\\/605.1.15 (KHTML, like Gecko) "
-                ."Mobile\\/21D61 [FBAN\\/FBIOS;FBAV\\/452.0.0.39.110;FBBV\\/569146793;FBDV\\/iPhone13,3;FBMD\\/iPhone;"
-                ."FBSN\\/iOS;FBSV\\/17.3.1;FBSS\\/3;FBID\\/phone;FBLC\\/nl_NL;FBOP\\/5;FBRV\\/571609390]"
+                . "Mobile\\/21D61 [FBAN\\/FBIOS;FBAV\\/452.0.0.39.110;FBBV\\/569146793;FBDV\\/iPhone13,3;FBMD\\/iPhone;"
+                . "FBSN\\/iOS;FBSV\\/17.3.1;FBSS\\/3;FBID\\/phone;FBLC\\/nl_NL;FBOP\\/5;FBRV\\/571609390]"
             ],
             [
                 "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0"

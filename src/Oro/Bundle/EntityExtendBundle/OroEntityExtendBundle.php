@@ -84,11 +84,13 @@ class OroEntityExtendBundle extends Bundle
         // this needed on application update to run oro_entity_extend.warmer tagged services
         // instead of regular cache warmup
         ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
-        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
+        if (
+            !CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
             && !CommandExecutor::isCurrentCommand('oro:install')
             && !CommandExecutor::isCurrentCommand('oro:assets:install')
         ) {
-            if (!ExtendClassLoadingUtils::classesExist($this->cacheDir)
+            if (
+                !ExtendClassLoadingUtils::classesExist($this->cacheDir)
                 && !CommandExecutor::isCommandRunning('oro:entity-extend:update-config')
             ) {
                 $this->checkConfigs();

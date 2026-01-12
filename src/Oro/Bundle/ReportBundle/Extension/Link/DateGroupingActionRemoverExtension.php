@@ -6,6 +6,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
+/**
+ * Removes action links from calendar date datagrid results to prevent unauthorized operations.
+ *
+ * This extension is applied to datagrids that display calendar date entities. It disables
+ * view, update, and delete actions for all rows in the result set, preventing users from
+ * performing operations on calendar date records. This is useful for read-only calendar
+ * date displays in reports where modifications should not be allowed.
+ */
 class DateGroupingActionRemoverExtension extends AbstractExtension
 {
     /**

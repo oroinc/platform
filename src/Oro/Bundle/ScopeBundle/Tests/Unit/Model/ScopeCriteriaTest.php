@@ -196,7 +196,7 @@ class ScopeCriteriaTest extends TestCase
                 'scope',
                 Join::WITH,
                 'scope.joinField = 1 AND scope.nullField IS NULL '
-                .'AND scope.notNullField IS NOT NULL AND scope.fieldWithValue = :scope_param_fieldWithValue',
+                . 'AND scope.notNullField IS NOT NULL AND scope.fieldWithValue = :scope_param_fieldWithValue',
                 'id'
             );
 

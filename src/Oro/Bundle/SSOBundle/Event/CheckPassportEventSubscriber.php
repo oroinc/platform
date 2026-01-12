@@ -32,7 +32,8 @@ class CheckPassportEventSubscriber implements EventSubscriberInterface
 
     public function onCheckPassport(CheckPassportEvent $event): void
     {
-        if (!$event->getAuthenticator() instanceof AbstractLoginFormAuthenticator
+        if (
+            !$event->getAuthenticator() instanceof AbstractLoginFormAuthenticator
             || !$event->getPassport()->getUser() instanceof EmailHolderInterface
             || ($event->getAuthenticator() instanceof UsernamePasswordOrganizationAuthenticator
                 && $event->getAuthenticator()->getFirewallName() !== $this->firewallName)
@@ -40,7 +41,8 @@ class CheckPassportEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->configManager->get($this->enableSsoConfigKey)
+        if (
+            !$this->configManager->get($this->enableSsoConfigKey)
             || !$this->configManager->get($this->ssoOnlyLoginConfigKey)
         ) {
             return;

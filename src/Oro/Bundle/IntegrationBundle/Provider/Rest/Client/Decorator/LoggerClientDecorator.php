@@ -5,6 +5,13 @@ namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Decorates a REST client to log all HTTP requests.
+ *
+ * This decorator wraps a REST client and logs details about each HTTP request made,
+ * including the HTTP method, resource path, parameters, and current memory usage.
+ * This is useful for debugging integration issues and monitoring API communication.
+ */
 class LoggerClientDecorator implements RestClientInterface
 {
     /**
@@ -66,9 +73,6 @@ class LoggerClientDecorator implements RestClientInterface
 
     protected function logRequest($httpMethod, $action, $params = [])
     {
-        /**
-         * @todo Filter security sensitive information from params or replaced real value on '*****'
-         */
         $this->logger->debug(
             sprintf(
                 '[%.1fMB/%.1fMB] Call %s action with http method %s with %s parameters',

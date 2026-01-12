@@ -97,7 +97,8 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
                     $levelsData[$buId] = $levelsData[$parentBuId] + 1;
                 } elseif (array_key_exists($parentBuId, $businessUnits)) {
                     $unprocessed[$buId] = $parentBuId;
-                    if ($businessUnits[$parentBuId] === $buId
+                    if (
+                        $businessUnits[$parentBuId] === $buId
                         || in_array($buId, $businessUnits, true)
                     ) {
                         $this->logger->critical(

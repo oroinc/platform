@@ -307,13 +307,13 @@ HELP
         }
 
         $command[] = '--env';
-        $command[] = 'symfony='.$input->getOption('env');
+        $command[] = 'symfony=' . $input->getOption('env');
 
         if ($verbosity) {
             $command[] = 'stats=' . $verbosity;
         }
         if ($input->getArgument('theme')) {
-            $command[] = 'theme='.$input->getArgument('theme');
+            $command[] = 'theme=' . $input->getArgument('theme');
         }
         if ($input->getOption('skip-css')) {
             $command[] = 'skipCSS';

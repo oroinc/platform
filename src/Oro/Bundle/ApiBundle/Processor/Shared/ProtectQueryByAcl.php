@@ -70,7 +70,8 @@ class ProtectQueryByAcl implements ProcessorInterface
         $permission = null;
 
         $aclAttribute = $this->AclAttributeProvider->findAttributeById($aclResource);
-        if ($aclAttribute
+        if (
+            $aclAttribute
             && $aclAttribute->getType() === 'entity'
             && $aclAttribute->getClass() === $entityClass
         ) {

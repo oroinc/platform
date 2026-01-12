@@ -31,7 +31,8 @@ abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConvert
                         continue;
                     }
 
-                    if (isset($config['import_export']['import_template']['value'])
+                    if (
+                        isset($config['import_export']['import_template']['value'])
                         && \is_array($config['import_export']['import_template']['value'])
                     ) {
                         $header = array_merge($header, $this->collectHeadersForArrayTemplateValue($field, $config));

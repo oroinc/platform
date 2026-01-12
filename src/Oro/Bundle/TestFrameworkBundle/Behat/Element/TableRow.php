@@ -101,7 +101,8 @@ class TableRow extends Element
             return (int) $value;
         } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/u', $value, $matches)) {
             return (int) $matches['amount'];
-        } elseif (($date = date_create($value, new \DateTimeZone('UTC'))) &&
+        } elseif (
+            ($date = date_create($value, new \DateTimeZone('UTC'))) &&
             (
                 preg_match(
                     '/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s([1-3])?[0-9]\,\s[1-2][0-9]{3}/',

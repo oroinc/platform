@@ -171,7 +171,8 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
     {
         $columnName = $this->context()->getColumnName($this->context()->getColumnId($columnAlias));
         $columnJoinId = $this->buildColumnJoinIdentifier($columnName);
-        if ($this->context()->hasVirtualColumnExpression($columnName)
+        if (
+            $this->context()->hasVirtualColumnExpression($columnName)
             && $this->context()->hasVirtualColumnOptions($columnJoinId)
         ) {
             return $this->context()->getVirtualColumnExpression($columnName);

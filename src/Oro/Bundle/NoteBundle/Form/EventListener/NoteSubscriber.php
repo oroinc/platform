@@ -11,6 +11,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Form event subscriber that dynamically adds entity relation fields to note forms.
+ *
+ * This subscriber listens to form pre-set-data events and inspects the note entity's
+ * extended configuration to discover manyToOne relationships. For each active manyToOne
+ * field, it dynamically adds an {@see EntityType} form field to the form, allowing users to
+ * select related entities. This enables flexible note forms that adapt to custom entity
+ * relationships without requiring explicit form configuration.
+ */
 class NoteSubscriber implements EventSubscriberInterface
 {
     /** @var  ConfigProvider */

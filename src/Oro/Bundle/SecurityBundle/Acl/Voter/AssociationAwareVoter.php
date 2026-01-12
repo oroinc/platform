@@ -42,7 +42,8 @@ class AssociationAwareVoter implements VoterInterface
             return BasicPermission::VIEW;
         }
 
-        if (BasicPermission::EDIT === $attribute
+        if (
+            BasicPermission::EDIT === $attribute
             || BasicPermission::CREATE === $attribute
             || BasicPermission::DELETE === $attribute
         ) {

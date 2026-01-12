@@ -83,7 +83,8 @@ class SubresourceUtil
     ): void {
         if (is_a($targetClassName, EntityIdentifier::class, true)) {
             $subresource->setAcceptableTargetClassNames($acceptableTargetClassNames);
-        } elseif (!empty($acceptableTargetClassNames)
+        } elseif (
+            !empty($acceptableTargetClassNames)
             && (
                 \count($acceptableTargetClassNames) > 1
                 || reset($acceptableTargetClassNames) !== $targetClassName

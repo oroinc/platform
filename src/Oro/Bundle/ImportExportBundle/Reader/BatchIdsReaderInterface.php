@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
+/**
+ * Defines the contract for readers that retrieve batch identifiers.
+ *
+ * Implementations provide a way to retrieve identifiers (such as entity IDs or row numbers)
+ * for a batch of items from a data source. These identifiers are used to track which items
+ * have been processed and to support batch-based import/export operations.
+ */
 interface BatchIdsReaderInterface
 {
     /**

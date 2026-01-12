@@ -23,7 +23,8 @@ class OpenApiSpecificationEventListener
     public function beforeFlush(AfterFormProcessEvent $event): void
     {
         $data = $event->getData();
-        if ($data instanceof OpenApiSpecification
+        if (
+            $data instanceof OpenApiSpecification
             && $data->getStatus() !== OpenApiSpecification::STATUS_CREATING
             && $data->getStatus() !== OpenApiSpecification::STATUS_RENEWING
         ) {

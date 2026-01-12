@@ -7,6 +7,12 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Processes transition context to prepare common template result data.
+ *
+ * This processor builds the result data structure for template-based workflow transitions,
+ * including transition information, form view, and form errors.
+ */
 class CommonTemplateDataProcessor implements ProcessorInterface
 {
     /**

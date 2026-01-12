@@ -5,6 +5,13 @@ namespace Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Exception;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Checks whether a value is of a specific type or class.
+ *
+ * This condition validates that the left operand (which must be a property path) is of the type
+ * specified by the right operand. It supports both PHP primitive types (via `gettype`) and class
+ * instance checks (via `instanceof`). The left operand must be a {@see PropertyPathInterface}.
+ */
 class Type extends AbstractComparison
 {
     public const NAME = 'type';

@@ -54,15 +54,17 @@ class ExceptionListener extends BaseExceptionListener
     #[\Override]
     protected function setTargetPath(Request $request): void
     {
-        if (!$request->hasSession() ||
-            !$request->isMethodSafe() ||
-            ($request->isXmlHttpRequest() && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
+        if (
+            !$request->hasSession()
+            || !$request->isMethodSafe()
+            || ($request->isXmlHttpRequest()
+                && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
             || $this->isExcludedRoute($request)
         ) {
             return;
         }
 
-        $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
+        $request->getSession()->set('_security.' . $this->providerKey . '.target_path', $request->getUri());
     }
 
     private function isExcludedRoute(Request $request): bool

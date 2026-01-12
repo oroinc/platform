@@ -16,7 +16,8 @@ class EntityFieldFallbackValueHeadersListener
     public function afterLoadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event)
     {
         // arrayValue for 10001, fallback for 10002, id for 10003, scalarValue for 10004
-        if (!$event->isFullData() ||
+        if (
+            !$event->isFullData() ||
             $event->getEntityName() !== EntityFieldFallbackValue::class
         ) {
             return;

@@ -80,7 +80,8 @@ class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
         ?\DateTimeInterface $bLeft,
         ?\DateTimeInterface $bRight
     ): bool {
-        if (($aRight === null && $bRight === null)
+        if (
+            ($aRight === null && $bRight === null)
             || (null === $aRight && $bRight >= $aLeft)
             || (null === $bRight && $aRight >= $bLeft)
         ) {

@@ -314,7 +314,7 @@ class ImapEmailManager
                 throw new RuntimeException(
                     sprintf(
                         'It is expected that the header "%s" has a string value, '
-                        .'but several values are returned. Values: %s.',
+                        . 'but several values are returned. Values: %s.',
                         $name,
                         implode(', ', $values)
                     )

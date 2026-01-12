@@ -24,7 +24,8 @@ class ModelNormalizer implements ModelNormalizerInterface
     {
         $model = $this->innerModelNormalizer->normalizeModel($model, $action, $isResponseModel);
         if (isset($model[JsonApiDoc::ID])) {
-            if (!$isResponseModel
+            if (
+                !$isResponseModel
                 && !($model[JsonApiDoc::ID]['required'] ?? false)
                 && $this->isActionWithRequiredIdInRequest($action)
             ) {

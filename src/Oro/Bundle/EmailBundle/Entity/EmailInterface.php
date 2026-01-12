@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+/**
+ * Defines the contract for entities that contain email address information.
+ *
+ * Entities implementing this interface must provide access to their email field name,
+ * unique identifier, email address, and associated email owner for email-related operations.
+ */
 interface EmailInterface
 {
     /**

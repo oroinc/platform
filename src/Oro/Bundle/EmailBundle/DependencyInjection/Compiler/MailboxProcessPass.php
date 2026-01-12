@@ -6,6 +6,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers mailbox process providers in the dependency injection container.
+ *
+ * Collects all services tagged with `oro_email.mailbox_process` and registers them
+ * with the mailbox process storage service for handling mailbox-specific processing.
+ */
 class MailboxProcessPass implements CompilerPassInterface
 {
     #[\Override]

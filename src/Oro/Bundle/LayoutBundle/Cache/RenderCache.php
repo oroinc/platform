@@ -135,7 +135,7 @@ class RenderCache
             } elseif ($value === null) {
                 $value = 'null';
             }
-            $keyParts[] = $key . '='. $value;
+            $keyParts[] = $key . '=' . $value;
         }
 
         return implode('|', $keyParts);

@@ -5,6 +5,14 @@ namespace Oro\Bundle\DataGridBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Guess\Guess;
 
+/**
+ * Chains multiple column options guessers and returns the best guess.
+ *
+ * This class aggregates multiple {@see ColumnOptionsGuesserInterface} implementations and executes
+ * them in sequence, returning the guess with the highest confidence level. This allows the
+ * system to combine guessing strategies from different sources (e.g., Doctrine metadata,
+ * custom entity configurations) to determine the most appropriate column options.
+ */
 class ColumnOptionsGuesserChain implements ColumnOptionsGuesserInterface
 {
     /** @var array  */

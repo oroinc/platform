@@ -4,6 +4,13 @@ namespace Oro\Bundle\EmbeddedFormBundle\Layout\Form;
 
 use Symfony\Component\Form\FormView;
 
+/**
+ * Provides common functionality for accessing and managing forms in the layout system.
+ *
+ * This base class implements form accessor methods for retrieving form views, processing fields,
+ * and managing form parameters like action, method, and encoding type. Subclasses must implement
+ * the `getForm` method to provide the actual form instance.
+ */
 abstract class AbstractFormAccessor implements FormAccessorInterface
 {
     /** @var FormAction */

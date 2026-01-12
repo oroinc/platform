@@ -126,7 +126,8 @@ class ActivityManager
      */
     public function addActivityTarget(ActivityInterface $activityEntity, $targetEntity)
     {
-        if ($targetEntity !== null
+        if (
+            $targetEntity !== null
             && $activityEntity->supportActivityTarget(get_class($targetEntity))
             && !$activityEntity->hasActivityTarget($targetEntity)
             && $this->featureChecker->isResourceEnabled(ClassUtils::getClass($targetEntity), 'entities')
@@ -206,7 +207,8 @@ class ActivityManager
      */
     public function removeActivityTarget(ActivityInterface $activityEntity, $targetEntity)
     {
-        if ($targetEntity !== null
+        if (
+            $targetEntity !== null
             && $activityEntity->supportActivityTarget(get_class($targetEntity))
             && $activityEntity->hasActivityTarget($targetEntity)
             && $this->featureChecker->isResourceEnabled(ClassUtils::getClass($targetEntity), 'entities')

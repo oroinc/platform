@@ -4,6 +4,16 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
+/**
+ * Records the latest successful migration versions for each bundle.
+ *
+ * This migration is responsible for updating the migration tracking table with the latest
+ * version of successfully executed migrations for each bundle. It extracts the highest version
+ * from all successful migrations and inserts them into the migration table. This ensures that
+ * the system knows which bundle versions have been successfully applied, even if some migrations
+ * failed. It implements {@see FailIndependentMigration} to indicate it can run independently of other
+ * migration failures.
+ */
 class UpdateBundleVersionMigration implements Migration, FailIndependentMigration
 {
     /** @var MigrationState[] */

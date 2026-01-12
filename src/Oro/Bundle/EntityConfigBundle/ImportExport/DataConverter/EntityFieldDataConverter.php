@@ -6,6 +6,12 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
 
+/**
+ * Converts entity field data between import and export formats.
+ *
+ * This converter handles the transformation of entity field configuration data during import/export operations,
+ * automatically injecting the entity identifier from the import context when not provided in the imported record.
+ */
 class EntityFieldDataConverter extends AbstractTableDataConverter implements ContextAwareInterface
 {
     /** @var ContextInterface */

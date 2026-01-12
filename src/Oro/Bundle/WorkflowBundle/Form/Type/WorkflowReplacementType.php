@@ -11,6 +11,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting replacement workflows during workflow deactivation.
+ *
+ * This form type allows users to choose which workflows should be deactivated when
+ * replacing an existing workflow with a new one.
+ */
 class WorkflowReplacementType extends AbstractType
 {
     public const NAME = 'oro_workflow_replacement';

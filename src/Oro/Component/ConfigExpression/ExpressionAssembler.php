@@ -2,6 +2,14 @@
 
 namespace Oro\Component\ConfigExpression;
 
+/**
+ * Assembles expression objects from configuration arrays.
+ *
+ * This class is responsible for converting configuration data into executable expression instances.
+ * It handles extraction of parameters, messages, and nested expressions, and delegates expression
+ * creation to the factory. It supports configuration passes for preprocessing configuration data
+ * before expression creation.
+ */
 class ExpressionAssembler extends AbstractAssembler
 {
     public const PARAMETERS_KEY = 'parameters';

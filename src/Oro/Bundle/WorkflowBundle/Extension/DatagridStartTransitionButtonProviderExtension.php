@@ -48,7 +48,8 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
 
         $workflow = $button->getWorkflow();
 
-        if (null === $buttonSearchContext->getEntityId() ||
+        if (
+            null === $buttonSearchContext->getEntityId() ||
             null !== $workflow->getWorkflowItemByEntityId($buttonSearchContext->getEntityId())
         ) {
             return false;
@@ -79,7 +80,8 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
     #[\Override]
     protected function getTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
     {
-        if ($searchContext->getDatagrid() !== null &&
+        if (
+            $searchContext->getDatagrid() !== null &&
             $searchContext->getEntityClass() === $workflow->getDefinition()->getRelatedEntity() &&
             in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids(), true)
         ) {

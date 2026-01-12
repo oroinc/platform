@@ -5,6 +5,13 @@ namespace Oro\Bundle\SoapBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Compiler pass that registers include handlers in the dependency injection container.
+ *
+ * Collects all services tagged with `oro_soap.include_handler` and registers them
+ * with the delegate include handler service, allowing dynamic handler registration
+ * for processing X-Include headers in SOAP API requests.
+ */
 class InlcudeHandlersPass implements CompilerPassInterface
 {
     public const TAG                         = 'oro_soap.include_handler';

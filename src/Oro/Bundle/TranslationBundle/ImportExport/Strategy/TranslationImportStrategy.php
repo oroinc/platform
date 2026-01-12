@@ -6,6 +6,14 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrate
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
+/**
+ * Strategy for importing translations into the system.
+ *
+ * Extends the configurable add-or-replace strategy to handle translation-specific import logic.
+ * Manages the import of translation entities, handling cases where translations have not been
+ * translated yet by setting their values to null to use parent translations. Locates existing
+ * translations by key, language, and domain for proper update or creation.
+ */
 class TranslationImportStrategy extends ConfigurableAddOrReplaceStrategy
 {
     /**

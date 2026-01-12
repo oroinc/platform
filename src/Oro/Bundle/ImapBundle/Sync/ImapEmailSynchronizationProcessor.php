@@ -123,7 +123,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
             } catch (UnselectableFolderException $e) {
                 $this->processUnselectableFolderException($folder, $notificationBag);
-            } catch (ConnectionException
+            } catch (
+                ConnectionException
                 | InvalidCredentialsException
                 | InvalidArgumentException
                 | OAuth2ConnectException  $e
@@ -339,7 +340,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     }
                 }
 
-                if (false === $this->getSettings()->isForceMode()
+                if (
+                    false === $this->getSettings()->isForceMode()
                     || (true === $this->getSettings()->isForceMode() && count($relatedExistingImapEmails) === 0)
                 ) {
                     $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);

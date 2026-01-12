@@ -35,7 +35,8 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         string $ownerField = '',
         string $organizationField = ''
     ): void {
-        if ($this->container->get(ApplicationState::class)->isInstalled()
+        if (
+            $this->container->get(ApplicationState::class)->isInstalled()
             && !$this->hasRecordsInActivityList($manager, $activityClass)
         ) {
             $provider = $this->container->get('oro_activity_list.provider.chain');

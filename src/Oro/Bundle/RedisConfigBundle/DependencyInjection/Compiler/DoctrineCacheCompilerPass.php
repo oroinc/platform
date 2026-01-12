@@ -42,7 +42,8 @@ class DoctrineCacheCompilerPass implements CompilerPassInterface
             );
             foreach ($this->getDoctrineCacheServices($container) as $serviceId) {
                 $serviceDef = $container->getDefinition($serviceId);
-                if ($serviceDef instanceof ChildDefinition
+                if (
+                    $serviceDef instanceof ChildDefinition
                     && str_starts_with($serviceDef->getParent(), CacheConfiguration::DATA_CACHE_POOL)
                 ) {
                     $newServiceDef = new ChildDefinition(

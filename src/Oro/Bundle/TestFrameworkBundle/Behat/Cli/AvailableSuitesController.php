@@ -10,6 +10,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Handles the `--available-suites` CLI option to output all registered test suites.
+ *
+ * This controller lists all configured Behat test suites, allowing developers to discover
+ * which test suites are available for execution.
+ */
 class AvailableSuitesController implements Controller
 {
     /**
@@ -36,7 +42,7 @@ class AvailableSuitesController implements Controller
                 '--available-suites',
                 null,
                 InputOption::VALUE_NONE,
-                'Show all available test suites.'.PHP_EOL.
+                'Show all available test suites.' . PHP_EOL .
                 'Suites can be configured automatically by extensions, and manually by configuration'
             );
     }

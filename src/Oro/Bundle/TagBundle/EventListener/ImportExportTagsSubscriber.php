@@ -70,7 +70,8 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
      */
     public function afterImport(StrategyEvent $event)
     {
-        if (!$this->pendingTaggedObjects ||
+        if (
+            !$this->pendingTaggedObjects ||
             $event->getEntity() === $this->importedEntity ||
             !$this->getTagImportManager()->isTaggable($event->getEntity())
         ) {
@@ -168,7 +169,8 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
 
     public function loadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event)
     {
-        if (!$event->isFullData() ||
+        if (
+            !$event->isFullData() ||
             !$this->getTagImportManager()->isTaggable($event->getEntityName())
         ) {
             return;

@@ -26,7 +26,7 @@ class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): ?string {
-        $key = UniversalCacheKeyGenerator::normalizeCacheKey($filter .'|'. $format . '|' . $referenceType);
+        $key = UniversalCacheKeyGenerator::normalizeCacheKey($filter . '|' . $format . '|' . $referenceType);
         return $this->cache->get($key, function () use ($filter, $format, $referenceType) {
             return $this->imagePlaceholderProvider->getPath($filter, $format, $referenceType);
         });

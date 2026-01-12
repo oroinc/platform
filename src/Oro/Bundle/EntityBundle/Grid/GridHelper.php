@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityBundle\Grid;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 
+/**
+ * Helper for retrieving configurable entity information for datagrids.
+ *
+ * This helper provides access to all configurable entities and their translated names,
+ * which is useful for populating entity selection dropdowns and other UI components
+ * that need to display available entities.
+ */
 class GridHelper
 {
     /** @var EntityProvider */

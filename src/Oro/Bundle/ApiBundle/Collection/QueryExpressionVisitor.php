@@ -388,7 +388,8 @@ class QueryExpressionVisitor extends ExpressionVisitor
                     }
                 }
             }
-            if (str_starts_with($field, Criteria::PLACEHOLDER_START)
+            if (
+                str_starts_with($field, Criteria::PLACEHOLDER_START)
                 && str_ends_with($field, Criteria::PLACEHOLDER_END)
             ) {
                 // it is a computed field that does not related to any join or a root entity

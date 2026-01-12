@@ -9,6 +9,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Form type for defining a single unique key constraint.
+ *
+ * This form type represents a single unique key definition with a name and a collection
+ * of field names that comprise the key. It provides two form fields: a text field for the
+ * unique key name and a choice field for selecting one or more fields that should be part
+ * of the unique constraint.
+ */
 class UniqueKeyType extends AbstractType
 {
     #[\Override]

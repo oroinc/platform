@@ -6,6 +6,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Handles decoding of folder data in form submission events.
+ *
+ * This event subscriber listens to form `PRE_SUBMIT` events and decodes JSON-encoded folder data
+ * back into an array structure. It ensures that folder information submitted through forms is
+ * properly deserialized before being processed by the form validation and data transformation layers.
+ */
 class DecodeFolderSubscriber implements EventSubscriberInterface
 {
     #[\Override]

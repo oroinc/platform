@@ -6,6 +6,12 @@ use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 
+/**
+ * Resolves transition frontend options based on workflow item context.
+ *
+ * This resolver evaluates transition options using the current workflow item state,
+ * allowing dynamic configuration of transition display and behavior.
+ */
 class TransitionOptionsResolver
 {
     /** @var OptionsResolver */

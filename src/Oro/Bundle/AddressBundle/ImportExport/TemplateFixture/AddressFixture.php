@@ -5,6 +5,14 @@ namespace Oro\Bundle\AddressBundle\ImportExport\TemplateFixture;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 
+/**
+ * Provides template fixture data for {@see Address} entities during import/export operations.
+ *
+ * This fixture generates sample address records with realistic data for different
+ * individuals (Jerry Coleman, John Smith, John Doo), including street addresses,
+ * postal codes, cities, regions, and countries. It is used to populate import templates
+ * and demonstrate the expected data structure for address imports.
+ */
 class AddressFixture extends AbstractTemplateRepository
 {
     #[\Override]

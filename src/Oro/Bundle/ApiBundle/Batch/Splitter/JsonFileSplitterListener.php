@@ -98,7 +98,8 @@ class JsonFileSplitterListener implements ListenerInterface
 
         $sectionName = $this->objectKeys[$this->objectLevel + 1] ?? null;
         if (null !== $this->headerSectionName && $sectionName === $this->headerSectionName) {
-            if (\count($this->objectKeys) !== 2
+            if (
+                \count($this->objectKeys) !== 2
                 || null !== $this->objectKeys[1]
                 || $this->headerSectionName !== $this->objectKeys[2]
             ) {

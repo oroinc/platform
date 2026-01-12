@@ -143,7 +143,8 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
                 continue;
             }
 
-            if ($this->isAccessControlEntryApplicable($requiredMask, $accessControlEntry, $extension)
+            if (
+                $this->isAccessControlEntryApplicable($requiredMask, $accessControlEntry, $extension)
                 && $accessControlEntry->isGranting()
             ) {
                 return true;

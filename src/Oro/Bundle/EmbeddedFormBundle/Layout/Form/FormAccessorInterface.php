@@ -6,6 +6,14 @@ use Oro\Component\Layout\ContextItemInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Defines the contract for accessing form data and metadata in layout contexts.
+ *
+ * This interface provides methods to retrieve form objects, views, and configuration
+ * details such as action, method, and enctype. It also manages processed fields tracking,
+ * allowing layout builders to keep track of which form fields have been rendered. Implementations
+ * serve as adapters between Symfony forms and the layout system.
+ */
 interface FormAccessorInterface extends ContextItemInterface
 {
     /**

@@ -5,6 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\Formatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
+/**
+ * Formats date and time values for export in various formats.
+ *
+ * This formatter handles the conversion of DateTime objects to formatted strings
+ * for export, supporting three types: datetime (full date and time), date (date only),
+ * and time (time only). It uses the locale-aware DateTimeFormatter from the LocaleBundle
+ * to ensure proper formatting according to user locale settings.
+ */
 class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterInterface
 {
     public const TYPE_DATETIME = 'datetime';

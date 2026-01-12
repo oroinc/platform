@@ -27,7 +27,7 @@ abstract class CleanupStorageCommandAbstract extends Command implements CronComm
                 'interval',
                 'i',
                 InputOption::VALUE_OPTIONAL,
-                'Time interval (days) to keep the import and export files.'.
+                'Time interval (days) to keep the import and export files.' .
                 ' Will be removed files older than today-interval.',
                 static::DEFAULT_PERIOD
             )

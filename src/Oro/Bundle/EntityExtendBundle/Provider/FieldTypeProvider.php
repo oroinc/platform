@@ -61,7 +61,8 @@ class FieldTypeProvider
             if ($propertyConfig->hasForm($configType, $fieldType)) {
                 $scope = $provider->getScope();
                 foreach ($propertyConfig->getItems($configType) as $code => $item) {
-                    if (isset($item['import_export']['import_template']['use_in_template'])
+                    if (
+                        isset($item['import_export']['import_template']['use_in_template'])
                         && true === $item['import_export']['import_template']['use_in_template']
                         && !isset($properties[$scope][$code])
                         && (

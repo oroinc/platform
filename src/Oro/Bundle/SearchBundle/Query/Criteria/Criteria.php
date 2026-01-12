@@ -46,7 +46,8 @@ class Criteria extends BaseCriteria
         $fieldType = Query::TYPE_TEXT;
         if (str_contains($field, '.')) {
             $parts = explode('.', $field, 2);
-            if ($parts[0] === Query::TYPE_TEXT || $parts[0] === Query::TYPE_INTEGER ||
+            if (
+                $parts[0] === Query::TYPE_TEXT || $parts[0] === Query::TYPE_INTEGER ||
                 $parts[0] === Query::TYPE_DECIMAL || $parts[0] === Query::TYPE_DATETIME
             ) {
                 [$fieldType, $field] = $parts;

@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Sync\Model;
 
+/**
+ * Configuration settings for email synchronization processing.
+ *
+ * Encapsulates parameters that control email synchronization behavior, including
+ * batch sizes, timeouts, and other performance-related settings.
+ */
 class SynchronizationProcessorSettings
 {
     /** @var  bool In this mode all emails will be re-synced again for checked folders */

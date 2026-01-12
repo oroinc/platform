@@ -4,6 +4,12 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Defines the contract for REST API read operations.
+ *
+ * Provides methods for handling GET requests to retrieve single entities and lists of entities
+ * with support for pagination, filtering, and custom join associations.
+ */
 interface RestApiReadInterface
 {
     public const ACTION_LIST = 'list';

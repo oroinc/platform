@@ -88,13 +88,13 @@ class ActualizeCountriesRegionsCommandTest extends TestCase
 
         $generatedTranslationFile = Yaml::parse(
             file_get_contents(
-                $tmpDir. DIRECTORY_SEPARATOR . 'entities.en.yml'
+                $tmpDir . DIRECTORY_SEPARATOR . 'entities.en.yml'
             )
         );
 
         $generatedCountriesFile = Yaml::parse(
             file_get_contents(
-                $tmpDir. DIRECTORY_SEPARATOR . 'countries.yml'
+                $tmpDir . DIRECTORY_SEPARATOR . 'countries.yml'
             )
         );
 

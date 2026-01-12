@@ -8,6 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 
+/**
+ * Filters entities and determines applicability for attribute import operations.
+ *
+ * This filter checks whether entities support attributes and provides topic information for WebSocket
+ * notifications during attribute import operations. It acts as a gatekeeper to ensure attribute import
+ * functionality is only applied to entities configured to support attributes.
+ */
 class AttributesImportFilter
 {
     /**

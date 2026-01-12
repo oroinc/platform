@@ -7,6 +7,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting reminder interval units.
+ *
+ * This form type provides a choice field for selecting the unit of time for a reminder
+ * interval (minute, hour, day, or week). It extends the Symfony {@see ChoiceType} and is
+ * typically used as part of the {@see ReminderIntervalType} to allow users to specify how
+ * often a reminder should be triggered.
+ */
 class UnitType extends AbstractType
 {
     #[\Override]

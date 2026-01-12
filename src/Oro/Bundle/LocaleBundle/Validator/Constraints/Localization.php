@@ -4,6 +4,14 @@ namespace Oro\Bundle\LocaleBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Constraint for validating localization entities and preventing circular references.
+ *
+ * This constraint ensures the integrity of the localization hierarchy by detecting
+ * and preventing circular parent-child relationships. It is applied at the class
+ * level to {@see Localization} entities and uses the {@see LocalizationValidator} to
+ * perform validation.
+ */
 class Localization extends Constraint
 {
     /**

@@ -2,6 +2,14 @@
 
 namespace Oro\Component\ConfigExpression;
 
+/**
+ * Defines the contract for all expression types in the configuration expression system.
+ *
+ * Expressions are the core building blocks of the configuration expression system. They can be
+ * evaluated against a context to produce results, converted to array or PHP code representations,
+ * and initialized with options. This interface is implemented by conditions, functions, and other
+ * expression types that can be used in declarative configuration.
+ */
 interface ExpressionInterface
 {
     /**

@@ -6,6 +6,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validator for the NoTags constraint.
+ *
+ * This validator checks that a value does not contain HTML tags by comparing the original
+ * value with its stripped version (using PHP's `strip_tags` function). If HTML tags are detected,
+ * it adds a violation to the validation context with the constraint's error message.
+ */
 class NoTagsValidator extends ConstraintValidator
 {
     #[\Override]

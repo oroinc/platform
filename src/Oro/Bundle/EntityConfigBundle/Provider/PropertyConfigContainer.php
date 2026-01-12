@@ -172,7 +172,8 @@ class PropertyConfigContainer
         $result = false;
         if ($fieldType) {
             foreach ($this->config[$type]['items'] as $code => $item) {
-                if (isset($item['form']['type'])
+                if (
+                    isset($item['form']['type'])
                     && (
                         !isset($item['options']['allowed_type'])
                         || in_array($fieldType, $item['options']['allowed_type'], true)
@@ -220,7 +221,8 @@ class PropertyConfigContainer
         $result = [];
         if ($fieldType) {
             foreach ($this->config[$type]['items'] as $code => $item) {
-                if (isset($item['form']['type'])
+                if (
+                    isset($item['form']['type'])
                     && (
                         !isset($item['options']['allowed_type'])
                         || in_array($fieldType, $item['options']['allowed_type'], true)

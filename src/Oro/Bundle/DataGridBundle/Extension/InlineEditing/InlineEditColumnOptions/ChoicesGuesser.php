@@ -56,10 +56,11 @@ class ChoicesGuesser implements GuesserInterface
                     }
                 }
 
-                if (\array_key_exists(PropertyInterface::DATA_NAME_KEY, $column)
+                if (
+                    \array_key_exists(PropertyInterface::DATA_NAME_KEY, $column)
                     && str_contains($column[PropertyInterface::DATA_NAME_KEY], '_target_field')
                 ) {
-                    $result[PropertyInterface::DATA_NAME_KEY] = $columnName.'_identity';
+                    $result[PropertyInterface::DATA_NAME_KEY] = $columnName . '_identity';
                 }
 
                 $isConfiguredInlineEdit = \array_key_exists(Config::BASE_CONFIG_KEY, $column);

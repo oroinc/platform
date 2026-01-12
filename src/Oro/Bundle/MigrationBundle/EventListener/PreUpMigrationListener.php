@@ -5,6 +5,14 @@ namespace Oro\Bundle\MigrationBundle\EventListener;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 
+/**
+ * Handles pre-migration events to initialize migration state and create the migration tracking table.
+ *
+ * This listener is responsible for loading the latest migration versions for all bundles
+ * from the database before migrations are executed. If the migration tracking table does not exist,
+ * it registers a migration to create it. This ensures that the migration system can properly
+ * track which migrations have been applied to each bundle.
+ */
 class PreUpMigrationListener
 {
     public function onPreUp(PreMigrationEvent $event)

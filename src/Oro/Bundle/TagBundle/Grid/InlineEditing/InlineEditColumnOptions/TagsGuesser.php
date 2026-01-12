@@ -30,7 +30,8 @@ class TagsGuesser implements GuesserInterface
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];
-        if (\array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
+        if (
+            \array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
             && $column[PropertyInterface::FRONTEND_TYPE_KEY] === self::SUPPORTED_TYPE
         ) {
             $result[Configuration::BASE_CONFIG_KEY] = $this->getInlineOptions($entityName, $isEnabledInline);

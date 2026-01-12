@@ -17,9 +17,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ProgressArtifactsSubscriber implements EventSubscriberInterface
 {
-    protected TotalStatistics   $statistics;
-    protected OutputPrinter     $printer;
-    protected array             $artifacts = [];
+    protected TotalStatistics $statistics;
+    protected OutputPrinter $printer;
+    protected array $artifacts = [];
     protected ScreenshotGenerator $screenshotGenerator;
 
     public function __construct(
@@ -48,7 +48,7 @@ class ProgressArtifactsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $scenarioPath = $scope->getFeature()->getFile().':'.$scope->getScenario()->getLine();
+        $scenarioPath = $scope->getFeature()->getFile() . ':' . $scope->getScenario()->getLine();
 
         $this->artifacts[$scenarioPath] = $this->screenshotGenerator->take();
     }
@@ -64,11 +64,11 @@ class ProgressArtifactsSubscriber implements EventSubscriberInterface
         /** @var StepStatV2 $stepStat */
         foreach ($stepStats as $stepStat) {
             $this->printer->writeln(
-                '      {+pending}'.$stepStat->getScenarioText().':{-pending}'
+                '      {+pending}' . $stepStat->getScenarioText() . ':{-pending}'
             );
             foreach ($this->artifacts[$stepStat->getScenarioPath()] as $artifact) {
                 $this->printer->writeln(
-                    '      --- {+pending}'.$artifact.'{-pending}'
+                    '      --- {+pending}' . $artifact . '{-pending}'
                 );
             }
         }

@@ -25,9 +25,11 @@ class TextGuesser implements GuesserInterface
         $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
-        if ($isEnabledInline
+        if (
+            $isEnabledInline
             && $this->hasField($metadata, $entityName, $columnName)
-            && !$metadata->hasAssociation($columnName)) {
+            && !$metadata->hasAssociation($columnName)
+        ) {
             $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
         }
 

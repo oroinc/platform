@@ -6,6 +6,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * API form type for collections of tag entities.
+ *
+ * This form type provides collection handling for tag entities in API contexts. It configures the form
+ * to accept multiple tag entries, allowing dynamic addition of tags and using TagEntityApiType for
+ * individual tag entries within the collection.
+ */
 class TagCollectionApiType extends AbstractType
 {
     #[\Override]

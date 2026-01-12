@@ -107,7 +107,8 @@ class EntityMetadataLoader
         $entityMetadata->setHints($config->getHints());
         $configuredIdFieldNames = $config->getIdentifierFieldNames();
         if (!empty($configuredIdFieldNames)) {
-            if ($entityMetadata->hasIdentifierGenerator()
+            if (
+                $entityMetadata->hasIdentifierGenerator()
                 && !$this->entityIdHelper->isEntityIdentifierEqual($entityMetadata->getIdentifierFieldNames(), $config)
             ) {
                 $entityMetadata->setHasIdentifierGenerator(false);

@@ -9,8 +9,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class WidgetDateType
- * @package Oro\Bundle\DashboardBundle\Form\Type
+ * Provides a form type for dashboard widget date configuration.
+ *
+ * This form type combines a checkbox to enable/disable date filtering with an optional date picker field.
+ * It is used in dashboard widget configuration forms to allow users to specify whether to filter data
+ * by date and, if enabled, to select the specific date.
  */
 class WidgetDateType extends AbstractType
 {

@@ -12,6 +12,12 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
+/**
+ * Extends button provider functionality to determine availability of start transition buttons.
+ *
+ * This extension checks whether a start transition button is available for a given entity
+ * by building a temporary workflow item and validating the transition availability.
+ */
 class StartTransitionButtonProviderExtension extends AbstractStartTransitionButtonProviderExtension
 {
     /**

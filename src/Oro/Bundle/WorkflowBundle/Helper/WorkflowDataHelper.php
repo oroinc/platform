@@ -261,7 +261,8 @@ class WorkflowDataHelper
 
         // extra case to show start transition
         $defaultStartTransition = $workflow->getTransitionManager()->getDefaultStartTransition();
-        if (null !== $defaultStartTransition
+        if (
+            null !== $defaultStartTransition
             && $this->isStartTransitionAllowed($workflow, $defaultStartTransition, $entity)
         ) {
             $transitions[$defaultStartTransition->getName()] = $defaultStartTransition;

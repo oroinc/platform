@@ -21,7 +21,8 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
     #[\Override]
     public function buildOptions(array $options): array
     {
-        if (!empty($options['route'])
+        if (
+            !empty($options['route'])
             && !$this->alreadyDenied($options)
             && !$this->featureChecker->isResourceEnabled($options['route'], 'routes')
         ) {

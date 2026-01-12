@@ -5,6 +5,12 @@ namespace Oro\Component\Layout\Form;
 use Symfony\Component\Form\FormRendererInterface as BaseFormRendererInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Extends Symfony's form renderer with layout-specific form rendering capabilities.
+ *
+ * This interface provides methods for searching and rendering form blocks by name suffix,
+ * supporting recursive block searches and optional parent block rendering.
+ */
 interface FormRendererInterface extends BaseFormRendererInterface
 {
     /**

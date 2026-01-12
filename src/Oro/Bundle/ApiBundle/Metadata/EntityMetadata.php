@@ -205,7 +205,8 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
      */
     public function getEntityMetadata(string $className): ?EntityMetadata
     {
-        if (null === $this->targetMetadataAccessor
+        if (
+            null === $this->targetMetadataAccessor
             || ($className === $this->className && !$this->targetMetadataAccessor->isFullMode())
         ) {
             return $this;

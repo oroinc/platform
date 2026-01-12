@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+/**
+ * Represents an entity that can be a recipient in email operations.
+ *
+ * Encapsulates information about an entity that can receive emails, including its class, identifier,
+ * display label, and organization, with support for additional type information in the label.
+ */
 class RecipientEntity
 {
     /** @var string */

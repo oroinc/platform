@@ -20,8 +20,10 @@ class CustomEntityConfigValidatorService
         $isNotConfigured = [];
         foreach ($configs as $entityConfig) {
             $className = $entityConfig->getId()->getClassName();
-            if (!ExtendHelper::isCustomEntity($className)
-                || str_starts_with($className, ExtendHelper::ENUM_CLASS_NAME_PREFIX)) {
+            if (
+                !ExtendHelper::isCustomEntity($className)
+                || str_starts_with($className, ExtendHelper::ENUM_CLASS_NAME_PREFIX)
+            ) {
                 continue;
             }
             if (!in_array($className, $this->customEntities, true)) {

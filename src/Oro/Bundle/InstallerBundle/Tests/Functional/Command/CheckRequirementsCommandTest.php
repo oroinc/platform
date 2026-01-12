@@ -35,7 +35,7 @@ class CheckRequirementsCommandTest extends WebTestCase
             $this->parseMessages($output, 'WARNING'),
         );
 
-        $errorMessage = 'Command Output: '.$output;
+        $errorMessage = 'Command Output: ' . $output;
         $this->assertContains(
             'Set the "memory_limit" setting in php.ini* to at least "512M".',
             $messages,
@@ -65,15 +65,15 @@ class CheckRequirementsCommandTest extends WebTestCase
         $gdVersion = PlatformRequirementsProvider::REQUIRED_GD_VERSION;
         $curlVersion = PlatformRequirementsProvider::REQUIRED_CURL_VERSION;
 
-        $errorMessage = 'Command Output: '.$output;
+        $errorMessage = 'Command Output: ' . $output;
         $this->assertContains('iconv() must be available', $messages, $errorMessage);
         $this->assertContains('ctype_alpha() must be available', $messages, $errorMessage);
         $this->assertContains('token_get_all() must be available', $messages, $errorMessage);
         $this->assertContains('simplexml_import_dom() must be available', $messages, $errorMessage);
         $this->assertContains('memory_limit should be at least 512M', $messages, $errorMessage);
         $this->assertContains('detect_unicode must be disabled in php.ini', $messages, $errorMessage);
-        $this->assertContains('GD extension must be at least '.$gdVersion, $messages, $errorMessage);
-        $this->assertContains('cURL extension must be at least '.$curlVersion, $messages, $errorMessage);
+        $this->assertContains('GD extension must be at least ' . $gdVersion, $messages, $errorMessage);
+        $this->assertContains('cURL extension must be at least ' . $curlVersion, $messages, $errorMessage);
         $this->assertContains('openssl_encrypt() should be available', $messages, $errorMessage);
         $this->assertContains('intl extension should be available', $messages, $errorMessage);
         $this->assertContains('zip extension should be installed', $messages, $errorMessage);
@@ -91,7 +91,7 @@ class CheckRequirementsCommandTest extends WebTestCase
         $process = new Process($command);
         $process->run();
 
-        return $process->getOutput()."\n".$process->getErrorOutput();
+        return $process->getOutput() . "\n" . $process->getErrorOutput();
     }
 
     private function parseMessages(string $output, string $prefix): array

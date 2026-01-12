@@ -57,7 +57,8 @@ class ObjectIdentityFactory
     public function underlying(ObjectIdentityInterface $oid): ObjectIdentity
     {
         $id = $oid->getIdentifier();
-        if (self::ROOT_IDENTITY_TYPE === $id
+        if (
+            self::ROOT_IDENTITY_TYPE === $id
             || $id === ($extensionKey = $this->extensionSelector->select($oid)->getExtensionKey())
         ) {
             throw new InvalidAclException(sprintf(

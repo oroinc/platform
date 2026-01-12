@@ -169,7 +169,8 @@ class PrepareNewEmailModelToSave implements ProcessorInterface
         $userId = $this->tokenAccessor->getUserId();
         foreach ($includedEntities as $entity) {
             $entityClass = $includedEntities->getClass($entity);
-            if ($entityClass
+            if (
+                $entityClass
                 && is_a($entityClass, EmailUser::class, true)
                 && $entity->getOrganization()->getId() === $organizationId
                 && $entity->getOwner()->getId() === $userId

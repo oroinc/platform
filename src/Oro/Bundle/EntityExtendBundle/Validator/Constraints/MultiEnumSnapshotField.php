@@ -4,6 +4,14 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Constraint for validating multi-enum snapshot field names.
+ *
+ * This constraint ensures that the names of snapshot fields (automatically created fields
+ * that store serialized multi-select enum values) do not conflict with existing multi-select
+ * field names or other field names in the entity. It prevents naming conflicts that could
+ * cause confusion or data integrity issues.
+ */
 class MultiEnumSnapshotField extends Constraint
 {
     /** @var string */

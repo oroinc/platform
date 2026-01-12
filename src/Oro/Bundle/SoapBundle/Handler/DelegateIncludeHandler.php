@@ -4,6 +4,13 @@ namespace Oro\Bundle\SoapBundle\Handler;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Delegates include request handling to registered handlers based on requested includes.
+ *
+ * Parses the `X-Include` header to identify requested includes, routes them to appropriate
+ * registered handlers, and tracks which includes were processed, unknown, or unsupported.
+ * Sets response headers to communicate the status of each requested include.
+ */
 class DelegateIncludeHandler implements IncludeHandlerInterface
 {
     /** @var array */

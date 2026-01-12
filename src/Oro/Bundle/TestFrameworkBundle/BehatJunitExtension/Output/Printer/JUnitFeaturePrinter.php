@@ -11,6 +11,12 @@ use Behat\Testwork\Output\Printer\JUnitOutputPrinter;
 use Behat\Testwork\Tester\Result\TestResult;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\EventListener\JUnitDurationListener;
 
+/**
+ * Prints Behat features in JUnit XML format with duration information.
+ *
+ * This printer generates JUnit-compatible XML output for Behat test results, including
+ * test statistics and execution durations. It's used for CI/CD integration and test reporting.
+ */
 final class JUnitFeaturePrinter implements FeaturePrinter
 {
     /**

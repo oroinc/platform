@@ -67,7 +67,8 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
             }
         } else {
             foreach ($other as $message) {
-                if (is_array($message)
+                if (
+                    is_array($message)
                     && array_key_exists('topic', $message)
                     && $message['topic'] === $this->message['topic']
                 ) {

@@ -61,7 +61,8 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
             $targetAction
         );
         $associationName = $context->getAssociationName();
-        if ($associationName
+        if (
+            $associationName
             && self::ATTACHMENTS_ASSOCIATION_NAME === $associationName
             && !$definition->hasDocumentation()
         ) {

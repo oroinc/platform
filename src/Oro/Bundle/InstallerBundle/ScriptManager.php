@@ -194,8 +194,7 @@ class ScriptManager
             '/@' . ScriptExecutor::ORO_SCRIPT_ANNOTATION . '\("([\w \-]+)"\)/i',
             file_get_contents($fileName),
             $tokens
-        )
-        ) {
+        )) {
             if (isset($tokens[1])) {
                 return [
                     'key'   => md5($fileName),
