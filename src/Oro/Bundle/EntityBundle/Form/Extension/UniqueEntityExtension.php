@@ -18,28 +18,13 @@ class UniqueEntityExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /** @var ValidatorInterface */
-    protected $validator;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     public function __construct(
-        ValidatorInterface $validator,
-        TranslatorInterface $translator,
-        ConfigProvider $entityConfigProvider,
-        DoctrineHelper $doctrineHelper
+        private readonly ValidatorInterface $validator,
+        private readonly TranslatorInterface $translator,
+        private readonly ConfigProvider $entityConfigProvider,
+        private readonly ConfigProvider $extendConfigProvider,
+        private readonly DoctrineHelper $doctrineHelper
     ) {
-        $this->validator            = $validator;
-        $this->translator           = $translator;
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->doctrineHelper       = $doctrineHelper;
     }
 
     #[\Override]
@@ -53,44 +38,36 @@ class UniqueEntityExtension extends AbstractTypeExtension
         if (!$this->doctrineHelper->isManageableEntity($className)) {
             return;
         }
-        if (!$this->entityConfigProvider->hasConfig($className)) {
+        if (!$this->extendConfigProvider->hasConfig($className)) {
             return;
         }
 
-        $uniqueKeys = $this->entityConfigProvider->getConfig($className)->get('unique_key');
+        $uniqueKeys = $this->extendConfigProvider->getConfig($className)->get('unique_key');
         if (empty($uniqueKeys)) {
             return;
         }
 
-        /* @var \Symfony\Component\Validator\Mapping\ClassMetadata $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($className);
 
         foreach ($uniqueKeys['keys'] as $uniqueKey) {
             $fields = $uniqueKey['key'];
 
             $labels = array_map(
-                function ($fieldName) use ($className) {
-                    $label = (string) $this
-                        ->entityConfigProvider
+                fn (string $fieldName): string => $this->translator->trans(
+                    (string) $this->entityConfigProvider
                         ->getConfig($className, $fieldName)
-                        ->get('label');
-
-                    return $this->translator->trans($label);
-                },
+                        ->get('label')
+                ),
                 $fields
             );
 
             $constraint = new UniqueEntity(
-                [
-                    'fields'    => $fields,
-                    'errorPath' => '',
-                    'message'   => $this
-                        ->translator
-                        ->trans(
-                            'oro.entity.validation.unique_field',
-                            ['%count%' => sizeof($fields), '%field%' => implode(', ', $labels)]
-                        ),
-                ]
+                fields: $fields,
+                message: $this->translator->trans(
+                    'oro.entity.validation.unique_field',
+                    ['%count%' => \count($fields), '%field%' => implode(', ', $labels)]
+                ),
+                errorPath: ''
             );
 
             $validatorMetadata->addConstraint($constraint);
