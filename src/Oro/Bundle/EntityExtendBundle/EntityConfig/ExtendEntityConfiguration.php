@@ -34,7 +34,7 @@ class ExtendEntityConfiguration implements EntityConfigInterface
             ->end()
             ->scalarNode('state')
                 ->info('`string` the state of the extend config field. All available state you can find in ' .
-                '`ExtendScope`(https://github.com/laboro/dev/blob/master/package/platform/src/Oro/Bundle/'.
+                '`ExtendScope`(https://github.com/laboro/dev/blob/master/package/platform/src/Oro/Bundle/' .
                 'EntityExtendBundle/EntityConfig/ExtendScope.php)')
                 ->defaultValue('Active')
             ->end()
@@ -42,12 +42,12 @@ class ExtendEntityConfiguration implements EntityConfigInterface
                 ->info('`boolean` if true the config entity able to delete')
                 ->defaultFalse()
             ->end()
-            ->scalarNode('unique_key')
-                ->info('`string` name of unique key')
+            ->variableNode('unique_key')
+                ->info('`array|null` unique keys configuration with structure: [["name" => string, "key" => string[]]]')
             ->end()
             ->arrayNode('index')
                 ->info('`string[]` list of index field of the entity. All available index state you can find in ' .
-                '`IndexScope`(https://github.com/laboro/dev/blob/master/package/platform/src/Oro/Bundle/'.
+                '`IndexScope`(https://github.com/laboro/dev/blob/master/package/platform/src/Oro/Bundle/' .
                 'EntityBundle/EntityConfig/IndexScope.php)')
                 ->scalarPrototype()->end()
             ->end()
