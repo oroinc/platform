@@ -176,7 +176,6 @@ class AutoResponseTemplateType extends AbstractType
             'valid_elements' => null, //all elements are valid
             'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullscreen']),
             'relative_urls' => false,
-            'entity_encoding' => 'raw',
         ];
     }
 }
