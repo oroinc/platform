@@ -92,6 +92,8 @@ services:
             - '@translator'
             - '@oro_entity_config.provider.entity'
             - '@oro_entity.doctrine_helper'
+        calls:
+            - [ setExtendConfigProvider, [ '@oro_entity_config.provider.extend' ] ]
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

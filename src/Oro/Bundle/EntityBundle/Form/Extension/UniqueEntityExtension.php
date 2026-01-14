@@ -30,6 +30,8 @@ class UniqueEntityExtension extends AbstractTypeExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    protected ?ConfigProvider $extendConfigProvider = null;
+
     public function __construct(
         ValidatorInterface $validator,
         TranslatorInterface $translator,
@@ -42,10 +44,15 @@ class UniqueEntityExtension extends AbstractTypeExtension
         $this->doctrineHelper       = $doctrineHelper;
     }
 
+    public function setExtendConfigProvider(ConfigProvider $extendConfigProvider)
+    {
+        $this->extendConfigProvider = $extendConfigProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (empty($options['data_class'])) {
             return;
@@ -55,11 +62,11 @@ class UniqueEntityExtension extends AbstractTypeExtension
         if (!$this->doctrineHelper->isManageableEntity($className)) {
             return;
         }
-        if (!$this->entityConfigProvider->hasConfig($className)) {
+        if (!$this->extendConfigProvider->hasConfig($className)) {
             return;
         }
 
-        $uniqueKeys = $this->entityConfigProvider->getConfig($className)->get('unique_key');
+        $uniqueKeys = $this->extendConfigProvider->getConfig($className)->get('unique_key');
         if (empty($uniqueKeys)) {
             return;
         }
@@ -71,28 +78,21 @@ class UniqueEntityExtension extends AbstractTypeExtension
             $fields = $uniqueKey['key'];
 
             $labels = array_map(
-                function ($fieldName) use ($className) {
-                    $label = (string) $this
-                        ->entityConfigProvider
+                fn (string $fieldName): string => $this->translator->trans(
+                    (string) $this->entityConfigProvider
                         ->getConfig($className, $fieldName)
-                        ->get('label');
-
-                    return $this->translator->trans($label);
-                },
+                        ->get('label')
+                ),
                 $fields
             );
 
             $constraint = new UniqueEntity(
-                [
-                    'fields'    => $fields,
-                    'errorPath' => '',
-                    'message'   => $this
-                        ->translator
-                        ->trans(
-                            'oro.entity.validation.unique_field',
-                            ['%count%' => sizeof($fields), '%field%' => implode(', ', $labels)]
-                        ),
-                ]
+                fields: $fields,
+                message: $this->translator->trans(
+                    'oro.entity.validation.unique_field',
+                    ['%count%' => \count($fields), '%field%' => implode(', ', $labels)]
+                ),
+                errorPath: ''
             );
 
             $validatorMetadata->addConstraint($constraint);

@@ -209,15 +209,20 @@ class ConfigController extends AbstractController
     public function fieldSearchAction($id)
     {
         $fields = [];
+        $allowedFieldTypes = [
+            'integer',
+            'string',
+            'smallint',
+            'decimal',
+            'bigint',
+            'text',
+            'money'
+        ];
         if ($id) {
             $className = $this->getRoutingHelper()->resolveEntityClass($id);
             $entityFields = $this->getEntityFieldProvider()->getEntityFields($className);
             foreach ($entityFields as $field) {
-                if (!\in_array(
-                    $field['type'],
-                    ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money'],
-                    true
-                )) {
+                if (!\in_array($field['type'], $allowedFieldTypes, true)) {
                     continue;
                 }
                 $fields[$field['name']] = $field['label'] ?: $field['name'];
@@ -274,10 +279,11 @@ class ConfigController extends AbstractController
         $className = $entity->getClassName();
 
         $entityConfigProvider = $this->getConfigProvider('entity');
+        $extendConfigProvider = $this->getConfigProvider('extend');
         $translator = $this->getTranslator();
 
-        $entityConfig = $entityConfigProvider->getConfig($className);
-        $uniqueKeys = $entityConfig->get('unique_key', false, ['keys' => []]);
+        $extendConfig = $extendConfigProvider->getConfig($className);
+        $uniqueKeys = $extendConfig->get('unique_key', false, ['keys' => []]);
 
         foreach ($uniqueKeys['keys'] as $index => $uniqueKey) {
             $uniqueKeys['keys'][$index]['key'] = array_map(
