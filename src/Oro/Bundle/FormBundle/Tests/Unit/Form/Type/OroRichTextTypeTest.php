@@ -184,6 +184,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 'cache_suffix' => '',
                 'document_base_url' => '/prefix//',
                 'paste_data_images' => false,
+                'entity_encoding' => 'raw',
             ]
         ];
 
