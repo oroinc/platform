@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Migration;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityRepository;
+use Extend\Entity\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveEnumFieldQuery;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadEnumOptionsData;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -14,31 +19,31 @@ class RemoveEnumFieldQueryTest extends WebTestCase
 {
     private Connection $connection;
     private ArrayLogger $logger;
+    private EntityRepository $repository;
 
     #[\Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->initClient();
-        $this->loadFixtures([
-            LoadEnumOptionsData::class
-        ]);
+        $this->loadFixtures([LoadEnumOptionsData::class]);
+
+        $doctrine = self::getContainer()->get('doctrine');
+
+        $this->connection = $doctrine->getConnection();
+        $this->repository = $doctrine->getRepository(TestEntity1::class);
         $this->logger = new ArrayLogger();
-        $this->connection = self::getContainer()->get('doctrine')->getConnection();
     }
 
     public function testGetDescription(): void
     {
-        $entityClass = \Extend\Entity\TestEntity1::class;
         $entityField = 'testEnumField';
 
-        $migrationQuery = new RemoveEnumFieldQuery(
-            $entityClass,
-            $entityField
-        );
-        $migrationQuery->setContainer(self::getContainer());
+        $migrationQuery = $this->createMigrationQuery(TestEntity1::class, $entityField);
 
         self::assertEquals(
-            'Remove testEnumField enum field data',
+            sprintf('Remove %s enum field data', $entityField),
             $migrationQuery->getDescription()
         );
     }
@@ -48,17 +53,12 @@ class RemoveEnumFieldQueryTest extends WebTestCase
         $entityClass = \Extend\Entity\UnknownEntity::class;
         $entityField = 'testEnumField';
 
-        $migrationQuery = new RemoveEnumFieldQuery(
-            $entityClass,
-            $entityField
-        );
-        $migrationQuery->setConnection($this->connection);
-        $migrationQuery->setContainer(self::getContainer());
+        $migrationQuery = $this->createMigrationQuery($entityClass, $entityField);
         $migrationQuery->execute($this->logger);
 
         self::assertSame(
             [
-                "Enum field 'testEnumField' from Entity 'Extend\Entity\UnknownEntity' is not found"
+                sprintf("Enum field '%s' from Entity '%s' is not found", $entityField, $entityClass)
             ],
             $this->logger->getMessages()
         );
@@ -66,20 +66,15 @@ class RemoveEnumFieldQueryTest extends WebTestCase
 
     public function testFieldNotFound(): void
     {
-        $entityClass = \Extend\Entity\TestEntity1::class;
+        $entityClass = TestEntity1::class;
         $entityField = 'unknownEnumField';
 
-        $migrationQuery = new RemoveEnumFieldQuery(
-            $entityClass,
-            $entityField
-        );
-        $migrationQuery->setContainer(self::getContainer());
-        $migrationQuery->setConnection($this->connection);
+        $migrationQuery = $this->createMigrationQuery($entityClass, $entityField);
         $migrationQuery->execute($this->logger);
 
         self::assertSame(
             [
-                "Enum field 'unknownEnumField' from Entity 'Extend\Entity\TestEntity1' is not found"
+                sprintf("Enum field '%s' from Entity '%s' is not found", $entityField, $entityClass)
             ],
             $this->logger->getMessages()
         );
@@ -88,20 +83,14 @@ class RemoveEnumFieldQueryTest extends WebTestCase
     /**
      * @dataProvider enumFieldData
      */
-    public function testExecute(string $entityClass, string $entityField): void
+    public function testExecute(string $entityClass, string $entityField, ?string $preservedEnumField): void
     {
         $fieldRow = $this->getFieldRow($entityClass, $entityField);
         $data = $this->connection->convertToPHPValue($fieldRow['data'], Types::ARRAY);
         $enumCode = $data['enum']['enum_code'];
         $enumOptions = $this->getEnumOptions($enumCode);
 
-        $migrationQuery = new RemoveEnumFieldQuery(
-            $entityClass,
-            $entityField
-        );
-
-        $migrationQuery->setContainer(self::getContainer());
-        $migrationQuery->setConnection($this->connection);
+        $migrationQuery = $this->createMigrationQuery($entityClass, $entityField);
         $migrationQuery->execute($this->logger);
 
         self::assertFalse($this->getEnumOptions($enumCode));
@@ -117,18 +106,29 @@ class RemoveEnumFieldQueryTest extends WebTestCase
                 self::assertFalse($this->getOroTranslationKey($translationKey));
             }
         }
+
+        $idToCheck = $this->getReference(LoadEnumOptionsData::REFERENCE_KEY)
+            ->getId();
+        $testEntity = $this->repository->find($idToCheck, LockMode::NONE);
+
+        self::assertEmpty($testEntity->$entityField);
+        if (null !== $preservedEnumField) {
+            self::assertNotEmpty($testEntity->$preservedEnumField);
+        }
     }
 
     public function enumFieldData(): array
     {
         return [
             'common enum field' => [
-                'entityClass' => \Extend\Entity\TestEntity1::class,
+                'entityClass' => TestEntity1::class,
                 'entityField' => 'testEnumField',
+                'fieldEnumToPreserve' => 'testMultienumField',
             ],
             'multi-enum field' => [
-                'entityClass' => \Extend\Entity\TestEntity1::class,
+                'entityClass' => TestEntity1::class,
                 'entityField' => 'testMultienumField',
+                'fieldEnumToPreserve' => null,
             ]
         ];
     }
@@ -192,5 +192,14 @@ class RemoveEnumFieldQueryTest extends WebTestCase
                 $entityField
             ]
         );
+    }
+
+    private function createMigrationQuery(string $entityClass, string $entityField): RemoveEnumFieldQuery
+    {
+        $migrationQuery = new RemoveEnumFieldQuery($entityClass, $entityField);
+        $migrationQuery->setConnection($this->connection);
+        $migrationQuery->setContainer(self::getContainer());
+
+        return $migrationQuery;
     }
 }
