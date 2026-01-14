@@ -42,8 +42,8 @@ class ExtendEntityConfiguration implements EntityConfigInterface
                 ->info('`boolean` if true the config entity able to delete')
                 ->defaultFalse()
             ->end()
-            ->scalarNode('unique_key')
-                ->info('`string` name of unique key')
+            ->variableNode('unique_key')
+                ->info('`array|null` unique keys configuration with structure: [["name" => string, "key" => string[]]]')
             ->end()
             ->arrayNode('index')
                 ->info('`string[]` list of index field of the entity. All available index state you can find in ' .

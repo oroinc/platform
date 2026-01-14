@@ -61,7 +61,11 @@
 
     {% apply spaceless %}
         <div class="row-oro">
-            <div class="oro-item-collection collection-fields-list" id="entity_extend_unique_key_collection" data-prototype="{{ configEntityGridUnique.unique_collection_prototype(form.keys)|escape }}">
+            <div class="oro-item-collection collection-fields-list" 
+                 id="entity_extend_unique_key_collection" 
+                 data-prototype="{{ configEntityGridUnique.unique_collection_prototype(form.keys)|escape }}"
+                 data-prototype-name="{{ form.keys.vars.prototype.vars.name }}"
+            >
                 {% for field in form.keys.children %}
                     {{ configEntityGridUnique.unique_collection_prototype(field) }}
                 {% endfor %}
