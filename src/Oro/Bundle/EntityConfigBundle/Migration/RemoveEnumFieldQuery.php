@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
@@ -38,6 +39,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery implements Contain
 
             return;
         }
+
         if (!ExtendHelper::isEnumerableType($fieldRow['type'])) {
             $logger->info("Field '{$this->enumField}' from Entity '{$this->entityClass}' is not Enumerable Type");
 
@@ -56,41 +58,8 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery implements Contain
         if (!empty($data['enum']['enum_code'])) {
             $enumCode = $data['enum']['enum_code'];
 
-            $sql = 'SELECT id, name FROM oro_enum_option WHERE enum_code = ?';
-            $enumOptions = $this->connection->fetchAssociative($sql, [$enumCode]);
-            $classTableName = $this->getEntityClassTableName();
-            if (!empty($enumOptions)) {
-                if (!array_is_list($enumOptions)) {
-                    $enumOptions = [$enumOptions];
-                }
-                foreach ($enumOptions as $enumOption) {
-                    $enumOptionId = $enumOption['id'];
-                    $enumOptionName = $enumOption['name'];
-                    $translationKey = ExtendHelper::buildEnumOptionTranslationKey($enumOptionId);
-
-                    $this->executeQuery(
-                        $logger,
-                        'DELETE FROM oro_enum_option_trans WHERE foreign_key = ?',
-                        [$enumOptionId]
-                    );
-                    $this->executeQuery($logger, 'DELETE FROM oro_translation_key WHERE key = ?', [$translationKey]);
-
-                    if ($classTableName) {
-                        if (ExtendHelper::isMultiEnumType($fieldRow['type'])) {
-                            $sql = "UPDATE $classTableName " .
-                                "SET serialized_data = jsonb_set(serialized_data::jsonb, '{{$enumOptionName}}', " .
-                                "(serialized_data->'$enumOptionName')::jsonb - NULL) " .
-                                "WHERE serialized_data->>'$enumOptionName' IS NOT NULL " .
-                                "AND (serialized_data->'$enumOptionName' @> ('\"$enumOptionId\"')::jsonb) = true";
-                            $this->executeQuery($logger, $sql);
-                        } else {
-                            $sql = "UPDATE $classTableName SET serialized_data = serialized_data - '$enumOptionName'" .
-                            " WHERE serialized_data->>'$enumOptionName' = '$enumOptionId'";
-                            $this->executeQuery($logger, $sql);
-                        }
-                    }
-                }
-            }
+            $this->removeOptionsTranslate($logger, (string)$enumCode);
+            $this->removeEntityFieldValue($logger);
 
             $this->executeQuery($logger, 'DELETE FROM oro_enum_option WHERE enum_code = ?', [$enumCode]);
         }
@@ -104,6 +73,73 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery implements Contain
         $statement = $this->connection->prepare($sql);
         $statement->executeQuery($parameters);
         $this->logQuery($logger, $sql, $parameters);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    protected function removeOptionsTranslate(LoggerInterface $logger, string $enumCode): void
+    {
+        $sql = 'SELECT id, name FROM oro_enum_option WHERE enum_code = ?';
+        $enumOptions = $this->connection->fetchAllAssociative($sql, [$enumCode]);
+        if (empty($enumOptions)) {
+            return;
+        }
+
+        if (!array_is_list($enumOptions)) {
+            $enumOptions = [$enumOptions];
+        }
+
+        $enumOptionIds = array_column($enumOptions, 'id');
+        $translationKeys = array_map(
+            fn ($id) => ExtendHelper::buildEnumOptionTranslationKey($id),
+            $enumOptionIds
+        );
+
+        $this->executeQueryWithMultipleValues(
+            $logger,
+            'DELETE FROM oro_enum_option_trans WHERE foreign_key IN (?)',
+            $enumOptionIds
+        );
+
+        $this->executeQueryWithMultipleValues(
+            $logger,
+            'DELETE FROM oro_translation_key WHERE key IN (?)',
+            $translationKeys
+        );
+    }
+
+    /**
+     * @throws Exception|\Doctrine\DBAL\Exception
+     */
+    protected function removeEntityFieldValue(LoggerInterface $logger): void
+    {
+        $classTableName = $this->getEntityClassTableName();
+        if (!$classTableName) {
+            return;
+        }
+
+        $sql = 'UPDATE ' . $classTableName
+            . ' SET serialized_data = serialized_data - ?'
+            . ' WHERE serialized_data->>? IS NOT NULL';
+        $this->executeQuery($logger, $sql, [$this->enumField, $this->enumField]);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    protected function executeQueryWithMultipleValues(
+        LoggerInterface $logger,
+        string $sql,
+        array $values,
+        int $paramType = Connection::PARAM_STR_ARRAY
+    ): void {
+        if (empty($values)) {
+            return;
+        }
+
+        $this->connection->executeQuery($sql, [$values], [$paramType]);
+        $this->logQuery($logger, $sql, $values);
     }
 
     #[\Override]
