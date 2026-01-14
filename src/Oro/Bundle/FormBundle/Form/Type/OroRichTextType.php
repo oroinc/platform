@@ -121,7 +121,8 @@ class OroRichTextType extends AbstractType
             'cache_suffix'       => $assetsVersionFormatted,
             'document_base_url'  => $assetsVersionBaseUrl,
             'paste_data_images'  => false,
-            'assets_base_url'    => $assetsBaseUrl
+            'assets_base_url'    => $assetsBaseUrl,
+            'entity_encoding'    => 'raw'
         ];
 
         $defaults = [
