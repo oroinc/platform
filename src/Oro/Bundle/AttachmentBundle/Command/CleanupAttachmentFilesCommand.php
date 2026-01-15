@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AttachmentBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\Type;
@@ -484,24 +483,15 @@ HELP
      */
     private function loadExistingAttachments(array $fileNames): array
     {
-        $params = implode(',', array_fill(0, \count($fileNames), '?'));
-        $qb = $this->getDbalConnection()
+        $existingFileNames = $this->getDbalConnection()
             ->createQueryBuilder()
-            ->from($this->getTemporaryTableName(), 'f')
-            ->select('f.filename')
-            ->where('f.filename IN (' . $params . ')');
-        $i = 0;
-        foreach ($fileNames as $fileName) {
-            $i++;
-            $qb->setParameter($i, $fileName, ParameterType::STRING);
-        }
-        $rows = $qb->execute();
-        $existingAttachments = [];
-        foreach ($rows as $row) {
-            $existingAttachments[$row['filename']] = true;
-        }
+            ->from($this->getTemporaryTableName())
+            ->select('filename')
+            ->where('filename IN (:fileNames)')
+            ->setParameter('fileNames', $fileNames, Connection::PARAM_STR_ARRAY)
+            ->fetchFirstColumn();
 
-        return $existingAttachments;
+        return array_fill_keys($existingFileNames, true);
     }
 
     private function createTemporaryTable(): void
