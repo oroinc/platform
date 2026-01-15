@@ -145,6 +145,13 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
             $params
         );
 
+        // Convert false to 0 for URL serialization. "false" casts to true, but "0" casts to false as expected.
+        array_walk_recursive($params, function (&$value) {
+            if (false === $value) {
+                $value = 0;
+            }
+        });
+
         $route = (string) $metaData->offsetGetByPath('[options][route]', '');
         $type = $metaData->offsetGetByPath('[options][requestMethod]', Request::METHOD_GET);
         $metaData->offsetAddToArray(
