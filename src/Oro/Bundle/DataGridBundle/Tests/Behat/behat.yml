@@ -125,6 +125,9 @@ oro_behat_extension:
       selector: '.dropdown-menu.show [id*="datagrid-settings-grid"] div.datagrid-settings-table > div.table-wrapper > table'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
 
+    GridColumnManagerTab:
+        selector: '.dropdown-menu.show [id*="datagrid-settings-grid"]'
+
     GridFilterManagerTab:
       selector: '.dropdown-menu.show [id*="datagrid-settings-filters"]'
 

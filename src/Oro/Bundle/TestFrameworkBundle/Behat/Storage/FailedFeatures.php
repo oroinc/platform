@@ -7,22 +7,25 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Storage;
  */
 class FailedFeatures
 {
-    private array $featureIds = [];
+    /**
+     * @var array<string>
+     */
+    private array $featureTitles = [];
 
-    public function addFailureFeature(string $featureId): void
+    public function addFailureFeature(string $featureTitle): void
     {
-        if (!$this->isFailureFeature($featureId)) {
-            $this->featureIds[] = $featureId;
+        if (!$this->isFailureFeature($featureTitle)) {
+            $this->featureTitles[] = $featureTitle;
         }
     }
 
-    public function isFailureFeature(string $featureId): bool
+    public function isFailureFeature(string $featureTitle): bool
     {
-        return in_array($featureId, $this->featureIds);
+        return in_array($featureTitle, $this->featureTitles, true);
     }
 
     public function clear(): void
     {
-        $this->featureIds = [];
+        $this->featureTitles = [];
     }
 }

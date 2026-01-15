@@ -45,7 +45,24 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
                 [[[1, 2]]],
                 [[[3, 4]]]
             );
-        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
+
+        $tmpFile1Path = '/tmp/test1';
+        $tmpFile2Path = '/tmp/test2';
+        $fileManager = $this->createMock(FileManager::class);
+        $fileManager->expects(self::exactly(2))
+            ->method('createTmpFile')
+            ->willReturnOnConsecutiveCalls($tmpFile1Path, $tmpFile2Path);
+        $fileManager->expects(self::exactly(2))
+            ->method('writeFileToStorage')
+            ->withConsecutive(
+                [$tmpFile1Path, self::matches('%s.csv')],
+                [$tmpFile2Path, self::matches('%s.csv')]
+            );
+        $fileManager->expects(self::exactly(2))
+            ->method('deleteTmpFile')
+            ->withConsecutive([$tmpFile1Path], [$tmpFile2Path]);
+
+        $batchFileManager = new BatchFileManager($fileManager, 1);
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
         $batchFileManager->setConfigurationOptions([
@@ -91,7 +108,24 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
                 [[[1, 2], [3, 4], [5, 6]]],
                 [[[7, 8], [9, 10]]]
             );
-        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
+
+        $tmpFile1Path = '/tmp/test1';
+        $tmpFile2Path = '/tmp/test2';
+        $fileManager = $this->createMock(FileManager::class);
+        $fileManager->expects(self::exactly(2))
+            ->method('createTmpFile')
+            ->willReturnOnConsecutiveCalls($tmpFile1Path, $tmpFile2Path);
+        $fileManager->expects(self::exactly(2))
+            ->method('writeFileToStorage')
+            ->withConsecutive(
+                [$tmpFile1Path, self::matches('%s.csv')],
+                [$tmpFile2Path, self::matches('%s.csv')]
+            );
+        $fileManager->expects(self::exactly(2))
+            ->method('deleteTmpFile')
+            ->withConsecutive([$tmpFile1Path], [$tmpFile2Path]);
+
+        $batchFileManager = new BatchFileManager($fileManager, 1);
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
         $batchFileManager->setConfigurationOptions([

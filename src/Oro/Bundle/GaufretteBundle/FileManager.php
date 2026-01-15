@@ -84,17 +84,6 @@ class FileManager
         $this->tmpFiles = [];
     }
 
-    private function rememberTempFile(string $file)
-    {
-        if (!$this->clearTempFilesCallbackRegistered) {
-            // In case of unexpected exit(); call or maximum execution time reaching temp files should be removed
-            register_shutdown_function([$this, 'clearTempFiles']);
-            $this->clearTempFilesCallbackRegistered = true;
-        }
-
-        $this->tmpFiles[$file] = true;
-    }
-
     /**
      * Sets a flag indicates whether files should be stored in a sub-directory.
      */
@@ -385,7 +374,7 @@ class FileManager
             return;
         }
 
-        // delete temp file created by file manager
+        // delete temp file created by the file manager
         if (\in_array($fileName, $this->tmpFiles, true)) {
             unset($this->tmpFiles[$fileName]);
             @unlink($fileName);
@@ -566,7 +555,6 @@ class FileManager
         if (false === @file_put_contents($tmpFileName, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $tmpFileName), 0, null, $tmpFileName);
         }
-        $this->rememberTempFile($tmpFileName);
 
         return new ComponentFile($tmpFileName, false);
     }
@@ -600,7 +588,6 @@ class FileManager
         } finally {
             $srcStream->close();
         }
-        $this->rememberTempFile($tmpFileName);
 
         return new ComponentFile($tmpFileName, false);
     }
@@ -627,6 +614,13 @@ class FileManager
         while (file_exists($tmpFile)) {
             $tmpFile = $tmpDir . $this->generateFileName($extension);
         }
+
+        if (!$this->clearTempFilesCallbackRegistered) {
+            // In case of unexpected exit(); call or maximum execution time reaching temp files should be removed
+            register_shutdown_function([$this, 'clearTempFiles']);
+            $this->clearTempFilesCallbackRegistered = true;
+        }
+        $this->tmpFiles[$tmpFile] = true;
 
         return $tmpFile;
     }
@@ -697,6 +691,12 @@ class FileManager
      */
     private function isDirectoryEmpty(string $realDirName): bool
     {
+        $adapter = $this->filesystem->getAdapter();
+
+        if ($adapter instanceof LocalAdapter) {
+            return $adapter->isDirectoryEmpty($realDirName . self::DIRECTORY_SEPARATOR);
+        }
+
         $listResult = $this->listKeys($realDirName . self::DIRECTORY_SEPARATOR);
 
         return empty($listResult['keys']) && empty($listResult['dirs']);

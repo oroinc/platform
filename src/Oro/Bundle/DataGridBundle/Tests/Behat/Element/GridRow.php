@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 
 class GridRow extends TableRow
 {
@@ -60,6 +61,7 @@ class GridRow extends TableRow
      */
     public function setCellValue($header, $value)
     {
+        $value = VariableStorage::normalizeValue($value);
         $cell = $this->startInlineEditing($header);
 
         //Tries to locate element several times to prevent premature ElementNotFoundException

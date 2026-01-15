@@ -56,7 +56,7 @@ class FeatureContext extends OroFeatureContext implements
     /**
      * Load "user.yml" alice fixture from UserBundle suite
      *
-     * @Given (Charlie Sheen) (active) user exists in the system
+     * @Given Charlie Sheen active user exists in the system
      */
     public function charlieUserInTheSystem()
     {

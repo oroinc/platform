@@ -27,6 +27,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -157,6 +158,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function startInlineEditingAndAssertEditorValue($field, $value, $entityTitle = null)
     {
+        $value = VariableStorage::normalizeValue($value);
         $row = $this->getGridRow($entityTitle);
         $cell = $row->startInlineEditing($field);
         $inlineEditor = $cell->findField('value');
@@ -172,6 +174,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     protected function getGridRow($entityTitle = null, $gridName = null)
     {
+        $entityTitle = VariableStorage::normalizeValue($entityTitle);
         $grid = $this->getGrid($gridName);
 
         if (null !== $entityTitle) {
@@ -725,6 +728,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreEnd
     public function assertColumnValueEquals($column, $rowNumber, $value, $gridName = null)
     {
+        $value = VariableStorage::normalizeValue($value);
         $grid = $this->getGrid($gridName);
         $rowValue = $grid->getRowByNumber($rowNumber)->getCellValue($column);
         self::assertEquals($value, $rowValue);
@@ -778,6 +782,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         });
 
         foreach ($table->getRows() as [$header, $value]) {
+            $value = VariableStorage::normalizeValue($value);
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = trim($columns[$columnNumber]->text());
             // removing multiple spaces, newlines, tabs
@@ -815,6 +820,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreEnd
     public function assertRowContent($content, $rowNumber, $gridName = null)
     {
+        $content = VariableStorage::normalizeValue($content);
         $grid = $this->getGrid($gridName);
         $row = $grid->getRowByNumber($this->getNumberFromString($rowNumber));
         self::assertMatchesRegularExpression(sprintf('/%s/i', $content), $row->getText());
@@ -825,6 +831,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function assertRowContentInTable($content, $rowNum)
     {
+        $content = VariableStorage::normalizeValue($content);
         /** @var Table $table */
         $table = $this->findElementContains('Table', $content);
         $row = $table->getRowByNumber($rowNum);
@@ -843,6 +850,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function assertContentInTable($type, $content, $tableContent)
     {
+        $content = VariableStorage::normalizeValue($content);
         /** @var Table $table */
         $table = $this->findElementContains('Table', $tableContent);
         $result = $table->has('named', ['content', $content]);
@@ -865,6 +873,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function assertRecordIsUnchecked($content, $gridName = null)
     {
+        $content = VariableStorage::normalizeValue($content);
         /** @var Grid $grid */
         $grid = $this->getGrid($gridName);
 
@@ -903,6 +912,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         string $filterGridName = 'Grid',
         string $strictly = ''
     ) {
+        $minValue = VariableStorage::normalizeValue($minValue);
+        $maxValue = VariableStorage::normalizeValue($maxValue);
         /** @var GridFilterPriceItem $filterItem */
         $filterItem = $this
             ->getGridFilters($filterGridName)
@@ -1587,6 +1598,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function thereIsNoInGrid($record, $gridName = null)
     {
+        $record = VariableStorage::normalizeValue($record);
         $grid = $this->getGrid($gridName);
         $gridRow = $grid->findElementContains('GridRow', $record);
         self::assertFalse($gridRow->isIsset(), sprintf('Grid still has record with "%s" content', $record));

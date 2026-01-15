@@ -71,30 +71,31 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         }
 
         $fileName = FileManager::generateFileName(sprintf('datagrid_%s', $contextParameters['gridName']), $format);
-        $filePath = FileManager::generateTmpFilePath($fileName);
+        $tmpFilePath = $this->fileManager->createTmpFile();
 
-        $contextParameters['filePath'] = $filePath;
+        $contextParameters[Context::OPTION_FILE_PATH] = $tmpFilePath;
 
         $context = new Context($contextParameters);
         $executor = new StepExecutor();
         $executor->setBatchSize($batchSize);
-        $executor
-            ->setReader($reader)
-            ->setProcessor($processor)
-            ->setWriter($writer);
-        foreach ([$executor->getReader(), $executor->getProcessor(), $executor->getWriter()] as $element) {
-            if ($element instanceof ContextAwareInterface) {
-                $element->setImportExportContext($context);
-            }
+        $executor->setReader($reader);
+        $executor->setProcessor($processor);
+        $executor->setWriter($writer);
+        $processor->setImportExportContext($context);
+        if ($reader instanceof ContextAwareInterface) {
+            $reader->setImportExportContext($context);
+        }
+        if ($writer instanceof ContextAwareInterface) {
+            $writer->setImportExportContext($context);
         }
 
         try {
             $executor->execute($this);
-            $this->fileManager->writeFileToStorage($filePath, $fileName);
+            $this->fileManager->writeFileToStorage($tmpFilePath, $fileName);
         } catch (\Exception $exception) {
             $context->addFailureException($exception);
         } finally {
-            @unlink($filePath);
+            $this->fileManager->deleteTmpFile($tmpFilePath);
         }
 
         $readsCount = $context->getReadCount() ?: 0;

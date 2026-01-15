@@ -70,22 +70,16 @@ class PostponedRowsHandler
         }
 
         // similar approach in BatchFileManager::writeBatch
-        $extension = pathinfo($originalFileName, PATHINFO_EXTENSION);
-        $fileName = FileManager::generateUniqueFileName($extension);
-        $filePath = FileManager::generateTmpFilePath($fileName);
+        $originalFileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+        $fileName = FileManager::generateUniqueFileName($originalFileExtension);
+        $tmpFilePath = $this->fileManager->createTmpFile();
 
-        $writerContext = new Context(['filePath' => $filePath]);
-        /** @var FileStreamWriter $writer */
-        $writer = $this->writerChain->getWriter($extension);
-        if (!$writer instanceof FileStreamWriter) {
-            $writer = $this->writerChain->getWriter('csv');
+        try {
+            $this->writeRowsToTmpFile($rows, $originalFileExtension, $tmpFilePath);
+            $this->fileManager->writeFileToStorage($tmpFilePath, $fileName);
+        } finally {
+            $this->fileManager->deleteTmpFile($tmpFilePath);
         }
-        $writer->setImportExportContext($writerContext);
-        $writer->write($rows);
-        $writer->close();
-
-        $this->fileManager->writeFileToStorage($filePath, $fileName);
-        @unlink($filePath);
 
         return $fileName;
     }
@@ -136,6 +130,17 @@ class PostponedRowsHandler
                 $this->messageProducer->send(ImportTopic::getName(), $message);
             }
         );
+    }
+
+    private function writeRowsToTmpFile(array $rows, string $originalFileExtension, string $tmpFilePath): void
+    {
+        $writer = $this->writerChain->getWriter($originalFileExtension);
+        if (!$writer instanceof FileStreamWriter) {
+            $writer = $this->writerChain->getWriter('csv');
+        }
+        $writer->setImportExportContext(new Context([Context::OPTION_FILE_PATH => $tmpFilePath]));
+        $writer->write($rows);
+        $writer->close();
     }
 
     private function getDelayedJobName(Job $currentJob, int $attempts): string
