@@ -144,12 +144,17 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider routeProvider
      */
-    public function testGetGridMetadataWorks(?string $configRoute, string $expectedRoute, string $requestMethod)
-    {
+    public function testGetGridMetadataWorks(
+        ?string $configRoute,
+        string $expectedRoute,
+        string $requestMethod,
+        ?array $metadataUrlParams,
+        array $inputParams,
+        array $expectedParams
+    ): void {
         $gridName = 'test-grid';
         $gridScope = 'test-scope';
         $gridFullName = 'test-grid:test-scope';
-        $params = ['foo' => 'bar'];
         $url = '/datagrid/test-grid?test-grid-test-scope=foo=bar';
 
         $grid = $this->createMock(DatagridInterface::class);
@@ -179,23 +184,21 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with(
-                $expectedRoute,
-                ['gridName' => $gridFullName, $gridFullName => $params]
-            )
+            ->with($expectedRoute, ['gridName' => $gridFullName, $gridFullName => $expectedParams])
             ->willReturn($url);
 
         $metadata->expects($this->once())
             ->method('offsetAddToArray')
-            ->with('options', ['url' => $url, 'urlParams' => $params, 'type' => $requestMethod]);
+            ->with('options', ['url' => $url, 'urlParams' => $expectedParams, 'type' => $requestMethod]);
 
         $metadata->expects($this->any())
             ->method('offsetGetByPath')
-            ->with()
-            ->willReturnMap([
-                ['[options][route]', '', $configRoute],
-                ['[options][requestMethod]', 'GET', $requestMethod],
-            ]);
+            ->willReturnCallback(fn ($path, $default = null) => match ($path) {
+                '[options][urlParams]' => $metadataUrlParams,
+                '[options][route]' => $configRoute ?? $default,
+                '[options][requestMethod]' => $requestMethod,
+                default => $default,
+            });
 
         $metadataArray = ['metadata-array'];
         $metadata->expects($this->once())
@@ -204,15 +207,48 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $metadataArray,
-            self::callTwigFunction($this->extension, 'oro_datagrid_metadata', [$grid, $params])
+            self::callTwigFunction($this->extension, 'oro_datagrid_metadata', [$grid, $inputParams])
         );
     }
 
     public function routeProvider(): array
     {
         return [
-            [null, 'oro_datagrid_index', 'GET'],
-            [null, 'oro_datagrid_index', 'POST'],
+            'get-no-false' => [
+                null, 'oro_datagrid_index', 'GET', null, ['foo' => 'bar'], ['foo' => 'bar']
+            ],
+            'post-no-false' => [
+                null, 'oro_datagrid_index', 'POST', null, ['foo' => 'bar'], ['foo' => 'bar']
+            ],
+            'false-root' => [
+                null, 'oro_datagrid_index', 'GET', null,
+                ['foo' => false, 'bar' => 'baz'],
+                ['foo' => 0, 'bar' => 'baz']
+            ],
+            'false-nested' => [
+                null, 'oro_datagrid_index', 'GET', null,
+                ['a' => ['b' => false, 'c' => true]],
+                ['a' => ['b' => 0, 'c' => true]]
+            ],
+            'false-from-metadata' => [
+                null, 'oro_datagrid_index', 'GET', ['fromMeta' => false],
+                ['foo' => 'bar'],
+                ['fromMeta' => 0, 'foo' => 'bar']
+            ],
+            'false-both' => [
+                null, 'oro_datagrid_index', 'GET', ['fromMeta' => false],
+                ['foo' => false],
+                ['fromMeta' => 0, 'foo' => 0]
+            ],
+            'custom-route' => [
+                'custom_route', 'custom_route', 'GET', null, ['foo' => 'bar'], ['foo' => 'bar']
+            ],
+            'merge-precedence' => [
+                null, 'oro_datagrid_index', 'GET',
+                ['foo' => 'meta', 'fromMeta' => false],
+                ['foo' => 'input'],
+                ['foo' => 'input', 'fromMeta' => 0]
+            ],
         ];
     }
 
