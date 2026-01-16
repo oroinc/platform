@@ -31,3 +31,9 @@ features:
         label: oro.attachment.config.feature.original_file_names_enabled.label
         description: oro.attachment.config.feature.original_file_names_enabled.description
         toggle: oro_attachment.original_file_names_enabled
+
+    attachment_metadata_service:
+        label: oro.attachment.config.feature.metadata_service.label
+        description: oro.attachment.config.feature.metadata_service.description
+        configuration:
+            - 'attachment_metadata_service_settings'

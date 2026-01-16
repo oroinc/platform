@@ -77,6 +77,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
         $this->appendCleanupOptions($rootNode->children());
+        $this->appendMetadataServiceOptions($rootNode->children());
 
         SettingsBuilder::append(
             $rootNode,
@@ -91,6 +92,7 @@ class Configuration implements ConfigurationInterface
                 'webp_quality' => ['value' => self::WEBP_QUALITY],
                 'external_file_allowed_urls_regexp' => ['value' => '', 'type'  => 'string'],
                 'original_file_names_enabled' => ['type' => 'boolean', 'value' => true],
+                'metadata_service_allowed' => ['type' => 'boolean', 'value' => false],
             ]
         );
 
@@ -145,6 +147,43 @@ class Configuration implements ConfigurationInterface
                         ->cannotBeEmpty()
                         ->defaultValue(10000)
                     ->end()
+                ->end()
+            ->end();
+    }
+
+    private function appendMetadataServiceOptions(NodeBuilder $node): void
+    {
+        $node
+            ->arrayNode('metadata_service')
+                ->info('The configuration of the external metadata service for image processing.')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->scalarNode('service_url')
+                        ->info('The URL of the metadata service endpoint.')
+                        ->defaultValue(
+                            sprintf(
+                                '%%env(default:%s:string:%s)%%',
+                                // Fallback container parameter.
+                                'oro_attachment.metadata_service_url_default',
+                                // Environment variable name.
+                                'ORO_METADATA_SERVICE_URL'
+                            )
+                        )
+                        ->example(['https://metadata-service.example.com', 'http://127.0.0.1:8040'])
+                    ->end()
+                    ->scalarNode('api_key')
+                        ->info('The API key for authentication with the metadata service.')
+                        ->defaultValue(
+                            sprintf(
+                                '%%env(default:%s:trim:string:%s)%%',
+                                // Fallback container parameter.
+                                'oro_attachment.metadata_service_api_key_default',
+                                // Environment variable name.
+                                'ORO_METADATA_SERVICE_API_KEY'
+                            )
+                        )
+                    ->end()
+                ->end()
                 ->end()
             ->end();
     }

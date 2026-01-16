@@ -22,6 +22,8 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'kernel.environment' => 'prod',
                 'oro_attachment.liip_imagine.unsupported_mime_types' => ['image/svg+xml', 'image/svg'],
+                'oro_attachment.metadata_service_url_default' => null,
+                'oro_attachment.metadata_service_api_key_default' => null,
                 'liip_imagine.controller.filter_action' => 'oro_attachment.controller.imagine::filterAction',
                 'oro_attachment.debug_images' => true,
                 'oro_attachment.upload_file_mime_types' => [],
@@ -34,6 +36,12 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_attachment.collect_attachment_files_batch_size' => 20000,
                 'oro_attachment.load_existing_attachments_batch_size' => 500,
                 'oro_attachment.load_attachments_batch_size' => 10000,
+                'oro_attachment.metadata_service_url' =>
+                    '%env(default:oro_attachment.metadata_service_url_default:'
+                    . 'string:ORO_METADATA_SERVICE_URL)%',
+                'oro_attachment.metadata_service_api_key' =>
+                    '%env(default:oro_attachment.metadata_service_api_key_default:'
+                    . 'trim:string:ORO_METADATA_SERVICE_API_KEY)%',
                 'oro_attachment.files' => [
                     'default' => 'fa-file-o',
                     'doc' => 'fa-file-text-o',

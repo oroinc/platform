@@ -34,6 +34,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'collect_attachment_files_batch_size' => 20000,
                     'load_existing_attachments_batch_size' => 500,
                     'load_attachments_batch_size' => 10000
+                ],
+                'metadata_service' => [
+                    'service_url' => '%env(default:oro_attachment.metadata_service_url_default:'
+                        . 'string:ORO_METADATA_SERVICE_URL)%',
+                    'api_key' => '%env(default:oro_attachment.metadata_service_api_key_default:'
+                        . 'trim:string:ORO_METADATA_SERVICE_API_KEY)%'
                 ]
             ],
             $config

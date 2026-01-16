@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Oro\Bundle\AttachmentBundle\Configurator\Provider\RuntimeConfigurationProvider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
@@ -27,6 +28,8 @@ class ResizedImageProvider implements ResizedImageProviderInterface
 
     private LoggerInterface $logger;
 
+    private ?RuntimeConfigurationProvider $runtimeConfigurationProvider = null;
+
     public function __construct(
         FileManager $fileManager,
         ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory,
@@ -41,6 +44,13 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         $this->filterConfig = $filterConfig;
         $this->filterRuntimeConfigProvider = $filterRuntimeConfigProvider;
         $this->logger = $logger;
+    }
+
+    public function setRuntimeConfigurationProvider(RuntimeConfigurationProvider $runtimeConfigurationProvider): self
+    {
+        $this->runtimeConfigurationProvider = $runtimeConfigurationProvider;
+
+        return $this;
     }
 
     #[\Override]
@@ -150,7 +160,12 @@ class ResizedImageProvider implements ResizedImageProviderInterface
     ): ?BinaryInterface {
         $originalImageBinary = $this->imagineBinaryFactory->createImagineBinary($content);
         try {
-            $runtimeConfig = $this->filterRuntimeConfigProvider->getRuntimeConfigForFilter($filterName, $format);
+            $runtimeContext = [
+                'original_content' => $originalImageBinary,
+                'format' => $format,
+                'file_name' => $fileName
+            ];
+            $runtimeConfig = $this->runtimeConfigurationProvider->getRuntimeConfig($filterName, $runtimeContext);
             $filteredBinary = $this->imagineBinaryFilter->applyFilter(
                 $originalImageBinary,
                 $filterName,

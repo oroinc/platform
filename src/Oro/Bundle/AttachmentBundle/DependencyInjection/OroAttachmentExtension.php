@@ -63,6 +63,14 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
             'oro_attachment.load_attachments_batch_size',
             $config['cleanup']['load_attachments_batch_size']
         );
+        $container->setParameter(
+            'oro_attachment.metadata_service_url',
+            $config['metadata_service']['service_url']
+        );
+        $container->setParameter(
+            'oro_attachment.metadata_service_api_key',
+            $config['metadata_service']['api_key']
+        );
 
         $value = Yaml::parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
         $container->setParameter('oro_attachment.files', $value['file-icons']);
