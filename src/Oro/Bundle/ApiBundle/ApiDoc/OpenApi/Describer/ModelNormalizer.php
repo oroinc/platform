@@ -35,7 +35,7 @@ class ModelNormalizer implements ModelNormalizerInterface
                     $readonly = true;
                     $item['readonly'] = true;
                 }
-                $item['description'] = $this->trimDescription($description);
+                $item['description'] = FieldDescriptionUtil::trimDescription($description);
                 $model[$name] = $item;
             }
             if (false === $readonly || (null !== $readonly && $isResponseModel)) {
@@ -45,18 +45,5 @@ class ModelNormalizer implements ModelNormalizerInterface
         }
 
         return $model;
-    }
-
-    private function trimDescription(string $description): string
-    {
-        $description = rtrim($description);
-        if (str_starts_with($description, '<p>') && str_ends_with($description, '</p>')) {
-            $trimmedDescription = substr($description, 3, -4);
-            if (!str_contains($trimmedDescription, '<p>')) {
-                $description = $trimmedDescription;
-            }
-        }
-
-        return $description;
     }
 }

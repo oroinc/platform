@@ -123,7 +123,6 @@ class CompleteEntityDefinitionHelper
                 $metadata
             );
         }
-        $this->completeDisableMetaProperties($definition, $metadata);
         // make sure that identifier field names are set
         $idFieldNames = $definition->getIdentifierFieldNames();
         if (empty($idFieldNames)) {
@@ -766,15 +765,6 @@ class CompleteEntityDefinitionHelper
             if (!$hasTranslatableHint) {
                 $definition->addHint('HINT_TRANSLATABLE');
             }
-        }
-    }
-
-    private function completeDisableMetaProperties(EntityDefinitionConfig $definition, ClassMetadata $metadata): void
-    {
-        if (!$definition->hasDisableMetaProperties()
-            && $this->dictionaryProvider->isSupportedEntityClass($metadata->name)
-        ) {
-            $definition->disableMetaProperties();
         }
     }
 }
