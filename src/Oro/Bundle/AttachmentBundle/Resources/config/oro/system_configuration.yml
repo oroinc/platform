@@ -21,6 +21,10 @@ system_configuration:
             title: oro.attachment.config.file_names.label
             description: oro.attachment.config.file_names.description
             description_style: warning
+        attachment_metadata_service_settings:
+            title: oro.attachment.config.metadata_service_settings.label
+            description: oro.attachment.config.metadata_service_settings.description
+            description_style: warning
     fields:
         oro_attachment.maxsize:
             data_type: integer
@@ -122,6 +126,15 @@ system_configuration:
                 label: oro.attachment.config.original_file_names_enabled.label
                 tooltip: oro.attachment.config.original_file_names_enabled.tooltip
 
+        oro_attachment.metadata_service_allowed:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            page_reload: true
+            options:
+                label: oro.attachment.config.feature.metadata_service.label
+                tooltip: oro.attachment.config.feature.metadata_service.description
+                resettable: true
+
     tree:
         system_configuration:
             platform:
@@ -152,6 +165,9 @@ system_configuration:
                                     attachment_file_names_settings:
                                         children:
                                             - oro_attachment.original_file_names_enabled
+                                    attachment_metadata_service_settings:
+                                        children:
+                                            - oro_attachment.metadata_service_allowed
     api_tree:
         attachments:
             oro_attachment.upload_file_mime_types: ~

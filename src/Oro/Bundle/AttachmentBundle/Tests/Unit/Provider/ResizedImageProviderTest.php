@@ -5,9 +5,9 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Imagine\Exception\RuntimeException;
 use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Oro\Bundle\AttachmentBundle\Configurator\Provider\RuntimeConfigurationProvider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
@@ -25,7 +25,7 @@ class ResizedImageProviderTest extends TestCase
     private ImagineBinaryByFileContentFactoryInterface&MockObject $imagineBinaryFactory;
     private ImagineBinaryFilterInterface&MockObject $imagineBinaryFilter;
     private FilterConfiguration&MockObject $filterConfig;
-    private FilterRuntimeConfigProviderInterface&MockObject $filterRuntimeConfigProvider;
+    private RuntimeConfigurationProvider&MockObject $runtimeConfigurationProvider;
     private LoggerInterface&MockObject $logger;
     private ResizedImageProvider $provider;
 
@@ -36,7 +36,7 @@ class ResizedImageProviderTest extends TestCase
         $this->imagineBinaryFactory = $this->createMock(ImagineBinaryByFileContentFactoryInterface::class);
         $this->imagineBinaryFilter = $this->createMock(ImagineBinaryFilterInterface::class);
         $this->filterConfig = $this->createMock(FilterConfiguration::class);
-        $this->filterRuntimeConfigProvider = $this->createMock(FilterRuntimeConfigProviderInterface::class);
+        $this->runtimeConfigurationProvider = $this->createMock(RuntimeConfigurationProvider::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->provider = new ResizedImageProvider(
@@ -44,7 +44,7 @@ class ResizedImageProviderTest extends TestCase
             $this->imagineBinaryFactory,
             $this->imagineBinaryFilter,
             $this->filterConfig,
-            $this->filterRuntimeConfigProvider,
+            $this->runtimeConfigurationProvider,
             $this->logger
         );
     }
@@ -94,9 +94,12 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with(
+                $filterName,
+                ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => 'test.jpg']
+            )
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -126,9 +129,12 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with(
+                $filterName,
+                ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => 'test.jpg']
+            )
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -179,9 +185,12 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with(
+                $filterName,
+                ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => $fileName]
+            )
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -211,9 +220,12 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with(
+                $filterName,
+                ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => $fileName]
+            )
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -240,9 +252,9 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with($filterName, ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => null])
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -267,9 +279,9 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with($filterName, ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => null])
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -311,9 +323,12 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with(
+                $filterName,
+                ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => 'test.jpg']
+            )
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -353,9 +368,12 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with(
+                $filterName,
+                ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => $fileName]
+            )
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -390,9 +408,9 @@ class ResizedImageProviderTest extends TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with($filterName, ['original_content' => $originalImageBinary, 'format' => $format, 'file_name' => null])
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')

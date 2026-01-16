@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Oro\Bundle\AttachmentBundle\Configurator\Provider\RuntimeConfigurationProvider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
@@ -23,7 +24,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
 
     private FilterConfiguration $filterConfig;
 
-    private FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider;
+    private RuntimeConfigurationProvider $runtimeConfigurationProvider;
 
     private LoggerInterface $logger;
 
@@ -32,14 +33,14 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory,
         ImagineBinaryFilterInterface $imagineBinaryFilter,
         FilterConfiguration $filterConfig,
-        FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider,
+        RuntimeConfigurationProvider $runtimeConfigurationProvider,
         LoggerInterface $logger
     ) {
         $this->fileManager = $fileManager;
         $this->imagineBinaryFactory = $imagineBinaryFactory;
         $this->imagineBinaryFilter = $imagineBinaryFilter;
         $this->filterConfig = $filterConfig;
-        $this->filterRuntimeConfigProvider = $filterRuntimeConfigProvider;
+        $this->runtimeConfigurationProvider = $runtimeConfigurationProvider;
         $this->logger = $logger;
     }
 
@@ -150,7 +151,12 @@ class ResizedImageProvider implements ResizedImageProviderInterface
     ): ?BinaryInterface {
         $originalImageBinary = $this->imagineBinaryFactory->createImagineBinary($content);
         try {
-            $runtimeConfig = $this->filterRuntimeConfigProvider->getRuntimeConfigForFilter($filterName, $format);
+            $runtimeContext = [
+                'original_content' => $originalImageBinary,
+                'format' => $format,
+                'file_name' => $fileName
+            ];
+            $runtimeConfig = $this->runtimeConfigurationProvider->getRuntimeConfig($filterName, $runtimeContext);
             $filteredBinary = $this->imagineBinaryFilter->applyFilter(
                 $originalImageBinary,
                 $filterName,

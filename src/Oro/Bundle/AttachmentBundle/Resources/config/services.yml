@@ -1,5 +1,7 @@
 parameters:
     oro_attachment.liip_imagine.unsupported_mime_types: ['image/svg+xml', 'image/svg']
+    oro_attachment.metadata_service_url_default: null
+    oro_attachment.metadata_service_api_key_default: null
 
 services:
     Liip\ImagineBundle\Imagine\Filter\FilterConfiguration:
@@ -415,16 +417,6 @@ services:
             - '@.inner'
             - 'media/cache'
 
-    oro_attachment.provider.filter_runtime_config:
-        class: Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigDefaultProvider
-
-    oro_attachment.provider.filter_runtime_config.webp_aware:
-        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareFilterRuntimeConfigProvider
-        decorates: oro_attachment.provider.filter_runtime_config
-        arguments:
-            - '@.inner'
-            - '@oro_attachment.tools.webp_configuration'
-
     Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider:
         alias: oro_attachment.provider.resized_image
 
@@ -436,7 +428,7 @@ services:
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
             - '@oro_attachment.liip_imagine.binary.filter'
             - '@liip_imagine.filter.configuration'
-            - '@oro_attachment.provider.filter_runtime_config'
+            - '@oro_attachment.configurator.provider.runtime_configuration'
             - '@logger'
 
     oro_attachment.manager.image_resize:
@@ -598,7 +590,7 @@ services:
         arguments:
             - '@oro_attachment.configurator.provider.attachment_post_processors_provider'
             - '@oro_attachment.configurator.attachment_filter_configuration'
-            - '@oro_attachment.provider.filter_runtime_config'
+            - '@oro_attachment.configurator.provider.runtime_configuration'
 
     oro_attachment.configurator.provider.attachment_post_processors_provider:
         class: Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsProvider
@@ -631,6 +623,40 @@ services:
             - [setEnabled, ['%oro_attachment.post_processors.enabled%']]
         tags:
             - { name: oro_featuretogle.voter, priority: 10 }
+
+    oro_attachment.checker.voter.metadata_service:
+        class: Oro\Bundle\AttachmentBundle\Checker\Voter\MetadataServiceVoter
+        calls:
+            - [setEnabled, ['%oro_attachment.metadata_service.enabled%']]
+        tags:
+            - { name: oro_featuretogle.voter, priority: 20 }
+
+    oro_attachment.provider.metadata_service:
+        class: Oro\Bundle\AttachmentBundle\Provider\MetadataServiceProvider
+        arguments:
+            - '@http_client'
+            - '@logger'
+            - '%oro_attachment.metadata_service_url%'
+            - '%oro_attachment.metadata_service_api_key%'
+        tags:
+            - { name: monolog.logger, channel: oro_attachment }
+
+    oro_attachment.imagine.metadata_service_post_processor:
+        class: Oro\Bundle\AttachmentBundle\Imagine\PostProcessor\MetadataServicePostProcessor
+        arguments:
+            - '@oro_attachment.provider.metadata_service'
+            - '@logger'
+        tags:
+            - { name: liip_imagine.filter.post_processor, post_processor: oro_metadata_service }
+            - { name: monolog.logger, channel: oro_attachment }
+
+    oro_attachment.provider.metadata_service_requirements:
+        class: Oro\Bundle\AttachmentBundle\Provider\MetadataServiceRequirementsProvider
+        arguments:
+            - '%oro_attachment.metadata_service.enabled%'
+            - '@oro_attachment.provider.metadata_service'
+        tags:
+            - { name: oro.requirements_provider, priority: -5 }
 
     oro_attachment.importexport.event_listener.file_headers:
         class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileHeadersListener
@@ -822,3 +848,23 @@ services:
 
     Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider:
         alias: oro_attachment.provider.images_template_provider
+
+    oro_attachment.configurator.provider.runtime_configuration:
+        class: Oro\Bundle\AttachmentBundle\Configurator\Provider\RuntimeConfigurationProvider
+        arguments:
+            $providers: !tagged_iterator oro.liip_imagine.runtime_config
+
+    oro_attachment.configurator.provider.runtime_metadata:
+        class: Oro\Bundle\AttachmentBundle\Configurator\Provider\RuntimeMetadataConfigurationProvider
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: oro.liip_imagine.runtime_config, priority: -20 }
+            - { name: oro_featuretogle.feature, feature: attachment_metadata_service }
+
+    oro_attachment.configurator.provider.webp_format:
+        class: Oro\Bundle\AttachmentBundle\Configurator\Provider\RuntimeWebpFormatConfigurationProvider
+        arguments:
+            - '@oro_attachment.tools.webp_configuration'
+        tags:
+            - { name: oro.liip_imagine.runtime_config, priority: -10 }
