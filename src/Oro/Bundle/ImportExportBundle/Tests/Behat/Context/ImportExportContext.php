@@ -345,6 +345,33 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         }
     }
 
+    /**
+     * Assert that the exported file does not contain the specified column and that each forbidden value
+     * does not appear in its corresponding row.
+     *
+     * The first column of the table specifies the column name that should not exist.
+     * Each subsequent row specifies a value that should not appear in the corresponding row of the exported file.
+     *
+     * Example:
+     *   And the exported file does not contain the following column and content:
+     *     | category.path                        |
+     *     | All Products / Electronics / Laptops |
+     *     | All Products / Electronics / Phones  |
+     *
+     * This will:
+     * - Assert that there is no column named "category.path" in the exported file
+     * - Assert that "All Products / Electronics / Laptops" does not appear in any cell of row 1
+     * - Assert that "All Products / Electronics / Phones" does not appear in any cell of row 2
+     *
+     * @Given /^the exported file does not contain the following column and content:$/
+     */
+    public function exportedFileDoesNotContainFollowingColumnAndContent(TableNode $expectedEntities)
+    {
+        $filePath = $this->getExportFile();
+
+        $this->assertFileDoesNotContainColumnAndContent($filePath, $expectedEntities);
+    }
+
     private function assertFileContainsAtLeastFollowingColumns(string $filePath, TableNode $expectedEntities)
     {
         $exportedFile = new \SplFileObject($filePath, 'rb');
@@ -403,6 +430,64 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         static::assertEmpty($errors, implode("\n\n", $errors));
 
         static::assertCount($exportedFile->key(), $expectedEntities->getRows());
+    }
+
+    private function assertFileDoesNotContainColumnAndContent(string $filePath, TableNode $forbiddenData)
+    {
+        $exportedFile = new \SplFileObject($filePath, 'rb');
+
+        // Treat file as CSV, skip empty lines.
+        $exportedFile->setFlags(\SplFileObject::READ_CSV
+            | \SplFileObject::READ_AHEAD
+            | \SplFileObject::SKIP_EMPTY
+            | \SplFileObject::DROP_NEW_LINE);
+
+        $headers = $exportedFile->current();
+        $forbiddenHeaders = $forbiddenData->getRow(0);
+
+        // First row contains the column name to check
+        $forbiddenColumn = $forbiddenHeaders[0];
+
+        // Assert that the column does not exist in the exported file
+        static::assertNotContains(
+            $forbiddenColumn,
+            $headers,
+            \sprintf('Failed asserting that the column "%s" does not exist in the exported file', $forbiddenColumn)
+        );
+
+        // Get all the values that should not be present (rows 1 onwards)
+        $forbiddenValues = [];
+        for ($i = 1; $i < count($forbiddenData->getRows()); $i++) {
+            $row = $forbiddenData->getRow($i);
+            $forbiddenValues[] = $row[0];
+        }
+
+        // Check that each forbidden value does not appear in its corresponding row
+        $rowIndex = 0;
+        foreach ($exportedFile as $line => $data) {
+            // Skip the header line
+            if ($line === 0) {
+                continue;
+            }
+
+            // Check if we have a forbidden value for this row index
+            if (isset($forbiddenValues[$rowIndex])) {
+                $forbiddenValue = $forbiddenValues[$rowIndex];
+
+                // Check if any cell in this row matches the forbidden value
+                foreach ($data as $cellValue) {
+                    if ($cellValue === $forbiddenValue) {
+                        static::fail(\sprintf(
+                            'Failed asserting that value "%s" does not exist in row %d of the exported file',
+                            $forbiddenValue,
+                            $line + 1
+                        ));
+                    }
+                }
+            }
+
+            $rowIndex++;
+        }
     }
 
     /**
@@ -800,6 +885,36 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     }
 
     /**
+     * Check that the import results email for the current import file contains the expected text.
+     * This step waits for the email with the subject `Result of importing file <filename>` to arrive,
+     * then checks that its body contains the expected text.
+     * The expected text may contain escape sequences (e.g., `\"`, `\\`, `\n`), which are unescaped before comparison.
+     *
+     * phpcs:disable Generic.Files.LineLength
+     *
+     * Examples:
+     *
+     *      And I should receive the import results email containing the text "Errors: 0 processed: 1, read: 1, added: 1, updated: 0, replaced: 0"
+     *      And I receive the import results email containing the text "Status: \"OK\", errors: 0"
+     *
+     * phpcs:enable
+     *
+     * See also the default template: `ImportExportBundle/Migrations/Data/ORM/emails/importExport/import.html.twig`
+     *
+     * @Then /^(?:I )?(?:should )?receive the import results email containing the text "(?P<text>(?:[^"\\]|\\.)*)"$/
+     *
+     * @see iShouldReceiveImportResultsEmailWithNoErrorsAndContainingText() that is more helpful for debugging fails
+     */
+    public function iShouldReceiveImportResultsEmailContainingText(string $text): void
+    {
+        $this->emailContext->emailWithFieldShouldContainText(
+            'Subject',
+            'Result of importing file ' . \basename($this->importFile),
+            \stripcslashes($text)
+        );
+    }
+
+    /**
      * @When /^(?:|I )try import file with strategy "(?P<strategy>([\w\s\.]+))"$/
      */
     public function tryImportFileWithStrategy($strategy)
@@ -891,6 +1006,88 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
             $validationMessage,
             implode('", "', $existedErrors)
         ));
+    }
+
+    /**
+     * Check import error log content after following "Error log" link from email
+     * Example: When I follow "Error log" link from the email
+     *          Then I should see import error "Category \"NonExistentCategory\" not found in the master catalog"
+     *
+     * @Then /^(?:|I )should see import error "(?P<errorMessage>(?:[^"]|\\")*)"$/
+     */
+    public function iShouldSeeImportError(string $errorMessage)
+    {
+        $errorMessage = $this->fixStepArgument($errorMessage);
+        $pageContent = $this->getSession()->getPage()->getText();
+
+        self::assertStringContainsString(
+            $errorMessage,
+            $pageContent,
+            \sprintf(
+                'Import error log does not contain expected message "%s". Actual error log content: %s',
+                $errorMessage,
+                $pageContent
+            )
+        );
+    }
+
+    /**
+     * phpcs:disable Generic.Files.LineLength
+     *
+     * Assert import results email with no errors and specific text
+     * If errors are found, automatically fetches and displays the error log content
+     *
+     * Example: Then I should receive the import results email with no errors and containing the text "Errors: 0 processed: 1, read: 1, added: 1"
+     *
+     * @Then /^(?:|I )(?:should )?receive the import results email with no errors and containing the text "(?P<text>(?:[^"\\]|\\.)*)"$/
+     *
+     * phpcs:enable
+     */
+    public function iShouldReceiveImportResultsEmailWithNoErrorsAndContainingText(string $text): void
+    {
+        $text = \stripcslashes($text);
+        $subject = 'Result of importing file ' . \basename($this->importFile);
+
+        // First check if the email exists with the expected subject
+        $messages = [];
+        $message = $this->spin(function () use ($subject, &$messages) {
+            $messages = $this->emailContext->getSentMessages();
+            foreach ($messages as $msg) {
+                if ($subject === ($msg['subject'] ?? '')) {
+                    return $msg;
+                }
+            }
+            return null;
+        }, 300);
+
+        self::assertNotNull(
+            $message,
+            \sprintf(
+                'Email with Subject "%s" was not found. The following messages have been sent: %s',
+                $subject,
+                \print_r($this->getSentMessagesData($messages), true)
+            )
+        );
+
+        $messageBody = \html_entity_decode(\strip_tags($message['body']), ENT_QUOTES);
+        $messageBody = \preg_replace('/\s+/u', ' ', $messageBody);
+
+        // Check if the body contains the expected text
+        $containsText = (bool)\preg_match('/' . \preg_quote($text, '/') . '/', $messageBody);
+
+        // If assertion would fail, try to fetch error log for better debugging
+        if (!$containsText) {
+            $errorLogContent = $this->tryFetchErrorLogFromEmail($message['body']);
+
+            self::fail(\sprintf(
+                'Email with Subject "%s" was found, but its body does not contain "%s" text.'
+                . ' Email body: %s%s',
+                $subject,
+                $text,
+                $messageBody,
+                $errorLogContent ? "\n\nError log content:\n" . $errorLogContent : ''
+            ));
+        }
     }
 
     /**
@@ -1100,5 +1297,55 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         }
 
         static::assertCount($i, $expectedEntities->getRows());
+    }
+
+    /**
+     * Try to fetch error log content from email by extracting the error log URL
+     */
+    private function tryFetchErrorLogFromEmail(string $emailBody): ?string
+    {
+        try {
+            // Extract error log URL from email
+            $pattern = '/<a.*href\s*=\s*"(?P<url>[^"]+job-error-log[^"]+)".*>/s';
+            $matches = [];
+
+            // Decode HTML entities and normalize whitespace
+            $text = \html_entity_decode($emailBody);
+            $text = \str_replace(\chr(160), \chr(32), $text);
+
+            if (\preg_match($pattern, $text, $matches) && isset($matches['url'])) {
+                $url = \htmlspecialchars_decode($matches['url']);
+
+                // Visit the error log URL
+                $this->visitPath($url);
+
+                // Get the error log content
+                $errorLogContent = $this->getSession()->getPage()->getText();
+
+                return $errorLogContent;
+            }
+        } catch (\Exception) {
+            // If we can't fetch the error log, just return null
+            return null;
+        }
+
+        return null;
+    }
+
+    private function getSentMessagesData(array $messages): array
+    {
+        $messagesData = [];
+        foreach ($messages as $message) {
+            $item = [];
+            foreach (['from', 'to', 'subject', 'body'] as $field) {
+                if (isset($message[$field])) {
+                    $item[$field] = $field === 'body'
+                        ? \html_entity_decode(\strip_tags($message[$field]), ENT_QUOTES)
+                        : $message[$field];
+                }
+            }
+            $messagesData[] = $item;
+        }
+        return $messagesData;
     }
 }

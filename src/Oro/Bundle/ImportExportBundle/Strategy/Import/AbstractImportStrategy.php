@@ -74,7 +74,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
     }
 
     /**
-     * @param object $entity
+     * @param object|null $entity
      * @return object
      */
     protected function beforeProcessEntity($entity)
@@ -85,7 +85,7 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
     }
 
     /**
-     * @param object $entity
+     * @param object|null $entity
      * @return object
      */
     protected function afterProcessEntity($entity)
