@@ -15,3 +15,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onClear }
             - { name: container.service_subscriber, id: oro_entity.helper.field_helper, key: Oro\Bundle\EntityBundle\Helper\FieldHelper }
+
+    Oro\Bundle\ImportExportBundle\Field\FieldHeaderHelper:
+        arguments:
+            - '@oro_entity.helper.field_helper'

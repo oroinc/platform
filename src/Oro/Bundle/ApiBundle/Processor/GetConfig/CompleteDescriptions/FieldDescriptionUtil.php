@@ -66,4 +66,18 @@ class FieldDescriptionUtil
 
         return self::addFieldNote($description, self::READ_ONLY_FIELD_NOTE);
     }
+
+    public static function trimDescription(string $description): string
+    {
+        $description = rtrim($description);
+        if (
+            str_starts_with($description, '<p>')
+            && str_ends_with($description, '</p>')
+            && false === strpos($description, '<p>', 3)
+        ) {
+            $description = substr($description, 3, -4);
+        }
+
+        return $description;
+    }
 }

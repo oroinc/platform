@@ -249,7 +249,7 @@ const ActionCell = Backgrid.Cell.extend({
         // update existing actions
         this.actions.forEach(action => {
             const isEnabled = config[action.configuration.name];
-            if (isEnabled !== void 0 && isEnabled !== action.launcherInstance.enabled) {
+            if (isEnabled !== void 0 && action.launcherInstance && isEnabled !== action.launcherInstance.enabled) {
                 action.launcherInstance[isEnabled ? 'enable' : 'disable']();
             }
         });
@@ -278,12 +278,18 @@ const ActionCell = Backgrid.Cell.extend({
         this.actions.push(..._.sortBy(_.compact(actions), 'order'));
 
         const isDropdownActions = this.isDropdownActions;
-        this.model.set('availableActions', this.actions.filter(action => action.launcherInstance?.enabled));
+        this.model.set('availableActions', this.actions.filter(
+            action => !action.launcherInstance || action.launcherInstance.enabled
+        ));
         this.isDropdownMode();
 
         if (isDropdownActions !== this.isDropdownActions) {
             // Patch existing actions
-            this.actions.forEach(action => action.launcherInstance.launcherMode = this.launcherMode);
+            this.actions.forEach(action => {
+                if (action.launcherInstance) {
+                    action.launcherInstance.launcherMode = this.launcherMode;
+                }
+            });
             this.render();
         }
 

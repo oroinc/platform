@@ -33,6 +33,8 @@ const SelectAllHeaderCell = BaseView.extend({
 
     selectState: null,
 
+    collectionEventActionName: 'backgrid:selectAll',
+
     /**
      * @inheritdoc
      */
@@ -55,6 +57,10 @@ const SelectAllHeaderCell = BaseView.extend({
         }
         this.selectState = new SelectStateModel();
         this.listenTo(this.selectState, 'change', debouncedUpdateState);
+
+        if (options.themeOptions && options.themeOptions.selectCellEventActionName) {
+            this.collectionEventActionName = options.themeOptions.selectCellEventActionName;
+        }
     },
 
     /**
@@ -109,7 +115,7 @@ const SelectAllHeaderCell = BaseView.extend({
 
     onCheckboxClick: function(e) {
         if (this.selectState.get('inset') && this.selectState.isEmpty()) {
-            this.collection.trigger('backgrid:selectAll');
+            this.collection.trigger(this.collectionEventActionName);
         } else {
             this.collection.trigger('backgrid:selectNone');
         }

@@ -306,6 +306,7 @@ const DataGridComponent = BaseComponent.extend({
         // create grid
         const options = this.combineGridOptions();
         mediator.trigger('datagrid_create_before', options, collection);
+        mediator.trigger(`datagrid-${this.gridName}:before-create`, options, collection);
 
         options.el = this.$el[0];
 
@@ -324,6 +325,7 @@ const DataGridComponent = BaseComponent.extend({
             });
         }
         mediator.trigger('datagrid:rendered', grid);
+        mediator.trigger(`datagrid-${this.gridName}:rendered`, grid);
 
         this.collection = collection;
 

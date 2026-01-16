@@ -116,6 +116,9 @@ oro:
                 original_file_names_enabled:
                     label: Attachment Original File Names
                     description: Enables appending original file names to the system-generated hash values. All non-alphanumeric characters (e.g., ":),~") are replaced with "-" (dash).
+                metadata_service:
+                    label: Preserve Original Image Metadata
+                    description: When enabled, uploaded images will keep their original metadata. Make sure the file contains only the information you want to share (e.g., copyright or attribution) and does not include sensitive data such as GPS location, author identity, or other personal details.
             attachment_processors_settings:
                 label: Image Processing
                 description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.
@@ -125,6 +128,9 @@ oro:
             webp_quality:
                 label: WebP resize quality (%)
                 tooltip: Determines the percentage of the .webp image resize quality (30%-100%). The higher the value, the better the image quality. Modification of the value may cause temporary storefront slow-down until all product images are resized.
+            metadata_service_settings:
+                label: Image Metadata Preservation
+                description: Modification of the default value may cause temporary storefront slow-down until all product images are regenerated with new metadata. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the hard-drive has at least 50% space available as the regenerated images will be stored alongside the existing ones.
             png_quality: PNG resize quality (%)
             png_preserve_quality: Preserve quality
             png_minimize_file_size: Minimize file size

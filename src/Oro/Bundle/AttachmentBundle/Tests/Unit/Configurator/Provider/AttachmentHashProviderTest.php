@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Configurator\Provider;
 use Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider;
 use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsProvider;
-use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
+use Oro\Bundle\AttachmentBundle\Configurator\Provider\RuntimeConfigurationProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +13,7 @@ class AttachmentHashProviderTest extends TestCase
 {
     private AttachmentPostProcessorsProvider&MockObject $attachmentPostProcessorsProvider;
     private AttachmentFilterConfiguration&MockObject $attachmentFilterConfiguration;
-    private FilterRuntimeConfigProviderInterface&MockObject $filterRuntimeConfigProvider;
+    private RuntimeConfigurationProvider&MockObject $runtimeConfigurationProvider;
     private AttachmentHashProvider $provider;
 
     #[\Override]
@@ -21,12 +21,12 @@ class AttachmentHashProviderTest extends TestCase
     {
         $this->attachmentPostProcessorsProvider = $this->createMock(AttachmentPostProcessorsProvider::class);
         $this->attachmentFilterConfiguration = $this->createMock(AttachmentFilterConfiguration::class);
-        $this->filterRuntimeConfigProvider = $this->createMock(FilterRuntimeConfigProviderInterface::class);
+        $this->runtimeConfigurationProvider = $this->createMock(RuntimeConfigurationProvider::class);
 
         $this->provider = new AttachmentHashProvider(
             $this->attachmentPostProcessorsProvider,
             $this->attachmentFilterConfiguration,
-            $this->filterRuntimeConfigProvider
+            $this->runtimeConfigurationProvider
         );
     }
 
@@ -45,9 +45,10 @@ class AttachmentHashProviderTest extends TestCase
 
         $format = 'sample_format';
         $runtimeConfig = ['quality' => 50];
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider
+            ->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with($filterName, ['metadata_refresh_hash' => true, 'format' => $format])
             ->willReturn($runtimeConfig);
 
         self::assertEquals(
@@ -71,9 +72,10 @@ class AttachmentHashProviderTest extends TestCase
 
         $format = 'sample_format';
         $runtimeConfig = ['sample_key' => 'sample_runtime_value'];
-        $this->filterRuntimeConfigProvider->expects(self::once())
-            ->method('getRuntimeConfigForFilter')
-            ->with($filterName, $format)
+        $this->runtimeConfigurationProvider
+            ->expects(self::once())
+            ->method('getRuntimeConfig')
+            ->with($filterName, ['metadata_refresh_hash' => true, 'format' => $format])
             ->willReturn($runtimeConfig);
 
         self::assertEquals(

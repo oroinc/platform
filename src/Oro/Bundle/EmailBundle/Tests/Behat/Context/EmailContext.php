@@ -84,6 +84,77 @@ class EmailContext extends OroFeatureContext
     }
 
     /**
+     * Checks that an email with a specific field value contains the expected text in its body.
+     *
+     * Examples:
+     *
+     *      Then email with Subject "Foo Bar" should contain the following "Doodle doo"
+     *      Then email with From "john@example.com" should contain the following "Hello"
+     *      Then email with Bcc "audit@example.com" should contain the following "Report"
+     *
+     * Note that unlike {@see emailWithFieldMustContainsTheFollowing()}, this step waits only for the first email
+     * with the given field value to arrive.
+     *
+     * As soon as that email is found, the step asserts the expected body content immediately -
+     * it does not keep waiting for the body to "eventually" match.
+     *
+     * In other words: the wait condition is "email with field value exists"; and the body check happens once,
+     * right after the email is received.
+     *
+     * phpcs:ignore Generic.Files.LineLength
+     * @Then /^email with (?P<field>[\w]+) "(?P<value>(?:[^"\\]|\\.)*)" should contain the following "(?P<expected>(?:[^"\\]|\\.)*)"$/
+     */
+    public function emailWithFieldShouldContainText(string $searchField, string $fieldValue, string $text): void
+    {
+        self::assertEmailFieldValid($searchField);
+        self::assertNotEmpty($fieldValue, 'Email field value cannot be empty.');
+        self::assertNotEmpty($text, 'Assertion text cannot be empty.');
+
+        $valuePattern = $this->getPattern($fieldValue);
+        $textPattern = $this->getPattern($text);
+        $messages = [];
+
+        // Spin to wait for the email with the specific field value to arrive
+        $message = $this->spin(function () use ($searchField, $valuePattern, &$messages) {
+            $messages = $this->getSentMessages();
+
+            foreach ($messages as $message) {
+                $value = $this->getMessageData($message, $searchField);
+                if (\preg_match($valuePattern, $value)) {
+                    return $message;
+                }
+            }
+
+            return null;
+        }, 300);
+
+        self::assertNotNull(
+            $message,
+            \sprintf(
+                'Email with %s "%s" was not found. The following messages have been sent: %s',
+                $searchField,
+                $fieldValue,
+                \print_r($this->getSentMessagesData($messages), true)
+            )
+        );
+
+        // Now check that the body contains the expected text
+        $messageBody = $this->getMessageData($message, 'Body');
+        $messageBody = \preg_replace('/\s+/u', ' ', $messageBody);
+
+        self::assertTrue(
+            (bool)\preg_match($textPattern, $messageBody),
+            \sprintf(
+                'Email with %s "%s" was found, but its body does not contain "%s" text. Email body: %s',
+                $searchField,
+                $fieldValue,
+                $text,
+                $messageBody
+            )
+        );
+    }
+
+    /**
      * Example: Then Email should contains the following:
      *            | From    | admin@example.com |
      *            | To      | user1@example.com |
@@ -307,6 +378,13 @@ class EmailContext extends OroFeatureContext
      *            | Cc      | user2@example.com |
      *            | Bcc     | user3@example.com |
      *            | Body    | Test Body         |
+     *
+     * @see emailWithFieldShouldContainText() for a different implementation, that waits in a spin loop only
+     * for the first email with the given subject to arrive, and then checks the body of that email outside the loop.
+     *
+     * The current step definition ({@see emailWithFieldMustContainsTheFollowing}) works differently - it waits
+     * in a spin loop for a stronger condition: it spins until it finds an email where BOTH the selected field
+     * (for example, the subject) and the expected body content match.
      *
      * @Given /^email with (?P<searchField>[\w]+) "(?P<searchText>(?:[^"]|\\")*)" containing the following was sent:/
      */
@@ -577,7 +655,7 @@ class EmailContext extends OroFeatureContext
         return $data;
     }
 
-    private function getSentMessages(): array
+    public function getSentMessages(): array
     {
         $emailClient = $this->emailClient;
 

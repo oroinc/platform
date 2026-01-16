@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AttachmentBundle\Configurator\Provider;
 
 use Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration;
-use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
 
 /**
  * Responsible for build unique hash and involved in building the url hash and specifying the location of the
@@ -15,16 +14,16 @@ class AttachmentHashProvider
 
     private AttachmentFilterConfiguration $attachmentFilterConfiguration;
 
-    private FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider;
+    private RuntimeConfigurationProvider $runtimeConfigurationProvider;
 
     public function __construct(
         AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider,
         AttachmentFilterConfiguration $attachmentFilterConfiguration,
-        FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider
+        RuntimeConfigurationProvider $runtimeConfigurationProvider
     ) {
         $this->attachmentPostProcessorsProvider = $attachmentPostProcessorsProvider;
         $this->attachmentFilterConfiguration = $attachmentFilterConfiguration;
-        $this->filterRuntimeConfigProvider = $filterRuntimeConfigProvider;
+        $this->runtimeConfigurationProvider = $runtimeConfigurationProvider;
     }
 
     /**
@@ -43,7 +42,20 @@ class AttachmentHashProvider
 
         $filterConfig = array_replace_recursive(
             $filterConfig,
-            $this->filterRuntimeConfigProvider->getRuntimeConfigForFilter($filterName, $format)
+            $this->runtimeConfigurationProvider->getRuntimeConfig(
+                $filterName,
+                [
+                    // Tells RuntimeMetadataConfigurationProvider to include metadata post-processor config in the hash
+                    // without requiring original_content. This ensures the URL hash changes when metadata
+                    // preservation settings are toggled, invalidating cached images.
+                    'metadata_refresh_hash' => true,
+                    // Specifies target image format (e.g., 'webp', 'jpg', 'png'). Used by
+                    // RuntimeWebpFormatConfigurationProvider to add format-specific settings to filter config
+                    // (e.g., quality for WebP). Different formats produce different URL hashes, enabling
+                    // separate cached versions of the same image in multiple formats.
+                    'format' => $format
+                ]
+            )
         );
 
         return md5(json_encode($filterConfig));

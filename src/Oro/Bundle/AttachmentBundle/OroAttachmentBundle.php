@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappi
 use Liip\ImagineBundle\DependencyInjection\LiipImagineExtension;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler\AddSupportedFieldTypesCompilerPass;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler\AttachmentProcessorsCompilerPass;
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler\MetadataServiceCompilerPass;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler\MigrateFileStorageCommandCompilerPass;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory;
 use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
@@ -32,6 +33,7 @@ class OroAttachmentBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new AttachmentProcessorsCompilerPass());
+        $container->addCompilerPass(new MetadataServiceCompilerPass());
         $container->addCompilerPass(new MigrateFileStorageCommandCompilerPass());
         $container->addCompilerPass(new AddSupportedFieldTypesCompilerPass());
 
