@@ -19,7 +19,17 @@ class SidebarConfigMenu extends Element
             return $linksCount === $collapsedLinksCount;
         });
 
-        $items = explode('/', $path);
+        // Split by "/" but allow "/" inside a path segment when it is escaped as "\/".
+        // This is needed to navigate to menu items whose labels contain a slash.
+        // Example:
+        //   Commerce/Product/Product Import\/Export
+        // where "Product Import/Export" is a single menu item.
+        $items = \preg_split('/(?<!\\\\)\//', $path);
+        $items = \array_map(
+            static fn ($s) => \str_replace('\/', '/', \trim($s)),
+            $items
+        );
+
         $context = $this->find('css', 'ul.jstree-container-ul');
         self::assertNotNull($context, 'System configuration not found');
         $lastLink = array_pop($items);
