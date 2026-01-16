@@ -2,19 +2,42 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## Changes in the Platform package versions
+
+- [6.1.0](#610-2025-03-31)
+- [6.0.0](#600-2024-03-30)
+- [5.1.0](#510-2023-03-31)
+- [5.0.0](#500-2022-01-26)
+- [4.2.10](#4210)
+- [4.2.4](#424)
+- [4.2.2](#422)
+- [4.2.0](#420-2020-01-29)
+- [4.1.0](#410-2020-01-31)
+- [4.0.0](#400-2019-07-31)
+- [3.1.4](#314)
+- [3.1.3](#313-2019-02-19)
+- [3.1.2](#312-2019-02-05)
+- [3.1.0](#310-2019-01-30)
+- [3.0.0](#300-2018-07-27)
+- [2.6.0](#260-2018-01-31)
+- [2.5.0](#250-2017-11-30)
+- [2.2.0](#220-2017-05-31)
+- [2.1.0](#210-2017-03-30)
+
 ## UNRELEASED
 
 ### Added
 
 #### EmailBundle
 * Added ability to add attachments to email template:
-  * Added `\Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel` and `\Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment` to represent an email template attachment.
-  * Added `attachments` field to `Oro\Bundle\EmailBundle\Entity\EmailTemplate` entity.
-  * Added `attachments` field to `Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation` entity.
-  * Added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentVariablesProvider` that provides entity variable definitions that could be used as email template attachments.
-  * Added `\Oro\Bundle\EmailBundle\Factory\EmailAttachmentEntityFromEmailTemplateAttachmentFactory` to create email attachment entity from email template attachment.
-  * Added `\Oro\Bundle\EmailBundle\Factory\EmailAttachmentModelFromEmailTemplateAttachmentFactory` to create email attachment model from email template attachment.
+    * Added `\Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel` and `\Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment` to represent an email template attachment.
+    * Added `attachments` field to `Oro\Bundle\EmailBundle\Entity\EmailTemplate` entity.
+    * Added `attachments` field to `Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation` entity.
+    * Added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentVariablesProvider` that provides entity variable definitions that could be used as email template attachments.
+    * Added `\Oro\Bundle\EmailBundle\Factory\EmailAttachmentEntityFromEmailTemplateAttachmentFactory` to create email attachment entity from email template attachment.
+    * Added `\Oro\Bundle\EmailBundle\Factory\EmailAttachmentModelFromEmailTemplateAttachmentFactory` to create email attachment model from email template attachment.
 
+### Layout Component
 #### AssetBundle
 * The options `npm_path` and `npm_install_timeout` renamed to `pnpm_path` and `pnpm_install_timeout` respectfully due to using PNPM Package manager.
 * `package/platform/src/Oro/Bundle/AssetBundle/NodeJsExecutableFinder.php` the `findNpm` method renamed to `findPnpm`.

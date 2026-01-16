@@ -27,11 +27,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DatagridActionButtonProviderTest extends TestCase
+final class DatagridActionButtonProviderTest extends TestCase
 {
-    private const PROVIDER_ALIAS = 'test_mass_action_provider';
-    private const TEST_ROUTE = 'test_route';
-    private const TEST_ROUTE_PARAMS = '%7B%22gridName%22%3A%22customer-view-quote-grid%22%7D';
+    private const string PROVIDER_ALIAS = 'test_mass_action_provider';
+    private const string TEST_ROUTE = 'test_route';
+    private const string TEST_ROUTE_PARAMS = '%7B%22gridName%22%3A%22customer-view-quote-grid%22%7D';
 
     private ButtonProvider&MockObject $buttonProvider;
     private DatagridActionButtonProvider $provider;
@@ -414,7 +414,24 @@ class DatagridActionButtonProviderTest extends TestCase
                     'view' => ['key2' => 'value2'],
                     'update' => true
                 ],
-            ]
+            ],
+            'record configuration' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    'action_configuration' => ['operation1' => false]
+                ]),
+                'record' => new ResultRecord(['id' => 3]),
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('operation1', true),
+                        $this->createButton('operation3', false)
+                    ]
+                ),
+                'expectedActions' => [
+                    'operation1' => false,
+                    'operation3' => false
+                ],
+            ],
         ];
     }
 

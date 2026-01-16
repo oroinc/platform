@@ -752,6 +752,10 @@ const AbstractWidgetView = BaseView.extend({
             data._sa_org_id = organizationId;
         }
 
+        if (this.options.widgetData) {
+            return Object.assign(data, this.options.widgetData);
+        }
+
         return data;
     },
 

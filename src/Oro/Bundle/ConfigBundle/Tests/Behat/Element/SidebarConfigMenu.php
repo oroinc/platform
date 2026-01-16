@@ -83,6 +83,7 @@ class SidebarConfigMenu extends Element
             '//div[@class="content-with-sidebar--header"]/div/div/ul/li[2]/a[@class="action dropdown-item"]'
         );
         self::assertNotNull($collapseAllLink, 'Collapse All link not found');
+
         $collapseAllLink->click();
     }
 }

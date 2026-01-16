@@ -17,6 +17,7 @@ const config = {
     template: template,
     insertMethod: 'appendTo',
     style: 'default',
+    description: null,
     storageKey: 'oroAfterReloadMessages',
     ...moduleConfig(module.id)
 };
@@ -45,7 +46,7 @@ function showMessage(type, message, options = {}) {
     const $el = $(opt.template({
         type,
         message,
-        description: null,
+        description: opt.description,
         style: opt.style,
         dismissible: opt.dismissible,
         showIcon: opt.showIcon,
