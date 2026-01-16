@@ -18,3 +18,7 @@ services:
             - '@oro_security.owner.ownership_metadata_provider.link'
         tags:
             - { name: doctrine.event_listener, event: onClear }
+
+    Oro\Bundle\ImportExportBundle\Field\FieldHeaderHelper:
+        arguments:
+            - '@oro_entity.helper.field_helper'
