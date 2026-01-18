@@ -73,6 +73,78 @@ class EnumEntityTest extends RestJsonApiTestCase
         );
     }
 
+    public function testGetListWithTitle(): void
+    {
+        $response = $this->cget(['entity' => 'testapienum1'], ['meta' => 'title']);
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '<toString(@enum1_0->id)>',
+                        'meta' => [
+                            'title' => 'Item 0'
+                        ],
+                        'attributes' => [
+                            'name' => 'Item 0',
+                            'priority' => -1,
+                            'default' => true
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '<toString(@enum1_1->id)>',
+                        'meta' => [
+                            'title' => 'Item 1'
+                        ],
+                        'attributes' => [
+                            'name' => 'Item 1',
+                            'priority' => 0,
+                            'default' => false
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '<toString(@enum1_2->id)>',
+                        'meta' => [
+                            'title' => 'Item 2'
+                        ],
+                        'attributes' => [
+                            'name' => 'Item 2',
+                            'priority' => 1,
+                            'default' => false
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '<toString(@enum1_3->id)>',
+                        'meta' => [
+                            'title' => 'Item 3'
+                        ],
+                        'attributes' => [
+                            'name' => 'Item 3',
+                            'priority' => 2,
+                            'default' => false
+                        ]
+                    ],
+                    [
+                        'type' => 'testapienum1',
+                        'id' => '<toString(@enum1_4->id)>',
+                        'meta' => [
+                            'title' => 'Item 4'
+                        ],
+                        'attributes' => [
+                            'name' => 'Item 4',
+                            'priority' => 3,
+                            'default' => false
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
     public function testGetListFilteredAndSortedByPriority(): void
     {
         $response = $this->cget(

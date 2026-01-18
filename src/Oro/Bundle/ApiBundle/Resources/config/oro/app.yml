@@ -168,6 +168,8 @@ oro_api:
         ascii_string[]: array of string
         guid: string
         guid[]: array of strings
+        uuid: string
+        uuid[]: array of strings
         json: object
         json_array: object
         simple_array: array
@@ -225,6 +227,7 @@ oro_api:
             text: [string, {format: text}]
             ascii_string: [string, {format: ascii}]
             guid: [string, {format: guid, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeGuid::REQUIREMENT}]
+            uuid: [string, {format: uuid, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeGuid::REQUIREMENT}]
             percent: [number]
             percent_100: [number]
             currency: [string, {format: currency}]
@@ -352,6 +355,7 @@ oro_api:
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         guid: ~
+        uuid: ~
         text:
             class: Oro\Bundle\ApiBundle\Filter\StringComparisonFilter
             # by default, only EXISTS (IS NOT NULL) and NOT EXISTS (IS NULL) operators
@@ -481,6 +485,8 @@ oro_api:
         text:
             form_type: Symfony\Component\Form\Extension\Core\Type\TextareaType
         guid:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\GuidType
+        uuid:
             form_type: Oro\Bundle\ApiBundle\Form\Type\GuidType
         percent:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType

@@ -164,8 +164,7 @@ class EntityNameResolverTest extends WebTestCase
                 . "\n     2. when this entity is exposed via API and it is not searchable and not data audit related"
                 . ' than depending on the entity type you can implement the test data loader'
                 . ' or add "disable_meta_properties: [ title ]" or "disable_meta_properties: true"'
-                . ' to "api.yml" if the entity do not need'
-                . ' a text representation'
+                . ' to "api.yml" if the entity do not need a text representation'
             );
         }
     }
