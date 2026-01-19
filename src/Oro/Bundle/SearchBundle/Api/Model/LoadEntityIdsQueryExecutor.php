@@ -56,7 +56,7 @@ class LoadEntityIdsQueryExecutor implements LoadEntityIdsQueryExecutorInterface
         FilterValueAccessorInterface $filterValues,
         FilterCollection $filters
     ): ?string {
-        foreach ($filterValues->getAll() as $filterKey => $filterValue) {
+        foreach ($filterValues->getAll() as $filterKey => $values) {
             if ($filters->get($filterKey) instanceof SearchQueryFilter) {
                 return $filterKey;
             }

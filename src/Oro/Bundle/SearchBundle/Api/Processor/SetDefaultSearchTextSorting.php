@@ -54,7 +54,7 @@ class SetDefaultSearchTextSorting implements ProcessorInterface
 
     private function hasSearchFilter(FilterCollection $filters, FilterValueAccessorInterface $filterValues): bool
     {
-        foreach ($filterValues->getAll() as $filterKey => $filterValue) {
+        foreach ($filterValues->getAll() as $filterKey => $values) {
             if ($this->isSearchFilter($filters->get($filterKey))) {
                 return true;
             }
