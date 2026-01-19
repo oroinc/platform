@@ -106,6 +106,42 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testAddNewFilterValuesWithSameKeyButDifferentOperators()
+    {
+        $filterValue1 = FilterValue::createFromSource('prm1', 'prm1', 'val1');
+        $filterValue2 = FilterValue::createFromSource('prm1', 'prm1', 'val2', 'contains');
+        $this->accessor->set('prm1', $filterValue1);
+        $this->accessor->set('prm1', $filterValue2);
+        self::assertSame([$filterValue1, $filterValue2], $this->accessor->getMultiple('prm1'), 'getMultiple');
+        self::assertSame($filterValue2, $this->accessor->get('prm1'), 'get');
+        self::assertSame(
+            ['prm1' => [$filterValue1, $filterValue2]],
+            $this->accessor->getAllMultiple(),
+            'getAllMultiple'
+        );
+        self::assertSame(
+            ['prm1' => $filterValue2],
+            $this->accessor->getAll(),
+            'getAll'
+        );
+        self::assertSame(
+            ['prm1' => [$filterValue1, $filterValue2]],
+            $this->accessor->getGroupMultiple('prm1'),
+            'getGroupMultiple'
+        );
+        self::assertSame(
+            ['prm1' => $filterValue2],
+            $this->accessor->getGroup('prm1'),
+            'getGroup'
+        );
+        self::assertSame($filterValue2, $this->accessor->get('prm1'));
+
+        self::assertEquals(
+            'prm1=val1&prm1%5Bcontains%5D=val2',
+            $this->accessor->getQueryString()
+        );
+    }
+
     public function testAddNewGroupedFilterValueWithoutSourceKey()
     {
         $filterValue = new FilterValue('path', 'val1', 'eq');

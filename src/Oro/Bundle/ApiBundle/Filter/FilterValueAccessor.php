@@ -6,14 +6,15 @@ use Oro\Component\PhpUtils\QueryStringUtil;
 
 /**
  * The default implementation of a collection of the FilterValue objects.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FilterValueAccessor implements FilterValueAccessorInterface
 {
     protected const DEFAULT_OPERATOR = 'eq';
 
-    /** @var FilterValue[]|null */
+    /** @var array|null [filter key => [FilterValue, ...] */
     private ?array $parameters = null;
-    /** @var array [group name => [filter key => FilterValue, ...], ...] */
+    /** @var array [group name => [filter key => [FilterValue, ...], ...], ...] */
     private array $groups;
     private ?string $defaultGroupName = null;
 
@@ -30,11 +31,13 @@ class FilterValueAccessor implements FilterValueAccessorInterface
 
         $result = false;
         if ($this->defaultGroupName && isset($this->groups[$this->defaultGroupName])) {
-            /** @var FilterValue $value */
-            foreach ($this->groups[$this->defaultGroupName] as $value) {
-                if ($value->getPath() === $key) {
-                    $result = true;
-                    break;
+            foreach ($this->groups[$this->defaultGroupName] as $values) {
+                /** @var FilterValue $value */
+                foreach ($values as $value) {
+                    if ($value->getPath() === $key) {
+                        $result = true;
+                        break;
+                    }
                 }
             }
         }
@@ -47,19 +50,37 @@ class FilterValueAccessor implements FilterValueAccessorInterface
      */
     public function get(string $key): ?FilterValue
     {
+        $values = $this->getMultiple($key);
+        if (!$values) {
+            return null;
+        }
+
+        return end($values);
+    }
+
+    /**
+     * Gets all filter values with the given key.
+     * In additional finds filter values in the default filter's group if it is set.
+     *
+     * @return FilterValue[]
+     */
+    public function getMultiple(string $key): array
+    {
         $this->ensureInitialized();
 
         if (isset($this->parameters[$key])) {
             return $this->parameters[$key];
         }
 
-        $result = null;
+        $result = [];
         if ($this->defaultGroupName && isset($this->groups[$this->defaultGroupName])) {
-            /** @var FilterValue $value */
-            foreach ($this->groups[$this->defaultGroupName] as $value) {
-                if ($value->getPath() === $key) {
-                    $result = $value;
-                    break;
+            foreach ($this->groups[$this->defaultGroupName] as $values) {
+                /** @var FilterValue $value */
+                foreach ($values as $value) {
+                    if ($value->getPath() === $key) {
+                        $result[] = $value;
+                        break;
+                    }
                 }
             }
         }
@@ -71,6 +92,24 @@ class FilterValueAccessor implements FilterValueAccessorInterface
      * {@inheritDoc}
      */
     public function getGroup(string $group): array
+    {
+        $resultGroups = [];
+        $groups = $this->getGroupMultiple($group);
+        foreach ($groups as $key => $values) {
+            $resultGroups[$key] = end($values);
+        }
+
+        return $resultGroups;
+    }
+
+    /**
+     * Gets all filter values from the given group.
+     *
+     * @param string $group
+     *
+     * @return array [filter key => [FilterValue, ...], ...]
+     */
+    public function getGroupMultiple(string $group): array
     {
         $this->ensureInitialized();
 
@@ -98,6 +137,22 @@ class FilterValueAccessor implements FilterValueAccessorInterface
      */
     public function getAll(): array
     {
+        $resultParameters = [];
+        $parameters = $this->getAllMultiple();
+        foreach ($parameters as $key => $values) {
+            $resultParameters[$key] = end($values);
+        }
+
+        return $resultParameters;
+    }
+
+    /**
+     * Gets all filter values.
+     *
+     * @return array [filter key => [FilterValue, ...], ...]
+     */
+    public function getAllMultiple(): array
+    {
         $this->ensureInitialized();
 
         return $this->parameters;
@@ -113,11 +168,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         $group = $this->extractGroup($key);
         if (null !== $value) {
             $value->setOperator($this->normalizeOperator($value->getOperator()));
-            if (isset($this->parameters[$key])) {
-                $value->setSource($this->parameters[$key]);
-            }
-            $this->parameters[$key] = $value;
-            $this->groups[$group][$key] = $value;
+            $this->setParameterWithRememberSource($group, $key, $value);
         } else {
             unset($this->parameters[$key], $this->groups[$group][$key]);
         }
@@ -144,21 +195,23 @@ class FilterValueAccessor implements FilterValueAccessorInterface
 
         $params = [];
         foreach ($this->groups as $group => $items) {
-            /** @var FilterValue $item */
-            foreach ($items as $item) {
-                if (!$item->getSourceKey()) {
-                    continue;
-                }
+            foreach ($items as $values) {
+                /** @var FilterValue $value */
+                foreach ($values as $value) {
+                    if (!$value->getSourceKey()) {
+                        continue;
+                    }
 
-                $path = $item->getPath();
-                if ($path !== $group) {
-                    $path = $group . '[' . implode('][', explode('.', $path)) . ']';
+                    $path = $value->getPath();
+                    if ($path !== $group) {
+                        $path = $group . '[' . implode('][', explode('.', $path)) . ']';
+                    }
+                    $operator = $value->getOperator();
+                    if (self::DEFAULT_OPERATOR !== $operator) {
+                        $path .= '[' . $operator . ']';
+                    }
+                    $params[$path] = $value->getSourceValue();
                 }
-                $operator = $item->getOperator();
-                if (self::DEFAULT_OPERATOR !== $operator) {
-                    $path .= '[' . $operator . ']';
-                }
-                $params[$path] = $item->getSourceValue();
             }
         }
 
@@ -176,8 +229,39 @@ class FilterValueAccessor implements FilterValueAccessorInterface
 
     protected function setParameter(string $group, string $key, FilterValue $value): void
     {
-        $this->parameters[$key] = $value;
-        $this->groups[$group][$key] = $value;
+        $valueIndex = null;
+        if (isset($this->parameters[$key])) {
+            /** @var FilterValue $existingValue */
+            foreach ($this->parameters[$key] as $existingValueIndex => $existingValue) {
+                if ($value->getOperator() === $existingValue->getOperator()) {
+                    $valueIndex = $existingValueIndex;
+                }
+            }
+        }
+        if (null === $valueIndex) {
+            $valueIndex = \count($this->parameters[$key] ?? []);
+        }
+        $this->parameters[$key][$valueIndex] = $value;
+        $this->groups[$group][$key][$valueIndex] = $value;
+    }
+
+    protected function setParameterWithRememberSource(string $group, string $key, FilterValue $value): void
+    {
+        $valueIndex = null;
+        if (isset($this->parameters[$key])) {
+            /** @var FilterValue $existingValue */
+            foreach ($this->parameters[$key] as $existingValueIndex => $existingValue) {
+                if ($value->getOperator() === $existingValue->getOperator()) {
+                    $valueIndex = $existingValueIndex;
+                    $value->setSource($existingValue);
+                }
+            }
+        }
+        if (null === $valueIndex) {
+            $valueIndex = \count($this->parameters[$key] ?? []);
+        }
+        $this->parameters[$key][$valueIndex] = $value;
+        $this->groups[$group][$key][$valueIndex] = $value;
     }
 
     protected function normalizeOperator(?string $operator): string
