@@ -100,7 +100,7 @@ class BuildSearchQuery implements ProcessorInterface
 
     private function hasSearchFilter(FilterCollection $filters, FilterValueAccessorInterface $filterValues): bool
     {
-        foreach ($filterValues->getAll() as $filterKey => $filterValue) {
+        foreach ($filterValues->getAll() as $filterKey => $values) {
             if ($this->isSearchFilter($filters->get($filterKey))) {
                 return true;
             }
@@ -111,7 +111,7 @@ class BuildSearchQuery implements ProcessorInterface
 
     private function hasNonSearchFilter(FilterCollection $filters, FilterValueAccessorInterface $filterValues): bool
     {
-        foreach ($filterValues->getAll() as $filterKey => $filterValue) {
+        foreach ($filterValues->getAll() as $filterKey => $values) {
             $filter = $filters->get($filterKey);
             if (!$this->isSearchFilter($filter) && !$this->isSpecialFilter($filter)) {
                 return true;
@@ -148,8 +148,7 @@ class BuildSearchQuery implements ProcessorInterface
 
     private function getSearchFilterName(ListContext $context): string
     {
-        $filterValues = $context->getFilterValues()->getAll();
-        foreach ($filterValues as $filterKey => $filterValue) {
+        foreach ($context->getFilterValues()->getAll() as $filterKey => $values) {
             if ($this->isSearchFilter($context->getFilters()->get($filterKey))) {
                 return $filterKey;
             }
