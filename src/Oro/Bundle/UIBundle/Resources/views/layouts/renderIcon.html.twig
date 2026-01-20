@@ -34,9 +34,14 @@
         {% import _self as themeIcons %}
         {% set layoutContext = get_layout_context() %}
         {% set isSvgSupport = layoutContext.is_svg_icons_support %}
+        {% set isSvgViaApi = layoutContext.is_svg_via_api %}
 
-        {% if isSvgSupport == true %}
-            {{ themeIcons.svgIcon(parameters) }}
+        {% if isSvgSupport %}
+            {% if isSvgViaApi %}
+                {{ themeIcons.svgAsImg(parameters) }}
+            {% else %}
+                {{ themeIcons.svgIcon(parameters) }}
+            {% endif %}
         {% else %}
             {{ themeIcons.faIcon(parameters) }}
         {% endif %}
@@ -124,3 +129,69 @@
         <span class="{{- class -}}" aria-hidden="true"></span>
     {% endif %}
 {% endmacro %}
+
+{#
+    Rendering a svg icon as an image
+    Parameters - array:
+        [
+            'name' - icon id to show
+            'id' - element id (attribute)
+            'width' - width attribute
+            'height' - height attribute
+            'class' - class attribute
+            'extraClass' - extra class
+            'loading' - controls how the image loads. It might be "eager" or "lazy"
+            'alt' - an alternate text
+        ]
+#}
+{% macro svgAsImg(parameters) -%}
+    {% if (parameters.name is defined) %}
+        {% import _self as themeIcons %}
+
+        {% set iconName = parameters.name %}
+
+        {% if oro_is_rtl_mode() %}
+            {% if iconName ends with '-left' %}
+                {% set iconName = iconName|replace({'-left': '-right'}) %}
+            {% elseif iconName ends with '-right' %}
+                {% set iconName = iconName|replace({'-right': '-left'}) %}
+            {% elseif iconName ends with '-start' %}
+                {% set iconName = iconName|replace({'-start': '-end'}) %}
+            {% elseif iconName ends with '-end' %}
+                {% set iconName = iconName|replace({'-end': '-start'}) %}
+            {% endif %}
+        {% endif %}
+
+        {% set layoutContext = get_layout_context() %}
+        {% set theme = layoutContext.theme %}
+        {% set href = 'build/' ~ theme ~ '/svg-icons/' ~ iconName ~ '.svg' %}
+        {% set class = parameters.class|default('theme-icon') %}
+        {% set alt = parameters.alt|default('oro.ui.svg_as_img.default_alt'|trans) %}
+        {% set loading = parameters.loading|default('lazy') %}
+        {% set ariaHidden = parameters.ariaHidden|default('true') %}
+
+        {% if parameters.extraClass is defined %}
+            {% set class = class|trim ~ ' ' ~ parameters.extraClass|trim  %}
+        {% endif %}
+
+        <img
+            class="{{- class -}}"
+            src="{{- asset(href) -}}"
+            loading="{{- loading -}}"
+            alt="{{- alt -}}"
+        {% if parameters.id is defined %}
+            id="{{- parameters.id -}}"
+        {% endif %}
+        {% if parameters.width is defined %}
+            width="{{- width -}}"
+        {% endif %}
+        {% if parameters.height is defined %}
+            height="{{- height -}}"
+        {% endif %}
+        {% if ariaHidden %}
+            aria-hidden="{{- ariaHidden -}}"
+        {% endif %}
+        >
+    {% endif %}
+{% endmacro %}
+
