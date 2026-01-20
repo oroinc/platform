@@ -165,6 +165,8 @@ oro:
             message: Current content view is simplified, please check the edit page to see the actual result.
         status_button:
             aria_label: 'View status'
+        svg_as_img:
+            default_alt: 'Icon'
 
     htmlpurifier:
         formatted_error: '- {{ message }} (near {{ place }}...)'

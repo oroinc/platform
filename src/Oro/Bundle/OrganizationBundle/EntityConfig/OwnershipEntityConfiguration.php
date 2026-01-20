@@ -4,12 +4,28 @@ namespace Oro\Bundle\OrganizationBundle\EntityConfig;
 
 use Oro\Bundle\EntityConfigBundle\EntityConfig\EntityConfigInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * Provides validations entity config for ownership scope.
  */
 class OwnershipEntityConfiguration implements EntityConfigInterface
 {
+    private const array OWNER_TYPES_WITH_ORGANIZATION = ['USER', 'BUSINESS_UNIT'];
+    private const string OWNER_TYPE_ORGANIZATION = 'ORGANIZATION';
+
+    private const array FIELDS_FOR_USER_OR_BUSINESS_UNIT = [
+        'owner_field_name',
+        'owner_column_name',
+        'organization_field_name',
+        'organization_column_name',
+    ];
+
+    private const array FIELDS_FOR_ORGANIZATION = [
+        'owner_field_name',
+        'owner_column_name',
+    ];
+
     #[\Override]
     public function getSectionName(): string
     {
@@ -61,6 +77,41 @@ class OwnershipEntityConfiguration implements EntityConfigInterface
             ->scalarNode('frontend_customer_column_name')
                 ->info('`string` the name of customer column for front part')
             ->end()
-        ;
+        ->end()
+        ->validate()
+            ->always($this->validateOwnershipFields(...))
+        ->end();
+    }
+
+    private function validateOwnershipFields(array $config): array
+    {
+        $ownerType = $config['owner_type'] ?? null;
+
+        if (null === $ownerType) {
+            return $config;
+        }
+
+        if (in_array($ownerType, self::OWNER_TYPES_WITH_ORGANIZATION, true)) {
+            $this->assertRequiredFields($config, $ownerType, self::FIELDS_FOR_USER_OR_BUSINESS_UNIT);
+        }
+        if (self::OWNER_TYPE_ORGANIZATION === $ownerType) {
+            $this->assertRequiredFields($config, $ownerType, self::FIELDS_FOR_ORGANIZATION);
+        }
+
+        return $config;
+    }
+
+    private function assertRequiredFields(array $config, string $ownerType, array $requiredFields): void
+    {
+        $missingFields = array_filter($requiredFields, static fn (string $field) => empty($config[$field]));
+
+        if ($missingFields) {
+            throw new InvalidConfigurationException(sprintf(
+                'owner_type "%s" requires fields: %s. Missing: %s.',
+                $ownerType,
+                implode(', ', $requiredFields),
+                implode(', ', $missingFields)
+            ));
+        }
     }
 }

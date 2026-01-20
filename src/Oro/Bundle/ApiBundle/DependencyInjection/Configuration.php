@@ -106,6 +106,10 @@ class Configuration implements ConfigurationInterface
                 ->info('The maximum number of entities that can be deleted by one request.')
                 ->min(0)
                 ->defaultValue(100)
+            ->end()
+            ->booleanNode('use_absolute_urls_for_api')
+                ->info('Use absolute URLs for assets in API responses')
+                ->defaultFalse()
             ->end();
     }
 
