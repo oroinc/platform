@@ -209,6 +209,10 @@ class ExpressionProcessor
         }
         $values = array_merge(['context' => $context, 'data' => $data], $this->values, $this->processedValues);
 
+        if ($this->hasParsedExpression($deps, $values)) {
+            return $expr;
+        }
+
         return $evaluate
             ? $this->expressionLanguage->evaluate($expr, $values)
             : $this->encoderRegistry->get($encoding)->encodeExpr($expr);
@@ -349,5 +353,16 @@ class ExpressionProcessor
                 $action->setArgument($index, $arg);
             }
         }
+    }
+
+    private function hasParsedExpression(array $deps, array $values): bool
+    {
+        foreach (array_keys($deps) as $key) {
+            if (($values[$key] ?? null) instanceof ParsedExpression) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
