@@ -97,6 +97,11 @@ services:
         calls:
             - [setName, ['attribute_multiselect']]
             - [setParent, ['attribute_text']]
+            -
+                - setOptionsConfig
+                -
+                    -
+                        visible: { default: '=value.count() > 0' }
         tags:
              - { name: layout.block_type, alias: attribute_multiselect }
 
