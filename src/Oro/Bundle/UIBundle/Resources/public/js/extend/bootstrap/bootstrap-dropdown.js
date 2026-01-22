@@ -55,7 +55,8 @@ define(function(require, exports, module) {
         displayArrow: true,
         keepSeparately: true,
         fullscreenable: false,
-        positionFixedBoundary: false
+        positionFixedBoundary: false,
+        menuContainer: null
     }, config);
 
     _.extend(Dropdown.prototype, {
@@ -125,6 +126,9 @@ define(function(require, exports, module) {
             if (this._popper !== null) {
                 scrollLocker.removeLocker(this._popper.options.cid);
             }
+
+            this._restoreMenuPosition();
+
             original.dispose.call(this);
         },
 
@@ -198,6 +202,8 @@ define(function(require, exports, module) {
          * @protected
          */
         _onShown(event) {
+            this._moveMenuToContainer();
+
             let focusTabbable = null;
 
             if (_.isMobile()) {
@@ -218,6 +224,49 @@ define(function(require, exports, module) {
             } else {
                 manageFocus.focusTabbable($(this._menu), focusTabbable);
             }
+        },
+
+        /**
+         * Move dropdown menu to configured container (e.g., body) to escape overflow:hidden
+         * @protected
+         */
+        _moveMenuToContainer() {
+            const container = this._config.menuContainer;
+            if (!container) {
+                return;
+            }
+
+            const $menu = $(this._menu);
+            if (!this._originalMenuParent) {
+                this._originalMenuParent = $menu.parent();
+                this._originalMenuNextSibling = $menu.next().length ? $menu.next() : null;
+            }
+
+            $menu.appendTo(container);
+
+            if (this._popper) {
+                this._popper.scheduleUpdate();
+            }
+        },
+
+        /**
+         * Move dropdown menu back to original parent
+         * @protected
+         */
+        _restoreMenuPosition() {
+            if (!this._originalMenuParent) {
+                return;
+            }
+
+            const $menu = $(this._menu);
+            if (this._originalMenuNextSibling) {
+                $menu.insertBefore(this._originalMenuNextSibling);
+            } else {
+                $menu.appendTo(this._originalMenuParent);
+            }
+
+            this._originalMenuParent = null;
+            this._originalMenuNextSibling = null;
         },
 
         /**
@@ -262,6 +311,8 @@ define(function(require, exports, module) {
                 clearTimeout(this._delayedFocusTabbable);
                 this._delayedFocusTabbable = null;
             }
+
+            this._restoreMenuPosition();
         },
 
         _popperDestroy() {
