@@ -11,6 +11,7 @@ const config = {
     keepSeparately: true,
     fullscreenable: false,
     positionFixedBoundary: false,
+    menuContainer: null,
     ...moduleConfig(module.id)
 };
 const original = _.clone(Dropdown.prototype);
@@ -121,6 +122,9 @@ _.extend(Dropdown.prototype, {
         if (this._popper !== null) {
             scrollLocker.removeLocker(this._popper.options.cid);
         }
+
+        this._restoreMenuPosition();
+
         original.dispose.call(this);
     },
 
@@ -194,6 +198,8 @@ _.extend(Dropdown.prototype, {
      * @protected
      */
     _onShown(event) {
+        this._moveMenuToContainer();
+
         let focusTabbable = null;
 
         if (_.isMobile()) {
@@ -214,6 +220,49 @@ _.extend(Dropdown.prototype, {
         } else {
             manageFocus.focusTabbable($(this._menu), focusTabbable);
         }
+    },
+
+    /**
+     * Move dropdown menu to configured container (e.g., body) to escape overflow:hidden
+     * @protected
+     */
+    _moveMenuToContainer() {
+        const container = this._config.menuContainer;
+        if (!container) {
+            return;
+        }
+
+        const $menu = $(this._menu);
+        if (!this._originalMenuParent) {
+            this._originalMenuParent = $menu.parent();
+            this._originalMenuNextSibling = $menu.next().length ? $menu.next() : null;
+        }
+
+        $menu.appendTo(container);
+
+        if (this._popper) {
+            this._popper.scheduleUpdate();
+        }
+    },
+
+    /**
+     * Move dropdown menu back to original parent
+     * @protected
+     */
+    _restoreMenuPosition() {
+        if (!this._originalMenuParent) {
+            return;
+        }
+
+        const $menu = $(this._menu);
+        if (this._originalMenuNextSibling) {
+            $menu.insertBefore(this._originalMenuNextSibling);
+        } else {
+            $menu.appendTo(this._originalMenuParent);
+        }
+
+        this._originalMenuParent = null;
+        this._originalMenuNextSibling = null;
     },
 
     /**
@@ -258,6 +307,7 @@ _.extend(Dropdown.prototype, {
             clearTimeout(this._delayedFocusTabbable);
             this._delayedFocusTabbable = null;
         }
+        this._restoreMenuPosition();
     },
 
     _popperDestroy() {
