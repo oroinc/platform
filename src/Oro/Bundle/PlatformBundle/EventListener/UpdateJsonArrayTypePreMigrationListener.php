@@ -89,8 +89,8 @@ class UpdateJsonArrayTypePreMigrationListener
         foreach ($columns as $col) {
             $commentSql = sprintf(
                 "COMMENT ON COLUMN %s.%s IS '(DC2Type:json)'",
-                $col['table_name'],
-                $col['column_name']
+                $connection->quoteIdentifier($col['table_name']),
+                $connection->quoteIdentifier($col['column_name'])
             );
 
             $connection->executeStatement($commentSql);

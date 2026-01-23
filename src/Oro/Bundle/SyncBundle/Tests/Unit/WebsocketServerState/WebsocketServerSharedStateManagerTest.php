@@ -86,7 +86,7 @@ final class WebsocketServerSharedStateManagerTest extends TestCase
             ->willReturnSelf();
 
         $queryBuilder->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($result);
 
         $result->expects(self::once())
@@ -132,7 +132,7 @@ final class WebsocketServerSharedStateManagerTest extends TestCase
             ->willReturnSelf();
 
         $queryBuilder->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($result);
 
         $result->expects(self::once())

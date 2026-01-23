@@ -46,7 +46,7 @@ class WebsocketServerSharedStateManager implements WebsocketServerStateManagerIn
             ->select('updated_at')
             ->where('id = :id')
             ->setParameter('id', $stateId, Types::STRING)
-            ->execute()
+            ->executeQuery()
             ->fetchOne() ?: null;
 
         if ($result !== null) {

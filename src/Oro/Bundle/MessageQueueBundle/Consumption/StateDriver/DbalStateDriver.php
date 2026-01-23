@@ -130,7 +130,7 @@ class DbalStateDriver implements StateDriverInterface
             ->select('updated_at')
             ->where('id = :id')
             ->setParameter('id', $this->key, ParameterType::STRING)
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
 
         if ($result) {

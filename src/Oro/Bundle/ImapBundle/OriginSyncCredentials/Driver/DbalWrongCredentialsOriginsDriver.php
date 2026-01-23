@@ -44,7 +44,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
 
         $existingRecord = $request
             ->setParameter('emailOriginId', $emailOriginId)
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
 
         if (!$existingRecord) {
@@ -63,7 +63,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
         $wrongOriginIds = $this->getConnection()->createQueryBuilder()
             ->select('origin_id')
             ->from('oro_imap_wrong_creds_origin')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         if (count($wrongOriginIds)) {
@@ -89,7 +89,7 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
             $request->andWhere('owner_id is null');
         }
 
-        $wrongOriginIds = $request->execute()->fetchAllAssociative();
+        $wrongOriginIds = $request->executeQuery()->fetchAllAssociative();
 
         if (count($wrongOriginIds)) {
             $origins = $this->getOriginRepository()->getOriginsByIds($wrongOriginIds);

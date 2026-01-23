@@ -37,7 +37,7 @@ class MaterializedViewRepository
     {
         return (int)$this->createQueryBuilder()
             ->select('COUNT(1)')
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
     }
 }
