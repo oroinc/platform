@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Exception;
 
+/**
+ * Thrown when a requested action group is not found in the action group registry.
+ */
 class ActionGroupNotFoundException extends \RuntimeException
 {
     /**

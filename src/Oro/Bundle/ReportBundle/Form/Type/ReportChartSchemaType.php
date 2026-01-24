@@ -11,6 +11,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for configuring chart data schema fields in reports.
+ *
+ * Manages the dynamic creation of form fields based on chart data schema configuration.
+ * Handles field type selection (text or checkbox), applies type filters to exclude
+ * incompatible properties, and integrates with the query designer manager to provide
+ * intelligent field filtering. Includes client-side validation and data type filtering
+ * through custom attributes.
+ */
 class ReportChartSchemaType extends AbstractType
 {
     const VIEW_MODULE_NAME = 'ororeport/js/app/views/report-chart-data-schema-view';

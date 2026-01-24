@@ -7,6 +7,13 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * Provides common functionality for scheduling workflow trigger cron jobs.
+ *
+ * This base class manages the deferred scheduler and logger setup for workflow trigger scheduling.
+ * Subclasses should implement specific scheduling logic for different types of workflow triggers
+ * (e.g., time-based triggers, event-based triggers).
+ */
 abstract class AbstractTriggerCronScheduler implements LoggerAwareInterface
 {
     /** @var DeferredScheduler */

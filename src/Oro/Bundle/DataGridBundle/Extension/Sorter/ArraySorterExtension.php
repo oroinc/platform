@@ -8,6 +8,13 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 
+/**
+ * Handles sorting for array-based datagrids.
+ *
+ * This extension applies sorting to array datasources using natural string comparison,
+ * with support for both ascending and descending order. It handles UTF-8 strings by
+ * converting them to ASCII for consistent sorting behavior.
+ */
 class ArraySorterExtension extends AbstractSorterExtension
 {
     const ASC_SORTING = 'ASC';

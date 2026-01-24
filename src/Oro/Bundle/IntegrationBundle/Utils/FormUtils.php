@@ -9,6 +9,14 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
+/**
+ * Provides utility methods for integration form handling.
+ *
+ * This utility class offers methods for checking integration capabilities and status,
+ * particularly for determining whether an integration supports two-way synchronization
+ * and whether it has been synchronized at least once. These utilities are useful for
+ * form rendering and validation logic.
+ */
 class FormUtils
 {
     /** @var TypesRegistry */

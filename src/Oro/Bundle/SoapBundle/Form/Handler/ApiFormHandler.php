@@ -8,6 +8,13 @@ use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles form submission and entity persistence for SOAP API requests.
+ *
+ * Processes POST and PUT requests by submitting form data, validating it, and persisting
+ * the entity to the database. Integrates with the request stack to access the current HTTP request
+ * and uses an entity manager for database operations.
+ */
 class ApiFormHandler implements FormAwareInterface
 {
     use RequestHandlerTrait;

@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid\Translation;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
+/**
+ * Listens to datagrid build events to add workflow translation column filters.
+ *
+ * This listener adds a workflow translation filter to datagrid configurations,
+ * enabling filtering of workflow-related data by translation keys.
+ */
 class WorkflowColumnListener
 {
     const COLUMN_NAME = 'workflow';

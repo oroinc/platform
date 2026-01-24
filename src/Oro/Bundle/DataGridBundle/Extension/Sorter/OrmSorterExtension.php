@@ -7,6 +7,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
+/**
+ * Handles sorting for ORM-based datagrids.
+ *
+ * This extension applies sorting to Doctrine ORM {@see QueryBuilder} instances and ensures predictable
+ * result ordering by automatically adding `ORDER BY` clauses based on primary keys or `GROUP BY`
+ * fields when explicit sorting is not specified.
+ */
 class OrmSorterExtension extends AbstractSorterExtension
 {
     #[\Override]

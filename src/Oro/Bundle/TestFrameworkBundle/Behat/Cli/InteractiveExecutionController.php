@@ -10,6 +10,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Handles the `--interactive` CLI option to enable interactive test execution.
+ *
+ * This controller enables interactive mode where test execution pauses after each step,
+ * allowing developers to inspect the state and debug test scenarios in real-time.
+ */
 class InteractiveExecutionController implements Controller
 {
     /**

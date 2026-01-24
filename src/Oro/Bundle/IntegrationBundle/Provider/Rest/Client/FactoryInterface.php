@@ -5,7 +5,10 @@ namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
 
 /**
- * Interface FactoryInterface
+ * Defines the interface for REST client factories.
+ *
+ * Implementations should create and configure REST client instances based on transport settings
+ * provided by integration configurations.
  */
 interface FactoryInterface
 {

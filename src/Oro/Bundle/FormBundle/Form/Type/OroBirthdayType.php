@@ -5,6 +5,13 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting a birthday date.
+ *
+ * This type extends {@see OroDateType} with pre-configured options suitable for birthday
+ * selection, including a year range from 120 years ago to the current year, and
+ * appropriate minimum and maximum date constraints.
+ */
 class OroBirthdayType extends AbstractType
 {
     #[\Override]

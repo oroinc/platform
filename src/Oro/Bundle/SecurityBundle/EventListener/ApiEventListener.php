@@ -9,6 +9,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Handles API events to enforce ACL access control.
+ *
+ * This listener intercepts API find operations and checks whether the current user
+ * has access to the returned entity. If access is denied, it throws an {@see AccessDeniedException}
+ * to prevent unauthorized data exposure through the API.
+ */
 class ApiEventListener
 {
     /** @var RequestStack */

@@ -4,6 +4,14 @@ namespace Oro\Bundle\SearchBundle\Query\Expression;
 
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 
+/**
+ * Manages a stream of tokens for parsing search query expressions.
+ *
+ * This class provides token stream management for expression parsing, including
+ * navigation through tokens, validation of token types and values, and error
+ * reporting with cursor position information. It supports forward and backward
+ * navigation and strict or lenient token validation modes.
+ */
 class TokenStream
 {
     /** @var Token */

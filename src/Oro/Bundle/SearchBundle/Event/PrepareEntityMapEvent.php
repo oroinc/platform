@@ -4,6 +4,14 @@ namespace Oro\Bundle\SearchBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched when preparing entity data for search indexing.
+ *
+ * This event allows listeners to modify the data that will be indexed for an entity
+ * before it is stored in the search index. Listeners can access the entity object,
+ * its class name, the prepared data array, and the entity mapping configuration,
+ * enabling customization of what data gets indexed and how it is structured.
+ */
 class PrepareEntityMapEvent extends Event
 {
     const EVENT_NAME = 'oro_search.prepare_entity_map';

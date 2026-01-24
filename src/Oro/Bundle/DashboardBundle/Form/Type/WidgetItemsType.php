@@ -10,6 +10,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing collections of widget items.
+ *
+ * This form type provides a complete interface for configuring multiple widget items,
+ * including their visibility, order, and other properties. It uses a collection of
+ * {@see WidgetItemType} forms and integrates with event subscribers to handle dynamic item
+ * management. The form requires widget name and item label configuration to properly
+ * render and process the item collection.
+ */
 class WidgetItemsType extends AbstractType
 {
     const NAME = 'oro_type_widget_items';

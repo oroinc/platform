@@ -10,6 +10,13 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Listens to workflow definition changes to update and delete workflow transition triggers.
+ *
+ * This listener responds to workflow changes by assembling and updating transition triggers,
+ * or removing triggers when workflows are deleted, maintaining consistency between definitions
+ * and their associated triggers.
+ */
 class WorkflowTransitionTriggersListener implements EventSubscriberInterface
 {
     /** @var WorkflowTransitionTriggersAssembler */

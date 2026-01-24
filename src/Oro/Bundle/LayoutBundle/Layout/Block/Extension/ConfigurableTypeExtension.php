@@ -5,6 +5,13 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 use Oro\Bundle\LayoutBundle\Layout\Block\OptionsConfigTrait;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 
+/**
+ * Extends block types with configurable options and automatic view building.
+ *
+ * This extension allows block type implementations to define options configuration
+ * declaratively through the {@see OptionsConfigTrait}, automatically handling option
+ * resolution and view variable assignment without requiring explicit method overrides.
+ */
 class ConfigurableTypeExtension extends AbstractBlockTypeExtension
 {
     use OptionsConfigTrait;

@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityBundle\Form\Guesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+/**
+ * Guesses form field types based on Doctrine entity metadata.
+ *
+ * This guesser analyzes entity field types and associations to determine appropriate
+ * Symfony form field types. It supports custom mappings from Doctrine types to form types
+ * and handles both scalar fields and entity associations.
+ */
 class DoctrineTypeGuesser extends AbstractFormGuesser
 {
     /**

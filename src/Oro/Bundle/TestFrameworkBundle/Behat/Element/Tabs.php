@@ -4,6 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 
+/**
+ * Represents a tabbed interface element in Behat tests.
+ *
+ * This element handles switching between tabs, checking tab existence, and retrieving
+ * the currently active tab content. It uses CSS selectors to locate tab headers and content areas.
+ */
 class Tabs extends Element
 {
     const SELECTOR_TAB_HEADER = '.tab-collection ul li a';

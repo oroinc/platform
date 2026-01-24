@@ -5,6 +5,14 @@ namespace Oro\Bundle\EntityMergeBundle\Data;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
+/**
+ * Encapsulates merge data for a single field within an entity merge operation.
+ *
+ * This class manages field-level merge information including the field's metadata,
+ * the source entity from which the field value will be taken, and the merge mode
+ * (e.g., `REPLACE` or `UNITE`) that determines how the field value is merged into the
+ * master entity. It provides access to the parent EntityData and field metadata.
+ */
 class FieldData
 {
     /**

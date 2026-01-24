@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider;
 
+/**
+ * Defines the contract for providing average test execution times.
+ *
+ * Implementations of this interface retrieve historical test execution time data
+ * and calculate average times for individual tests or overall test suites.
+ */
 interface AvgTimeProviderInterface
 {
     /**

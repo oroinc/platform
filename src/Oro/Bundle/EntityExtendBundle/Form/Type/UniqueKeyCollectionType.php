@@ -11,6 +11,15 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing unique key constraints on extended entities.
+ *
+ * This form type provides a collection interface for defining and managing unique key
+ * constraints on custom entity fields. It dynamically builds a list of available fields
+ * (excluding to-many relations) and allows users to create multiple unique key combinations.
+ * Each unique key can consist of one or more fields, and the form validates that the
+ * combination of field names is unique across all defined keys.
+ */
 class UniqueKeyCollectionType extends AbstractType
 {
     /**

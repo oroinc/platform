@@ -9,6 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validator for the GroupAttributes constraint.
+ *
+ * This validator ensures that attributes are not duplicated across groups within an attribute family
+ * and that all system attributes required by the entity are included in the family's groups, maintaining
+ * data integrity and completeness of attribute families.
+ */
 class GroupAttributesValidator extends ConstraintValidator
 {
     const ALIAS = 'oro_entity_config.validator.group_attributes';

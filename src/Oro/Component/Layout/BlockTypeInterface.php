@@ -5,6 +5,13 @@ namespace Oro\Component\Layout;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 
+/**
+ * Defines the contract for block types in the layout system.
+ *
+ * A block type defines how blocks of that type are built, how their views are rendered, and what options
+ * they support. Block types form a hierarchy where each type can have a parent type, allowing for
+ * inheritance and extension of functionality.
+ */
 interface BlockTypeInterface
 {
     /**

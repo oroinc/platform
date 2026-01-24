@@ -6,6 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
+/**
+ * Dispatched before entity and field configuration changes are persisted to the database.
+ *
+ * This event is triggered before the configuration manager flushes pending configuration changes,
+ * allowing listeners to validate, modify, or reject configuration updates before they are persisted.
+ * Listeners can access both entity and field configurations and determine the type of configuration being flushed.
+ */
 class PreFlushConfigEvent extends Event
 {
     /** @var ConfigInterface[] */

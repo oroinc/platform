@@ -13,6 +13,16 @@ use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
+/**
+ * Extends entity configuration dumper to handle ownership-related entity configuration.
+ *
+ * This extension processes custom entities during the entity config dumping phase to
+ * automatically create ownership relations based on the configured ownership type (User,
+ * Business Unit, or Organization). It ensures that custom entities with ownership
+ * configuration have the necessary database relations and entity config settings to support
+ * the ownership model, including automatic creation of organization relations for User and
+ * Business Unit ownership types.
+ */
 class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var ConfigManager */

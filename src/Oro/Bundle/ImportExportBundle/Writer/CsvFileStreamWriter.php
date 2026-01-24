@@ -6,6 +6,13 @@ use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
+/**
+ * Provides common functionality for writing data to CSV files using streams.
+ *
+ * This base class extends {@see FileStreamWriter} to handle CSV-specific formatting including
+ * delimiters, enclosures, headers, and escape characters. Subclasses should implement methods
+ * to define the header row and convert data items to CSV rows.
+ */
 abstract class CsvFileStreamWriter extends FileStreamWriter
 {
     /**

@@ -8,6 +8,14 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * Layout block type for rendering the opening tag of an embedded form.
+ *
+ * This block type renders the HTML form opening tag with all necessary attributes such as
+ * action, method, and enctype. It supports both direct action paths and route-based actions,
+ * allowing flexible configuration of form submission targets. The block processes form
+ * configuration and layout options to generate the appropriate form tag.
+ */
 class EmbedFormStartType extends AbstractFormType
 {
     const NAME = 'embed_form_start';

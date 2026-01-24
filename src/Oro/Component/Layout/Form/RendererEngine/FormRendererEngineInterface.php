@@ -5,6 +5,12 @@ namespace Oro\Component\Layout\Form\RendererEngine;
 use Symfony\Component\Form\FormRendererEngineInterface as BaseFormRendererEngineInterfaceInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Extends Symfony's form renderer engine with additional theme and resource management capabilities.
+ *
+ * This interface provides methods for managing default themes and navigating the block hierarchy
+ * to find appropriate parent resources during form rendering.
+ */
 interface FormRendererEngineInterface extends BaseFormRendererEngineInterfaceInterface
 {
     /**

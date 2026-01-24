@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Event;
 
+/**
+ * Defines event names for UI rendering operations.
+ */
 final class Events
 {
     const BEFORE_VIEW_RENDER           = 'entity_view.render.before';

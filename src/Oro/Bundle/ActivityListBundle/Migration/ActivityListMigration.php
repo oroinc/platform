@@ -12,6 +12,15 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * Manages database schema migrations for activity list functionality.
+ *
+ * This migration class is responsible for creating and updating the database schema
+ * to support activity list tracking. It coordinates with the {@see ActivityListExtension}
+ * to establish the necessary tables and associations between the activity list entity
+ * and target entities that support activity tracking. The migration is executed during
+ * the post-migration phase to ensure all entity configurations are available.
+ */
 class ActivityListMigration implements Migration
 {
     /** @var ActivityListChainProvider */

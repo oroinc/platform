@@ -7,6 +7,13 @@ use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Encapsulates context information for SOAP API request handling.
+ *
+ * Provides access to the controller, HTTP request and response objects, the current action name,
+ * and arbitrary key-value pairs for passing data between handlers. Acts as a data container
+ * that flows through the request processing pipeline.
+ */
 class Context
 {
     /** @var object|FormAwareInterface|EntityManagerAwareInterface */

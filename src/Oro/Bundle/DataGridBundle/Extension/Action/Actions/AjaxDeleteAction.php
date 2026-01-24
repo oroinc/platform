@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action\Actions;
 
+/**
+ * Represents an AJAX-based delete action for datagrid rows.
+ *
+ * This specialized AJAX action is configured specifically for delete operations,
+ * typically including confirmation dialogs and appropriate frontend handling.
+ */
 class AjaxDeleteAction extends AjaxAction
 {
     /**

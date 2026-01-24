@@ -9,6 +9,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for filtering email origins and folders in datagrids.
+ *
+ * Provides a choice-based filter allowing users to select email origins and folders
+ * with support for "contains" and "not contains" filter operations.
+ */
 class ChoiceOriginFolderFilterType extends AbstractChoiceType
 {
     const TYPE_CONTAINS     = 1;

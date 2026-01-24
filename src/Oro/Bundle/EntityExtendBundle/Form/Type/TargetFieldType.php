@@ -9,6 +9,14 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting target fields in entity relations.
+ *
+ * This form type provides a choice field that displays available fields from a specified
+ * entity class. It filters the available fields to only include scalar types (integer, string,
+ * smallint, decimal, bigint, text, money) and excludes deleted fields. The field choices are
+ * dynamically populated based on the entity class provided in the form options.
+ */
 class TargetFieldType extends AbstractType
 {
     /** @var ConfigManager */

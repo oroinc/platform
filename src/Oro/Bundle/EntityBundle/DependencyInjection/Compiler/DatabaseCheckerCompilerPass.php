@@ -6,6 +6,13 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers database checkers in the dependency injection container.
+ *
+ * This compiler pass collects all services tagged with `oro_entity.database_checker`
+ * and registers them with the database state manager. It enables the system to check
+ * the database state using multiple pluggable checkers.
+ */
 class DatabaseCheckerCompilerPass implements CompilerPassInterface
 {
     const STATE_MANAGER_SERVICE     = 'oro_entity.database_checker.state_manager';

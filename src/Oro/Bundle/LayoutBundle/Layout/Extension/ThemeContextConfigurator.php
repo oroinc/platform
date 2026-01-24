@@ -7,6 +7,14 @@ use Oro\Component\Layout\ContextInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 
+/**
+ * Configures the layout context with the current theme identifier.
+ *
+ * This configurator registers the `theme` context variable, which identifies the
+ * active theme for layout rendering. If not explicitly provided, it attempts to
+ * resolve the theme from the current request's `_theme` attribute, defaulting to
+ * `default` if no theme is specified.
+ */
 class ThemeContextConfigurator implements ContextConfiguratorInterface
 {
     /** @var RequestStack */

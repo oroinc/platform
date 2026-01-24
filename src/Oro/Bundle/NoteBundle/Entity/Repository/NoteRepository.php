@@ -7,6 +7,15 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Repository for querying notes associated with entities.
+ *
+ * This repository provides specialized query builders for retrieving notes that are
+ * associated with specific entities. It handles the complex relationship between notes
+ * and their target entities through the activity association mechanism. The repository
+ * supports pagination and eager loading of related data (note owner and updater) to
+ * optimize query performance when retrieving associated notes.
+ */
 class NoteRepository extends EntityRepository
 {
     /**

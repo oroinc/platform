@@ -4,6 +4,12 @@ namespace Oro\Component\Layout\Loader;
 
 use Oro\Component\Layout\Loader\Driver\DriverInterface;
 
+/**
+ * Loads layout updates from files using format-specific drivers.
+ *
+ * This loader maintains a registry of drivers indexed by file extension and delegates loading
+ * to the appropriate driver based on the file extension of the layout update file.
+ */
 class LayoutUpdateLoader implements LayoutUpdateLoaderInterface
 {
     /** @var DriverInterface[] */

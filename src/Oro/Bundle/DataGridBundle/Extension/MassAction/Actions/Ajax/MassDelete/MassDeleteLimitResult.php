@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete;
 
+/**
+ * Contains the result of mass delete limit validation.
+ *
+ * This class encapsulates information about the number of selected records, how many can
+ * actually be deleted based on permissions and limits, and the maximum allowed deletion limit.
+ */
 class MassDeleteLimitResult
 {
     /** @var int */

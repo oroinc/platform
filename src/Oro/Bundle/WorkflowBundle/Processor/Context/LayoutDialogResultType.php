@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Processor\Context;
 
+/**
+ * Represents a layout dialog result type for workflow transition actions.
+ *
+ * This result type indicates that the transition action result should be rendered as a dialog within
+ * a layout context. It supports custom form handling and requires a form route name to be specified
+ * for rendering the transition form within the dialog.
+ */
 class LayoutDialogResultType implements LayoutResultTypeInterface
 {
     const NAME = 'layout_dialog';

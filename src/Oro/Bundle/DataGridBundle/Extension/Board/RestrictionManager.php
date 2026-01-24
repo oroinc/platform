@@ -7,6 +7,13 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
+/**
+ * Manages restrictions for board view availability in datagrids.
+ *
+ * This class determines whether the board view appearance is available for a datagrid based on
+ * device type (desktop only) and workflow configuration (disabled when workflows are active for
+ * the entity).
+ */
 class RestrictionManager
 {
     /** @var UserAgentProvider */

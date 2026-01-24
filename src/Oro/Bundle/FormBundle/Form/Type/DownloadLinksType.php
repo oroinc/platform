@@ -9,6 +9,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for displaying downloadable files.
+ *
+ * This type renders a list of download links for files matching a specified pattern
+ * in a given directory. It uses the {@see Finder} component to locate files and the asset
+ * helper to generate proper URLs for the download links.
+ */
 class DownloadLinksType extends AbstractType
 {
     /** @var AssetHelper */

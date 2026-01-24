@@ -5,6 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Compiler pass that registers type formatters with the formatter provider service.
+ *
+ * This pass collects all services tagged with `oro_importexport.formatter.formatter`,
+ * validates that they are public, and registers them with the formatter provider.
+ * It organizes formatters by alias and by format type/data type combinations,
+ * enabling the provider to locate the appropriate formatter for any given type conversion.
+ */
 class FormatterProviderPass implements CompilerPassInterface
 {
     const SERVICE_ID = 'oro_importexport.formatter.formatter_provider';

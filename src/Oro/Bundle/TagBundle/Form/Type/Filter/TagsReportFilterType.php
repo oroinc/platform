@@ -6,6 +6,13 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Form type for filtering tags in reports with entity class specification.
+ *
+ * This filter type extends the dictionary filter to provide tag filtering capabilities in report contexts.
+ * It adds an entity_class field to allow filtering tags for specific entity types, enabling flexible
+ * tag-based reporting across different taggable entities.
+ */
 class TagsReportFilterType extends DictionaryFilterType
 {
     const NAME = 'oro_type_tags_report_filter';

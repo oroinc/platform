@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\FilterBundle\Datasource;
 
+/**
+ * Defines the contract for building filter expressions for many-to-many relationships.
+ *
+ * Implementations of this interface are responsible for constructing ORM expressions
+ * that allow filtering datasources based on many-to-many relationships. This includes
+ * building comparison expressions for filtering by related entities and null value
+ * expressions for filtering by the absence of relationships.
+ */
 interface ManyRelationBuilderInterface
 {
     /**

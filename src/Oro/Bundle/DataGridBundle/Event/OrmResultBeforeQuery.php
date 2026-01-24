@@ -6,6 +6,13 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched before executing an ORM query in a datagrid datasource.
+ *
+ * This event allows listeners to modify the {@see QueryBuilder} before the query is executed,
+ * enabling customization of the query such as adding joins, where clauses, or modifying
+ * select statements based on runtime conditions.
+ */
 class OrmResultBeforeQuery extends Event implements GridEventInterface
 {
     const NAME = 'oro_datagrid.orm_datasource.result.before_query';

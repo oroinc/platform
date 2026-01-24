@@ -4,6 +4,15 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
+/**
+ * Encapsulates merge metadata for an entity class.
+ *
+ * This class manages merge-specific configuration for an entity, including the Doctrine
+ * metadata for the entity class and the merge metadata for each field. It provides access
+ * to field metadata, entity class name, and merge constraints such as the maximum number
+ * of entities that can be merged in a single operation. Developers can extend this class
+ * or customize its behavior through event listeners to support custom merge logic.
+ */
 class EntityMetadata extends Metadata implements MetadataInterface
 {
     const MAX_ENTITIES_COUNT = 5;

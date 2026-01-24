@@ -7,6 +7,13 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
+/**
+ * Handles entity configuration datagrid building and provides module choice options.
+ *
+ * This listener prepares entity configuration datagrids by configuring query parameters and providing
+ * a list of available modules for filtering. It extends the abstract configuration grid listener to
+ * specialize in entity-level configuration management.
+ */
 class EntityConfigGridListener extends AbstractConfigGridListener
 {
     /**

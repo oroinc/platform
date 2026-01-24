@@ -10,6 +10,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * Handles datagrid events for entity relation fields.
+ *
+ * This listener configures datagrids that display related entities for a specific
+ * entity field. It builds the query to show available related entities and marks
+ * which ones are already assigned to the parent entity, supporting both one-to-many
+ * and many-to-many relationships.
+ */
 class EntityRelationGridListener
 {
     /** @var ConfigManager */

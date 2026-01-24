@@ -8,6 +8,13 @@ use Oro\Component\ConfigExpression\Condition\AbstractComparison;
 use Oro\Component\ConfigExpression\Exception;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Checks if a value exists in a collection element accessed via nested property paths.
+ *
+ * This condition evaluates whether a specified value exists within a collection
+ * that is accessed through one or more property paths. It supports nested property
+ * resolution and works with both arrays and Doctrine collections.
+ */
 class CollectionElementValueExists extends AbstractComparison
 {
     const NAME = 'collection_element_value_exists';

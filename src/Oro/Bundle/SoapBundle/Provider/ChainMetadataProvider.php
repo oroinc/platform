@@ -5,6 +5,13 @@ namespace Oro\Bundle\SoapBundle\Provider;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 
+/**
+ * Aggregates metadata from multiple providers using the chain of responsibility pattern.
+ *
+ * Collects metadata from all registered metadata providers and merges their results,
+ * allowing extensible metadata retrieval where multiple providers can contribute
+ * different aspects of metadata for API objects.
+ */
 class ChainMetadataProvider implements MetadataProviderInterface
 {
     /** @var MetadataProviderInterface[] */

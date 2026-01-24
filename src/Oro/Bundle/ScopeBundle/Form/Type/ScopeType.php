@@ -11,6 +11,16 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting and configuring scope criteria.
+ *
+ * This form type provides a specialized form for managing scope selection and configuration.
+ * It dynamically generates form fields based on the scope type and scope entities defined
+ * in the scope manager. The type uses a data transformer to convert between Scope entities
+ * and form data, and reorders fields according to the scope field configuration. It is
+ * commonly used in configuration forms where administrators need to specify scope-specific
+ * settings.
+ */
 class ScopeType extends AbstractType
 {
     const NAME = 'oro_scope';

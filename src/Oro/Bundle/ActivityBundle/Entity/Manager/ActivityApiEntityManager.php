@@ -6,6 +6,14 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
+/**
+ * Provides API access to activity entities and their associated target entities.
+ *
+ * This manager extends the base API entity manager to handle activity-specific operations,
+ * including retrieving available activity types and their compatible target entity types.
+ * It leverages the {@see ActivityManager} to determine which entities can be associated with
+ * specific activity types, enabling flexible activity management through the API.
+ */
 class ActivityApiEntityManager extends ApiEntityManager
 {
     /** @var ActivityManager */

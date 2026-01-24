@@ -7,6 +7,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for editing name format patterns.
+ *
+ * This form type provides a text input field for configuring the name format
+ * pattern used throughout the application. It extends {@see TextType} and automatically
+ * populates the field with the current name format from the {@see NameFormatter} service,
+ * allowing administrators to customize how names are displayed and formatted.
+ */
 class NameFormatType extends AbstractType
 {
     /**

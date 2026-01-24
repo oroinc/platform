@@ -10,6 +10,12 @@ use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * Represents an executable process with actions and conditions.
+ *
+ * This class encapsulates a process definition with assembled actions and pre-conditions,
+ * enabling the execution of process logic based on workflow triggers.
+ */
 class Process
 {
     /**

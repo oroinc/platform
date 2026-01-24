@@ -6,6 +6,12 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Represents an AJAX-based mass action for datagrids.
+ *
+ * This mass action executes asynchronously via AJAX requests, processing multiple selected
+ * rows without full page reloads. It requires a handler service to process the selected records.
+ */
 class AjaxMassAction extends AbstractMassAction
 {
     /** @var array */

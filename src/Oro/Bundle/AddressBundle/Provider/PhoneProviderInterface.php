@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Provider;
 
+/**
+ * Defines the contract for retrieving phone numbers from objects.
+ *
+ * Implementations of this interface provide the ability to extract phone number
+ * information from various entity types. Providers can return a single primary phone
+ * number or a complete list of all available phone numbers associated with an object,
+ * along with information about the phone owner.
+ */
 interface PhoneProviderInterface
 {
     /**

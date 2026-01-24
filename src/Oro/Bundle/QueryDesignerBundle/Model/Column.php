@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
+/**
+ * Represents a column definition in a query designer query.
+ *
+ * This class encapsulates the configuration of a single column that will be
+ * included in the query result set. It manages the column's name, display label,
+ * sorting direction (`ASC`/`DESC`), and optional aggregation function. Columns are
+ * the fundamental building blocks of query designer queries, defining which
+ * fields from the data source should be selected and how they should be presented.
+ */
 class Column
 {
     /**

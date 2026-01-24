@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
+/**
+ * Defines the contract for resolving unique identifiers for fixtures.
+ *
+ * Implementations of this interface convert fixture objects and strings to unique
+ * string identifiers for tracking and managing fixtures during test execution.
+ */
 interface FixtureIdentifierResolverInterface
 {
     /**

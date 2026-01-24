@@ -8,6 +8,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Handles form pre-submission events for system configuration forms.
+ *
+ * This event subscriber processes form data before submission to handle the "use parent scope value"
+ * checkbox behavior. When this checkbox is checked, it resets the field value to the parent scope's
+ * value. For file fields, it sets an empty file state; for other field types, it retrieves and sets
+ * the parent scope's configuration value. This ensures that configuration inheritance works correctly
+ * when users opt to use parent scope values instead of defining scope-specific values.
+ */
 class ConfigSubscriber implements EventSubscriberInterface
 {
     /**

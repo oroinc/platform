@@ -9,6 +9,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting a parent localization with autocomplete and grid filtering.
+ *
+ * This form type provides an entity select field for choosing a parent localization
+ * in a hierarchical localization structure. It includes autocomplete functionality
+ * and automatically filters out the current localization and its children from the
+ * available options to prevent circular references. The form view is enhanced with
+ * entity ID and grid parameters for client-side filtering.
+ */
 class LocalizationParentSelectType extends AbstractType
 {
     const NAME = 'oro_localization_parent_select';

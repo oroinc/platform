@@ -7,6 +7,13 @@ use Oro\Component\Layout\ContextInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 
+/**
+ * Configures layout context with widget-specific parameters.
+ *
+ * Extracts widget container and widget ID from the HTTP request and makes them available
+ * in the layout context. This allows layouts to be aware of whether they are being rendered
+ * within a widget container and to access the widget's unique identifier.
+ */
 class WidgetContextConfigurator implements ContextConfiguratorInterface
 {
     /**

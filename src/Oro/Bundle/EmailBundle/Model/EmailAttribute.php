@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+/**
+ * Represents an email attribute for template variable rendering.
+ *
+ * Encapsulates metadata about an email attribute including its name and whether it represents
+ * an association, used for template variable discovery and rendering.
+ */
 class EmailAttribute
 {
     /** @var string */

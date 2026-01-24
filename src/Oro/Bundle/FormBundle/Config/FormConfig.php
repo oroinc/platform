@@ -4,6 +4,14 @@ namespace Oro\Bundle\FormBundle\Config;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Manages configuration for a complete form.
+ *
+ * A form is composed of multiple blocks, each containing sub-blocks and fields.
+ * This class manages the collection of blocks, provides access to specific blocks
+ * and their sub-blocks, and can serialize the entire form configuration to an array.
+ * Blocks are automatically sorted by priority when added or modified.
+ */
 class FormConfig implements FormConfigInterface
 {
     /**

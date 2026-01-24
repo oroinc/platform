@@ -9,6 +9,15 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting an export processor.
+ *
+ * This form type provides a choice field for selecting which export processor to use
+ * for a given entity. It dynamically populates the choices based on available processors
+ * for the entity, allowing users to select from multiple export options. The form can
+ * be configured to filter processors by alias and supports both single and multiple
+ * processor selections.
+ */
 class ExportType extends AbstractType
 {
     const NAME = 'oro_importexport_export';

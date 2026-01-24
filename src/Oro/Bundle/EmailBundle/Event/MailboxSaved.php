@@ -5,6 +5,12 @@ namespace Oro\Bundle\EmailBundle\Event;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when a mailbox is saved.
+ *
+ * This event is triggered after a mailbox configuration has been successfully saved,
+ * allowing listeners to perform additional processing such as synchronization or validation.
+ */
 class MailboxSaved extends Event
 {
     const NAME = 'oro_email.mailbox_saved';

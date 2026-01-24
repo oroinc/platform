@@ -6,6 +6,12 @@ use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Prints health checker errors to the console after test execution completes.
+ *
+ * This event subscriber listens for the exercise completion event and outputs any errors
+ * reported by health checkers, providing developers with feedback on test environment issues.
+ */
 class ResultPrinterSubscriber implements EventSubscriberInterface, HealthCheckerAwareInterface
 {
     use HealthCheckerAwareTrait;

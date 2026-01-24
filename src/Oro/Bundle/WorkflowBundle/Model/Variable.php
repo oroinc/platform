@@ -4,6 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\ActionBundle\Model\EntityParameterInterface;
 
+/**
+ * Represents a workflow variable with type, value, and entity ACL configuration.
+ *
+ * This class defines a variable used in workflows, including its type, label, property path,
+ * and entity ACL settings that control access to the variable data.
+ */
 class Variable implements EntityParameterInterface
 {
     const INTERNAL_TYPE_VARIABLE = 'variable';

@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Provides utilities for querying block type hierarchies and relationships.
+ *
+ * This helper caches type hierarchies and relationships to efficiently answer queries about
+ * block type inheritance, parent types, and type instance checks.
+ */
 class BlockTypeHelper implements BlockTypeHelperInterface
 {
     /** @var LayoutRegistryInterface */

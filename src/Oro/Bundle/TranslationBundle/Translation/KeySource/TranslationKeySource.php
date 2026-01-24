@@ -5,6 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Translation\KeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
+/**
+ * Translation key source that generates translation keys from templates and data.
+ *
+ * Implements the translation key source interface to provide translation key generation
+ * based on a template and associated data. Requires all necessary data to be provided
+ * at construction time and validates that all required keys from the template are present
+ * and non-empty before allowing the source to be used.
+ */
 class TranslationKeySource implements TranslationKeySourceInterface
 {
     /**

@@ -9,6 +9,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Helper for managing cron-triggered workflow transitions.
+ *
+ * This helper provides methods to fetch entities and workflow items that match cron trigger
+ * criteria, enabling the execution of scheduled workflow transitions.
+ */
 class TransitionCronTriggerHelper
 {
     /** @var DoctrineHelper */

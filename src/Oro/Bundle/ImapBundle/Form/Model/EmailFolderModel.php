@@ -6,6 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
+/**
+ * Represents a hierarchical model of email folders for form processing.
+ *
+ * This model class encapsulates the structure and relationships of email folders, including
+ * parent-child relationships and IMAP UID validity tracking. It is used during form handling
+ * to manage folder hierarchies before persisting them as EmailFolder entities, providing
+ * a convenient intermediate representation for form data transformation and validation.
+ */
 class EmailFolderModel
 {
     /**

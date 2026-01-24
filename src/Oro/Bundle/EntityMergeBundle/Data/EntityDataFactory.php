@@ -8,6 +8,14 @@ use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Creates EntityData instances from entity names and entity collections.
+ *
+ * This factory is responsible for instantiating {@see EntityData} objects that encapsulate
+ * the entities to be merged along with their associated merge metadata. It dispatches
+ * the `CREATE_ENTITY_DATA` event to allow listeners to modify the entity data before
+ * it is returned to the caller.
+ */
 class EntityDataFactory
 {
     /**

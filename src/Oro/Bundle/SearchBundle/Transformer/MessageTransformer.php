@@ -4,6 +4,14 @@ namespace Oro\Bundle\SearchBundle\Transformer;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * Transforms entities into reindexing messages for asynchronous processing.
+ *
+ * This transformer converts entity objects into message arrays suitable for
+ * asynchronous message queue processing. It batches entity IDs by class into
+ * chunks to optimize message processing and reduce the number of messages
+ * required for large-scale reindexing operations.
+ */
 class MessageTransformer implements MessageTransformerInterface
 {
     /**

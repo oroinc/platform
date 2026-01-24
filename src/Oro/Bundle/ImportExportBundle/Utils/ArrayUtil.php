@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Utils;
 
+/**
+ * Utility class for array manipulation operations.
+ *
+ * This class provides static helper methods for processing arrays, particularly
+ * for filtering out empty sub-arrays while preserving the structure of the array.
+ * It is used during import/export data processing to clean up and normalize data.
+ */
 class ArrayUtil
 {
     /**

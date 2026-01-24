@@ -4,6 +4,13 @@ namespace Oro\Bundle\SoapBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched after a single entity is found via the SOAP API.
+ *
+ * This event allows listeners to perform post-processing on the retrieved entity,
+ * such as applying additional transformations, validations, or side effects after
+ * the entity has been fetched from the database.
+ */
 class FindAfter extends Event
 {
     const NAME = 'oro_api.request.find.after';

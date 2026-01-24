@@ -6,6 +6,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers duplicator filter services with the duplicator filter factory.
+ *
+ * This compiler pass collects all services tagged with `oro_action.duplicate.filter_type`
+ * and registers them with the duplicator filter factory for entity duplication operations.
+ */
 class DuplicatorFilterPass implements CompilerPassInterface
 {
     const TAG_NAME = 'oro_action.duplicate.filter_type';

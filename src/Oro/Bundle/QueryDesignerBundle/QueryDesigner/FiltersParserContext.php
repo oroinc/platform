@@ -4,6 +4,16 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
 
+/**
+ * Maintains parsing state and validation context for filter expression parsing.
+ *
+ * This class tracks the state of the filter parser as it processes filter definitions,
+ * maintaining information about the last token encountered, its type, and position.
+ * It provides validation methods to ensure filter syntax correctness by checking
+ * valid token sequences (e.g., operators can only follow filters or closing groups).
+ * The class enforces proper filter structure rules and provides detailed error messages
+ * when syntax violations are detected, making it essential for robust filter parsing.
+ */
 class FiltersParserContext
 {
     const NONE_TOKEN        = 0;

@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider;
 
+/**
+ * Aggregates multiple average time providers for feature execution time estimation.
+ *
+ * This registry delegates average time lookups to registered providers, falling back to an overall average
+ * when no provider can supply a specific time estimate.
+ * It is used to combine different time estimation strategies for Behat test scheduling.
+ */
 final class FeatureAvgTimeRegistry implements AvgTimeProviderInterface
 {
     /**

@@ -7,6 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for the {@see WorkflowAwareEntity}.
+ *
+ * This form type provides a simple form for creating and editing workflow-aware test entities,
+ * with a name field and proper data class configuration.
+ */
 class WorkflowAwareEntityType extends AbstractType
 {
     const NAME = 'oro_test_workflow_aware_entity_type';

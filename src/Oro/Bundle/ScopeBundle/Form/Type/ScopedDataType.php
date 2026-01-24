@@ -14,6 +14,16 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing data across multiple scopes.
+ *
+ * This form type enables the creation of scope-specific data forms where different data
+ * can be configured for each scope. It dynamically creates nested forms for each scope,
+ * allowing users to input scope-specific values. The type handles both preloaded scopes
+ * and dynamically added scopes through form events, validating that only allowed scopes
+ * are used. This is useful for configuration systems where different settings apply to
+ * different scopes (e.g., website-specific or organization-specific settings).
+ */
 class ScopedDataType extends AbstractType
 {
     const NAME = 'oro_scoped_data_type';

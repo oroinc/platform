@@ -18,6 +18,15 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Builds form fields for selecting and merging individual entity fields.
+ *
+ * Renders a form type that allows users to select which source entity's value to use
+ * for a specific field during a merge operation. For fields with multiple merge modes,
+ * it provides a dropdown to choose between strategies (e.g., `REPLACE` or `UNITE` for collections).
+ * The form displays radio buttons for entity selection and automatically defaults to the
+ * master entity if no source entity is selected.
+ */
 class MergeFieldType extends AbstractType
 {
     /**

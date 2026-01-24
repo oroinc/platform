@@ -5,6 +5,12 @@ namespace Oro\Component\Layout\ExpressionLanguage\Encoder;
 use Oro\Component\Layout\Action;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
+/**
+ * Defines the contract for encoding parsed expressions and actions into string representations.
+ *
+ * Implementations of this interface provide format-specific encoding of Symfony expression language
+ * expressions and layout actions, allowing expressions to be serialized and transmitted in various formats.
+ */
 interface ExpressionEncoderInterface
 {
     /**

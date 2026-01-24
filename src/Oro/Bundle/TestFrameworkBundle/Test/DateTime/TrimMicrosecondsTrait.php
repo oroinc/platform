@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DateTime;
 
+/**
+ * Provides functionality to trim microseconds from {@see \DateTime} objects for database comparison.
+ *
+ * This trait helps normalize {@see \DateTime} objects to match database datetime format (without microseconds),
+ * which is useful for comparing dynamically created DateTime objects with database values in tests.
+ */
 trait TrimMicrosecondsTrait
 {
     /**

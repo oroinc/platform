@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Routing;
 
+/**
+ * Encapsulates route information including the route name and its parameters.
+ *
+ * This data object holds the route identifier and associated parameters,
+ * providing a simple container for passing route information throughout
+ * the application.
+ */
 class RouteData
 {
     /**

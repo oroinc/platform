@@ -7,6 +7,14 @@ use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Filters widget data by owner criteria based on widget configuration.
+ *
+ * This filter applies owner-based restrictions to widget query builders, limiting
+ * the displayed data to records owned by specific users or business units as configured
+ * in the widget options. It uses optimized `IN` queries to efficiently filter large datasets
+ * while respecting the ownership hierarchy and user permissions.
+ */
 class OwnersWidgetProviderFilter implements WidgetProviderFilterInterface
 {
     /** @var OwnerHelper */

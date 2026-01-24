@@ -5,6 +5,15 @@ namespace Oro\Bundle\CacheBundle\Action\Handler;
 use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 
+/**
+ * Builds command-line arguments for scheduled cache invalidation commands.
+ *
+ * This class extracts cache invalidation parameters from a {@see DataStorageInterface} instance,
+ * filters out internal scheduling parameters (such as invalidation time and handler service name),
+ * and formats the remaining parameters as command-line arguments. The resulting arguments
+ * can be passed to the {@see InvalidateCacheScheduleCommand} for execution in a scheduled context,
+ * enabling asynchronous cache invalidation operations.
+ */
 class InvalidateCacheScheduleArgumentsBuilder implements InvalidateCacheScheduleArgumentsBuilderInterface
 {
     /**

@@ -10,6 +10,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Form type for filtering activity lists by activity type and presence.
+ *
+ * This form type extends the base {@see FilterType} to provide filtering capabilities for activity lists.
+ * It allows users to filter entities based on whether they have or do not have specific activities
+ * of a given type. The form includes fields for specifying the entity class, activity field name,
+ * activity type, and the filter type (has activity or has not activity). CSRF protection is disabled
+ * to allow filtering operations without token validation.
+ */
 class ActivityListFilterType extends AbstractType
 {
     const NAME = 'oro_type_activity_list_filter';

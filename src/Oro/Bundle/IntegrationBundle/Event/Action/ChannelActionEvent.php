@@ -7,6 +7,13 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Provides common functionality for integration channel action events.
+ *
+ * This base class encapsulates an integration channel and provides error collection functionality
+ * for events related to channel operations. Subclasses should extend this to create specific
+ * channel action events (e.g., enable, disable, synchronize).
+ */
 abstract class ChannelActionEvent extends Event
 {
     const NAME = '';

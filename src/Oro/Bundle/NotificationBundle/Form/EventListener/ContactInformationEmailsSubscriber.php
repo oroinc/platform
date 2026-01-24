@@ -10,6 +10,15 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Form event subscriber that populates email field choices for email notifications.
+ *
+ * This subscriber listens to form pre-set-data and pre-submit events to dynamically
+ * populate the list of available email fields for a selected entity. It queries the
+ * entity configuration to discover all email contact information fields and adds them
+ * as choices to the entityEmails field in the recipientList form section. This allows
+ * administrators to select which entity email fields should receive notifications.
+ */
 class ContactInformationEmailsSubscriber implements EventSubscriberInterface
 {
     /**

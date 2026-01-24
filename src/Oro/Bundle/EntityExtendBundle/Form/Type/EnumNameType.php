@@ -15,6 +15,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * Form type for configuring enum field names.
+ *
+ * This form type handles the input and validation of enum field names. For new enums,
+ * it applies strict validation rules including length limits, character restrictions,
+ * and uniqueness checks. For existing enums, it applies more lenient validation to allow
+ * label changes while preventing code modifications. The form type automatically determines
+ * whether a field is read-only based on whether it reuses an existing public enum.
+ */
 class EnumNameType extends AbstractType
 {
     const INVALID_NAME_MESSAGE =

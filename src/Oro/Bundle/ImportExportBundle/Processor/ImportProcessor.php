@@ -11,7 +11,11 @@ use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
 /**
- * Processes given data by applying a data converter, serializer and an import strategy.
+ * Processes import data by converting, denormalizing, and applying import strategies.
+ *
+ * This processor coordinates the import pipeline: it converts raw data to import format using a data converter,
+ * denormalizes it to entity objects using the serializer, then applies an import strategy for validation, merging,
+ * and persistence logic. It handles errors and tracks row numbers for detailed error reporting.
  */
 class ImportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
 {

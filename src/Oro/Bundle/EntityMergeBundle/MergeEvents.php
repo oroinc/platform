@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle;
 
+/**
+ * Defines event names for entity merge lifecycle operations.
+ */
 final class MergeEvents
 {
     /**

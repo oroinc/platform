@@ -5,6 +5,13 @@ namespace Oro\Bundle\IntegrationBundle\Event;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched when loading integration themes for a form.
+ *
+ * This event allows listeners to register additional themes that should be available
+ * for integration configuration forms. Listeners can add custom themes to the event,
+ * which will be made available to the form view for rendering.
+ */
 class LoadIntegrationThemesEvent extends Event
 {
     const NAME = 'oro_integration.load_integration_themes';

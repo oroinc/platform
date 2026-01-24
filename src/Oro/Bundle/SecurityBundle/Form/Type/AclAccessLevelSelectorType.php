@@ -10,6 +10,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting ACL access levels.
+ *
+ * This form type extends the choice type to provide a specialized selector for
+ * ACL access levels. It displays available access level options and includes
+ * additional context information about the privilege identity and level label.
+ */
 class AclAccessLevelSelectorType extends AbstractType
 {
     const NAME = 'oro_acl_access_level_selector';

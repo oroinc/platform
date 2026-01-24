@@ -7,6 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides datagrid information for multiple entities.
+ *
+ * This provider retrieves and filters datagrid configurations for multiple entity classes,
+ * respecting ACL permissions and entity configuration. It's used for features that need to
+ * display or select from available datagrids across different entity types.
+ */
 class MultiGridProvider
 {
     /** @var AuthorizationCheckerInterface */

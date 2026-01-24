@@ -6,6 +6,13 @@ use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * API form type for tag entities with PATCH request support.
+ *
+ * This form type extends the standard {@see TagType} to provide API-specific functionality, including support
+ * for partial updates via PATCH requests. It disables CSRF protection for API contexts and configures
+ * the form to work with the Tag entity class.
+ */
 class TagApiType extends TagType
 {
     #[\Override]

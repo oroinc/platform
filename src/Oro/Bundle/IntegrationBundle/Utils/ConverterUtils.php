@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Utils;
 
+/**
+ * Provides utility methods for converting data structures.
+ *
+ * This utility class offers static methods for converting between different data types,
+ * particularly for converting stdClass objects to arrays recursively. This is useful
+ * when working with data from external APIs or JSON responses that need to be converted
+ * to native PHP arrays for processing.
+ */
 class ConverterUtils
 {
     /**

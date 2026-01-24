@@ -7,6 +7,12 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
+/**
+ * API entity manager for datagrid views.
+ *
+ * This manager extends the base API entity manager with datagrid view-specific operations,
+ * including setting default views for users and retrieving views by various criteria.
+ */
 class GridViewApiEntityManager extends ApiEntityManager
 {
     /** @var GridViewManager */

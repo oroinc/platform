@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+/**
+ * Registry for caching and retrieving entity merge metadata.
+ *
+ * This class manages the caching of {@see EntityMetadata} objects for entity classes, using
+ * a {@see MetadataBuilder} to construct metadata on-demand for classes that have not yet been
+ * loaded. It provides a single point of access for retrieving merge metadata throughout
+ * the merge process, improving performance by avoiding redundant metadata construction.
+ */
 class MetadataRegistry
 {
     /**

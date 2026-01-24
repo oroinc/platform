@@ -18,6 +18,13 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for entity field fallback values.
+ *
+ * This form type manages fields that support fallback values, allowing users to either
+ * set a specific value or use a fallback value from a parent entity or system configuration.
+ * It dynamically builds form fields based on the fallback configuration and value type.
+ */
 class EntityFieldFallbackValueType extends AbstractType
 {
     const NAME = 'oro_entity_fallback_value';

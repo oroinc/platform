@@ -4,6 +4,12 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
 
+/**
+ * Provides a list of all Doctrine-managed entity class names.
+ *
+ * This provider queries all configured Doctrine object managers and returns
+ * a complete list of entity class names, excluding mapped superclasses.
+ */
 class OrmEntityClassProvider implements EntityClassProviderInterface
 {
     /** @var DoctrineHelper */

@@ -6,6 +6,14 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting a localization with autocomplete and inline creation.
+ *
+ * This form type provides an entity select field with autocomplete functionality
+ * for choosing a localization. It supports inline creation of new localizations
+ * through a dedicated form route, allowing users to quickly add new localization
+ * options without leaving the current form.
+ */
 class LocalizationSelectType extends AbstractType
 {
     const NAME = 'oro_locale_localization_select';

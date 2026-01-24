@@ -5,6 +5,14 @@ namespace Oro\Bundle\CurrencyBundle\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Transforms multi-currency field references in Doctrine query builders.
+ *
+ * This transformer converts references to multi-currency fields into the appropriate
+ * database column references for the value component. It handles the mapping from
+ * the logical field name to the physical `Value` column, enabling queries to work
+ * seamlessly with multi-currency data structures.
+ */
 class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformerInterface
 {
     #[\Override]

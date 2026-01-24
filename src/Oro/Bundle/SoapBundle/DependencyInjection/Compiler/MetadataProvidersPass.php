@@ -6,6 +6,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Compiler pass that registers metadata providers in the dependency injection container.
+ *
+ * Collects all services tagged with `oro_soap.metadata_provider` and adds them to the
+ * chain metadata provider service, enabling extensible metadata retrieval for API objects.
+ */
 class MetadataProvidersPass implements CompilerPassInterface
 {
     const TAG_NAME = 'oro_soap.metadata_provider';

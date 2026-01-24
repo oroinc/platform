@@ -6,12 +6,12 @@ use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
 /**
- * Class Manager
+ * Manages datagrid creation and configuration.
  *
- * @package Oro\Bundle\DataGridBundle\Datagrid
- *
- * Responsibility of this class is to store raw config data, prepare configs for datagrid builder.
- * Public interface returns datagrid object prepared by builder using config
+ * This class is responsible for retrieving datagrid configurations, building datagrid instances using the builder,
+ * and handling grid naming strategies including scopes. It serves as the main entry point for creating datagrids
+ * from configuration and request parameters, coordinating between configuration providers, builders,
+ * and parameter factories.
  */
 class Manager implements ManagerInterface
 {

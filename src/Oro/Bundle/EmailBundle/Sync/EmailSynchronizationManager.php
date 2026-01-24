@@ -5,6 +5,12 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Manages email synchronization operations across mailboxes.
+ *
+ * Orchestrates the synchronization of emails from external email servers, coordinating
+ * synchronizers, handling errors, and managing the overall synchronization workflow.
+ */
 class EmailSynchronizationManager
 {
     /**

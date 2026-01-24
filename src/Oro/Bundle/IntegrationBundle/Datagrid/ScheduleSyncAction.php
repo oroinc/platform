@@ -4,6 +4,12 @@ namespace Oro\Bundle\IntegrationBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxAction;
 
+/**
+ * Provides a custom datagrid action for scheduling synchronization of integration channels.
+ *
+ * This action extends the standard AJAX action and configures it with a custom frontend type
+ * to enable the schedule-sync functionality in the datagrid UI.
+ */
 class ScheduleSyncAction extends AjaxAction
 {
     /**

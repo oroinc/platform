@@ -7,6 +7,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched after executing an ORM query in a datagrid datasource.
+ *
+ * This event allows listeners to modify or process the result records after the query has been
+ * executed but before the results are returned to the datagrid. This is useful for post-processing
+ * data, adding computed fields, or filtering results based on business logic.
+ */
 class OrmResultAfter extends Event implements GridEventInterface
 {
     const NAME = 'oro_datagrid.orm_datasource.result.after';

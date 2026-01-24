@@ -4,6 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
+/**
+ * Handles workflow variable configuration normalization.
+ *
+ * Processes variable definitions from workflow configurations, ensuring each variable has a unique name
+ * and a defined value. Variables are used to store and manage state data throughout workflow execution.
+ * This handler normalizes variable configurations by generating unique identifiers for unnamed variables
+ * and initializing default values. It prepares variable definitions for use by the workflow engine.
+ */
 class VariableHandler extends AbstractHandler
 {
     #[\Override]

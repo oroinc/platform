@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
+/**
+ * Converts ICU date/time formats to PHP date format.
+ *
+ * This converter transforms date and time format strings from the ICU (International Components
+ * for Unicode) standard to PHP's native date format as used by the date() function. It maintains
+ * a comprehensive mapping of ICU format tokens to their PHP equivalents, supporting various
+ * date, time, timezone, and locale-specific formatting options.
+ */
 class PhpDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
     const NAME = 'php';

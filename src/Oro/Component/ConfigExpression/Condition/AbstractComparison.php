@@ -6,6 +6,14 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
 
+/**
+ * Provides common functionality for comparison conditions.
+ *
+ * This base class handles binary comparison operations between left and right operands, providing initialization,
+ * validation, and compilation support.
+ * Subclasses should implement the `isConditionAllowed` method to define the specific comparison logic
+ * (e.g., equals, greater than).
+ */
 abstract class AbstractComparison extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;

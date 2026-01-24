@@ -7,6 +7,13 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerVerifierInterface;
 
+/**
+ * Assembles transition event triggers from configuration options.
+ *
+ * This assembler creates {@see TransitionEventTrigger} instances from configuration arrays containing
+ * event specifications. It verifies the trigger configuration using an event trigger verifier
+ * and supports optional entity class, field, relation, and requirement specifications.
+ */
 class TransitionEventTriggerAssembler extends AbstractTransitionTriggerAssembler
 {
     /** @var TransitionEventTriggerVerifierInterface */

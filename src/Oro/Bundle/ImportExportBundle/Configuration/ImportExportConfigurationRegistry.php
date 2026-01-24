@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Configuration;
 
+/**
+ * Manages a registry of import/export configurations.
+ *
+ * This class stores and retrieves configurations that have been registered via configuration
+ * providers. It maintains configurations organized by alias, allowing efficient lookup of all
+ * configurations associated with a specific alias. This is typically used during dependency
+ * injection compilation to aggregate configurations from multiple providers.
+ */
 class ImportExportConfigurationRegistry implements ImportExportConfigurationRegistryInterface
 {
     /**

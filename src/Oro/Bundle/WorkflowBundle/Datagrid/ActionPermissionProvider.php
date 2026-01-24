@@ -7,6 +7,13 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 
+/**
+ * Provides permission information for workflow-related datagrid actions.
+ *
+ * This provider determines which actions (activate, deactivate, clone, delete, update, view)
+ * are permitted for workflow definitions based on feature toggles, configuration validity,
+ * and workflow state.
+ */
 class ActionPermissionProvider
 {
     /** @var FeatureChecker */

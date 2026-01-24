@@ -6,6 +6,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Compiler pass that registers import/export configuration providers with the registry.
+ *
+ * This pass collects all services tagged with `oro_importexport.configuration`,
+ * extracts their alias from the tag, and registers them with the configuration registry
+ * service. This allows the system to discover and aggregate configurations from multiple
+ * providers during the dependency injection compilation phase.
+ */
 class ImportExportConfigurationRegistryCompilerPass implements CompilerPassInterface
 {
     /**

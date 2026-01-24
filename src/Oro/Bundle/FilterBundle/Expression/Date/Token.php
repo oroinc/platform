@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\FilterBundle\Expression\Date;
 
+/**
+ * Represents a token in a date expression.
+ *
+ * This class encapsulates a single token parsed from a date expression string,
+ * including its type (operator, integer, variable, punctuation, time, date, or day-month),
+ * its value, and an optional string representation. Tokens are used by the date expression
+ * lexer and parser to break down and analyze date filter expressions.
+ */
 class Token
 {
     const TYPE_OPERATOR    = 'TYPE_OPERATOR';

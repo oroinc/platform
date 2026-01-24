@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+/**
+ * Defines the contract for providing virtual entity relations.
+ *
+ * Implementations of this interface supply information about virtual relations
+ * (computed or derived relations) that are not directly mapped in the database
+ * but are available on entities.
+ */
 interface VirtualRelationProviderInterface
 {
     /**

@@ -9,6 +9,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Handles form submission and persistence of page state data.
+ *
+ * This handler processes page state forms submitted via POST or PUT requests. It manages the association
+ * of page state data with the current user and persists the state to the database. Page state represents
+ * the user's UI preferences and layout configuration for specific pages, enabling personalized user experiences.
+ */
 class PageStateHandler
 {
     use RequestHandlerTrait;

@@ -4,6 +4,14 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 
+/**
+ * Encapsulates email message content with encoding and transfer encoding information.
+ *
+ * This class represents the body content of an email message along with its metadata,
+ * including content type, character encoding, and content transfer encoding. It provides
+ * methods to retrieve both raw and decoded content, automatically handling character set
+ * conversion and transfer encoding decoding for proper display and processing.
+ */
 class Content
 {
     /**

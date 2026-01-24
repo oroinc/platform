@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
+/**
+ * Resolves fixture identifiers from fixture objects and strings.
+ *
+ * This resolver converts fixture objects to their class names and passes through
+ * string identifiers unchanged, providing a simple identification strategy.
+ */
 class FixtureIdentifierResolver implements FixtureIdentifierResolverInterface
 {
     #[\Override]

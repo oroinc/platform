@@ -6,6 +6,12 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * Provides workflow definition choices grouped by exclusive active and record groups.
+ *
+ * This provider retrieves workflow definitions and organizes them into choice groups
+ * for use in forms and UI components.
+ */
 class WorkflowDefinitionChoicesGroupProvider
 {
     /** @var ManagerRegistry */

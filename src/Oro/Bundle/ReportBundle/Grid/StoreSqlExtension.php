@@ -9,6 +9,16 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Extends datagrid functionality to capture and display executed SQL queries for authorized users.
+ *
+ * This extension enables SQL query visibility in datagrids when the `display_sql_query` parameter
+ * is enabled and the current user has the `oro_report_view_sql` permission. It works in conjunction
+ * with {@see StoreSqlListener} to capture the executed SQL and its parameters, then makes this information
+ * available in the datagrid metadata. This is particularly useful for debugging, auditing, and
+ * understanding the actual queries being executed by the report system. The extension only applies
+ * to ORM-based datagrids and requires an authenticated user.
+ */
 class StoreSqlExtension extends AbstractExtension
 {
     const DISPLAY_SQL_QUERY  = 'display_sql_query';

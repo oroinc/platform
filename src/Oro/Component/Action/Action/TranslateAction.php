@@ -9,6 +9,13 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Translates a message using the Symfony translation service and stores the result.
+ *
+ * This action translates a message ID using the configured translator, supporting optional
+ * translation parameters, domain specification, and locale override. The translated message
+ * is stored in a specified context attribute for use by subsequent actions.
+ */
 class TranslateAction extends AbstractAction
 {
     const OPTION_KEY_ATTRIBUTE  = 'attribute';

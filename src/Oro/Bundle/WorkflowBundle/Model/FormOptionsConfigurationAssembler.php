@@ -8,6 +8,12 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Symfony\Component\Form\FormRegistryInterface;
 
+/**
+ * Assembles and validates form configuration for workflow transitions.
+ *
+ * This assembler processes transition form configuration, validates form types and handlers,
+ * and prepares form options for use in workflow transition forms.
+ */
 class FormOptionsConfigurationAssembler
 {
     /** @var FormRegistryInterface */

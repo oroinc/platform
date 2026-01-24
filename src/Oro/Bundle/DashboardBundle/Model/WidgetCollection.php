@@ -7,6 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 
+/**
+ * Lazy-loading collection of visible widget models for a dashboard.
+ *
+ * This collection extends Doctrine's {@see AbstractLazyCollection} to provide on-demand loading
+ * of widget models. It filters the dashboard's widgets to include only those that are
+ * visible to the current user based on permissions and configuration, creating widget
+ * models through the factory only when the collection is actually accessed. This approach
+ * optimizes performance by avoiding unnecessary widget model creation.
+ */
 class WidgetCollection extends AbstractLazyCollection
 {
     /**

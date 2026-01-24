@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor;
 
+/**
+ * Defines the contract for entity API field handlers.
+ *
+ * Implementations of this interface handle the lifecycle of entity field updates
+ * through the API, providing hooks for pre-processing, validation, post-processing,
+ * and error handling. Each handler is responsible for a specific entity class.
+ */
 interface EntityApiHandlerInterface
 {
     /**

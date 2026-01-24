@@ -6,6 +6,15 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDec
 use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides access to system configuration definitions and data transformers.
+ *
+ * This class acts as a container for the parsed system configuration structure,
+ * including field definitions, tree definitions, and group definitions. It also
+ * manages the retrieval of data transformers for specific configuration fields.
+ * The configuration data is typically loaded from YAML files and processed by
+ * the SystemConfiguration processor.
+ */
 class ConfigBag
 {
     /** @var array */

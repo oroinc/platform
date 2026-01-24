@@ -5,6 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 
+/**
+ * Defines the contract for datagrid managers.
+ *
+ * The datagrid manager is responsible for creating and configuring datagrid instances based on
+ * their configuration. It serves as the main entry point for obtaining datagrid objects, handling
+ * parameter initialization, and managing datagrid scopes.
+ */
 interface ManagerInterface
 {
     /**

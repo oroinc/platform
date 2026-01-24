@@ -7,6 +7,13 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
+/**
+ * Accessor for handling tag operations during entity merge processes.
+ *
+ * This accessor implements the merge functionality for tags on taggable entities. It provides methods to check
+ * if an entity supports tag merging, retrieve tags from a source entity, and set merged tags on a destination entity.
+ * It integrates with the entity merge bundle to ensure tags are properly handled when merging entities.
+ */
 class TagMergeAccessor implements AccessorInterface
 {
     /** @var TagManager */

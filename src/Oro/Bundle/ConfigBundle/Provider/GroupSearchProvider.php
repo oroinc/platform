@@ -6,6 +6,14 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides searchable data for system configuration groups.
+ *
+ * Implements the {@see SearchProviderInterface} to extract and return searchable content
+ * from configuration group definitions. This includes group titles which are translated
+ * to the current locale. The provider is used by the configuration search functionality
+ * to enable users to find configuration groups by their titles.
+ */
 class GroupSearchProvider implements SearchProviderInterface
 {
     /** @var ConfigBag */

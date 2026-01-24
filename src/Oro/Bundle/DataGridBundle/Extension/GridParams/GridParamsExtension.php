@@ -7,7 +7,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
 /**
- * @TODO: should be refactored in BAP-6849
+ * Adds grid parameters to datagrid metadata.
+ *
+ * This extension extracts scalar parameters from the parameter bag and includes them in the
+ * datagrid metadata, making them available to frontend components for URL generation and
+ * state management.
  */
 class GridParamsExtension extends AbstractExtension
 {

@@ -4,6 +4,14 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
+/**
+ * Creates the migration tracking table in the database.
+ *
+ * This migration creates the `oro_migrations` table that is used to track which migrations
+ * have been applied to each bundle. The table stores the bundle name, migration version,
+ * and the timestamp when the migration was loaded. This is a core migration that is
+ * executed first to initialize the migration tracking system.
+ */
 class CreateMigrationTableMigration implements Migration
 {
     const MIGRATION_TABLE = 'oro_migrations';

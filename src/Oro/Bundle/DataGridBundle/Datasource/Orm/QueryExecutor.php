@@ -6,7 +6,12 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
 /**
- * The default implementation of QueryExecutorInterface.
+ * Executes ORM queries with support for materialized view output result modification.
+ *
+ * This class provides the default implementation of {@see QueryExecutorInterface}, handling the execution
+ * of Doctrine ORM queries with special support for materialized views. It manages parameter clearing
+ * and mapping synchronization to prevent parameter count mismatches when using materialized views,
+ * which is necessary to avoid {@see QueryException} errors during export operations.
  */
 class QueryExecutor implements QueryExecutorInterface
 {

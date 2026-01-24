@@ -4,6 +4,14 @@ namespace Oro\Bundle\EntityMergeBundle\Model\Step;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
+/**
+ * Sorts merge steps based on their dependencies using topological sorting.
+ *
+ * Analyzes the dependency graph of merge steps and returns them in the correct execution order.
+ * Uses a topological sort algorithm to ensure that all dependencies of a step are executed before
+ * the step itself. Throws an exception if circular dependencies are detected or if a declared
+ * dependency cannot be resolved.
+ */
 class StepSorter
 {
     /**

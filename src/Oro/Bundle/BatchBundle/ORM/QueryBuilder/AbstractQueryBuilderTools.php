@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
+/**
+ * Provides common functionality for analyzing and manipulating query builder structures.
+ *
+ * This base class implements tools for extracting and managing field aliases and join table paths
+ * from DQL query parts. It provides infrastructure for query analysis and transformation needed during
+ * batch processing operations. Subclasses must implement the specific parsing logic for `SELECT` and `JOIN` clauses.
+ */
 abstract class AbstractQueryBuilderTools
 {
     /** @var array */

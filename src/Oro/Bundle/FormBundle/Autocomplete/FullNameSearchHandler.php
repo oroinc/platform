@@ -4,6 +4,11 @@ namespace Oro\Bundle\FormBundle\Autocomplete;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
+/**
+ * Autocomplete search handler that enriches results with entity full names.
+ *
+ * Adds formatted full name information to search results using {@see EntityNameResolver}.
+ */
 class FullNameSearchHandler extends SearchHandler
 {
     /**

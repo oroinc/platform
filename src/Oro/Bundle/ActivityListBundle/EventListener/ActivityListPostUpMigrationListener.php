@@ -10,6 +10,14 @@ use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
+/**
+ * Handles post-migration events to set up activity list associations.
+ *
+ * This listener is triggered after database migrations are completed and creates
+ * the necessary activity list associations for all target entities. It instantiates
+ * and executes the {@see ActivityListMigration} to ensure that activity list tables and
+ * relationships are properly configured for entities that support activity tracking.
+ */
 class ActivityListPostUpMigrationListener
 {
     /**  @var ActivityListChainProvider */

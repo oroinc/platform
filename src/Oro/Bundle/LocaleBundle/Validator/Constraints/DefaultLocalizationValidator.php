@@ -8,6 +8,16 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validator for the {@see DefaultLocalization} constraint.
+ *
+ * This validator checks that the selected default localization is included in
+ * the list of enabled localizations. It operates on localization configuration
+ * forms and ensures data consistency by preventing the selection of a default
+ * localization that is not enabled. If validation fails, it provides localized
+ * error messages indicating either that the localization is not enabled or that
+ * the localization ID is unknown.
+ */
 class DefaultLocalizationValidator extends ConstraintValidator
 {
     const ENABLED_LOCALIZATIONS_NAME = 'oro_locale___enabled_localizations';

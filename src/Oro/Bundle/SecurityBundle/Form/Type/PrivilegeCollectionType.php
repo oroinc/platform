@@ -8,6 +8,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing a collection of ACL privileges.
+ *
+ * This form type extends the standard collection type to provide specialized handling
+ * for ACL privilege collections, including passing privilege configuration and page
+ * component options to child forms for rendering access level selectors.
+ */
 class PrivilegeCollectionType extends AbstractType
 {
     const NAME = 'oro_acl_collection';

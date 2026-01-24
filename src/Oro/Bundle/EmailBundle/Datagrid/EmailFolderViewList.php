@@ -7,6 +7,12 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides predefined grid views for email folder filtering.
+ *
+ * Defines views for filtering emails by folder type (inbox, sent) and by mailbox,
+ * allowing users to quickly navigate and view emails organized by their storage location.
+ */
 class EmailFolderViewList extends AbstractViewsList
 {
     /**

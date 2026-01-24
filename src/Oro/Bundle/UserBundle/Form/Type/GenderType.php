@@ -7,6 +7,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting user gender.
+ *
+ * This form type provides a choice field for selecting gender values.
+ * It uses the {@see GenderProvider} to retrieve available gender options and displays
+ * them as a dropdown with a placeholder for no selection.
+ */
 class GenderType extends AbstractType
 {
     const NAME = 'oro_gender';

@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * Container for managing transition triggers associated with a workflow definition.
+ *
+ * This class encapsulates a collection of transition triggers for a specific workflow definition,
+ * providing a convenient way to access and manage all triggers related to that workflow.
+ */
 class TriggersBag
 {
     /**

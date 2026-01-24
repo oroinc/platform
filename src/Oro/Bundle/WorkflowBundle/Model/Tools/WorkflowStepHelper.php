@@ -10,6 +10,13 @@ use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Provides utility methods for navigating and analyzing workflow steps.
+ *
+ * This helper class offers functionality to determine step relationships within a workflow,
+ * including finding steps that come after a given step (with optional tree traversal) and
+ * retrieving the historical path of steps that a workflow item has traversed.
+ */
 class WorkflowStepHelper
 {
     /**

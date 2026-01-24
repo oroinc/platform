@@ -4,6 +4,13 @@ namespace Oro\Bundle\DataGridBundle\Extension\Action\Actions;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 
+/**
+ * Defines the contract for datagrid actions.
+ *
+ * Actions represent operations that can be performed on datagrid rows or the entire grid.
+ * Each action has a name, optional ACL resource for permission checking, and configuration
+ * options that control its behavior and appearance in the UI.
+ */
 interface ActionInterface
 {
     const ACL_KEY = 'acl_resource';

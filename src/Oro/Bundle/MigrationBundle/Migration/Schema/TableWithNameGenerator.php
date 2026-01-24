@@ -4,6 +4,13 @@ namespace Oro\Bundle\MigrationBundle\Migration\Schema;
 
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * Extends Table with automatic database identifier name generation.
+ *
+ * This class wraps the base {@see Table} class and automatically generates database-compliant names
+ * for indexes and foreign key constraints using a {@see DbIdentifierNameGenerator}. This ensures that
+ * generated names follow database naming conventions and avoid conflicts with reserved words.
+ */
 class TableWithNameGenerator extends Table
 {
     /**

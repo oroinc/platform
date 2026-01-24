@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Defines the contract for querying block type hierarchies and relationships.
+ *
+ * This helper provides methods to check type relationships, retrieve type hierarchies, and access
+ * the complete chain of parent types for a given block type.
+ */
 interface BlockTypeHelperInterface
 {
     /**

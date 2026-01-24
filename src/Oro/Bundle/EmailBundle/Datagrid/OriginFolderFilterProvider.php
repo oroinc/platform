@@ -8,6 +8,13 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Provides email origin and folder choices for filtering in datagrids.
+ *
+ * Retrieves available email origins and mailboxes for the current user and organization,
+ * and prepares them as choice lists for use in email folder filters, supporting both
+ * basic and extended folder information.
+ */
 class OriginFolderFilterProvider
 {
     /** @var TokenAccessorInterface */

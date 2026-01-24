@@ -4,6 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Event fired when restoring the test environment to its initial state.
+ *
+ * This event provides access to the output interface for logging restoration progress
+ * and status messages during the test isolation process.
+ */
 class RestoreStateEvent implements TestIsolationEvent
 {
     /**

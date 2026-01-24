@@ -4,6 +4,12 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
+/**
+ * Builds string option values by managing a delimited list of string values.
+ *
+ * This builder supports adding, removing, and replacing string values in a collection,
+ * with optional tokenization of values by a configurable delimiter.
+ */
 class StringOptionValueBuilder implements OptionValueBuilderInterface
 {
     /** @var string */

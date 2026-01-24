@@ -8,6 +8,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for taxonomy entities with color customization.
+ *
+ * This form type provides the standard form configuration for taxonomy entities, including a required name field
+ * and an optional background color picker. It supports custom colors and allows users to leave the color empty,
+ * providing visual customization options for taxonomy classification.
+ */
 class TaxonomyType extends AbstractType
 {
     #[\Override]

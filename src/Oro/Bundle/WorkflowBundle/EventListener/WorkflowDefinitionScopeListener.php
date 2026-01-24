@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 
+/**
+ * Listens to workflow definition changes to update workflow scopes.
+ *
+ * This listener responds to workflow activation, deactivation, creation, and update events
+ * to synchronize the workflow scope configuration with the scope manager.
+ */
 class WorkflowDefinitionScopeListener
 {
     /** @var WorkflowScopeManager */

@@ -25,15 +25,22 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 /**
- * Writes and reads values to/from an object/array graph.
+ * Provides unified property access for objects and arrays with extended entity support.
  *
- * This class is mostly a copy of {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
- * but it has the following advantages:
- * * allows using the same syntax of the property path for objects and arrays
- * * magic __get __set methods are always enabled to support ORO extended entities
- * * objects implementing \ArrayAccess are accessed as arrays, getter and setter methods are ignored
- * New features:
- * * 'remove' method is added to allow to remove items from arrays or objects
+ * This class extends Symfony's {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
+ * with Oro-specific enhancements for accessing and modifying object and array properties
+ * using a consistent dot-notation syntax.
+ *
+ * Key features:
+ * - Unified syntax for accessing properties in both objects and arrays
+ * - Always enables magic `__get` and `__set` methods to support Oro extended entities
+ * - Treats objects implementing {@see \ArrayAccess} as arrays, ignoring getter/setter methods
+ * - Provides a `remove` method to delete items from arrays or objects
+ * - Supports property path caching for improved performance
+ * - Handles reflection-based property access for extended entity properties
+ *
+ * This implementation is based on Symfony's {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
+ * but customized for Oro's extended entity system where entities can have dynamic properties and magic methods.
  *
  * @SuppressWarnings(PHPMD)
  */

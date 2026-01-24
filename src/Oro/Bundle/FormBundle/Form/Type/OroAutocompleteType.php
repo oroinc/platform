@@ -10,6 +10,13 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for autocomplete text input with dynamic search results.
+ *
+ * This type provides an autocomplete field that queries a search handler to retrieve
+ * matching results as the user types. It supports configurable search routes, aliases,
+ * pagination, and custom result formatting through templates and properties.
+ */
 class OroAutocompleteType extends AbstractType
 {
     const NAME = 'oro_autocomplete';

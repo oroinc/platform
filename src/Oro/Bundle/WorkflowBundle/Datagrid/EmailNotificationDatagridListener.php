@@ -13,6 +13,12 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Listens to email notification datagrid events to translate workflow and transition names.
+ *
+ * This listener processes datagrid results to translate workflow definition and transition names
+ * using the workflow translation system, providing human-readable labels in the datagrid.
+ */
 class EmailNotificationDatagridListener
 {
     /** @var TranslatorInterface */

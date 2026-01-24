@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Copies values from multiple sources into a target attribute.
+ *
+ * This action merges data from one or more source arrays or objects into a target attribute.
+ * It supports copying from both array and object sources, and can handle multiple data sources
+ * in a single execution. The target attribute can be either an array or an object.
+ */
 class CopyValues extends AbstractAction
 {
     /** @var PropertyPathInterface */

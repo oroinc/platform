@@ -11,6 +11,14 @@ use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provides search engine integration for datagrids.
+ *
+ * This datasource implementation bridges the DataGrid framework with the search engine,
+ * allowing datagrids to be populated with search results. It processes search query
+ * configurations, executes search queries, and dispatches events before and after
+ * result retrieval to allow customization of the search process and results.
+ */
 class SearchDatasource implements DatasourceInterface
 {
     const TYPE = 'search';

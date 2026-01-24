@@ -12,7 +12,11 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 
 /**
- * Basic export processor.
+ * Processes entities for export by normalizing and converting them to export format.
+ *
+ * This processor coordinates the export pipeline: it normalizes entities using the serializer,
+ * then optionally converts the normalized data to the final export format using a data converter.
+ * It supports context-aware and query builder-aware data converters for advanced export scenarios.
  */
 class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
 {

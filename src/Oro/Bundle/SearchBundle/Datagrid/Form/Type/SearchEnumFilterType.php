@@ -7,6 +7,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for filtering search results by enumeration fields.
+ *
+ * This form type extends the standard {@see EnumFilterType} to provide filtering
+ * capabilities for enumeration fields in search-based datagrids. It normalizes
+ * operator choices from the field options to ensure proper filtering behavior.
+ */
 class SearchEnumFilterType extends AbstractType
 {
     const NAME = 'oro_search_type_enum_filter';

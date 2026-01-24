@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Testing\Doctrine;
 
+/**
+ * Defines event constants for Doctrine-related testing scenarios.
+ *
+ * This class provides event names that are triggered during functional test
+ * execution, particularly for handling transaction rollback scenarios and
+ * cleanup of test fixtures.
+ */
 class Events
 {
     /**

@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+/**
+ * Defines the contract for event trigger entities.
+ *
+ * Event triggers are used to automatically initiate workflow transitions based on entity
+ * lifecycle events (create, update, delete) and field changes, enabling event-driven
+ * workflow automation.
+ */
 interface EventTriggerInterface
 {
     const EVENT_CREATE = 'create';

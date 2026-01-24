@@ -6,6 +6,12 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when a workflow start transition is being executed.
+ *
+ * This event allows listeners to react to the initiation of a new workflow instance,
+ * providing access to the workflow, transition, and route parameters for customization.
+ */
 class StartTransitionEvent extends Event
 {
     /** @var Transition */

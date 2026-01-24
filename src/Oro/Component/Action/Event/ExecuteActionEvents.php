@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Action\Event;
 
+/**
+ * Defines event names for action execution lifecycle.
+ *
+ * This class provides constants for events dispatched during action execution, allowing listeners
+ * to hook into the action lifecycle at specific points. Events are dispatched with {@see ExecuteActionEvent}
+ * instances containing the execution context and action details.
+ */
 class ExecuteActionEvents
 {
     /**

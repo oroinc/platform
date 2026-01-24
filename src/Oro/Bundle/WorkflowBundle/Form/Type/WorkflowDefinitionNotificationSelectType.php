@@ -10,6 +10,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting workflow definitions in notification configuration.
+ *
+ * This form type provides a filtered list of workflows applicable to a specific entity class,
+ * allowing users to select which workflows should trigger notifications.
+ */
 class WorkflowDefinitionNotificationSelectType extends AbstractType
 {
     const NAME = 'oro_workflow_definition_notification_select';

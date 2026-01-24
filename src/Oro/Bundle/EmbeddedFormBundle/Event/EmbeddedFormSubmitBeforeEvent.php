@@ -5,6 +5,14 @@ namespace Oro\Bundle\EmbeddedFormBundle\Event;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched before an embedded form is submitted.
+ *
+ * This event is triggered before form validation and submission processing begins.
+ * It provides access to the submitted data and the embedded form entity, allowing listeners
+ * to perform pre-submission actions such as data validation, transformation, or modification
+ * before the form is processed.
+ */
 class EmbeddedFormSubmitBeforeEvent extends Event
 {
     const EVENT_NAME = 'oro_embedded_form.form_submit.before';

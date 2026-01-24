@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+/**
+ * Utility for checking and retrieving accessor methods for entity properties.
+ *
+ * This class provides methods to find getter, setter, and relation-specific methods
+ * (like `add`, `remove`, `setDefault`) for a given property on a class. It uses reflection
+ * to check if methods exist and supports common naming conventions for property accessors.
+ */
 class ClassMethodNameChecker
 {
     public static $getters         = ['get', 'is', 'has'];

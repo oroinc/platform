@@ -7,6 +7,14 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Creates form instances for workflow transitions.
+ *
+ * This processor uses the Symfony form factory to create form instances based on the transition's
+ * form type configuration. It requires that form data and form options have been set in the context
+ * by previous processors. The created form is stored in the context for subsequent processing,
+ * such as rendering or handling form submissions.
+ */
 class FormFactoryProcessor implements ProcessorInterface
 {
     /** @var FormFactoryInterface */

@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\FilterBundle\Datasource;
 
+/**
+ * Composite builder for many-to-many filter expressions.
+ *
+ * This class acts as a composite pattern implementation that manages a collection of
+ * {@see ManyRelationBuilderInterface} implementations. It delegates the building of many-to-many
+ * filter expressions to the first builder that supports the given datasource adapter.
+ * This allows different datasource types (e.g., ORM, MongoDB) to be handled by their
+ * respective specialized builders.
+ */
 class ManyRelationBuilder
 {
     /** @var ManyRelationBuilderInterface[] */

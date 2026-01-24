@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActivityBundle\Event;
 
+/**
+ * Defines event names for activity association operations.
+ */
 final class Events
 {
     const ADD_ACTIVITY    = 'oro_activity.add_activity';

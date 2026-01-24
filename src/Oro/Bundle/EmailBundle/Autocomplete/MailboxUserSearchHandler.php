@@ -4,6 +4,11 @@ namespace Oro\Bundle\EmailBundle\Autocomplete;
 
 use Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler;
 
+/**
+ * Autocomplete search handler for mailbox users.
+ *
+ * Filters users by a specific organization and enabled status for mailbox assignment.
+ */
 class MailboxUserSearchHandler extends OrganizationUsersHandler
 {
     protected $organizationId = null;

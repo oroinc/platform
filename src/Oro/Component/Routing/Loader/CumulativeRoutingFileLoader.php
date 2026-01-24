@@ -5,6 +5,13 @@ namespace Oro\Component\Routing\Loader;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Loads routing definitions from cumulative resource files across all bundles.
+ *
+ * This loader discovers and loads routing configuration files from specified
+ * relative paths within each bundle, allowing for distributed route definitions
+ * across the application's bundle structure.
+ */
 class CumulativeRoutingFileLoader extends AbstractLoader
 {
     /** @var KernelInterface */

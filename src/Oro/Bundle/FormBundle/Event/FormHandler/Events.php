@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Event\FormHandler;
 
+/**
+ * Defines event names for form handler lifecycle operations.
+ */
 final class Events
 {
     /**

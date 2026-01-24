@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
+/**
+ * Represents date-based grouping configuration for query results.
+ *
+ * This class manages the configuration for grouping query results by date fields.
+ * It allows specifying which date field to group by and provides options to control
+ * filtering behavior, such as skipping empty periods and applying date group filters.
+ * This is essential for time-series analysis and date-based aggregations in reports.
+ */
 class DateGrouping
 {
     /**

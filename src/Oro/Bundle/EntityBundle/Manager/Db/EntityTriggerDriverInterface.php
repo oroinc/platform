@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Manager\Db;
 
+/**
+ * Defines the contract for database trigger drivers.
+ *
+ * Implementations of this interface provide database-specific methods to enable and disable
+ * triggers for entity tables. Each driver handles the specific SQL syntax required by
+ * its database platform (MySQL, PostgreSQL, etc.).
+ */
 interface EntityTriggerDriverInterface
 {
     /**

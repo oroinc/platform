@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Button;
 
+/**
+ * Represents a workflow transition button for executing transitions on existing workflow items.
+ *
+ * This button extends the base transition button functionality to provide template data
+ * specific to transitions on entities that already have an active workflow item.
+ */
 class TransitionButton extends AbstractTransitionButton
 {
     #[\Override]

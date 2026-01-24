@@ -12,6 +12,13 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * Configures process triggers by synchronizing trigger configurations with the database.
+ *
+ * This configurator manages the lifecycle of process triggers, including creation, update,
+ * and removal of triggers based on provided configurations. It also handles cron scheduling
+ * for time-based triggers and maintains a dirty flag to track changes requiring persistence.
+ */
 class ProcessTriggersConfigurator implements LoggerAwareInterface
 {
     /** @var LoggerInterface */

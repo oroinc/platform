@@ -8,6 +8,13 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provides common functionality for workflow and operation actions.
+ *
+ * This base class implements the core action execution flow including condition evaluation,
+ * event dispatching, and context access. Subclasses must implement the `executeAction` method
+ * to define the specific action logic.
+ */
 abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface
 {
     /**

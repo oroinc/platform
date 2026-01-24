@@ -13,6 +13,12 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Provides page data for workflow start transition rendering.
+ *
+ * This provider prepares data needed to display start transition pages, including
+ * workflow information, transition details, and route parameters.
+ */
 class StartTransitionPageDataProvider
 {
     /** @var WorkflowManager */

@@ -4,6 +4,14 @@ namespace Oro\Bundle\IntegrationBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched when an error occurs during import/export write operations.
+ *
+ * This event carries information about the batch items being processed, the job name,
+ * the exception that occurred, and any warning messages. Listeners can use this event
+ * to handle errors, log them, or determine whether the error can be skipped and processing
+ * should continue.
+ */
 class WriterErrorEvent extends Event
 {
     const NAME = 'oro_integration.writer_error';

@@ -8,6 +8,13 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Generates API documentation for dictionary entity routes.
+ *
+ * This handler automatically generates descriptions and documentation for API routes
+ * that retrieve dictionary entity values. It uses entity aliases and class names to
+ * create meaningful documentation for the API endpoints.
+ */
 class DictionaryEntityApiDocHandler implements HandlerInterface
 {
     const DESCRIPTION_TEMPLATE = 'Get {plural_name}';

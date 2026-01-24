@@ -4,6 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Provider;
 
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Provides documentation information for container service tags.
+ *
+ * This provider collects container tags and searches for their documentation in Oro source code,
+ * filtering tags based on inclusion/exclusion lists to focus on relevant Oro-specific tags.
+ */
 class ContainerTagsDocumentationInformationProvider
 {
     /**

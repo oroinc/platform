@@ -7,6 +7,12 @@ use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Provides a list of available mailboxes and email origins as choices for form fields.
+ *
+ * Retrieves mailboxes and origins available to the current user and organization,
+ * and formats them as a choice list suitable for use in dropdown fields and filters.
+ */
 class MailboxChoiceList
 {
     /** @var TokenAccessorInterface */

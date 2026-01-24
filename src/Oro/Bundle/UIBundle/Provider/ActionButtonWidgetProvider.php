@@ -4,6 +4,13 @@ namespace Oro\Bundle\UIBundle\Provider;
 
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 
+/**
+ * Provides action button widgets for entities.
+ *
+ * Retrieves button and link widgets from placeholders and assembles them into a structured
+ * widget format. Supports both button and optional link widgets, allowing flexible action
+ * button rendering with associated links.
+ */
 class ActionButtonWidgetProvider implements WidgetProviderInterface
 {
     /** @var PlaceholderProvider */

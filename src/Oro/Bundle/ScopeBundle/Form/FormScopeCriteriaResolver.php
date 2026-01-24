@@ -7,6 +7,15 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Resolver that extracts scope criteria from form configuration.
+ *
+ * This resolver examines form configuration options to determine the scope context and
+ * criteria. It can extract scope information from either a direct scope option or a
+ * context option, and recursively processes parent forms to build a complete scope
+ * context. The resolver uses the scope manager to convert scope information into
+ * ScopeCriteria objects that can be used for scope-aware queries and operations.
+ */
 class FormScopeCriteriaResolver
 {
     const SCOPE = 'scope';

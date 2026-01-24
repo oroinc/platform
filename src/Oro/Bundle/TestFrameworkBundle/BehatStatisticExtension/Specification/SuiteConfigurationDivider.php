@@ -5,6 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification;
 use Behat\Testwork\Suite\Suite;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
 
+/**
+ * Divides test suites into sets based on maximum execution time.
+ *
+ * This divider groups suites into sets such that each set's total execution time
+ * does not exceed a specified limit, enabling balanced parallel test execution based
+ * on historical execution time data.
+ */
 class SuiteConfigurationDivider implements SpecificationDividerInterface
 {
     /**

@@ -8,6 +8,14 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
+/**
+ * Reads template fixture data for export template generation.
+ *
+ * This reader retrieves template fixture entities from the template manager based on
+ * the entity name specified in the context. It provides sample data that represents
+ * the structure and format of entities, which is used to generate export templates
+ * that users can download and use as a reference for import files.
+ */
 class TemplateFixtureReader extends IteratorBasedReader
 {
     /**

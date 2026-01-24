@@ -6,6 +6,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Compiler pass that registers data readers with the reader chain service.
+ *
+ * This pass collects all services tagged with `oro_importexport.reader`,
+ * extracts their alias from the tag, and adds them to the reader chain.
+ * The reader chain uses these registered readers to determine which reader
+ * should handle a particular data source based on its alias.
+ */
 class ReaderCompilerPass implements CompilerPassInterface
 {
     #[\Override]

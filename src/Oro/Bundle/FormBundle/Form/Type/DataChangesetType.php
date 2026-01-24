@@ -9,6 +9,14 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for tracking changes to generic data structures.
+ *
+ * This type captures and represents changes to data by storing original and modified
+ * values in a changeset format. It uses data transformers to convert between array
+ * data and JSON representation, making it suitable for hidden fields that track
+ * data modifications.
+ */
 class DataChangesetType extends AbstractType
 {
     const NAME = 'oro_data_changeset';

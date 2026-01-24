@@ -7,6 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Form type for datagrid sorting configuration.
+ *
+ * This form type provides fields for configuring sorting in datagrids, including the field
+ * to sort by and the sort direction (ascending or descending).
+ */
 class GridSortingType extends AbstractType
 {
     #[\Override]

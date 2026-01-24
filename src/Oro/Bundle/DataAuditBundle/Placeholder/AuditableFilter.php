@@ -5,6 +5,14 @@ namespace Oro\Bundle\DataAuditBundle\Placeholder;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+/**
+ * Placeholder filter that determines whether an entity is auditable.
+ *
+ * This filter is used in placeholder templates to conditionally display audit-related UI elements
+ * (such as change history links or audit widgets) based on whether the entity has audit tracking
+ * enabled. It checks the entity's configuration to determine if the `auditable` flag is set,
+ * allowing the system to show or hide audit functionality dynamically based on entity configuration.
+ */
 class AuditableFilter
 {
     /** @var ConfigProvider */

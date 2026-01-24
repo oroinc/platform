@@ -8,6 +8,14 @@ use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Builds layout blocks for form fields in embedded forms.
+ *
+ * This builder traverses a form structure and creates layout blocks for each field,
+ * supporting both simple and compound form types. It respects preferred field ordering
+ * and can be extended to handle field grouping. The builder maintains state during the
+ * build process and provides hooks for customization through simple form type registration.
+ */
 class FormLayoutBuilder implements FormLayoutBuilderInterface
 {
     /** A char that separates fields within a path */

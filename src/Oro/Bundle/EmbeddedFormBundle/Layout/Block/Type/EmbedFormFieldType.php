@@ -9,6 +9,14 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Layout block type for rendering individual embedded form fields.
+ *
+ * This block type is responsible for rendering a single form field within an embedded form
+ * layout. It extracts the specified field from the form using a field path and renders it
+ * as a layout block. It also handles visibility logic, preventing `form_rest()` from rendering
+ * fields that are marked as invisible in the layout.
+ */
 class EmbedFormFieldType extends AbstractFormType
 {
     const NAME = 'embed_form_field';

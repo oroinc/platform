@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
+/**
+ * Defines the contract for accessing address information.
+ *
+ * This interface provides methods to retrieve various address components including street,
+ * city, region, postal code, country, and organization information. Implementations should
+ * provide access to both human-readable names and standardized codes (e.g., ISO codes for countries).
+ */
 interface AddressInterface
 {
     /**

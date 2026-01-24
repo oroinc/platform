@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\TemplateFixture;
 
+/**
+ * Defines the contract for template entity repositories.
+ *
+ * Implementations provide template fixture data for a specific entity class, including
+ * methods to retrieve entities by key and to populate entity data with all necessary
+ * field values and relationships. These repositories are used to generate export templates
+ * and validate import data structure.
+ */
 interface TemplateEntityRepositoryInterface
 {
     /**

@@ -7,6 +7,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
+/**
+ * Provides virtual tag relation support for taggable entities.
+ *
+ * This provider enables tags to be accessed as a virtual many-to-many relation on taggable
+ * entities, allowing tags to be queried and joined in ORM queries without explicit relation
+ * definitions. It integrates with the entity bundle's virtual relation system to provide
+ * seamless tag relation access and query building across the application.
+ */
 class TagVirtualRelationProvider implements VirtualRelationProviderInterface
 {
     const RELATION_NAME = 'tags_virtual';

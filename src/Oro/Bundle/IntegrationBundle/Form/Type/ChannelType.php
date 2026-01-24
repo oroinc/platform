@@ -12,6 +12,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Form type for creating and editing integration channels.
+ *
+ * This form type provides the complete interface for managing integration channels, including
+ * selection of integration type, transport type, enabled connectors, and default owner assignment.
+ * It uses event subscribers to dynamically populate transport and connector choices based on the
+ * selected integration type, and to manage the default owner field based on the integration type's
+ * ownership model.
+ */
 class ChannelType extends AbstractType
 {
     const NAME            = 'oro_integration_channel_form';

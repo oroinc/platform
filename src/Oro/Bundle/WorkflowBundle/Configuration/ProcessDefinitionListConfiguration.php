@@ -6,6 +6,13 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Defines the configuration structure for a list of process definitions.
+ *
+ * This configuration class validates and processes process definition configurations using
+ * Symfony's configuration definition system, delegating individual definition node definitions
+ * to {@see ProcessDefinitionConfiguration}.
+ */
 class ProcessDefinitionListConfiguration implements ConfigurationInterface
 {
     /**

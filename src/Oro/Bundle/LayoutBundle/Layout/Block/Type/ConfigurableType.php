@@ -5,6 +5,14 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 use Oro\Bundle\LayoutBundle\Layout\Block\OptionsConfigTrait;
 use Oro\Component\Layout\Block\Type\AbstractType;
 
+/**
+ * A dynamically configurable block type with runtime-defined name and parent.
+ *
+ * This block type allows the name and parent type to be set at runtime through
+ * setter methods, enabling programmatic creation of block types without requiring
+ * separate class definitions. It integrates with {@see OptionsConfigTrait} for automatic
+ * options handling.
+ */
 class ConfigurableType extends AbstractType
 {
     use OptionsConfigTrait;

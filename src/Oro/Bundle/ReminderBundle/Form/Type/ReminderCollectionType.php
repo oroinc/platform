@@ -6,6 +6,14 @@ use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing a collection of reminders.
+ *
+ * This form type provides a collection field for managing multiple reminder entities.
+ * It extends the Oro {@see CollectionType} and is configured to use {@see ReminderType} for each
+ * entry in the collection, allowing users to add, edit, and remove reminders from
+ * an entity that implements the {@see RemindableInterface}.
+ */
 class ReminderCollectionType extends AbstractType
 {
     #[\Override]

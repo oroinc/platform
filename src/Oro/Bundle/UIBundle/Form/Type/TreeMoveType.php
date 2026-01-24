@@ -9,6 +9,13 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for handling tree item move operations.
+ *
+ * Provides a form for moving tree items to a new target location within the tree hierarchy.
+ * Includes fields for selecting the target location and optionally creating a redirect
+ * when the item's slug changes due to the move operation.
+ */
 class TreeMoveType extends AbstractType
 {
     #[\Override]

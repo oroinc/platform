@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Provider;
 
+/**
+ * Defines the contract for user agent detection and analysis.
+ *
+ * Provides methods to retrieve the raw user agent string and determine device type
+ * (mobile vs. desktop) from the HTTP request headers.
+ */
 interface UserAgentInterface
 {
     /**

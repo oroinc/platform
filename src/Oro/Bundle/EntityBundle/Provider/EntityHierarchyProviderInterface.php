@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+/**
+ * Defines the contract for providing entity inheritance hierarchies.
+ *
+ * Implementations of this interface provide information about entity inheritance
+ * relationships, including parent entities and mapped superclasses for each entity.
+ */
 interface EntityHierarchyProviderInterface
 {
     /**

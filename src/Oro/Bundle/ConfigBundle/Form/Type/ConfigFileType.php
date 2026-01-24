@@ -10,6 +10,15 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for handling file uploads in system configuration.
+ *
+ * Extends the attachment bundle's {@see FileType} to provide specialized file handling for
+ * system configuration fields. This form type manages both file uploads and the ability
+ * to clear/delete files through an "emptyFile" hidden field. It applies a data transformer
+ * to convert between form data and configuration storage format, and supports configurable
+ * file constraints for validation.
+ */
 class ConfigFileType extends AbstractType
 {
     /**

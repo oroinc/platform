@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityBundle\Helper;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
+/**
+ * Helper for working with virtual entity relations.
+ *
+ * This helper analyzes virtual relations defined by the virtual relation provider
+ * and provides methods to determine if an entity has virtual relations and to get
+ * the metadata type for virtual joins between entities.
+ */
 class RelationHelper
 {
     /** @var VirtualRelationProviderInterface */

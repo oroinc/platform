@@ -9,6 +9,15 @@ use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Processes `@addTree` layout update actions into individual `@add` actions.
+ *
+ * This generator extension transforms the `@addTree` action, which allows defining
+ * a hierarchical tree of blocks with shared item definitions, into individual `@add`
+ * actions. It recursively processes the tree structure, matching each block ID with
+ * its corresponding item definition and generating proper `@add` actions with correct
+ * parent-child relationships.
+ */
 class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
     const NODE_ITEMS = 'items';

@@ -4,6 +4,12 @@ namespace Oro\Component\Action\Action;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * Removes a value from a context attribute by setting it to null.
+ *
+ * This action delegates to {@see AssignValue} to set a context attribute to null, effectively unsetting
+ * or clearing the value. It provides a semantic alternative to explicitly assigning null values.
+ */
 class UnsetValue extends AbstractAction
 {
     /**

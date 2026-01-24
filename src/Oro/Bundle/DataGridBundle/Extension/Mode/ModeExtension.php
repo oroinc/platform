@@ -6,6 +6,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
+/**
+ * Manages datagrid processing mode (server-side vs client-side).
+ *
+ * This extension configures whether datagrid operations like filtering, sorting, and pagination
+ * are performed on the server or client side. It adds mode information to the metadata for
+ * frontend components to handle accordingly.
+ */
 class ModeExtension extends AbstractExtension
 {
     const MODE_OPTION_PATH = '[options][mode]';

@@ -11,6 +11,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
+/**
+ * Form type for changing user passwords.
+ *
+ * This form type provides fields for password change operations, including
+ * current password verification and new password confirmation. It uses the
+ * {@see ChangePasswordSubscriber} to manage form field visibility and validation.
+ */
 class ChangePasswordType extends AbstractType
 {
     const NAME = 'oro_change_password';

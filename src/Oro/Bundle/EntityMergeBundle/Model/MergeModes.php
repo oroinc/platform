@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model;
 
+/**
+ * Defines available merge modes for entity merging operations.
+ */
 final class MergeModes
 {
     /**

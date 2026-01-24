@@ -11,6 +11,14 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Enhanced collection form type with advanced features.
+ *
+ * This type extends Symfony's {@see CollectionType} with additional functionality including
+ * primary item handling, configurable add/delete buttons, prototype management, and
+ * flexible row count options. It provides a more feature-rich interface for managing
+ * collections of form entries.
+ */
 class CollectionType extends AbstractType
 {
     const NAME = 'oro_collection';

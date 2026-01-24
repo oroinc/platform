@@ -6,6 +6,13 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Defines the configuration structure for a list of workflows.
+ *
+ * This configuration class validates and processes workflow configurations using Symfony's
+ * configuration definition system, delegating individual workflow node definitions to
+ * WorkflowConfiguration.
+ */
 class WorkflowListConfiguration implements ConfigurationInterface
 {
     const NODE_WORKFLOWS = 'workflows';

@@ -8,6 +8,13 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 
+/**
+ * Initializes Behat contexts with page and element factories.
+ *
+ * This initializer injects the {@see OroPageFactory} and {@see OroElementFactory} into any Behat context
+ * that implements {@see OroPageObjectAware}, enabling contexts to interact with page objects and
+ * UI elements during test execution.
+ */
 class OroPageObjectInitializer implements ContextInitializer
 {
     /**

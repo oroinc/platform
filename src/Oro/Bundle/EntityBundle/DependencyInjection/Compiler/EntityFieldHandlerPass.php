@@ -6,6 +6,13 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers entity field handlers in the dependency injection container.
+ *
+ * This compiler pass collects all services tagged with `oro_entity.form.entity_field.handler`
+ * and registers them with the entity field handler processor. It enables the system to process
+ * entity field updates using pluggable handlers.
+ */
 class EntityFieldHandlerPass implements CompilerPassInterface
 {
     const HANDLER_PROCESSOR_SERVICE = 'oro_entity.form.entity_field.handler.processor.handler_processor';

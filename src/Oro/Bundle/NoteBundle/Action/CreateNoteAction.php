@@ -10,6 +10,16 @@ use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
+/**
+ * Workflow action that creates a {@see Note} and associates it with a target entity.
+ *
+ * This action can be used in workflows and automation rules to programmatically create
+ * notes. It accepts a message, target entity, and optional attribute name for storing
+ * the created note. The action creates a new {@see Note} entity, sets its message and timestamp,
+ * associates it with the target entity through the activity manager, and persists it to
+ * the database. The created note can optionally be stored in a workflow context attribute
+ * for further processing.
+ */
 class CreateNoteAction extends AbstractAction
 {
     /** @var ManagerRegistry */

@@ -4,6 +4,13 @@ namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Oro\Component\Config\Common\ConfigObject;
 
+/**
+ * Container for datagrid results data.
+ *
+ * This class encapsulates the data returned by a datagrid, including the actual data rows
+ * and metadata such as total record count. It extends {@see ConfigObject} to provide flexible
+ * access to result properties using path-based accessors.
+ */
 class ResultsObject extends ConfigObject
 {
     /**

@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Checker;
 
+/**
+ * Provides feature checker storage and feature management functionality.
+ *
+ * This trait can be used by classes that need to store a {@see FeatureChecker} instance and
+ * manage a list of features to check. It provides methods to set the feature checker,
+ * add features to the list, and check if all registered features are enabled for a
+ * given scope. This is useful for classes that need to verify multiple feature flags
+ * before proceeding with certain operations.
+ */
 trait FeatureCheckerHolderTrait
 {
     /**

@@ -4,6 +4,14 @@ namespace Oro\Bundle\QueryDesignerBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Represents grouping configuration for query results.
+ *
+ * This class manages the set of columns by which query results should be grouped.
+ * Grouping is typically used in conjunction with aggregate functions to summarize
+ * data across multiple records. The class maintains a collection of column names
+ * that define the grouping criteria for the query.
+ */
 class Grouping
 {
     /**

@@ -9,6 +9,13 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Defines the configuration structure for individual process triggers.
+ *
+ * This configuration class validates and processes trigger configurations including event types,
+ * field names, priority levels, queuing options, and cron expressions using Symfony's
+ * configuration definition system.
+ */
 class ProcessTriggerConfiguration implements ConfigurationInterface
 {
     /**

@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\FilterBundle\Provider;
 
+/**
+ * Provides date variables and date parts for date filtering.
+ *
+ * This provider manages the mapping between date variable constants and their
+ * corresponding labels, as well as the mapping between date parts and the variables
+ * that can be applied to them. It offers methods to retrieve available date variables
+ * for each date part and to get translatable labels for both variables and parts,
+ * enabling the construction of flexible and user-friendly date filter options.
+ */
 class DateModifierProvider implements DateModifierInterface
 {
     /** @var array */

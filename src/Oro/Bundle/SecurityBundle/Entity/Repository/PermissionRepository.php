@@ -6,6 +6,14 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 
+/**
+ * Repository for {@see Permission} entities.
+ *
+ * This repository provides specialized query methods for retrieving permissions
+ * based on entity class and optional permission IDs. It handles complex filtering
+ * logic to determine which permissions apply to a given entity, considering both
+ * apply-to-all and apply-to-specific-entities configurations.
+ */
 class PermissionRepository extends EntityRepository
 {
     /**

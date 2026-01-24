@@ -4,6 +4,15 @@ namespace Oro\Bundle\ScopeBundle\Manager;
 
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * Normalizer for converting between entity objects and IDs in scope context.
+ *
+ * This normalizer provides bidirectional conversion of scope context data. The normalize
+ * method converts entity objects to their IDs for storage or transmission, while the
+ * denormalize method converts IDs back to entity objects by loading them from the database.
+ * This is essential for scope management where context needs to be serialized and
+ * deserialized while maintaining type safety and entity relationships.
+ */
 class ContextNormalizer
 {
     /** @var ScopeManager */

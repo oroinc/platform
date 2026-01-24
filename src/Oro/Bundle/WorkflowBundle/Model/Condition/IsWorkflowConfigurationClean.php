@@ -9,6 +9,13 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
 
+/**
+ * Evaluates whether a workflow definition's configuration is clean and valid.
+ *
+ * This condition checks if a given workflow definition has a clean configuration
+ * by delegating to a configuration checker. It returns true if the workflow configuration
+ * is valid, or if the provided value is not a WorkflowDefinition instance.
+ */
 class IsWorkflowConfigurationClean extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;

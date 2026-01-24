@@ -6,6 +6,12 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
+/**
+ * Determines applicability of send email action for entities.
+ *
+ * Checks whether the send email action can be applied to a given entity as an activity,
+ * verifying both email support and activity association configuration.
+ */
 class SendEmailPlaceholderFilter
 {
     /** @var Email */

@@ -7,6 +7,12 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
 
+/**
+ * Workflow condition for checking the count of items in a collection.
+ *
+ * Evaluates whether a countable collection meets a specified count condition (equal to, greater than, or less than),
+ * allowing workflows to branch based on collection size.
+ */
 class HasCount extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;

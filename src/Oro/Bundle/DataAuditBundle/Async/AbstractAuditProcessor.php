@@ -7,6 +7,13 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 
+/**
+ * Provides common functionality for asynchronous audit message processors.
+ *
+ * This base class implements helper methods for extracting audit-related data from message payloads,
+ * including timestamps, transaction IDs, and entity references for users, organizations, and impersonations.
+ * Subclasses should extend this to implement specific audit processing logic for different audit event types.
+ */
 abstract class AbstractAuditProcessor implements MessageProcessorInterface
 {
     /**

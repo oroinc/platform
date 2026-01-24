@@ -5,6 +5,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event;
 use Behat\Gherkin\Node\TaggedNodeInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Dispatched before an isolated Behat test begins execution.
+ *
+ * This event allows isolators to prepare the test environment for a specific test,
+ * potentially using test tags to determine which isolation operations are needed.
+ */
 final class BeforeIsolatedTestEvent implements TestIsolationEvent
 {
     /**

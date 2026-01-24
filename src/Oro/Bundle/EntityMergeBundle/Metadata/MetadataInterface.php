@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+/**
+ * Defines the contract for metadata objects used in entity merge operations.
+ *
+ * This interface provides a common API for accessing and manipulating metadata options
+ * stored as key-value pairs. Implementations can store merge configuration, Doctrine
+ * mapping information, or other metadata relevant to entity merge operations. The interface
+ * supports getting, setting, checking existence, and merging metadata values.
+ */
 interface MetadataInterface
 {
     /**

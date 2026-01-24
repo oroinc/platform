@@ -5,6 +5,14 @@ namespace Oro\Bundle\ChartBundle\Model\Data\Transformer;
 use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
 
+/**
+ * Transforms data to pie chart specific format by calculating fractional values.
+ *
+ * This transformer converts raw numeric data into fractional values suitable for pie charts.
+ * It calculates the fraction of each value relative to the total sum, allowing pie slices
+ * to be rendered proportionally. The input and output field names for the fraction calculation
+ * are configurable through chart options, providing flexibility for different data structures.
+ */
 class PieChartDataTransformer implements TransformerInterface
 {
     const FRACTION_INPUT_DATA_FIELD = 'fraction_input_data_field';

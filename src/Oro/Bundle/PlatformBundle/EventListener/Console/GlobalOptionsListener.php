@@ -7,6 +7,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 
+/**
+ * Handles console command events to inject and resolve global options.
+ *
+ * This listener intercepts console command execution events and uses the {@see GlobalOptionsProviderRegistry}
+ * to add global options to commands and resolve their values from the input. It ensures that global
+ * options are available to all console commands and properly bound to the command definition.
+ */
 class GlobalOptionsListener
 {
     /**

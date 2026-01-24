@@ -4,6 +4,16 @@ namespace Oro\Bundle\QueryDesignerBundle\Model;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Represents a node in a hierarchical filter group structure.
+ *
+ * This class implements a tree structure for organizing filter conditions into logical groups.
+ * Each node can contain child nodes (other {@see GroupNode} instances) or leaf nodes ({@see Restriction} instances),
+ * connected by logical operators (`AND`/`OR`). The class determines the type of expressions it contains
+ * (computed, uncomputed, or mixed) to support proper query construction and validation.
+ * This hierarchical structure allows building complex, nested filter expressions with proper
+ * operator precedence and grouping semantics.
+ */
 class GroupNode
 {
     const TYPE_COMPUTED   = 'computed';

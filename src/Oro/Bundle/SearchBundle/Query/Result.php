@@ -4,6 +4,14 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Represents the results of a search query execution.
+ *
+ * This class extends {@see ArrayCollection} to hold search result items and provides
+ * access to query metadata including total record count and aggregated data from
+ * aggregation functions. It can be converted to an array representation suitable
+ * for API responses or other serialization needs.
+ */
 class Result extends ArrayCollection
 {
     /**

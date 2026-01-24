@@ -6,6 +6,12 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WindowMassAction;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Represents a mass edit action for datagrid rows.
+ *
+ * This action opens a dialog window allowing users to edit common fields across multiple
+ * selected records simultaneously, streamlining bulk data updates.
+ */
 class MassEditAction extends WindowMassAction
 {
     /** @var array */

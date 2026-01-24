@@ -8,6 +8,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerAssemblerInterface;
 
+/**
+ * Assembles transition trigger objects from workflow configuration.
+ *
+ * This assembler creates transition trigger instances from workflow definition configuration,
+ * delegating to specialized assemblers for different trigger types.
+ */
 class WorkflowTransitionTriggersAssembler
 {
     /** @var TransitionTriggerAssemblerInterface[] */

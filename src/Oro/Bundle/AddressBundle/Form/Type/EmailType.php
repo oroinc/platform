@@ -8,6 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Provides a form type for managing individual email address entries.
+ *
+ * This form type handles the creation and editing of single email address records,
+ * including an email field and a primary flag. It allows users to specify which email
+ * address is the primary contact method and includes a hidden identifier field for
+ * proper entity tracking and management.
+ */
 class EmailType extends AbstractType
 {
     #[\Override]

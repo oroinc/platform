@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
+/**
+ * Repository for managing workflow step entities.
+ */
 class WorkflowStepRepository extends EntityRepository
 {
     /**

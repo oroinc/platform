@@ -6,6 +6,13 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 
+/**
+ * Provides utility methods for working with Doctrine result set mappings.
+ *
+ * This utility class offers helper methods for creating and manipulating
+ * result set mappings, including platform-specific mapping creation and
+ * column alias resolution.
+ */
 class ResultSetMappingUtil
 {
     /**

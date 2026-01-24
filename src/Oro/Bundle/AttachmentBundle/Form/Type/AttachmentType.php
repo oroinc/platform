@@ -7,6 +7,15 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for building attachment forms with file and comment fields.
+ *
+ * This form type provides a standard interface for creating attachment forms that include
+ * a file upload field and an optional comment field. It is used throughout the application
+ * to handle attachment creation and editing, with configurable options for file validation
+ * and deletion permissions. The form integrates with the FileType form type to provide
+ * comprehensive file handling capabilities.
+ */
 class AttachmentType extends AbstractType
 {
     const NAME = 'oro_attachment';

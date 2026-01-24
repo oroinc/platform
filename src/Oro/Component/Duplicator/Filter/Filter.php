@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Duplicator\Filter;
 
+/**
+ * Defines the contract for object duplication filters.
+ *
+ * Filters are applied during the deep copy process to customize how specific
+ * object properties are handled during duplication.
+ */
 interface Filter extends \DeepCopy\Filter\Filter
 {
     /**

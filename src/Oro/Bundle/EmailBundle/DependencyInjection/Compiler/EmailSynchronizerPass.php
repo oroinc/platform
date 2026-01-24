@@ -6,6 +6,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers email synchronizers in the dependency injection container.
+ *
+ * Collects all services tagged with `oro_email.email_synchronizer` and registers them
+ * with the email synchronization manager, injecting the security token storage for authentication.
+ */
 class EmailSynchronizerPass implements CompilerPassInterface
 {
     const SERVICE_KEY = 'oro_email.email_synchronization_manager';

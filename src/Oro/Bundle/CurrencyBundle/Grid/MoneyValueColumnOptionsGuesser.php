@@ -6,6 +6,14 @@ use Oro\Bundle\CurrencyBundle\DoctrineExtension\Dbal\Types\MoneyValueType;
 use Oro\Bundle\DataGridBundle\Datagrid\AbstractColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 
+/**
+ * Provides automatic configuration for money value datagrid columns.
+ *
+ * This guesser automatically configures formatter and filter options for columns
+ * that use the {@see MoneyValueType}. It sets up appropriate display formatting and
+ * number-range filtering to ensure monetary values are properly presented and
+ * filterable in datagrids.
+ */
 class MoneyValueColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     #[\Override]

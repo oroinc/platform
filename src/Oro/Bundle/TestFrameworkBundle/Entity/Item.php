@@ -11,7 +11,11 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Entity for testing search engine
+ * Test entity for search engine functionality.
+ *
+ * This entity is used for testing search engine capabilities and features.
+ * It includes various field types (string, integer, decimal, float, boolean, blob, array, datetime, guid)
+ * to test search indexing and retrieval across different data types.
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'test_search_item')]

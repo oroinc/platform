@@ -4,6 +4,14 @@ namespace Oro\Bundle\CurrencyBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Defines the contract for transforming multi-currency field references in queries.
+ *
+ * Implement this interface to create transformers that convert logical multi-currency
+ * field names into the appropriate database column references. This abstraction allows
+ * the query layer to work with multi-currency fields without needing to know the
+ * underlying database schema details.
+ */
 interface CurrencyQueryBuilderTransformerInterface
 {
     /**

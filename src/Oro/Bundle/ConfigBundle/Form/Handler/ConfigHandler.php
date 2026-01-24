@@ -7,6 +7,15 @@ use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Handles form submission and processing for system configuration.
+ *
+ * This handler manages the complete lifecycle of configuration form processing, including
+ * loading initial settings data, handling POST/PUT requests, validating form data, and
+ * persisting changes to the configuration manager. It supports custom post-processing through
+ * callable handlers attached to the form configuration, allowing for additional logic to be
+ * executed after successful configuration updates.
+ */
 class ConfigHandler
 {
     use RequestHandlerTrait;

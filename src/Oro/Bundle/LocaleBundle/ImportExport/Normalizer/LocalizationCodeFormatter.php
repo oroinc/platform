@@ -4,6 +4,14 @@ namespace Oro\Bundle\LocaleBundle\ImportExport\Normalizer;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Utility class for formatting localization codes and names for import/export operations.
+ *
+ * This class provides static methods to convert {@see Localization} entities or string
+ * identifiers into standardized format codes and keys used during data import and
+ * export. It handles null values by returning a default localization identifier,
+ * and supports both Localization objects and string representations.
+ */
 class LocalizationCodeFormatter
 {
     const DEFAULT_LOCALIZATION = 'default';

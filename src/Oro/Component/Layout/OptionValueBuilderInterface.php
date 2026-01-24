@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Defines the contract for building block option values through add, remove, and replace operations.
+ *
+ * Implementations of this interface manage collections of values for block options, supporting
+ * incremental construction through add, remove, and replace operations, with format-specific handling.
+ */
 interface OptionValueBuilderInterface
 {
     /**

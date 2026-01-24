@@ -4,6 +4,12 @@ namespace Oro\Component\Layout\Loader\Driver;
 
 use Oro\Component\Layout\LayoutUpdateInterface;
 
+/**
+ * Defines the contract for loading layout updates from files.
+ *
+ * Drivers are responsible for loading and generating layout update instances from files of specific formats
+ * (e.g., YAML, PHP), and providing the filename pattern that identifies layout update files for their format.
+ */
 interface DriverInterface
 {
     /**

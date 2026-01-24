@@ -8,6 +8,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 
+/**
+ * Defines the contract for datagrid extension visitors.
+ *
+ * Extension visitors implement the visitor pattern to modify datagrid behavior at various stages
+ * of processing. They can process configuration, modify datasources, transform results, and
+ * customize metadata. Extensions are applied in priority order and can be conditionally enabled
+ * based on datagrid configuration.
+ */
 interface ExtensionVisitorInterface
 {
     /**

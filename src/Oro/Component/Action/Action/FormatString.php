@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Formats a string using parameter substitution and stores the result.
+ *
+ * This action uses PHP's `strtr()` function to replace placeholders in a template string with
+ * provided argument values. Arguments are specified as an array where keys become placeholder names
+ * (wrapped with `%` delimiters). The formatted result is stored in a specified context attribute.
+ */
 class FormatString extends AbstractAction
 {
     /**

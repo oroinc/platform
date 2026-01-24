@@ -7,6 +7,15 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for choice tree filters.
+ *
+ * This form type provides a specialized filter interface for selecting values from
+ * a hierarchical tree structure. It supports two filter operators: `contains` and
+ * `not contains`, allowing users to filter records based on whether they contain
+ * or exclude specific values from the tree hierarchy. The type extends {@see TextFilterType}
+ * to inherit common text filtering behavior.
+ */
 class ChoiceTreeFilterType extends AbstractType
 {
     const TYPE_CONTAINS     = 1;

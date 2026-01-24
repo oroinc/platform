@@ -7,6 +7,14 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
+/**
+ * Listens to datagrid build events and automatically generates synchronization tags for ORM datasources.
+ *
+ * This listener intercepts the datagrid build process and generates content tags for ORM-based datagrids.
+ * These tags are used by the content manager to track which datagrids need to be synchronized when
+ * underlying data changes. The listener also ensures that the required JavaScript module for grid
+ * synchronization is included in the datagrid metadata.
+ */
 class DataGridTagListener
 {
     const TAGS_PATH = '[contentTags]';

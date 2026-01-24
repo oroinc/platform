@@ -9,6 +9,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Form type for entering a list of text values as a delimited string.
+ *
+ * This type accepts a comma-delimited string and converts it to/from an array of
+ * text values. It handles empty arrays by converting them to empty strings during
+ * form submission, and uses {@see ArrayToStringTransformer} for bidirectional conversion.
+ */
 class OroTextListType extends AbstractType
 {
     #[\Override]

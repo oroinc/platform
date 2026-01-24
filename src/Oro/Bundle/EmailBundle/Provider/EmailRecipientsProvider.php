@@ -7,6 +7,12 @@ use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Aggregates email recipients from multiple providers.
+ *
+ * Collects and combines email recipients from all registered providers, supporting filtering
+ * by search query, result limits, and excluded recipients for email composition.
+ */
 class EmailRecipientsProvider
 {
     /** @var TranslatorInterface */

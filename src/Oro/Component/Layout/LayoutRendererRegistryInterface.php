@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Defines the contract for managing layout renderers by name.
+ *
+ * This registry provides access to layout renderers by name and supports querying for renderer availability,
+ * with support for a default renderer when no specific renderer is requested.
+ */
 interface LayoutRendererRegistryInterface
 {
     /**

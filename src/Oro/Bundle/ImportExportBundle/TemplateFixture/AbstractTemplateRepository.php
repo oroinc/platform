@@ -4,6 +4,13 @@ namespace Oro\Bundle\ImportExportBundle\TemplateFixture;
 
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * Provides common functionality for template fixture entity repositories.
+ *
+ * This base class implements template entity management operations including entity retrieval,
+ * data filling, and registration with the template manager. Subclasses must implement methods
+ * to define the entity class and provide the actual template data.
+ */
 abstract class AbstractTemplateRepository implements
     TemplateEntityRepositoryInterface,
     TemplateManagerAwareInterface

@@ -6,6 +6,11 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Autocomplete search handler for business units in dashboard widgets.
+ *
+ * Current business unit is prepended to results on the first page using {@see OwnerHelper}.
+ */
 class WidgetBusinessUnitSearchHandler extends SearchHandler
 {
     /** @var TranslatorInterface */

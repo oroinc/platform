@@ -11,6 +11,14 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Converts YAML query definitions to Doctrine ORM QueryBuilder instances.
+ *
+ * This converter parses YAML-formatted or array-based query definitions and constructs
+ * corresponding Doctrine {@see QueryBuilder} objects. It handles complex query structures including
+ * joins, where clauses, grouping, and ordering, with intelligent join reordering to ensure
+ * proper dependency resolution.
+ */
 class YamlConverter implements QueryConverterInterface
 {
     const MAX_ITERATIONS = 100;

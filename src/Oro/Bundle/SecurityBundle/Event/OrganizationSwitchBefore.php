@@ -6,6 +6,14 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched before a user switches to a different organization.
+ *
+ * This event is triggered before the organization switch operation is executed,
+ * allowing listeners to validate the switch, perform pre-switch cleanup, or even
+ * modify the target organization. Listeners can prevent the switch or change which
+ * organization the user will switch to.
+ */
 class OrganizationSwitchBefore extends Event
 {
     const NAME = 'oro_security.event.organization_switch.before';

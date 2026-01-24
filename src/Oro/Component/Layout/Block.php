@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Represents a single block in the layout hierarchy.
+ *
+ * This class encapsulates a layout block with its type, options, context, and relationships to parent and child blocks.
+ * It provides methods for accessing block properties and navigating the block tree structure.
+ */
 final class Block implements BlockInterface
 {
     /** @var ContextInterface */

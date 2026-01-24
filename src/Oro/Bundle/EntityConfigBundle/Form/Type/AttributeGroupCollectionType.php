@@ -7,6 +7,12 @@ use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for managing a collection of attribute groups.
+ *
+ * This form type extends the base CollectionType to provide specialized handling for collections of
+ * attribute groups, allowing users to add, edit, and remove attribute groups within an attribute family.
+ */
 class AttributeGroupCollectionType extends AbstractType
 {
     const NAME = 'oro_entity_config_attribute_group_collection';

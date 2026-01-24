@@ -11,6 +11,13 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension as 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+/**
+ * Extends the base delete mass action to check operation availability.
+ *
+ * This extension integrates the action operation system with datagrid mass actions,
+ * ensuring that delete operations are only available when the corresponding `DELETE`
+ * operation is configured and available for the current context.
+ */
 class DeleteMassActionExtension extends BaseDeleteMassActionExtension
 {
     const OPERATION_NAME = 'DELETE';

@@ -10,6 +10,13 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
+/**
+ * Handles tag operations during entity merge processes.
+ *
+ * This listener integrates with the entity merge bundle to manage tags when entities
+ * are merged. It ensures that tag metadata is properly configured, tags are loaded
+ * before merge operations, and tags are persisted after the merge is complete.
+ */
 class MergeListener
 {
     const FIELD_NAME = 'tags';

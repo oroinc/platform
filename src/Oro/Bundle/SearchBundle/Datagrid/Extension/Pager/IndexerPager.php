@@ -5,6 +5,14 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Extension\Pager;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
+/**
+ * Manages pagination for search engine query results.
+ *
+ * This class provides pagination functionality for search results, handling page
+ * navigation, results per page configuration, and calculation of first result offsets.
+ * It works with search queries to apply pagination parameters and provides methods
+ * to navigate between pages and determine pagination state.
+ */
 class IndexerPager
 {
     /**

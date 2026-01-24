@@ -9,6 +9,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting aggregation and transformation functions in query designer.
+ *
+ * This form type provides a choice field for selecting functions that can be applied to columns
+ * in query designer queries. It integrates with the query designer manager to retrieve available
+ * functions organized by type (converters and aggregates) and renders them using a custom
+ * JavaScript component for enhanced user experience.
+ */
 class FunctionChoiceType extends AbstractType
 {
     const NAME = 'oro_function_choice';

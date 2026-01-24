@@ -5,6 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\Converter;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
+/**
+ * Calculates the maximum number of related entities based on template fixtures.
+ *
+ * This implementation examines template fixture data to determine the maximum count
+ * of related entities for a given field. It iterates through fixture instances and
+ * inspects the field values to find the largest collection, which is then used to
+ * determine the number of columns needed for export format representation.
+ */
 class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
 {
     /** @var TemplateManager */

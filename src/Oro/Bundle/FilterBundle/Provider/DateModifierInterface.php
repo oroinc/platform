@@ -2,6 +2,16 @@
 
 namespace Oro\Bundle\FilterBundle\Provider;
 
+/**
+ * Defines constants for date variables and date parts used in date filtering.
+ *
+ * This interface provides a centralized definition of date-related constants that are
+ * used throughout the filtering system. It includes constants for date variables
+ * (such as `now`, `today`, `start of week`) and date parts (such as `day`, `month`,
+ * `year`) that can be combined to create flexible date-based filter expressions.
+ * These constants are used in conjunction with translation keys to provide
+ * user-friendly labels for date filter options.
+ */
 interface DateModifierInterface
 {
     const LABEL_VAR_PREFIX  = 'oro.filter.form.label_date_var.';

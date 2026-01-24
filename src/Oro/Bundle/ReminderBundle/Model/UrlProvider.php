@@ -6,6 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Generates URLs for reminder-related entities.
+ *
+ * This provider uses entity configuration metadata to determine the appropriate
+ * route for a reminder's related entity. It generates URLs that can be used in
+ * reminder notifications to direct users to the relevant entity page. The provider
+ * supports both view routes (with entity ID) and named routes, falling back to an
+ * empty string if no suitable route is found in the entity configuration.
+ */
 class UrlProvider
 {
     /**

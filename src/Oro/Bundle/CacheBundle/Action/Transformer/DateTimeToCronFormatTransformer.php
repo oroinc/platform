@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\CacheBundle\Action\Transformer;
 
+/**
+ * Transforms `DateTime` objects to and from cron schedule format strings.
+ *
+ * This transformer converts `DateTime` instances into cron expression format (minute hour day month *)
+ * for use in scheduled cache invalidation operations. It also provides reverse transformation
+ * to parse cron format strings back into `DateTime` objects, enabling bidirectional conversion
+ * between human-readable `DateTime` values and cron-compatible schedule expressions.
+ */
 class DateTimeToCronFormatTransformer implements DateTimeToStringTransformerInterface
 {
     /**

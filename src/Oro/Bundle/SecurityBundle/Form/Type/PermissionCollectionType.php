@@ -7,6 +7,12 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Form type for managing a collection of ACL permissions.
+ *
+ * This form type extends the standard collection type to provide specialized handling
+ * for ACL permission collections, including passing privilege configuration to child forms.
+ */
 class PermissionCollectionType extends AbstractType
 {
     const NAME = 'oro_acl_permission_collection';

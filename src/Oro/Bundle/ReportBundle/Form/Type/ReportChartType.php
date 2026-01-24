@@ -9,6 +9,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for configuring chart visualization in reports.
+ *
+ * Extends the base {@see ChartType} to provide report-specific chart configuration with
+ * data schema support. Filters available charts to only those marked as available
+ * in reports and integrates with the report chart view module for frontend rendering.
+ */
 class ReportChartType extends AbstractType
 {
     const VIEW_MODULE_NAME = 'ororeport/js/app/views/report-chart-view';

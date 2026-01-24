@@ -5,6 +5,15 @@ namespace Oro\Component\MessageQueue\Consumption;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
+/**
+ * Defines the contract for processing messages from the queue.
+ *
+ * Implementations of this interface handle the actual processing of messages consumed from
+ * the message queue. The processor receives a message and a session, processes it, and returns
+ * a status constant ({@see MessageProcessorInterface::ACK}, {@see MessageProcessorInterface::REJECT},
+ * or {@see MessageProcessorInterface::REQUEUE}) indicating the outcome of the processing.
+ * This allows for flexible message handling strategies and error recovery mechanisms.
+ */
 interface MessageProcessorInterface
 {
     /**

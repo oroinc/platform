@@ -7,6 +7,14 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * Defines the configuration structure for search query datasources.
+ *
+ * This class implements the Symfony {@see ConfigurationInterface} to provide a tree builder
+ * that validates and normalizes search query configuration. It defines the expected
+ * structure for query configuration including select fields, from entities, and where
+ * conditions with support for both `AND` and `OR` logical operators.
+ */
 class QueryConfiguration implements ConfigurationInterface
 {
     #[\Override]

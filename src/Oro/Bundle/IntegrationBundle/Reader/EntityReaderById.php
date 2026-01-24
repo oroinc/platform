@@ -7,6 +7,14 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader as BaseReader;
 
+/**
+ * Reads entities from the database by their identifiers during import/export operations.
+ *
+ * This reader extends the base entity reader to support filtering entities by specific IDs.
+ * It can be configured with a query builder or entity name and will apply ID-based filtering
+ * to retrieve only the specified entities. This is useful for selective data export or
+ * re-processing of specific entities.
+ */
 class EntityReaderById extends BaseReader
 {
     const ID_FILTER = 'id';

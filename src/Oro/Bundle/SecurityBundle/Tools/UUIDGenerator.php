@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Tools;
 
+/**
+ * Generates secure UUIDv4 identifiers.
+ *
+ * This utility class provides methods to generate UUIDv4 identifiers with varying
+ * levels of security. It uses OpenSSL for the most secure generation when available,
+ * and falls back to {@see \mt_rand} for less secure but still functional UUID generation
+ * when OpenSSL is not installed.
+ */
 class UUIDGenerator
 {
     /**

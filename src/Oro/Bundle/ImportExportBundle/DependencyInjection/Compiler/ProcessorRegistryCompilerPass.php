@@ -7,6 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Compiler pass that registers import/export processors with the processor registry.
+ *
+ * This pass collects all services tagged with `oro_importexport.processor`,
+ * validates that each tag contains required attributes (type, entity, alias),
+ * and registers the processors with the registry. This enables the system to locate
+ * the appropriate processor for a given entity, operation type, and alias combination.
+ */
 class ProcessorRegistryCompilerPass implements CompilerPassInterface
 {
     const PROCESSOR_REGISTRY_SERVICE = 'oro_importexport.processor.registry';

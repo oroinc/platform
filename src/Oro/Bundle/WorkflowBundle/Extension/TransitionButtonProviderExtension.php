@@ -12,6 +12,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Extends button provider functionality to determine availability of workflow transition buttons.
+ *
+ * This extension checks whether a transition button is available for a given entity by
+ * validating the transition availability and ensuring the entity has an active workflow item.
+ */
 class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
 {
     #[\Override]

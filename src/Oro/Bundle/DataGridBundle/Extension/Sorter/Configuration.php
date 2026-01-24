@@ -6,6 +6,12 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines the configuration structure for datagrid sorting options.
+ *
+ * This configuration class validates and normalizes sorter settings including column sorters,
+ * default sorting, multiple sorting support, and toolbar sorting controls.
+ */
 class Configuration implements ConfigurationInterface
 {
     const SORTERS_KEY                       = 'sorters';

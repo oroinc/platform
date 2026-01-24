@@ -5,6 +5,14 @@ namespace Oro\Bundle\FormBundle\Event\FormHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched after a form has been processed.
+ *
+ * This event is triggered after form submission and validation have completed,
+ * allowing listeners to perform post-processing actions such as persisting data,
+ * sending notifications, or triggering side effects. The event carries both the
+ * processed form and the associated data.
+ */
 class AfterFormProcessEvent extends Event implements FormAwareInterface
 {
     /**

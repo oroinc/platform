@@ -11,6 +11,17 @@ use Oro\Bundle\LocaleBundle\Model\NameInterface;
 use Oro\Bundle\LocaleBundle\Model\NamePrefixInterface;
 use Oro\Bundle\LocaleBundle\Model\NameSuffixInterface;
 
+/**
+ * Formats person names according to locale-specific name format patterns.
+ *
+ * This formatter takes person objects implementing various name part interfaces ({@see FirstNameInterface},
+ * {@see LastNameInterface}, {@see MiddleNameInterface}, {@see NamePrefixInterface}, {@see NameSuffixInterface})
+ * and formats them into a complete name string based on the locale-specific name format configuration.
+ * The format pattern supports placeholders like `%PREFIX%`, `%FIRST_NAME%`, `%MIDDLE_NAME%`, `%LAST_NAME%`,
+ * and `%SUFFIX%` which are replaced with actual name parts. It also supports case conversion
+ * (uppercase) for individual name parts. The formatter retrieves locale-specific format patterns
+ * from the {@see LocaleSettings} configuration, with fallback to language-based and system default formats.
+ */
 class NameFormatter
 {
     /**

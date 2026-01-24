@@ -8,6 +8,14 @@ use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
+/**
+ * Converts search query expressions to query string format.
+ *
+ * This visitor traverses expression trees and converts them into search query
+ * string format, handling comparisons, composite expressions, and values. It
+ * properly formats field names, operators, and values according to search query
+ * syntax requirements, including proper quoting and array formatting.
+ */
 class QueryStringExpressionVisitor extends ExpressionVisitor
 {
     #[\Override]

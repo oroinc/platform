@@ -5,6 +5,14 @@ namespace Oro\Bundle\DashboardBundle\Event;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched when widget items data is being loaded.
+ *
+ * This event allows listeners to filter, sort, or modify the items that will be displayed
+ * in a widget. Listeners can access widget configuration and options to determine how to
+ * process the items, enabling dynamic customization of widget content based on user preferences
+ * or system configuration.
+ */
 class WidgetItemsLoadDataEvent extends Event
 {
     const EVENT_NAME = 'oro_dashboard.widget_items_load_data';

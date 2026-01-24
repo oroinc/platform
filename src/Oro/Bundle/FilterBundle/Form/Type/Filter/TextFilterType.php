@@ -8,6 +8,15 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for text filters.
+ *
+ * This form type provides a comprehensive filter interface for text-based filtering.
+ * It supports multiple operators including `contains`, `not contains`, `equals`,
+ * `starts with`, `ends with`, `in`, `not in`, `empty`, and `not empty`, allowing
+ * users to filter records based on various text matching criteria. The type requires
+ * a translator service for localizing operator labels.
+ */
 class TextFilterType extends AbstractType
 {
     const TYPE_CONTAINS     = 1;

@@ -11,6 +11,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Handles the `--available-features` CLI option to output all registered Behat features.
+ *
+ * This controller discovers and lists all feature files available in the configured test suites,
+ * providing developers with a way to see which features are available for testing.
+ */
 class AvailableFeaturesController implements Controller
 {
     /**

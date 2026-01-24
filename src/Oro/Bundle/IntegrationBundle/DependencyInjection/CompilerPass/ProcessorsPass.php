@@ -7,6 +7,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers synchronization processors with the processor registry during dependency injection compilation.
+ *
+ * This compiler pass collects all services tagged with `oro_integration.sync_processor` and
+ * registers them with the sync processor registry. Each processor is associated with an integration
+ * type, allowing the system to route synchronization requests to the appropriate processor based
+ * on the integration type being synchronized.
+ */
 class ProcessorsPass implements CompilerPassInterface
 {
     const SYNC_PROCESSOR_TAG = 'oro_integration.sync_processor';

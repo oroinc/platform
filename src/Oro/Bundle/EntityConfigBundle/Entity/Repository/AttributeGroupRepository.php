@@ -6,6 +6,12 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 
+/**
+ * Repository for querying and retrieving attribute group entities.
+ *
+ * This repository provides specialized query methods for accessing attribute groups, including retrieval
+ * by identifiers and fetching groups with their associated attribute relations for a specific attribute family.
+ */
 class AttributeGroupRepository extends EntityRepository
 {
     /**

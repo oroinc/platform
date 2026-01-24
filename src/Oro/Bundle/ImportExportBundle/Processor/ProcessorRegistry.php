@@ -5,6 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\Processor;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 
+/**
+ * Registry for managing import/export processors.
+ *
+ * This class maintains a registry of processors organized by type (export, import, etc.)
+ * and by entity name. It allows registration, lookup, and retrieval of processors based
+ * on type, entity name, and alias. The registry supports multiple processors per entity
+ * and type combination, enabling flexible processor selection during import/export operations.
+ */
 class ProcessorRegistry
 {
     const TYPE_EXPORT = 'export';

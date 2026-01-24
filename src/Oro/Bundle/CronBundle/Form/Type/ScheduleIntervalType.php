@@ -9,6 +9,24 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for editing schedule interval data with activation and deactivation dates.
+ *
+ * This form type provides two datetime fields for defining when a schedule becomes active
+ * and when it should be deactivated. It is designed to work with entities implementing
+ * {@see ScheduleIntervalInterface} and is commonly used in:
+ * - Price list scheduling (defining when price lists are active)
+ * - Promotion scheduling (setting promotion availability windows)
+ * - Any feature requiring time-based activation/deactivation
+ *
+ * The form validates that the data_class option implements {@see ScheduleIntervalInterface},
+ * ensuring type safety and preventing misconfiguration. Both datetime fields are optional,
+ * allowing for open-ended schedules (e.g., active from a date with no end, or active until
+ * a date with no specific start).
+ *
+ * This type is typically used within {@see ScheduleIntervalsCollectionType} to manage multiple
+ * schedule intervals for a single entity.
+ */
 class ScheduleIntervalType extends AbstractType
 {
     const NAME = 'oro_cron_schedule_interval';

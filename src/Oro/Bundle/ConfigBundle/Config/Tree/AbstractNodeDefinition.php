@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ConfigBundle\Config\Tree;
 
+/**
+ * Provides common functionality for configuration tree node definitions.
+ *
+ * This base class represents a node in the system configuration tree structure, managing the node's name, priority,
+ * and definition data. It provides infrastructure for building hierarchical configuration structures.
+ * Subclasses should extend this to create specific node types (e.g., groups, fields)
+ * with their own validation and rendering logic.
+ */
 abstract class AbstractNodeDefinition
 {
     /** @var string */

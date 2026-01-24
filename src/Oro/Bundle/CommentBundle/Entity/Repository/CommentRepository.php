@@ -6,6 +6,13 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Repository for managing {@see Comment} entities.
+ *
+ * Provides specialized query building methods for retrieving comments associated with
+ * specific entities. This repository handles the construction of query builders for
+ * filtering comments by entity relationships and counting comments for multiple entities.
+ */
 class CommentRepository extends EntityRepository
 {
     /**

@@ -13,6 +13,15 @@ use Oro\Bundle\IntegrationBundle\Provider\ForceConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
+/**
+ * Central registry for managing integration types, transports, and connectors.
+ *
+ * This registry maintains collections of all registered integration channel types, transport
+ * implementations, and connector types. It provides methods to register new types, retrieve
+ * them by name, and generate choice lists for form fields. The registry also handles
+ * validation of type availability and supports filtering of connectors based on capabilities
+ * like force sync and two-way sync support.
+ */
 class TypesRegistry
 {
     /** @var ArrayCollection|IntegrationInterface[] */

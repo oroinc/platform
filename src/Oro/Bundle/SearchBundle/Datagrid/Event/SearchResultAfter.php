@@ -8,6 +8,14 @@ use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Dispatched after search results are retrieved for a datagrid.
+ *
+ * This event allows listeners to modify the search results after they have been
+ * retrieved from the search engine but before they are displayed in the datagrid.
+ * Listeners can access the datagrid, the search query that was executed, and the
+ * result records, and can modify the records before they are rendered.
+ */
 class SearchResultAfter extends Event implements GridEventInterface
 {
     const NAME = 'oro_datagrid.search_datasource.result.after';

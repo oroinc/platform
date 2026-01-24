@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\SyncBundle\Content;
 
+/**
+ * Generates synchronization tags from simple array-based data structures.
+ *
+ * This tag generator processes array data containing a `name` key and optional `params` and `children` keys.
+ * It generates tags by combining the name with parameters, and can optionally process nested child data
+ * to generate tags for hierarchical structures. This is useful for generating tags from configuration arrays
+ * or simple data structures that need to be tracked for synchronization purposes.
+ */
 class SimpleTagGenerator implements TagGeneratorInterface
 {
     const STATIC_NAME_KEY = 'name';

@@ -12,6 +12,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Handles form submission for associating activities with target entities via the API.
+ *
+ * This handler processes API requests to create or update activity associations. It manages
+ * the form submission workflow, validates user permissions before allowing modifications,
+ * and delegates to the {@see ActivityManager} to establish the associations between activities
+ * and their target entities. It ensures that only authorized users can modify activity associations.
+ */
 class ActivityEntityApiHandler extends ApiFormHandler
 {
     /** @var ActivityManager */

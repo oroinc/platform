@@ -5,6 +5,15 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
+/**
+ * Filter for skipping empty periods in date range filtering.
+ *
+ * This filter extends {@see ChoiceFilter} to provide specialized handling for filtering
+ * records based on whether they have values in a specific date field. When enabled,
+ * it filters to show only records with non-null values in the target field. When
+ * disabled and other filters are present, it adds an `OR` condition to include records
+ * with null values, effectively allowing empty periods to be included in the results.
+ */
 class SkipEmptyPeriodsFilter extends ChoiceFilter
 {
     const NAME = 'skip_empty_periods';

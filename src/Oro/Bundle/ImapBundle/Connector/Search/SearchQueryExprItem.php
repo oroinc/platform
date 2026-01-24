@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\ImapBundle\Connector\Search;
 
+/**
+ * Represents a named search criterion in an IMAP search query expression.
+ *
+ * This class encapsulates a search item that targets a specific message property (e.g., FROM, TO, SUBJECT)
+ * with a particular value and match type. It combines a property name with a search value, allowing
+ * developers to build complex IMAP search queries that filter messages based on specific criteria.
+ */
 class SearchQueryExprItem extends SearchQueryExprValueBase implements
     SearchQueryExprNamedItemInterface,
     SearchQueryExprValueInterface,

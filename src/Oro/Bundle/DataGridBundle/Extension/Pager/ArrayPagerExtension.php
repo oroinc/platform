@@ -10,6 +10,13 @@ use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
+/**
+ * Handles pagination for array-based datagrids.
+ *
+ * This extension applies pagination to array datasources by slicing the data array based on
+ * the current page and items per page settings. It supports various pagination modes including
+ * one-page mode and client-side mode.
+ */
 class ArrayPagerExtension extends AbstractPagerExtension
 {
     /**

@@ -7,6 +7,13 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDeco
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * Handles the attachment of a logging decorator to REST clients.
+ *
+ * This listener intercepts the {@see ClientCreatedAfterEvent} and wraps the REST client with
+ * a {@see LoggerClientDecorator}, enabling request/response logging for all REST API calls.
+ * The logging functionality can be enabled or disabled through configuration.
+ */
 class LoggerClientDecoratorListener extends AbstractClientDecoratorListener implements LoggerAwareInterface
 {
     use LoggerAwareTrait;

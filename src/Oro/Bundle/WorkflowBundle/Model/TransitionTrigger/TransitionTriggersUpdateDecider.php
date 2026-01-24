@@ -4,6 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 
+/**
+ * Determines which transition triggers should be added or removed during updates.
+ *
+ * This class compares existing triggers with new triggers and identifies which ones need to be
+ * added (present in new but not in existing) and which ones need to be removed (present in existing
+ * but not in new). It uses trigger equality comparison to determine matches.
+ */
 class TransitionTriggersUpdateDecider
 {
     /**

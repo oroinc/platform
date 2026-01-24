@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Formatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Formats workflow variable values for display in the UI.
+ *
+ * This formatter converts workflow variable values to human-readable strings,
+ * handling arrays, booleans, and other types with appropriate formatting.
+ */
 class WorkflowVariableFormatter
 {
     /**

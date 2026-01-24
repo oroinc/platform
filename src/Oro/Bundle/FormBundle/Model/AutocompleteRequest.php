@@ -4,6 +4,14 @@ namespace Oro\Bundle\FormBundle\Model;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Encapsulates autocomplete search request parameters.
+ *
+ * This class parses and stores autocomplete request data from HTTP requests,
+ * including the search handler name, query string, pagination information, and
+ * whether the search should be performed by entity ID. It provides convenient
+ * accessors for all request parameters.
+ */
 class AutocompleteRequest
 {
     /**

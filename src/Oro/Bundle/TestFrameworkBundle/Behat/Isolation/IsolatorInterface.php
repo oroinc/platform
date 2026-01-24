@@ -9,6 +9,13 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Defines the contract for test isolators that manage test environment state.
+ *
+ * Isolators handle the setup, teardown, and restoration of the test environment across
+ * test execution. They can be applied selectively based on container configuration and
+ * support tagging for selective isolation skipping.
+ */
 interface IsolatorInterface
 {
     /**

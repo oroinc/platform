@@ -10,6 +10,13 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles form processing for tag entities in API contexts.
+ *
+ * This handler extends the base API form handler to provide specialized processing for tags on taggable entities.
+ * It manages the transformation of tag data from API requests into tag entities, loads or creates tags as needed,
+ * and persists the tag associations to the target entity.
+ */
 class TagEntityApiHandler extends ApiFormHandler
 {
     /** @var TagManager */
