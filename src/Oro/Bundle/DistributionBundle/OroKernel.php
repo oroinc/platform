@@ -475,7 +475,10 @@ abstract class OroKernel extends Kernel
             if ($collectDeprecations) {
                 restore_error_handler();
 
-                if (null !== $container && $container->getParameter('oro_platform.collect_deprecations')) {
+                if (null !== $container
+                    && $container->hasParameter('oro_platform.collect_deprecations')
+                    && $container->getParameter('oro_platform.collect_deprecations')
+                ) {
                     file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
                 }
                 file_put_contents($cacheDir.'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
