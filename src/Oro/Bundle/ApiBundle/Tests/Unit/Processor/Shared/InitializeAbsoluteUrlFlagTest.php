@@ -1,24 +1,23 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\InitializeAbsoluteUrlFlag;
-use Oro\Component\ChainProcessor\ContextInterface;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Oro\Bundle\ApiBundle\Processor\Shared\InitializeAbsoluteUrlFlag;
+use Oro\Bundle\ApiBundle\Provider\ApiUrlResolver;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class InitializeAbsoluteUrlFlagTest extends TestCase
+class InitializeAbsoluteUrlFlagTest extends GetListProcessorTestCase
 {
     private RequestStack $requestStack;
-    private ContextInterface&MockObject $context;
 
     #[\Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->requestStack = new RequestStack();
-        $this->context = $this->createMock(ContextInterface::class);
     }
 
     public function testProcessWhenConfigurationDisabled(): void
@@ -29,10 +28,10 @@ class InitializeAbsoluteUrlFlagTest extends TestCase
         $processor = new InitializeAbsoluteUrlFlag($this->requestStack, false);
         $processor->process($this->context);
 
-        self::assertFalse($request->attributes->has(InitializeAbsoluteUrlFlag::ABSOLUTE_URL_FLAG));
+        self::assertFalse($request->attributes->has(ApiUrlResolver::ABSOLUTE_URL_FLAG));
     }
 
-    public function testProcessWhenConfigurationEnabledAndRequestExists(): void
+    public function testProcessWhenConfigurationEnabled(): void
     {
         $request = new Request();
         $this->requestStack->push($request);
@@ -40,14 +39,15 @@ class InitializeAbsoluteUrlFlagTest extends TestCase
         $processor = new InitializeAbsoluteUrlFlag($this->requestStack, true);
         $processor->process($this->context);
 
-        self::assertTrue($request->attributes->has(InitializeAbsoluteUrlFlag::ABSOLUTE_URL_FLAG));
-        self::assertTrue($request->attributes->get(InitializeAbsoluteUrlFlag::ABSOLUTE_URL_FLAG));
+        self::assertTrue($request->attributes->has(ApiUrlResolver::ABSOLUTE_URL_FLAG));
+        self::assertTrue($request->attributes->get(ApiUrlResolver::ABSOLUTE_URL_FLAG));
     }
 
     public function testProcessWhenConfigurationEnabledButNoRequest(): void
     {
         $processor = new InitializeAbsoluteUrlFlag($this->requestStack, true);
         $processor->process($this->context);
+
         self::assertNull($this->requestStack->getCurrentRequest());
     }
 }

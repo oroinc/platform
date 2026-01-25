@@ -66,6 +66,11 @@ provided by `Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInter
 found in the PHP attributes implementing `PHPAttributeConfigurationInterface`
 
 ### Changed
+
+#### ApiBundle
+* The service `oro_api.provider.api_url_resolver` was renamed to `oro_api.api_url_resolver`.
+
+#### EmailBundle
 * Decomposed `\Oro\Bundle\EmailBundle\Model\EmailTemplate` model into smaller classes responsible for parsing and creating an email template:
     * `\Oro\Bundle\EmailBundle\Model\Factory\EmailTemplateFromRawDataFactory`
     * `\Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser`

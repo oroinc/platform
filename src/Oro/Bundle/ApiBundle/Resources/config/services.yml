@@ -1408,19 +1408,10 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    oro_api.provider.api_url_resolver:
+    oro_api.api_url_resolver:
         class: Oro\Bundle\ApiBundle\Provider\ApiUrlResolver
         arguments:
             - '@request_stack'
-
-    oro_api.processor.initialize_absolute_url_flag:
-        class: Oro\Bundle\ApiBundle\Processor\InitializeAbsoluteUrlFlag
-        arguments:
-            - '@request_stack'
-            - '%oro_api.use_absolute_urls_for_api%'
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
-            - { name: oro.api.processor, action: get_list, group: initialize, priority: 250 }
 
     oro_api.asset.api_absolute_url_asset_packages:
         class: Oro\Bundle\ApiBundle\Asset\ApiAbsoluteUrlAssetPackages
@@ -1428,4 +1419,4 @@ services:
         arguments:
             - '@.inner'
             - '@request_stack'
-            - '@oro_api.provider.api_url_resolver'
+            - '@oro_api.api_url_resolver'

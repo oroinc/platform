@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Provider\ApiUrlResolver;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,8 +13,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class InitializeAbsoluteUrlFlag implements ProcessorInterface
 {
-    public const ABSOLUTE_URL_FLAG = '_api_use_absolute_urls';
-
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly bool $useAbsoluteUrlsForApi
@@ -26,9 +25,6 @@ class InitializeAbsoluteUrlFlag implements ProcessorInterface
             return;
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-        if ($request) {
-            $request->attributes->set(self::ABSOLUTE_URL_FLAG, true);
-        }
+        $this->requestStack->getCurrentRequest()?->attributes->set(ApiUrlResolver::ABSOLUTE_URL_FLAG, true);
     }
 }
