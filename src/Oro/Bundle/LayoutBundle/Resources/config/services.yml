@@ -149,7 +149,7 @@ services:
     oro_layout.layout_context_configurator.is_svg_via_api:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ApiSvgConfigurator
         arguments:
-            - '@oro_api.provider.api_url_resolver'
+            - '@oro_api.api_url_resolver'
         tags:
             - { name: layout.context_configurator }
 

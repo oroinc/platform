@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\ApiBundle\Processor\InitializeAbsoluteUrlFlag;
 use Oro\Bundle\ApiBundle\Provider\ApiUrlResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +28,7 @@ class ApiUrlResolverTest extends TestCase
     public function testShouldUseAbsoluteUrlsReturnsTrueWhenFlagSet(): void
     {
         $request = new Request();
-        $request->attributes->set(InitializeAbsoluteUrlFlag::ABSOLUTE_URL_FLAG, true);
+        $request->attributes->set(ApiUrlResolver::ABSOLUTE_URL_FLAG, true);
         $this->requestStack->push($request);
 
         self::assertTrue($this->resolver->shouldUseAbsoluteUrls());
@@ -54,7 +53,7 @@ class ApiUrlResolverTest extends TestCase
     public function testGetEffectiveReferenceTypeReturnsAbsoluteUrlWhenFlagSet(): void
     {
         $request = new Request();
-        $request->attributes->set(InitializeAbsoluteUrlFlag::ABSOLUTE_URL_FLAG, true);
+        $request->attributes->set(ApiUrlResolver::ABSOLUTE_URL_FLAG, true);
         $this->requestStack->push($request);
 
         self::assertSame(
@@ -66,7 +65,7 @@ class ApiUrlResolverTest extends TestCase
     public function testGetEffectiveReferenceTypeIgnoresCustomDefaultWhenFlagSet(): void
     {
         $request = new Request();
-        $request->attributes->set(InitializeAbsoluteUrlFlag::ABSOLUTE_URL_FLAG, true);
+        $request->attributes->set(ApiUrlResolver::ABSOLUTE_URL_FLAG, true);
         $this->requestStack->push($request);
 
         self::assertSame(

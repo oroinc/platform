@@ -9,6 +9,15 @@ services:
     # initialize
     #
 
+    oro_api.initialize_absolute_url_flag:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeAbsoluteUrlFlag
+        arguments:
+            - '@request_stack'
+            - '%oro_api.use_absolute_urls_for_api%'
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: 250 }
+
     oro_api.check_request_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
         tags:

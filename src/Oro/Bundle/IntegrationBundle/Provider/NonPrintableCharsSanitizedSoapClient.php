@@ -10,9 +10,15 @@ use Oro\Bundle\IntegrationBundle\Utils\NonPrintableCharsStringSanitizer;
 class NonPrintableCharsSanitizedSoapClient extends \SoapClient
 {
     #[\Override]
-    public function __doRequest($request, $location, $action, $version, $one_way = 0): ?string
-    {
-        $response = parent::__doRequest($request, $location, $action, $version, $one_way);
+    public function __doRequest(
+        $request,
+        $location,
+        $action,
+        $version,
+        $one_way = 0,
+        ?string $uriParserClass = null
+    ): ?string {
+        $response = parent::__doRequest($request, $location, $action, $version, $one_way, $uriParserClass);
 
         $response = $this->removeNonPrintableCharacters($response);
 
