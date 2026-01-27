@@ -14,8 +14,8 @@ Feature: Plural translations management
     Given I go to System/Configuration
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     When I fill form with:
-      | Enabled Localizations | Russian (Russia) |
-      | Default Localization  | Russian (Russia) |
+      | Enabled Localizations | Russian (Russian Federation) |
+      | Default Localization  | Russian (Russian Federation) |
     And I save form
     Then I should see "Configuration saved" flash message
 

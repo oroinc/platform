@@ -1,4 +1,14 @@
 data:
+    - type: regions
+      id: GB-ABC
+      attributes:
+          code: ABC
+          name: 'Armagh City, Banbridge and Craigavon'
+      relationships:
+          country:
+              data:
+                  type: countries
+                  id: GB
     -
         type: regions
         id: GB-ABD
@@ -16,17 +26,6 @@ data:
         attributes:
             code: ABE
             name: 'Aberdeen City'
-        relationships:
-            country:
-                data:
-                    type: countries
-                    id: GB
-    -
-        type: regions
-        id: GB-AGB
-        attributes:
-            code: AGB
-            name: 'Argyll and Bute'
         relationships:
             country:
                 data:

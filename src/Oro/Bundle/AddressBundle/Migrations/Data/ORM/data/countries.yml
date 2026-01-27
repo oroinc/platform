@@ -112,9 +112,9 @@ AF:
         AF-LAG:
             combinedCode: AF-LAG
             code: LAG
-        AF-LOW:
-            combinedCode: AF-LOW
-            code: LOW
+        AF-LOG:
+            combinedCode: AF-LOG
+            code: LOG
         AF-NAN:
             combinedCode: AF-NAN
             code: NAN
@@ -124,9 +124,6 @@ AF:
         AF-NUR:
             combinedCode: AF-NUR
             code: NUR
-        AF-ORU:
-            combinedCode: AF-ORU
-            code: ORU
         AF-PAN:
             combinedCode: AF-PAN
             code: PAN
@@ -148,6 +145,9 @@ AF:
         AF-TAK:
             combinedCode: AF-TAK
             code: TAK
+        AF-URU:
+            combinedCode: AF-URU
+            code: URU
         AF-WAR:
             combinedCode: AF-WAR
             code: WAR
@@ -226,114 +226,6 @@ AL:
         AL-12:
             combinedCode: AL-12
             code: '12'
-        AL-BR:
-            combinedCode: AL-BR
-            code: BR
-        AL-BU:
-            combinedCode: AL-BU
-            code: BU
-        AL-DI:
-            combinedCode: AL-DI
-            code: DI
-        AL-DL:
-            combinedCode: AL-DL
-            code: DL
-        AL-DR:
-            combinedCode: AL-DR
-            code: DR
-        AL-DV:
-            combinedCode: AL-DV
-            code: DV
-        AL-EL:
-            combinedCode: AL-EL
-            code: EL
-        AL-ER:
-            combinedCode: AL-ER
-            code: ER
-        AL-FR:
-            combinedCode: AL-FR
-            code: FR
-        AL-GJ:
-            combinedCode: AL-GJ
-            code: GJ
-        AL-GR:
-            combinedCode: AL-GR
-            code: GR
-        AL-HA:
-            combinedCode: AL-HA
-            code: HA
-        AL-KA:
-            combinedCode: AL-KA
-            code: KA
-        AL-KB:
-            combinedCode: AL-KB
-            code: KB
-        AL-KC:
-            combinedCode: AL-KC
-            code: KC
-        AL-KO:
-            combinedCode: AL-KO
-            code: KO
-        AL-KR:
-            combinedCode: AL-KR
-            code: KR
-        AL-KU:
-            combinedCode: AL-KU
-            code: KU
-        AL-LB:
-            combinedCode: AL-LB
-            code: LB
-        AL-LE:
-            combinedCode: AL-LE
-            code: LE
-        AL-LU:
-            combinedCode: AL-LU
-            code: LU
-        AL-MK:
-            combinedCode: AL-MK
-            code: MK
-        AL-MM:
-            combinedCode: AL-MM
-            code: MM
-        AL-MR:
-            combinedCode: AL-MR
-            code: MR
-        AL-MT:
-            combinedCode: AL-MT
-            code: MT
-        AL-PG:
-            combinedCode: AL-PG
-            code: PG
-        AL-PQ:
-            combinedCode: AL-PQ
-            code: PQ
-        AL-PR:
-            combinedCode: AL-PR
-            code: PR
-        AL-PU:
-            combinedCode: AL-PU
-            code: PU
-        AL-SH:
-            combinedCode: AL-SH
-            code: SH
-        AL-SK:
-            combinedCode: AL-SK
-            code: SK
-        AL-SR:
-            combinedCode: AL-SR
-            code: SR
-        AL-TE:
-            combinedCode: AL-TE
-            code: TE
-        AL-TP:
-            combinedCode: AL-TP
-            code: TP
-        AL-TR:
-            combinedCode: AL-TR
-            code: TR
-        AL-VL:
-            combinedCode: AL-VL
-            code: VL
 AM:
     iso2Code: AM
     iso3Code: ARM
@@ -475,7 +367,7 @@ AR:
             code: M
         AR-N:
             combinedCode: AR-N
-            code: N
+            code: 'N'
         AR-P:
             combinedCode: AR-P
             code: P
@@ -505,7 +397,7 @@ AR:
             code: X
         AR-Y:
             combinedCode: AR-Y
-            code: Y
+            code: 'Y'
         AR-Z:
             combinedCode: AR-Z
             code: Z
@@ -575,7 +467,7 @@ AU:
 AW:
     iso2Code: AW
     iso3Code: ABW
-    regions: {}
+    regions: {  }
 AX:
     iso2Code: AX
     iso3Code: ALA
@@ -584,9 +476,6 @@ AZ:
     iso2Code: AZ
     iso3Code: AZE
     regions:
-        AZ-AB:
-            combinedCode: AZ-AB
-            code: AB
         AZ-ABS:
             combinedCode: AZ-ABS
             code: ABS
@@ -638,9 +527,6 @@ AZ:
         AZ-DAS:
             combinedCode: AZ-DAS
             code: DAS
-        AZ-DAV:
-            combinedCode: AZ-DAV
-            code: DAV
         AZ-FUZ:
             combinedCode: AZ-FUZ
             code: FUZ
@@ -656,6 +542,9 @@ AZ:
         AZ-GOY:
             combinedCode: AZ-GOY
             code: GOY
+        AZ-GYG:
+            combinedCode: AZ-GYG
+            code: GYG
         AZ-HAC:
             combinedCode: AZ-HAC
             code: HAC
@@ -668,6 +557,9 @@ AZ:
         AZ-KAL:
             combinedCode: AZ-KAL
             code: KAL
+        AZ-KAN:
+            combinedCode: AZ-KAN
+            code: KAN
         AZ-KUR:
             combinedCode: AZ-KUR
             code: KUR
@@ -695,6 +587,9 @@ AZ:
         AZ-NEF:
             combinedCode: AZ-NEF
             code: NEF
+        AZ-NV:
+            combinedCode: AZ-NV
+            code: NV
         AZ-NX:
             combinedCode: AZ-NX
             code: NX
@@ -749,6 +644,9 @@ AZ:
         AZ-SAT:
             combinedCode: AZ-SAT
             code: SAT
+        AZ-SBN:
+            combinedCode: AZ-SBN
+            code: SBN
         AZ-SIY:
             combinedCode: AZ-SIY
             code: SIY
@@ -764,9 +662,9 @@ AZ:
         AZ-SMX:
             combinedCode: AZ-SMX
             code: SMX
-        AZ-SS:
-            combinedCode: AZ-SS
-            code: SS
+        AZ-SR:
+            combinedCode: AZ-SR
+            code: SR
         AZ-SUS:
             combinedCode: AZ-SUS
             code: SUS
@@ -785,9 +683,6 @@ AZ:
         AZ-XAC:
             combinedCode: AZ-XAC
             code: XAC
-        AZ-XAN:
-            combinedCode: AZ-XAN
-            code: XAN
         AZ-XCI:
             combinedCode: AZ-XCI
             code: XCI
@@ -819,36 +714,6 @@ BA:
     iso2Code: BA
     iso3Code: BIH
     regions:
-        BA-01:
-            combinedCode: BA-01
-            code: '01'
-        BA-02:
-            combinedCode: BA-02
-            code: '02'
-        BA-03:
-            combinedCode: BA-03
-            code: '03'
-        BA-04:
-            combinedCode: BA-04
-            code: '04'
-        BA-05:
-            combinedCode: BA-05
-            code: '05'
-        BA-06:
-            combinedCode: BA-06
-            code: '06'
-        BA-07:
-            combinedCode: BA-07
-            code: '07'
-        BA-08:
-            combinedCode: BA-08
-            code: '08'
-        BA-09:
-            combinedCode: BA-09
-            code: '09'
-        BA-10:
-            combinedCode: BA-10
-            code: '10'
         BA-BIH:
             combinedCode: BA-BIH
             code: BIH
@@ -926,9 +791,6 @@ BD:
         BD-09:
             combinedCode: BD-09
             code: '09'
-        BD-1:
-            combinedCode: BD-1
-            code: '1'
         BD-10:
             combinedCode: BD-10
             code: '10'
@@ -959,9 +821,6 @@ BD:
         BD-19:
             combinedCode: BD-19
             code: '19'
-        BD-2:
-            combinedCode: BD-2
-            code: '2'
         BD-20:
             combinedCode: BD-20
             code: '20'
@@ -992,9 +851,6 @@ BD:
         BD-29:
             combinedCode: BD-29
             code: '29'
-        BD-3:
-            combinedCode: BD-3
-            code: '3'
         BD-30:
             combinedCode: BD-30
             code: '30'
@@ -1025,9 +881,6 @@ BD:
         BD-39:
             combinedCode: BD-39
             code: '39'
-        BD-4:
-            combinedCode: BD-4
-            code: '4'
         BD-40:
             combinedCode: BD-40
             code: '40'
@@ -1058,9 +911,6 @@ BD:
         BD-49:
             combinedCode: BD-49
             code: '49'
-        BD-5:
-            combinedCode: BD-5
-            code: '5'
         BD-50:
             combinedCode: BD-50
             code: '50'
@@ -1091,9 +941,6 @@ BD:
         BD-59:
             combinedCode: BD-59
             code: '59'
-        BD-6:
-            combinedCode: BD-6
-            code: '6'
         BD-60:
             combinedCode: BD-60
             code: '60'
@@ -1109,6 +956,30 @@ BD:
         BD-64:
             combinedCode: BD-64
             code: '64'
+        BD-A:
+            combinedCode: BD-A
+            code: A
+        BD-B:
+            combinedCode: BD-B
+            code: B
+        BD-C:
+            combinedCode: BD-C
+            code: C
+        BD-D:
+            combinedCode: BD-D
+            code: D
+        BD-E:
+            combinedCode: BD-E
+            code: E
+        BD-F:
+            combinedCode: BD-F
+            code: F
+        BD-G:
+            combinedCode: BD-G
+            code: G
+        BD-H:
+            combinedCode: BD-H
+            code: H
 BE:
     iso2Code: BE
     iso3Code: BEL
@@ -1122,6 +993,9 @@ BE:
         BE-VBR:
             combinedCode: BE-VBR
             code: VBR
+        BE-VLG:
+            combinedCode: BE-VLG
+            code: VLG
         BE-VLI:
             combinedCode: BE-VLI
             code: VLI
@@ -1131,6 +1005,9 @@ BE:
         BE-VWV:
             combinedCode: BE-VWV
             code: VWV
+        BE-WAL:
+            combinedCode: BE-WAL
+            code: WAL
         BE-WBR:
             combinedCode: BE-WBR
             code: WBR
@@ -1425,9 +1302,6 @@ BH:
         BH-15:
             combinedCode: BH-15
             code: '15'
-        BH-16:
-            combinedCode: BH-16
-            code: '16'
         BH-17:
             combinedCode: BH-17
             code: '17'
@@ -1474,9 +1348,15 @@ BI:
         BI-MW:
             combinedCode: BI-MW
             code: MW
+        BI-MY:
+            combinedCode: BI-MY
+            code: MY
         BI-NG:
             combinedCode: BI-NG
             code: NG
+        BI-RM:
+            combinedCode: BI-RM
+            code: RM
         BI-RT:
             combinedCode: BI-RT
             code: RT
@@ -1565,7 +1445,7 @@ BO:
             code: L
         BO-N:
             combinedCode: BO-N
-            code: N
+            code: 'N'
         BO-O:
             combinedCode: BO-O
             code: O
@@ -1619,9 +1499,6 @@ BR:
         BR-ES:
             combinedCode: BR-ES
             code: ES
-        BR-FN:
-            combinedCode: BR-FN
-            code: FN
         BR-GO:
             combinedCode: BR-GO
             code: GO
@@ -1683,9 +1560,9 @@ BS:
     iso2Code: BS
     iso3Code: BHS
     regions:
-        BS-AC:
-            combinedCode: BS-AC
-            code: AC
+        BS-AK:
+            combinedCode: BS-AK
+            code: AK
         BS-BI:
             combinedCode: BS-BI
             code: BI
@@ -1722,9 +1599,6 @@ BS:
         BS-GC:
             combinedCode: BS-GC
             code: GC
-        BS-GT:
-            combinedCode: BS-GT
-            code: GT
         BS-HI:
             combinedCode: BS-HI
             code: HI
@@ -1751,7 +1625,7 @@ BS:
             code: NE
         BS-NO:
             combinedCode: BS-NO
-            code: NO
+            code: 'NO'
         BS-NP:
             combinedCode: BS-NP
             code: NP
@@ -1857,9 +1731,21 @@ BW:
         BW-CE:
             combinedCode: BW-CE
             code: CE
+        BW-CH:
+            combinedCode: BW-CH
+            code: CH
+        BW-FR:
+            combinedCode: BW-FR
+            code: FR
+        BW-GA:
+            combinedCode: BW-GA
+            code: GA
         BW-GH:
             combinedCode: BW-GH
             code: GH
+        BW-JW:
+            combinedCode: BW-JW
+            code: JW
         BW-KG:
             combinedCode: BW-KG
             code: KG
@@ -1869,12 +1755,12 @@ BW:
         BW-KW:
             combinedCode: BW-KW
             code: KW
+        BW-LO:
+            combinedCode: BW-LO
+            code: LO
         BW-NE:
             combinedCode: BW-NE
             code: NE
-        BW-NG:
-            combinedCode: BW-NG
-            code: NG
         BW-NW:
             combinedCode: BW-NW
             code: NW
@@ -1884,6 +1770,12 @@ BW:
         BW-SO:
             combinedCode: BW-SO
             code: SO
+        BW-SP:
+            combinedCode: BW-SP
+            code: SP
+        BW-ST:
+            combinedCode: BW-ST
+            code: ST
 BY:
     iso2Code: BY
     iso3Code: BLR
@@ -1961,7 +1853,7 @@ CA:
             code: NU
         CA-ON:
             combinedCode: CA-ON
-            code: ON
+            code: 'ON'
         CA-PE:
             combinedCode: CA-PE
             code: PE
@@ -2112,9 +2004,9 @@ CF:
         CF-UK:
             combinedCode: CF-UK
             code: UK
-        CF-VR:
-            combinedCode: CF-VR
-            code: VR
+        CF-VK:
+            combinedCode: CF-VK
+            code: VK
 CG:
     iso2Code: CG
     iso3Code: COG
@@ -2134,6 +2026,9 @@ CG:
         CG-15:
             combinedCode: CG-15
             code: '15'
+        CG-16:
+            combinedCode: CG-16
+            code: '16'
         CG-2:
             combinedCode: CG-2
             code: '2'
@@ -2324,6 +2219,9 @@ CL:
         CL-ML:
             combinedCode: CL-ML
             code: ML
+        CL-NB:
+            combinedCode: CL-NB
+            code: NB
         CL-RM:
             combinedCode: CL-RM
             code: RM
@@ -2354,7 +2252,7 @@ CM:
             code: LT
         CM-NO:
             combinedCode: CM-NO
-            code: NO
+            code: 'NO'
         CM-NW:
             combinedCode: CM-NW
             code: NW
@@ -2371,108 +2269,108 @@ CN:
     iso2Code: CN
     iso3Code: CHN
     regions:
-        CN-11:
-            combinedCode: CN-11
-            code: '11'
-        CN-12:
-            combinedCode: CN-12
-            code: '12'
-        CN-13:
-            combinedCode: CN-13
-            code: '13'
-        CN-14:
-            combinedCode: CN-14
-            code: '14'
-        CN-15:
-            combinedCode: CN-15
-            code: '15'
-        CN-21:
-            combinedCode: CN-21
-            code: '21'
-        CN-22:
-            combinedCode: CN-22
-            code: '22'
-        CN-23:
-            combinedCode: CN-23
-            code: '23'
-        CN-31:
-            combinedCode: CN-31
-            code: '31'
-        CN-32:
-            combinedCode: CN-32
-            code: '32'
-        CN-33:
-            combinedCode: CN-33
-            code: '33'
-        CN-34:
-            combinedCode: CN-34
-            code: '34'
-        CN-35:
-            combinedCode: CN-35
-            code: '35'
-        CN-36:
-            combinedCode: CN-36
-            code: '36'
-        CN-37:
-            combinedCode: CN-37
-            code: '37'
-        CN-41:
-            combinedCode: CN-41
-            code: '41'
-        CN-42:
-            combinedCode: CN-42
-            code: '42'
-        CN-43:
-            combinedCode: CN-43
-            code: '43'
-        CN-44:
-            combinedCode: CN-44
-            code: '44'
-        CN-45:
-            combinedCode: CN-45
-            code: '45'
-        CN-46:
-            combinedCode: CN-46
-            code: '46'
-        CN-50:
-            combinedCode: CN-50
-            code: '50'
-        CN-51:
-            combinedCode: CN-51
-            code: '51'
-        CN-52:
-            combinedCode: CN-52
-            code: '52'
-        CN-53:
-            combinedCode: CN-53
-            code: '53'
-        CN-54:
-            combinedCode: CN-54
-            code: '54'
-        CN-61:
-            combinedCode: CN-61
-            code: '61'
-        CN-62:
-            combinedCode: CN-62
-            code: '62'
-        CN-63:
-            combinedCode: CN-63
-            code: '63'
-        CN-64:
-            combinedCode: CN-64
-            code: '64'
-        CN-65:
-            combinedCode: CN-65
-            code: '65'
-        CN-71:
-            combinedCode: CN-71
-            code: '71'
-        CN-91:
-            combinedCode: CN-91
-            code: '91'
-        CN-92:
-            combinedCode: CN-92
-            code: '92'
+        CN-AH:
+            combinedCode: CN-AH
+            code: AH
+        CN-BJ:
+            combinedCode: CN-BJ
+            code: BJ
+        CN-CQ:
+            combinedCode: CN-CQ
+            code: CQ
+        CN-FJ:
+            combinedCode: CN-FJ
+            code: FJ
+        CN-GD:
+            combinedCode: CN-GD
+            code: GD
+        CN-GS:
+            combinedCode: CN-GS
+            code: GS
+        CN-GX:
+            combinedCode: CN-GX
+            code: GX
+        CN-GZ:
+            combinedCode: CN-GZ
+            code: GZ
+        CN-HA:
+            combinedCode: CN-HA
+            code: HA
+        CN-HB:
+            combinedCode: CN-HB
+            code: HB
+        CN-HE:
+            combinedCode: CN-HE
+            code: HE
+        CN-HI:
+            combinedCode: CN-HI
+            code: HI
+        CN-HK:
+            combinedCode: CN-HK
+            code: HK
+        CN-HL:
+            combinedCode: CN-HL
+            code: HL
+        CN-HN:
+            combinedCode: CN-HN
+            code: HN
+        CN-JL:
+            combinedCode: CN-JL
+            code: JL
+        CN-JS:
+            combinedCode: CN-JS
+            code: JS
+        CN-JX:
+            combinedCode: CN-JX
+            code: JX
+        CN-LN:
+            combinedCode: CN-LN
+            code: LN
+        CN-MO:
+            combinedCode: CN-MO
+            code: MO
+        CN-NM:
+            combinedCode: CN-NM
+            code: NM
+        CN-NX:
+            combinedCode: CN-NX
+            code: NX
+        CN-QH:
+            combinedCode: CN-QH
+            code: QH
+        CN-SC:
+            combinedCode: CN-SC
+            code: SC
+        CN-SD:
+            combinedCode: CN-SD
+            code: SD
+        CN-SH:
+            combinedCode: CN-SH
+            code: SH
+        CN-SN:
+            combinedCode: CN-SN
+            code: SN
+        CN-SX:
+            combinedCode: CN-SX
+            code: SX
+        CN-TJ:
+            combinedCode: CN-TJ
+            code: TJ
+        CN-TW:
+            combinedCode: CN-TW
+            code: TW
+        CN-XJ:
+            combinedCode: CN-XJ
+            code: XJ
+        CN-XZ:
+            combinedCode: CN-XZ
+            code: XZ
+        CN-YN:
+            combinedCode: CN-YN
+            code: YN
+        CN-ZJ:
+            combinedCode: CN-ZJ
+            code: ZJ
 CO:
     iso2Code: CO
     iso3Code: COL
@@ -2608,9 +2506,6 @@ CU:
         CU-01:
             combinedCode: CU-01
             code: '01'
-        CU-02:
-            combinedCode: CU-02
-            code: '02'
         CU-03:
             combinedCode: CU-03
             code: '03'
@@ -2647,6 +2542,12 @@ CU:
         CU-14:
             combinedCode: CU-14
             code: '14'
+        CU-15:
+            combinedCode: CU-15
+            code: '15'
+        CU-16:
+            combinedCode: CU-16
+            code: '16'
         CU-99:
             combinedCode: CU-99
             code: '99'
@@ -2711,6 +2612,9 @@ CV:
         CV-SM:
             combinedCode: CV-SM
             code: SM
+        CV-SO:
+            combinedCode: CV-SO
+            code: SO
         CV-SS:
             combinedCode: CV-SS
             code: SS
@@ -2757,48 +2661,276 @@ CZ:
     iso2Code: CZ
     iso3Code: CZE
     regions:
-        CZ-JC:
-            combinedCode: CZ-JC
-            code: JC
-        CZ-JM:
-            combinedCode: CZ-JM
-            code: JM
-        CZ-KA:
-            combinedCode: CZ-KA
-            code: KA
-        CZ-KR:
-            combinedCode: CZ-KR
-            code: KR
-        CZ-LI:
-            combinedCode: CZ-LI
-            code: LI
-        CZ-MO:
-            combinedCode: CZ-MO
-            code: MO
-        CZ-OL:
-            combinedCode: CZ-OL
-            code: OL
-        CZ-PA:
-            combinedCode: CZ-PA
-            code: PA
-        CZ-PL:
-            combinedCode: CZ-PL
-            code: PL
-        CZ-PR:
-            combinedCode: CZ-PR
-            code: PR
-        CZ-ST:
-            combinedCode: CZ-ST
-            code: ST
-        CZ-US:
-            combinedCode: CZ-US
-            code: US
-        CZ-VY:
-            combinedCode: CZ-VY
-            code: VY
-        CZ-ZL:
-            combinedCode: CZ-ZL
-            code: ZL
+        CZ-10:
+            combinedCode: CZ-10
+            code: '10'
+        CZ-20:
+            combinedCode: CZ-20
+            code: '20'
+        CZ-201:
+            combinedCode: CZ-201
+            code: '201'
+        CZ-202:
+            combinedCode: CZ-202
+            code: '202'
+        CZ-203:
+            combinedCode: CZ-203
+            code: '203'
+        CZ-204:
+            combinedCode: CZ-204
+            code: '204'
+        CZ-205:
+            combinedCode: CZ-205
+            code: '205'
+        CZ-206:
+            combinedCode: CZ-206
+            code: '206'
+        CZ-207:
+            combinedCode: CZ-207
+            code: '207'
+        CZ-208:
+            combinedCode: CZ-208
+            code: '208'
+        CZ-209:
+            combinedCode: CZ-209
+            code: '209'
+        CZ-20A:
+            combinedCode: CZ-20A
+            code: 20A
+        CZ-20B:
+            combinedCode: CZ-20B
+            code: 20B
+        CZ-20C:
+            combinedCode: CZ-20C
+            code: 20C
+        CZ-31:
+            combinedCode: CZ-31
+            code: '31'
+        CZ-311:
+            combinedCode: CZ-311
+            code: '311'
+        CZ-312:
+            combinedCode: CZ-312
+            code: '312'
+        CZ-313:
+            combinedCode: CZ-313
+            code: '313'
+        CZ-314:
+            combinedCode: CZ-314
+            code: '314'
+        CZ-315:
+            combinedCode: CZ-315
+            code: '315'
+        CZ-316:
+            combinedCode: CZ-316
+            code: '316'
+        CZ-317:
+            combinedCode: CZ-317
+            code: '317'
+        CZ-32:
+            combinedCode: CZ-32
+            code: '32'
+        CZ-321:
+            combinedCode: CZ-321
+            code: '321'
+        CZ-322:
+            combinedCode: CZ-322
+            code: '322'
+        CZ-323:
+            combinedCode: CZ-323
+            code: '323'
+        CZ-324:
+            combinedCode: CZ-324
+            code: '324'
+        CZ-325:
+            combinedCode: CZ-325
+            code: '325'
+        CZ-326:
+            combinedCode: CZ-326
+            code: '326'
+        CZ-327:
+            combinedCode: CZ-327
+            code: '327'
+        CZ-41:
+            combinedCode: CZ-41
+            code: '41'
+        CZ-411:
+            combinedCode: CZ-411
+            code: '411'
+        CZ-412:
+            combinedCode: CZ-412
+            code: '412'
+        CZ-413:
+            combinedCode: CZ-413
+            code: '413'
+        CZ-42:
+            combinedCode: CZ-42
+            code: '42'
+        CZ-421:
+            combinedCode: CZ-421
+            code: '421'
+        CZ-422:
+            combinedCode: CZ-422
+            code: '422'
+        CZ-423:
+            combinedCode: CZ-423
+            code: '423'
+        CZ-424:
+            combinedCode: CZ-424
+            code: '424'
+        CZ-425:
+            combinedCode: CZ-425
+            code: '425'
+        CZ-426:
+            combinedCode: CZ-426
+            code: '426'
+        CZ-427:
+            combinedCode: CZ-427
+            code: '427'
+        CZ-51:
+            combinedCode: CZ-51
+            code: '51'
+        CZ-511:
+            combinedCode: CZ-511
+            code: '511'
+        CZ-512:
+            combinedCode: CZ-512
+            code: '512'
+        CZ-513:
+            combinedCode: CZ-513
+            code: '513'
+        CZ-514:
+            combinedCode: CZ-514
+            code: '514'
+        CZ-52:
+            combinedCode: CZ-52
+            code: '52'
+        CZ-521:
+            combinedCode: CZ-521
+            code: '521'
+        CZ-522:
+            combinedCode: CZ-522
+            code: '522'
+        CZ-523:
+            combinedCode: CZ-523
+            code: '523'
+        CZ-524:
+            combinedCode: CZ-524
+            code: '524'
+        CZ-525:
+            combinedCode: CZ-525
+            code: '525'
+        CZ-53:
+            combinedCode: CZ-53
+            code: '53'
+        CZ-531:
+            combinedCode: CZ-531
+            code: '531'
+        CZ-532:
+            combinedCode: CZ-532
+            code: '532'
+        CZ-533:
+            combinedCode: CZ-533
+            code: '533'
+        CZ-534:
+            combinedCode: CZ-534
+            code: '534'
+        CZ-63:
+            combinedCode: CZ-63
+            code: '63'
+        CZ-631:
+            combinedCode: CZ-631
+            code: '631'
+        CZ-632:
+            combinedCode: CZ-632
+            code: '632'
+        CZ-633:
+            combinedCode: CZ-633
+            code: '633'
+        CZ-634:
+            combinedCode: CZ-634
+            code: '634'
+        CZ-635:
+            combinedCode: CZ-635
+            code: '635'
+        CZ-64:
+            combinedCode: CZ-64
+            code: '64'
+        CZ-641:
+            combinedCode: CZ-641
+            code: '641'
+        CZ-642:
+            combinedCode: CZ-642
+            code: '642'
+        CZ-643:
+            combinedCode: CZ-643
+            code: '643'
+        CZ-644:
+            combinedCode: CZ-644
+            code: '644'
+        CZ-645:
+            combinedCode: CZ-645
+            code: '645'
+        CZ-646:
+            combinedCode: CZ-646
+            code: '646'
+        CZ-647:
+            combinedCode: CZ-647
+            code: '647'
+        CZ-71:
+            combinedCode: CZ-71
+            code: '71'
+        CZ-711:
+            combinedCode: CZ-711
+            code: '711'
+        CZ-712:
+            combinedCode: CZ-712
+            code: '712'
+        CZ-713:
+            combinedCode: CZ-713
+            code: '713'
+        CZ-714:
+            combinedCode: CZ-714
+            code: '714'
+        CZ-715:
+            combinedCode: CZ-715
+            code: '715'
+        CZ-72:
+            combinedCode: CZ-72
+            code: '72'
+        CZ-721:
+            combinedCode: CZ-721
+            code: '721'
+        CZ-722:
+            combinedCode: CZ-722
+            code: '722'
+        CZ-723:
+            combinedCode: CZ-723
+            code: '723'
+        CZ-724:
+            combinedCode: CZ-724
+            code: '724'
+        CZ-80:
+            combinedCode: CZ-80
+            code: '80'
+        CZ-801:
+            combinedCode: CZ-801
+            code: '801'
+        CZ-802:
+            combinedCode: CZ-802
+            code: '802'
+        CZ-803:
+            combinedCode: CZ-803
+            code: '803'
+        CZ-804:
+            combinedCode: CZ-804
+            code: '804'
+        CZ-805:
+            combinedCode: CZ-805
+            code: '805'
+        CZ-806:
+            combinedCode: CZ-806
+            code: '806'
 DE:
     iso2Code: DE
     iso3Code: DEU
@@ -2896,9 +3028,6 @@ DM:
     iso2Code: DM
     iso3Code: DMA
     regions:
-        DM-01:
-            combinedCode: DM-01
-            code: '01'
         DM-02:
             combinedCode: DM-02
             code: '02'
@@ -2926,6 +3055,9 @@ DM:
         DM-10:
             combinedCode: DM-10
             code: '10'
+        DM-11:
+            combinedCode: DM-11
+            code: '11'
 DO:
     iso2Code: DO
     iso3Code: DOM
@@ -3020,6 +3152,42 @@ DO:
         DO-30:
             combinedCode: DO-30
             code: '30'
+        DO-31:
+            combinedCode: DO-31
+            code: '31'
+        DO-32:
+            combinedCode: DO-32
+            code: '32'
+        DO-33:
+            combinedCode: DO-33
+            code: '33'
+        DO-34:
+            combinedCode: DO-34
+            code: '34'
+        DO-35:
+            combinedCode: DO-35
+            code: '35'
+        DO-36:
+            combinedCode: DO-36
+            code: '36'
+        DO-37:
+            combinedCode: DO-37
+            code: '37'
+        DO-38:
+            combinedCode: DO-38
+            code: '38'
+        DO-39:
+            combinedCode: DO-39
+            code: '39'
+        DO-40:
+            combinedCode: DO-40
+            code: '40'
+        DO-41:
+            combinedCode: DO-41
+            code: '41'
+        DO-42:
+            combinedCode: DO-42
+            code: '42'
 DZ:
     iso2Code: DZ
     iso3Code: DZA
@@ -3168,6 +3336,36 @@ DZ:
         DZ-48:
             combinedCode: DZ-48
             code: '48'
+        DZ-49:
+            combinedCode: DZ-49
+            code: '49'
+        DZ-50:
+            combinedCode: DZ-50
+            code: '50'
+        DZ-51:
+            combinedCode: DZ-51
+            code: '51'
+        DZ-52:
+            combinedCode: DZ-52
+            code: '52'
+        DZ-53:
+            combinedCode: DZ-53
+            code: '53'
+        DZ-54:
+            combinedCode: DZ-54
+            code: '54'
+        DZ-55:
+            combinedCode: DZ-55
+            code: '55'
+        DZ-56:
+            combinedCode: DZ-56
+            code: '56'
+        DZ-57:
+            combinedCode: DZ-57
+            code: '57'
+        DZ-58:
+            combinedCode: DZ-58
+            code: '58'
 EC:
     iso2Code: EC
     iso3Code: ECU
@@ -3207,7 +3405,7 @@ EC:
             code: M
         EC-N:
             combinedCode: EC-N
-            code: N
+            code: 'N'
         EC-O:
             combinedCode: EC-O
             code: O
@@ -3240,7 +3438,7 @@ EC:
             code: X
         EC-Y:
             combinedCode: EC-Y
-            code: Y
+            code: 'Y'
         EC-Z:
             combinedCode: EC-Z
             code: Z
@@ -3248,51 +3446,288 @@ EE:
     iso2Code: EE
     iso3Code: EST
     regions:
+        EE-130:
+            combinedCode: EE-130
+            code: '130'
+        EE-141:
+            combinedCode: EE-141
+            code: '141'
+        EE-142:
+            combinedCode: EE-142
+            code: '142'
+        EE-171:
+            combinedCode: EE-171
+            code: '171'
+        EE-184:
+            combinedCode: EE-184
+            code: '184'
+        EE-191:
+            combinedCode: EE-191
+            code: '191'
+        EE-198:
+            combinedCode: EE-198
+            code: '198'
+        EE-205:
+            combinedCode: EE-205
+            code: '205'
+        EE-214:
+            combinedCode: EE-214
+            code: '214'
+        EE-245:
+            combinedCode: EE-245
+            code: '245'
+        EE-247:
+            combinedCode: EE-247
+            code: '247'
+        EE-251:
+            combinedCode: EE-251
+            code: '251'
+        EE-255:
+            combinedCode: EE-255
+            code: '255'
+        EE-272:
+            combinedCode: EE-272
+            code: '272'
+        EE-283:
+            combinedCode: EE-283
+            code: '283'
+        EE-284:
+            combinedCode: EE-284
+            code: '284'
+        EE-291:
+            combinedCode: EE-291
+            code: '291'
+        EE-293:
+            combinedCode: EE-293
+            code: '293'
+        EE-296:
+            combinedCode: EE-296
+            code: '296'
+        EE-303:
+            combinedCode: EE-303
+            code: '303'
+        EE-305:
+            combinedCode: EE-305
+            code: '305'
+        EE-317:
+            combinedCode: EE-317
+            code: '317'
+        EE-321:
+            combinedCode: EE-321
+            code: '321'
+        EE-338:
+            combinedCode: EE-338
+            code: '338'
+        EE-353:
+            combinedCode: EE-353
+            code: '353'
         EE-37:
             combinedCode: EE-37
             code: '37'
         EE-39:
             combinedCode: EE-39
             code: '39'
-        EE-44:
-            combinedCode: EE-44
-            code: '44'
-        EE-49:
-            combinedCode: EE-49
-            code: '49'
-        EE-51:
-            combinedCode: EE-51
-            code: '51'
-        EE-57:
-            combinedCode: EE-57
-            code: '57'
-        EE-59:
-            combinedCode: EE-59
-            code: '59'
-        EE-65:
-            combinedCode: EE-65
-            code: '65'
-        EE-67:
-            combinedCode: EE-67
-            code: '67'
-        EE-70:
-            combinedCode: EE-70
-            code: '70'
+        EE-424:
+            combinedCode: EE-424
+            code: '424'
+        EE-430:
+            combinedCode: EE-430
+            code: '430'
+        EE-431:
+            combinedCode: EE-431
+            code: '431'
+        EE-432:
+            combinedCode: EE-432
+            code: '432'
+        EE-441:
+            combinedCode: EE-441
+            code: '441'
+        EE-442:
+            combinedCode: EE-442
+            code: '442'
+        EE-446:
+            combinedCode: EE-446
+            code: '446'
+        EE-45:
+            combinedCode: EE-45
+            code: '45'
+        EE-478:
+            combinedCode: EE-478
+            code: '478'
+        EE-480:
+            combinedCode: EE-480
+            code: '480'
+        EE-486:
+            combinedCode: EE-486
+            code: '486'
+        EE-50:
+            combinedCode: EE-50
+            code: '50'
+        EE-503:
+            combinedCode: EE-503
+            code: '503'
+        EE-511:
+            combinedCode: EE-511
+            code: '511'
+        EE-514:
+            combinedCode: EE-514
+            code: '514'
+        EE-52:
+            combinedCode: EE-52
+            code: '52'
+        EE-528:
+            combinedCode: EE-528
+            code: '528'
+        EE-557:
+            combinedCode: EE-557
+            code: '557'
+        EE-56:
+            combinedCode: EE-56
+            code: '56'
+        EE-567:
+            combinedCode: EE-567
+            code: '567'
+        EE-586:
+            combinedCode: EE-586
+            code: '586'
+        EE-60:
+            combinedCode: EE-60
+            code: '60'
+        EE-615:
+            combinedCode: EE-615
+            code: '615'
+        EE-618:
+            combinedCode: EE-618
+            code: '618'
+        EE-622:
+            combinedCode: EE-622
+            code: '622'
+        EE-624:
+            combinedCode: EE-624
+            code: '624'
+        EE-638:
+            combinedCode: EE-638
+            code: '638'
+        EE-64:
+            combinedCode: EE-64
+            code: '64'
+        EE-651:
+            combinedCode: EE-651
+            code: '651'
+        EE-653:
+            combinedCode: EE-653
+            code: '653'
+        EE-661:
+            combinedCode: EE-661
+            code: '661'
+        EE-663:
+            combinedCode: EE-663
+            code: '663'
+        EE-668:
+            combinedCode: EE-668
+            code: '668'
+        EE-68:
+            combinedCode: EE-68
+            code: '68'
+        EE-689:
+            combinedCode: EE-689
+            code: '689'
+        EE-698:
+            combinedCode: EE-698
+            code: '698'
+        EE-708:
+            combinedCode: EE-708
+            code: '708'
+        EE-71:
+            combinedCode: EE-71
+            code: '71'
+        EE-712:
+            combinedCode: EE-712
+            code: '712'
+        EE-714:
+            combinedCode: EE-714
+            code: '714'
+        EE-719:
+            combinedCode: EE-719
+            code: '719'
+        EE-726:
+            combinedCode: EE-726
+            code: '726'
+        EE-732:
+            combinedCode: EE-732
+            code: '732'
+        EE-735:
+            combinedCode: EE-735
+            code: '735'
         EE-74:
             combinedCode: EE-74
             code: '74'
-        EE-78:
-            combinedCode: EE-78
-            code: '78'
-        EE-82:
-            combinedCode: EE-82
-            code: '82'
+        EE-784:
+            combinedCode: EE-784
+            code: '784'
+        EE-79:
+            combinedCode: EE-79
+            code: '79'
+        EE-792:
+            combinedCode: EE-792
+            code: '792'
+        EE-793:
+            combinedCode: EE-793
+            code: '793'
+        EE-796:
+            combinedCode: EE-796
+            code: '796'
+        EE-803:
+            combinedCode: EE-803
+            code: '803'
+        EE-809:
+            combinedCode: EE-809
+            code: '809'
+        EE-81:
+            combinedCode: EE-81
+            code: '81'
+        EE-824:
+            combinedCode: EE-824
+            code: '824'
+        EE-834:
+            combinedCode: EE-834
+            code: '834'
         EE-84:
             combinedCode: EE-84
             code: '84'
-        EE-86:
-            combinedCode: EE-86
-            code: '86'
+        EE-855:
+            combinedCode: EE-855
+            code: '855'
+        EE-87:
+            combinedCode: EE-87
+            code: '87'
+        EE-890:
+            combinedCode: EE-890
+            code: '890'
+        EE-897:
+            combinedCode: EE-897
+            code: '897'
+        EE-899:
+            combinedCode: EE-899
+            code: '899'
+        EE-901:
+            combinedCode: EE-901
+            code: '901'
+        EE-903:
+            combinedCode: EE-903
+            code: '903'
+        EE-907:
+            combinedCode: EE-907
+            code: '907'
+        EE-917:
+            combinedCode: EE-917
+            code: '917'
+        EE-919:
+            combinedCode: EE-919
+            code: '919'
+        EE-928:
+            combinedCode: EE-928
+            code: '928'
 EG:
     iso2Code: EG
     iso3Code: EGY
@@ -3333,9 +3768,6 @@ EG:
         EG-GZ:
             combinedCode: EG-GZ
             code: GZ
-        EG-HU:
-            combinedCode: EG-HU
-            code: HU
         EG-IS:
             combinedCode: EG-IS
             code: IS
@@ -3351,6 +3783,9 @@ EG:
         EG-KN:
             combinedCode: EG-KN
             code: KN
+        EG-LX:
+            combinedCode: EG-LX
+            code: LX
         EG-MN:
             combinedCode: EG-MN
             code: MN
@@ -3372,9 +3807,6 @@ EG:
         EG-SIN:
             combinedCode: EG-SIN
             code: SIN
-        EG-SU:
-            combinedCode: EG-SU
-            code: SU
         EG-SUZ:
             combinedCode: EG-SUZ
             code: SUZ
@@ -3646,12 +4078,18 @@ ET:
         ET-OR:
             combinedCode: ET-OR
             code: OR
+        ET-SI:
+            combinedCode: ET-SI
+            code: SI
         ET-SN:
             combinedCode: ET-SN
             code: SN
         ET-SO:
             combinedCode: ET-SO
             code: SO
+        ET-SW:
+            combinedCode: ET-SW
+            code: SW
         ET-TI:
             combinedCode: ET-TI
             code: TI
@@ -3659,28 +4097,109 @@ FI:
     iso2Code: FI
     iso3Code: FIN
     regions:
-        FI-AL:
-            combinedCode: FI-AL
-            code: AL
-        FI-ES:
-            combinedCode: FI-ES
-            code: ES
-        FI-IS:
-            combinedCode: FI-IS
-            code: IS
-        FI-LL:
-            combinedCode: FI-LL
-            code: LL
-        FI-LS:
-            combinedCode: FI-LS
-            code: LS
-        FI-OL:
-            combinedCode: FI-OL
-            code: OL
+        FI-01:
+            combinedCode: FI-01
+            code: '01'
+        FI-02:
+            combinedCode: FI-02
+            code: '02'
+        FI-03:
+            combinedCode: FI-03
+            code: '03'
+        FI-04:
+            combinedCode: FI-04
+            code: '04'
+        FI-05:
+            combinedCode: FI-05
+            code: '05'
+        FI-06:
+            combinedCode: FI-06
+            code: '06'
+        FI-07:
+            combinedCode: FI-07
+            code: '07'
+        FI-08:
+            combinedCode: FI-08
+            code: '08'
+        FI-09:
+            combinedCode: FI-09
+            code: '09'
+        FI-10:
+            combinedCode: FI-10
+            code: '10'
+        FI-11:
+            combinedCode: FI-11
+            code: '11'
+        FI-12:
+            combinedCode: FI-12
+            code: '12'
+        FI-13:
+            combinedCode: FI-13
+            code: '13'
+        FI-14:
+            combinedCode: FI-14
+            code: '14'
+        FI-15:
+            combinedCode: FI-15
+            code: '15'
+        FI-16:
+            combinedCode: FI-16
+            code: '16'
+        FI-17:
+            combinedCode: FI-17
+            code: '17'
+        FI-18:
+            combinedCode: FI-18
+            code: '18'
+        FI-19:
+            combinedCode: FI-19
+            code: '19'
 FJ:
     iso2Code: FJ
     iso3Code: FJI
     regions:
+        FJ-01:
+            combinedCode: FJ-01
+            code: '01'
+        FJ-02:
+            combinedCode: FJ-02
+            code: '02'
+        FJ-03:
+            combinedCode: FJ-03
+            code: '03'
+        FJ-04:
+            combinedCode: FJ-04
+            code: '04'
+        FJ-05:
+            combinedCode: FJ-05
+            code: '05'
+        FJ-06:
+            combinedCode: FJ-06
+            code: '06'
+        FJ-07:
+            combinedCode: FJ-07
+            code: '07'
+        FJ-08:
+            combinedCode: FJ-08
+            code: '08'
+        FJ-09:
+            combinedCode: FJ-09
+            code: '09'
+        FJ-10:
+            combinedCode: FJ-10
+            code: '10'
+        FJ-11:
+            combinedCode: FJ-11
+            code: '11'
+        FJ-12:
+            combinedCode: FJ-12
+            code: '12'
+        FJ-13:
+            combinedCode: FJ-13
+            code: '13'
+        FJ-14:
+            combinedCode: FJ-14
+            code: '14'
         FJ-C:
             combinedCode: FJ-C
             code: C
@@ -3689,7 +4208,7 @@ FJ:
             code: E
         FJ-N:
             combinedCode: FJ-N
-            code: N
+            code: 'N'
         FJ-R:
             combinedCode: FJ-R
             code: R
@@ -3781,6 +4300,9 @@ FR:
         FR-19:
             combinedCode: FR-19
             code: '19'
+        FR-20R:
+            combinedCode: FR-20R
+            code: 20R
         FR-21:
             combinedCode: FR-21
             code: '21'
@@ -3934,6 +4456,12 @@ FR:
         FR-69:
             combinedCode: FR-69
             code: '69'
+        FR-69M:
+            combinedCode: FR-69M
+            code: 69M
+        FR-6AE:
+            combinedCode: FR-6AE
+            code: 6AE
         FR-70:
             combinedCode: FR-70
             code: '70'
@@ -3949,9 +4477,9 @@ FR:
         FR-74:
             combinedCode: FR-74
             code: '74'
-        FR-75:
-            combinedCode: FR-75
-            code: '75'
+        FR-75C:
+            combinedCode: FR-75C
+            code: 75C
         FR-76:
             combinedCode: FR-76
             code: '76'
@@ -4012,111 +4540,81 @@ FR:
         FR-95:
             combinedCode: FR-95
             code: '95'
-        FR-A:
-            combinedCode: FR-A
-            code: A
-        FR-B:
-            combinedCode: FR-B
-            code: B
+        FR-971:
+            combinedCode: FR-971
+            code: '971'
+        FR-972:
+            combinedCode: FR-972
+            code: '972'
+        FR-973:
+            combinedCode: FR-973
+            code: '973'
+        FR-974:
+            combinedCode: FR-974
+            code: '974'
+        FR-976:
+            combinedCode: FR-976
+            code: '976'
+        FR-ARA:
+            combinedCode: FR-ARA
+            code: ARA
+        FR-BFC:
+            combinedCode: FR-BFC
+            code: BFC
         FR-BL:
             combinedCode: FR-BL
             code: BL
-        FR-C:
-            combinedCode: FR-C
-            code: C
+        FR-BRE:
+            combinedCode: FR-BRE
+            code: BRE
         FR-CP:
             combinedCode: FR-CP
             code: CP
-        FR-D:
-            combinedCode: FR-D
-            code: D
-        FR-E:
-            combinedCode: FR-E
-            code: E
-        FR-F:
-            combinedCode: FR-F
-            code: F
-        FR-G:
-            combinedCode: FR-G
-            code: G
-        FR-GF:
-            combinedCode: FR-GF
-            code: GF
-        FR-GP:
-            combinedCode: FR-GP
-            code: GP
-        FR-H:
-            combinedCode: FR-H
-            code: H
-        FR-I:
-            combinedCode: FR-I
-            code: I
-        FR-J:
-            combinedCode: FR-J
-            code: J
-        FR-K:
-            combinedCode: FR-K
-            code: K
-        FR-L:
-            combinedCode: FR-L
-            code: L
-        FR-M:
-            combinedCode: FR-M
-            code: M
+        FR-CVL:
+            combinedCode: FR-CVL
+            code: CVL
+        FR-GES:
+            combinedCode: FR-GES
+            code: GES
+        FR-HDF:
+            combinedCode: FR-HDF
+            code: HDF
+        FR-IDF:
+            combinedCode: FR-IDF
+            code: IDF
         FR-MF:
             combinedCode: FR-MF
             code: MF
-        FR-MQ:
-            combinedCode: FR-MQ
-            code: MQ
-        FR-N:
-            combinedCode: FR-N
-            code: N
+        FR-NAQ:
+            combinedCode: FR-NAQ
+            code: NAQ
         FR-NC:
             combinedCode: FR-NC
             code: NC
-        FR-O:
-            combinedCode: FR-O
-            code: O
-        FR-P:
-            combinedCode: FR-P
-            code: P
+        FR-NOR:
+            combinedCode: FR-NOR
+            code: NOR
+        FR-OCC:
+            combinedCode: FR-OCC
+            code: OCC
+        FR-PAC:
+            combinedCode: FR-PAC
+            code: PAC
+        FR-PDL:
+            combinedCode: FR-PDL
+            code: PDL
         FR-PF:
             combinedCode: FR-PF
             code: PF
         FR-PM:
             combinedCode: FR-PM
             code: PM
-        FR-Q:
-            combinedCode: FR-Q
-            code: Q
-        FR-R:
-            combinedCode: FR-R
-            code: R
-        FR-RE:
-            combinedCode: FR-RE
-            code: RE
-        FR-S:
-            combinedCode: FR-S
-            code: S
-        FR-T:
-            combinedCode: FR-T
-            code: T
         FR-TF:
             combinedCode: FR-TF
             code: TF
-        FR-U:
-            combinedCode: FR-U
-            code: U
-        FR-V:
-            combinedCode: FR-V
-            code: V
         FR-WF:
             combinedCode: FR-WF
             code: WF
-        FR-YT:
-            combinedCode: FR-YT
-            code: YT
 GA:
     iso2Code: GA
     iso3Code: GAB
@@ -4152,6 +4650,9 @@ GB:
     iso2Code: GB
     iso3Code: GBR
     regions:
+        GB-ABC:
+            combinedCode: GB-ABC
+            code: ABC
         GB-ABD:
             combinedCode: GB-ABD
             code: ABD
@@ -4164,24 +4665,24 @@ GB:
         GB-AGY:
             combinedCode: GB-AGY
             code: AGY
+        GB-AND:
+            combinedCode: GB-AND
+            code: AND
+        GB-ANN:
+            combinedCode: GB-ANN
+            code: ANN
         GB-ANS:
             combinedCode: GB-ANS
             code: ANS
-        GB-ANT:
-            combinedCode: GB-ANT
-            code: ANT
-        GB-ARD:
-            combinedCode: GB-ARD
-            code: ARD
-        GB-ARM:
-            combinedCode: GB-ARM
-            code: ARM
         GB-BAS:
             combinedCode: GB-BAS
             code: BAS
         GB-BBD:
             combinedCode: GB-BBD
             code: BBD
+        GB-BCP:
+            combinedCode: GB-BCP
+            code: BCP
         GB-BDF:
             combinedCode: GB-BDF
             code: BDF
@@ -4209,18 +4710,6 @@ GB:
         GB-BKM:
             combinedCode: GB-BKM
             code: BKM
-        GB-BLA:
-            combinedCode: GB-BLA
-            code: BLA
-        GB-BLY:
-            combinedCode: GB-BLY
-            code: BLY
-        GB-BMH:
-            combinedCode: GB-BMH
-            code: BMH
-        GB-BNB:
-            combinedCode: GB-BNB
-            code: BNB
         GB-BNE:
             combinedCode: GB-BNE
             code: BNE
@@ -4260,33 +4749,24 @@ GB:
         GB-CBF:
             combinedCode: GB-CBF
             code: CBF
+        GB-CCG:
+            combinedCode: GB-CCG
+            code: CCG
         GB-CGN:
             combinedCode: GB-CGN
             code: CGN
-        GB-CGV:
-            combinedCode: GB-CGV
-            code: CGV
         GB-CHE:
             combinedCode: GB-CHE
             code: CHE
         GB-CHW:
             combinedCode: GB-CHW
             code: CHW
-        GB-CKF:
-            combinedCode: GB-CKF
-            code: CKF
-        GB-CKT:
-            combinedCode: GB-CKT
-            code: CKT
         GB-CLD:
             combinedCode: GB-CLD
             code: CLD
         GB-CLK:
             combinedCode: GB-CLK
             code: CLK
-        GB-CLR:
-            combinedCode: GB-CLR
-            code: CLR
         GB-CMA:
             combinedCode: GB-CMA
             code: CMA
@@ -4308,9 +4788,6 @@ GB:
         GB-CRY:
             combinedCode: GB-CRY
             code: CRY
-        GB-CSR:
-            combinedCode: GB-CSR
-            code: CSR
         GB-CWY:
             combinedCode: GB-CWY
             code: CWY
@@ -4329,9 +4806,6 @@ GB:
         GB-DEV:
             combinedCode: GB-DEV
             code: DEV
-        GB-DGN:
-            combinedCode: GB-DGN
-            code: DGN
         GB-DGY:
             combinedCode: GB-DGY
             code: DGY
@@ -4344,12 +4818,9 @@ GB:
         GB-DOR:
             combinedCode: GB-DOR
             code: DOR
-        GB-DOW:
-            combinedCode: GB-DOW
-            code: DOW
-        GB-DRY:
-            combinedCode: GB-DRY
-            code: DRY
+        GB-DRS:
+            combinedCode: GB-DRS
+            code: DRS
         GB-DUD:
             combinedCode: GB-DUD
             code: DUD
@@ -4359,9 +4830,6 @@ GB:
         GB-EAL:
             combinedCode: GB-EAL
             code: EAL
-        GB-EAW:
-            combinedCode: GB-EAW
-            code: EAW
         GB-EAY:
             combinedCode: GB-EAY
             code: EAY
@@ -4380,6 +4848,9 @@ GB:
         GB-ENF:
             combinedCode: GB-ENF
             code: ENF
+        GB-ENG:
+            combinedCode: GB-ENG
+            code: ENG
         GB-ERW:
             combinedCode: GB-ERW
             code: ERW
@@ -4395,21 +4866,18 @@ GB:
         GB-FAL:
             combinedCode: GB-FAL
             code: FAL
-        GB-FER:
-            combinedCode: GB-FER
-            code: FER
         GB-FIF:
             combinedCode: GB-FIF
             code: FIF
         GB-FLN:
             combinedCode: GB-FLN
             code: FLN
+        GB-FMO:
+            combinedCode: GB-FMO
+            code: FMO
         GB-GAT:
             combinedCode: GB-GAT
             code: GAT
-        GB-GBN:
-            combinedCode: GB-GBN
-            code: GBN
         GB-GLG:
             combinedCode: GB-GLG
             code: GLG
@@ -4434,15 +4902,15 @@ GB:
         GB-HCK:
             combinedCode: GB-HCK
             code: HCK
-        GB-HED:
-            combinedCode: GB-HED
-            code: HED
         GB-HEF:
             combinedCode: GB-HEF
             code: HEF
         GB-HIL:
             combinedCode: GB-HIL
             code: HIL
+        GB-HLD:
+            combinedCode: GB-HLD
+            code: HLD
         GB-HMF:
             combinedCode: GB-HMF
             code: HMF
@@ -4461,6 +4929,9 @@ GB:
         GB-HRY:
             combinedCode: GB-HRY
             code: HRY
+        GB-IOS:
+            combinedCode: GB-IOS
+            code: IOS
         GB-IOW:
             combinedCode: GB-IOW
             code: IOW
@@ -4491,6 +4962,9 @@ GB:
         GB-LAN:
             combinedCode: GB-LAN
             code: LAN
+        GB-LBC:
+            combinedCode: GB-LBC
+            code: LBC
         GB-LBH:
             combinedCode: GB-LBH
             code: LBH
@@ -4512,18 +4986,9 @@ GB:
         GB-LIV:
             combinedCode: GB-LIV
             code: LIV
-        GB-LMV:
-            combinedCode: GB-LMV
-            code: LMV
         GB-LND:
             combinedCode: GB-LND
             code: LND
-        GB-LRN:
-            combinedCode: GB-LRN
-            code: LRN
-        GB-LSB:
-            combinedCode: GB-LSB
-            code: LSB
         GB-LUT:
             combinedCode: GB-LUT
             code: LUT
@@ -4536,9 +5001,9 @@ GB:
         GB-MDW:
             combinedCode: GB-MDW
             code: MDW
-        GB-MFT:
-            combinedCode: GB-MFT
-            code: MFT
+        GB-MEA:
+            combinedCode: GB-MEA
+            code: MEA
         GB-MIK:
             combinedCode: GB-MIK
             code: MIK
@@ -4557,18 +5022,15 @@ GB:
         GB-MTY:
             combinedCode: GB-MTY
             code: MTY
-        GB-MYL:
-            combinedCode: GB-MYL
-            code: MYL
+        GB-MUL:
+            combinedCode: GB-MUL
+            code: MUL
         GB-NAY:
             combinedCode: GB-NAY
             code: NAY
         GB-NBL:
             combinedCode: GB-NBL
             code: NBL
-        GB-NDN:
-            combinedCode: GB-NDN
-            code: NDN
         GB-NEL:
             combinedCode: GB-NEL
             code: NEL
@@ -4590,15 +5052,15 @@ GB:
         GB-NLN:
             combinedCode: GB-NLN
             code: NLN
+        GB-NMD:
+            combinedCode: GB-NMD
+            code: NMD
+        GB-NNH:
+            combinedCode: GB-NNH
+            code: NNH
         GB-NSM:
             combinedCode: GB-NSM
             code: NSM
-        GB-NTA:
-            combinedCode: GB-NTA
-            code: NTA
-        GB-NTH:
-            combinedCode: GB-NTH
-            code: NTH
         GB-NTL:
             combinedCode: GB-NTL
             code: NTL
@@ -4617,18 +5079,12 @@ GB:
         GB-NYK:
             combinedCode: GB-NYK
             code: NYK
-        GB-NYM:
-            combinedCode: GB-NYM
-            code: NYM
         GB-OLD:
             combinedCode: GB-OLD
             code: OLD
-        GB-OMH:
-            combinedCode: GB-OMH
-            code: OMH
-        GB-ORR:
-            combinedCode: GB-ORR
-            code: ORR
+        GB-ORK:
+            combinedCode: GB-ORK
+            code: ORK
         GB-OXF:
             combinedCode: GB-OXF
             code: OXF
@@ -4641,9 +5097,6 @@ GB:
         GB-PLY:
             combinedCode: GB-PLY
             code: PLY
-        GB-POL:
-            combinedCode: GB-POL
-            code: POL
         GB-POR:
             combinedCode: GB-POR
             code: POR
@@ -4737,9 +5190,6 @@ GB:
         GB-SRY:
             combinedCode: GB-SRY
             code: SRY
-        GB-STB:
-            combinedCode: GB-STB
-            code: STB
         GB-STE:
             combinedCode: GB-STE
             code: STE
@@ -4791,18 +5241,15 @@ GB:
         GB-TWH:
             combinedCode: GB-TWH
             code: TWH
-        GB-UKM:
-            combinedCode: GB-UKM
-            code: UKM
         GB-VGL:
             combinedCode: GB-VGL
             code: VGL
         GB-WAR:
             combinedCode: GB-WAR
             code: WAR
-        GB-WBX:
-            combinedCode: GB-WBX
-            code: WBX
+        GB-WBK:
+            combinedCode: GB-WBK
+            code: WBK
         GB-WDU:
             combinedCode: GB-WDU
             code: WDU
@@ -4812,6 +5259,9 @@ GB:
         GB-WGN:
             combinedCode: GB-WGN
             code: WGN
+        GB-WIL:
+            combinedCode: GB-WIL
+            code: WIL
         GB-WKF:
             combinedCode: GB-WKF
             code: WKF
@@ -4830,6 +5280,9 @@ GB:
         GB-WND:
             combinedCode: GB-WND
             code: WND
+        GB-WNH:
+            combinedCode: GB-WNH
+            code: WNH
         GB-WNM:
             combinedCode: GB-WNM
             code: WNM
@@ -4928,7 +5381,7 @@ GE:
 GF:
     iso2Code: GF
     iso3Code: GUF
-    regions: { }
+    regions: {  }
 GG:
     iso2Code: GG
     iso3Code: GGY
@@ -4940,21 +5393,36 @@ GH:
         GH-AA:
             combinedCode: GH-AA
             code: AA
+        GH-AF:
+            combinedCode: GH-AF
+            code: AF
         GH-AH:
             combinedCode: GH-AH
             code: AH
-        GH-BA:
-            combinedCode: GH-BA
-            code: BA
+        GH-BE:
+            combinedCode: GH-BE
+            code: BE
+        GH-BO:
+            combinedCode: GH-BO
+            code: BO
         GH-CP:
             combinedCode: GH-CP
             code: CP
         GH-EP:
             combinedCode: GH-EP
             code: EP
+        GH-NE:
+            combinedCode: GH-NE
+            code: NE
         GH-NP:
             combinedCode: GH-NP
             code: NP
+        GH-OT:
+            combinedCode: GH-OT
+            code: OT
+        GH-SV:
+            combinedCode: GH-SV
+            code: SV
         GH-TV:
             combinedCode: GH-TV
             code: TV
@@ -4964,6 +5432,9 @@ GH:
         GH-UW:
             combinedCode: GH-UW
             code: UW
+        GH-WN:
+            combinedCode: GH-WN
+            code: WN
         GH-WP:
             combinedCode: GH-WP
             code: WP
@@ -4975,15 +5446,18 @@ GL:
     iso2Code: GL
     iso3Code: GRL
     regions:
+        GL-AV:
+            combinedCode: GL-AV
+            code: AV
         GL-KU:
             combinedCode: GL-KU
             code: KU
-        GL-QA:
-            combinedCode: GL-QA
-            code: QA
         GL-QE:
             combinedCode: GL-QE
             code: QE
+        GL-QT:
+            combinedCode: GL-QT
+            code: QT
         GL-SM:
             combinedCode: GL-SM
             code: SM
@@ -5002,7 +5476,7 @@ GM:
             code: M
         GM-N:
             combinedCode: GM-N
-            code: N
+            code: 'N'
         GM-U:
             combinedCode: GM-U
             code: U
@@ -5117,7 +5591,7 @@ GN:
             code: MM
         GN-N:
             combinedCode: GN-N
-            code: N
+            code: 'N'
         GN-NZ:
             combinedCode: GN-NZ
             code: NZ
@@ -5159,6 +5633,9 @@ GQ:
         GQ-CS:
             combinedCode: GQ-CS
             code: CS
+        GQ-DJ:
+            combinedCode: GQ-DJ
+            code: DJ
         GQ-I:
             combinedCode: GQ-I
             code: I
@@ -5175,165 +5652,12 @@ GR:
     iso2Code: GR
     iso3Code: GRC
     regions:
-        GR-01:
-            combinedCode: GR-01
-            code: '01'
-        GR-03:
-            combinedCode: GR-03
-            code: '03'
-        GR-04:
-            combinedCode: GR-04
-            code: '04'
-        GR-05:
-            combinedCode: GR-05
-            code: '05'
-        GR-06:
-            combinedCode: GR-06
-            code: '06'
-        GR-07:
-            combinedCode: GR-07
-            code: '07'
-        GR-11:
-            combinedCode: GR-11
-            code: '11'
-        GR-12:
-            combinedCode: GR-12
-            code: '12'
-        GR-13:
-            combinedCode: GR-13
-            code: '13'
-        GR-14:
-            combinedCode: GR-14
-            code: '14'
-        GR-15:
-            combinedCode: GR-15
-            code: '15'
-        GR-16:
-            combinedCode: GR-16
-            code: '16'
-        GR-17:
-            combinedCode: GR-17
-            code: '17'
-        GR-21:
-            combinedCode: GR-21
-            code: '21'
-        GR-22:
-            combinedCode: GR-22
-            code: '22'
-        GR-23:
-            combinedCode: GR-23
-            code: '23'
-        GR-24:
-            combinedCode: GR-24
-            code: '24'
-        GR-31:
-            combinedCode: GR-31
-            code: '31'
-        GR-32:
-            combinedCode: GR-32
-            code: '32'
-        GR-33:
-            combinedCode: GR-33
-            code: '33'
-        GR-34:
-            combinedCode: GR-34
-            code: '34'
-        GR-41:
-            combinedCode: GR-41
-            code: '41'
-        GR-42:
-            combinedCode: GR-42
-            code: '42'
-        GR-43:
-            combinedCode: GR-43
-            code: '43'
-        GR-44:
-            combinedCode: GR-44
-            code: '44'
-        GR-51:
-            combinedCode: GR-51
-            code: '51'
-        GR-52:
-            combinedCode: GR-52
-            code: '52'
-        GR-53:
-            combinedCode: GR-53
-            code: '53'
-        GR-54:
-            combinedCode: GR-54
-            code: '54'
-        GR-55:
-            combinedCode: GR-55
-            code: '55'
-        GR-56:
-            combinedCode: GR-56
-            code: '56'
-        GR-57:
-            combinedCode: GR-57
-            code: '57'
-        GR-58:
-            combinedCode: GR-58
-            code: '58'
-        GR-59:
-            combinedCode: GR-59
-            code: '59'
-        GR-61:
-            combinedCode: GR-61
-            code: '61'
-        GR-62:
-            combinedCode: GR-62
-            code: '62'
-        GR-63:
-            combinedCode: GR-63
-            code: '63'
-        GR-64:
-            combinedCode: GR-64
-            code: '64'
         GR-69:
             combinedCode: GR-69
             code: '69'
-        GR-71:
-            combinedCode: GR-71
-            code: '71'
-        GR-72:
-            combinedCode: GR-72
-            code: '72'
-        GR-73:
-            combinedCode: GR-73
-            code: '73'
-        GR-81:
-            combinedCode: GR-81
-            code: '81'
-        GR-82:
-            combinedCode: GR-82
-            code: '82'
-        GR-83:
-            combinedCode: GR-83
-            code: '83'
-        GR-84:
-            combinedCode: GR-84
-            code: '84'
-        GR-85:
-            combinedCode: GR-85
-            code: '85'
-        GR-91:
-            combinedCode: GR-91
-            code: '91'
-        GR-92:
-            combinedCode: GR-92
-            code: '92'
-        GR-93:
-            combinedCode: GR-93
-            code: '93'
-        GR-94:
-            combinedCode: GR-94
-            code: '94'
         GR-A:
             combinedCode: GR-A
             code: A
-        GR-A1:
-            combinedCode: GR-A1
-            code: A1
         GR-B:
             combinedCode: GR-B
             code: B
@@ -5378,72 +5702,72 @@ GT:
     iso2Code: GT
     iso3Code: GTM
     regions:
-        GT-AV:
-            combinedCode: GT-AV
-            code: AV
-        GT-BV:
-            combinedCode: GT-BV
-            code: BV
-        GT-CM:
-            combinedCode: GT-CM
-            code: CM
-        GT-CQ:
-            combinedCode: GT-CQ
-            code: CQ
-        GT-ES:
-            combinedCode: GT-ES
-            code: ES
-        GT-GU:
-            combinedCode: GT-GU
-            code: GU
-        GT-HU:
-            combinedCode: GT-HU
-            code: HU
-        GT-IZ:
-            combinedCode: GT-IZ
-            code: IZ
-        GT-JA:
-            combinedCode: GT-JA
-            code: JA
-        GT-JU:
-            combinedCode: GT-JU
-            code: JU
-        GT-PE:
-            combinedCode: GT-PE
-            code: PE
-        GT-PR:
-            combinedCode: GT-PR
-            code: PR
-        GT-QC:
-            combinedCode: GT-QC
-            code: QC
-        GT-QZ:
-            combinedCode: GT-QZ
-            code: QZ
-        GT-RE:
-            combinedCode: GT-RE
-            code: RE
-        GT-SA:
-            combinedCode: GT-SA
-            code: SA
-        GT-SM:
-            combinedCode: GT-SM
-            code: SM
-        GT-SO:
-            combinedCode: GT-SO
-            code: SO
-        GT-SR:
-            combinedCode: GT-SR
-            code: SR
-        GT-SU:
-            combinedCode: GT-SU
-            code: SU
-        GT-TO:
-            combinedCode: GT-TO
-            code: TO
-        GT-ZA:
-            combinedCode: GT-ZA
-            code: ZA
+        GT-01:
+            combinedCode: GT-01
+            code: '01'
+        GT-02:
+            combinedCode: GT-02
+            code: '02'
+        GT-03:
+            combinedCode: GT-03
+            code: '03'
+        GT-04:
+            combinedCode: GT-04
+            code: '04'
+        GT-05:
+            combinedCode: GT-05
+            code: '05'
+        GT-06:
+            combinedCode: GT-06
+            code: '06'
+        GT-07:
+            combinedCode: GT-07
+            code: '07'
+        GT-08:
+            combinedCode: GT-08
+            code: '08'
+        GT-09:
+            combinedCode: GT-09
+            code: '09'
+        GT-10:
+            combinedCode: GT-10
+            code: '10'
+        GT-11:
+            combinedCode: GT-11
+            code: '11'
+        GT-12:
+            combinedCode: GT-12
+            code: '12'
+        GT-13:
+            combinedCode: GT-13
+            code: '13'
+        GT-14:
+            combinedCode: GT-14
+            code: '14'
+        GT-15:
+            combinedCode: GT-15
+            code: '15'
+        GT-16:
+            combinedCode: GT-16
+            code: '16'
+        GT-17:
+            combinedCode: GT-17
+            code: '17'
+        GT-18:
+            combinedCode: GT-18
+            code: '18'
+        GT-19:
+            combinedCode: GT-19
+            code: '19'
+        GT-20:
+            combinedCode: GT-20
+            code: '20'
+        GT-21:
+            combinedCode: GT-21
+            code: '21'
+        GT-22:
+            combinedCode: GT-22
+            code: '22'
 GU:
     iso2Code: GU
     iso3Code: GUM
@@ -5475,7 +5799,7 @@ GW:
             code: L
         GW-N:
             combinedCode: GW-N
-            code: N
+            code: 'N'
         GW-OI:
             combinedCode: GW-OI
             code: OI
@@ -5674,9 +5998,12 @@ HT:
         HT-NE:
             combinedCode: HT-NE
             code: NE
+        HT-NI:
+            combinedCode: HT-NI
+            code: NI
         HT-NO:
             combinedCode: HT-NO
-            code: NO
+            code: 'NO'
         HT-OU:
             combinedCode: HT-OU
             code: OU
@@ -5761,7 +6088,7 @@ HU:
             code: NK
         HU-NO:
             combinedCode: HU-NO
-            code: NO
+            code: 'NO'
         HU-NY:
             combinedCode: HU-NY
             code: NY
@@ -5841,9 +6168,6 @@ ID:
         ID-GO:
             combinedCode: ID-GO
             code: GO
-        ID-IJ:
-            combinedCode: ID-IJ
-            code: IJ
         ID-JA:
             combinedCode: ID-JA
             code: JA
@@ -5880,12 +6204,18 @@ ID:
         ID-KT:
             combinedCode: ID-KT
             code: KT
+        ID-KU:
+            combinedCode: ID-KU
+            code: KU
         ID-LA:
             combinedCode: ID-LA
             code: LA
         ID-MA:
             combinedCode: ID-MA
             code: MA
+        ID-ML:
+            combinedCode: ID-ML
+            code: ML
         ID-MU:
             combinedCode: ID-MU
             code: MU
@@ -5904,6 +6234,21 @@ ID:
         ID-PB:
             combinedCode: ID-PB
             code: PB
+        ID-PD:
+            combinedCode: ID-PD
+            code: PD
+        ID-PE:
+            combinedCode: ID-PE
+            code: PE
+        ID-PP:
+            combinedCode: ID-PP
+            code: PP
+        ID-PS:
+            combinedCode: ID-PS
+            code: PS
+        ID-PT:
+            combinedCode: ID-PT
+            code: PT
         ID-RI:
             combinedCode: ID-RI
             code: RI
@@ -5953,6 +6298,9 @@ IE:
         IE-CN:
             combinedCode: IE-CN
             code: CN
+        IE-CO:
+            combinedCode: IE-CO
+            code: CO
         IE-CW:
             combinedCode: IE-CW
             code: CW
@@ -6076,21 +6424,18 @@ IN:
         IN-BR:
             combinedCode: IN-BR
             code: BR
+        IN-CG:
+            combinedCode: IN-CG
+            code: CG
         IN-CH:
             combinedCode: IN-CH
             code: CH
-        IN-CT:
-            combinedCode: IN-CT
-            code: CT
-        IN-DD:
-            combinedCode: IN-DD
-            code: DD
+        IN-DH:
+            combinedCode: IN-DH
+            code: DH
         IN-DL:
             combinedCode: IN-DL
             code: DL
-        IN-DN:
-            combinedCode: IN-DN
-            code: DN
         IN-GA:
             combinedCode: IN-GA
             code: GA
@@ -6115,6 +6460,9 @@ IN:
         IN-KL:
             combinedCode: IN-KL
             code: KL
+        IN-LA:
+            combinedCode: IN-LA
+            code: LA
         IN-LD:
             combinedCode: IN-LD
             code: LD
@@ -6136,9 +6484,9 @@ IN:
         IN-NL:
             combinedCode: IN-NL
             code: NL
-        IN-OR:
-            combinedCode: IN-OR
-            code: OR
+        IN-OD:
+            combinedCode: IN-OD
+            code: OD
         IN-PB:
             combinedCode: IN-PB
             code: PB
@@ -6157,9 +6505,12 @@ IN:
         IN-TR:
             combinedCode: IN-TR
             code: TR
-        IN-UL:
-            combinedCode: IN-UL
-            code: UL
+        IN-TS:
+            combinedCode: IN-TS
+            code: TS
+        IN-UK:
+            combinedCode: IN-UK
+            code: UK
         IN-UP:
             combinedCode: IN-UP
             code: UP
@@ -6201,6 +6552,12 @@ IQ:
         IQ-KA:
             combinedCode: IQ-KA
             code: KA
+        IQ-KI:
+            combinedCode: IQ-KI
+            code: KI
+        IQ-KR:
+            combinedCode: IQ-KR
+            code: KR
         IQ-MA:
             combinedCode: IQ-MA
             code: MA
@@ -6219,12 +6576,9 @@ IQ:
         IQ-SD:
             combinedCode: IQ-SD
             code: SD
-        IQ-SW:
-            combinedCode: IQ-SW
-            code: SW
-        IQ-TS:
-            combinedCode: IQ-TS
-            code: TS
+        IQ-SU:
+            combinedCode: IQ-SU
+            code: SU
         IQ-WA:
             combinedCode: IQ-WA
             code: WA
@@ -6232,6 +6586,9 @@ IR:
     iso2Code: IR
     iso3Code: IRN
     regions:
+        IR-00:
+            combinedCode: IR-00
+            code: '00'
         IR-01:
             combinedCode: IR-01
             code: '01'
@@ -6256,6 +6613,9 @@ IR:
         IR-08:
             combinedCode: IR-08
             code: '08'
+        IR-09:
+            combinedCode: IR-09
+            code: '09'
         IR-10:
             combinedCode: IR-10
             code: '10'
@@ -6319,16 +6679,10 @@ IR:
         IR-30:
             combinedCode: IR-30
             code: '30'
-        IR-31:
-            combinedCode: IR-31
-            code: '31'
 IS:
     iso2Code: IS
     iso3Code: ISL
     regions:
-        IS-0:
-            combinedCode: IS-0
-            code: '0'
         IS-1:
             combinedCode: IS-1
             code: '1'
@@ -6353,6 +6707,198 @@ IS:
         IS-8:
             combinedCode: IS-8
             code: '8'
+        IS-AKN:
+            combinedCode: IS-AKN
+            code: AKN
+        IS-AKU:
+            combinedCode: IS-AKU
+            code: AKU
+        IS-ARN:
+            combinedCode: IS-ARN
+            code: ARN
+        IS-ASA:
+            combinedCode: IS-ASA
+            code: ASA
+        IS-BLA:
+            combinedCode: IS-BLA
+            code: BLA
+        IS-BOG:
+            combinedCode: IS-BOG
+            code: BOG
+        IS-BOL:
+            combinedCode: IS-BOL
+            code: BOL
+        IS-DAB:
+            combinedCode: IS-DAB
+            code: DAB
+        IS-DAV:
+            combinedCode: IS-DAV
+            code: DAV
+        IS-EOM:
+            combinedCode: IS-EOM
+            code: EOM
+        IS-EYF:
+            combinedCode: IS-EYF
+            code: EYF
+        IS-FJD:
+            combinedCode: IS-FJD
+            code: FJD
+        IS-FJL:
+            combinedCode: IS-FJL
+            code: FJL
+        IS-FLA:
+            combinedCode: IS-FLA
+            code: FLA
+        IS-FLR:
+            combinedCode: IS-FLR
+            code: FLR
+        IS-GAR:
+            combinedCode: IS-GAR
+            code: GAR
+        IS-GOG:
+            combinedCode: IS-GOG
+            code: GOG
+        IS-GRN:
+            combinedCode: IS-GRN
+            code: GRN
+        IS-GRU:
+            combinedCode: IS-GRU
+            code: GRU
+        IS-GRY:
+            combinedCode: IS-GRY
+            code: GRY
+        IS-HAF:
+            combinedCode: IS-HAF
+            code: HAF
+        IS-HRG:
+            combinedCode: IS-HRG
+            code: HRG
+        IS-HRU:
+            combinedCode: IS-HRU
+            code: HRU
+        IS-HUG:
+            combinedCode: IS-HUG
+            code: HUG
+        IS-HUV:
+            combinedCode: IS-HUV
+            code: HUV
+        IS-HVA:
+            combinedCode: IS-HVA
+            code: HVA
+        IS-HVE:
+            combinedCode: IS-HVE
+            code: HVE
+        IS-ISA:
+            combinedCode: IS-ISA
+            code: ISA
+        IS-KAL:
+            combinedCode: IS-KAL
+            code: KAL
+        IS-KJO:
+            combinedCode: IS-KJO
+            code: KJO
+        IS-KOP:
+            combinedCode: IS-KOP
+            code: KOP
+        IS-LAN:
+            combinedCode: IS-LAN
+            code: LAN
+        IS-MOS:
+            combinedCode: IS-MOS
+            code: MOS
+        IS-MUL:
+            combinedCode: IS-MUL
+            code: MUL
+        IS-MYR:
+            combinedCode: IS-MYR
+            code: MYR
+        IS-NOR:
+            combinedCode: IS-NOR
+            code: NOR
+        IS-RGE:
+            combinedCode: IS-RGE
+            code: RGE
+        IS-RGY:
+            combinedCode: IS-RGY
+            code: RGY
+        IS-RHH:
+            combinedCode: IS-RHH
+            code: RHH
+        IS-RKN:
+            combinedCode: IS-RKN
+            code: RKN
+        IS-RKV:
+            combinedCode: IS-RKV
+            code: RKV
+        IS-SBT:
+            combinedCode: IS-SBT
+            code: SBT
+        IS-SDN:
+            combinedCode: IS-SDN
+            code: SDN
+        IS-SDV:
+            combinedCode: IS-SDV
+            code: SDV
+        IS-SEL:
+            combinedCode: IS-SEL
+            code: SEL
+        IS-SFA:
+            combinedCode: IS-SFA
+            code: SFA
+        IS-SHF:
+            combinedCode: IS-SHF
+            code: SHF
+        IS-SKF:
+            combinedCode: IS-SKF
+            code: SKF
+        IS-SKG:
+            combinedCode: IS-SKG
+            code: SKG
+        IS-SKO:
+            combinedCode: IS-SKO
+            code: SKO
+        IS-SKR:
+            combinedCode: IS-SKR
+            code: SKR
+        IS-SNF:
+            combinedCode: IS-SNF
+            code: SNF
+        IS-SOG:
+            combinedCode: IS-SOG
+            code: SOG
+        IS-SOL:
+            combinedCode: IS-SOL
+            code: SOL
+        IS-SSS:
+            combinedCode: IS-SSS
+            code: SSS
+        IS-STR:
+            combinedCode: IS-STR
+            code: STR
+        IS-STY:
+            combinedCode: IS-STY
+            code: STY
+        IS-SVG:
+            combinedCode: IS-SVG
+            code: SVG
+        IS-TAL:
+            combinedCode: IS-TAL
+            code: TAL
+        IS-THG:
+            combinedCode: IS-THG
+            code: THG
+        IS-TJO:
+            combinedCode: IS-TJO
+            code: TJO
+        IS-VEM:
+            combinedCode: IS-VEM
+            code: VEM
+        IS-VER:
+            combinedCode: IS-VER
+            code: VER
+        IS-VOP:
+            combinedCode: IS-VOP
+            code: VOP
 IT:
     iso2Code: IT
     iso3Code: ITA
@@ -6426,9 +6972,6 @@ IT:
         IT-AN:
             combinedCode: IT-AN
             code: AN
-        IT-AO:
-            combinedCode: IT-AO
-            code: AO
         IT-AP:
             combinedCode: IT-AP
             code: AP
@@ -6486,9 +7029,6 @@ IT:
         IT-CH:
             combinedCode: IT-CH
             code: CH
-        IT-CI:
-            combinedCode: IT-CI
-            code: CI
         IT-CL:
             combinedCode: IT-CL
             code: CL
@@ -6570,6 +7110,9 @@ IT:
         IT-MB:
             combinedCode: IT-MB
             code: MB
+        IT-MC:
+            combinedCode: IT-MC
+            code: MC
         IT-ME:
             combinedCode: IT-ME
             code: ME
@@ -6593,19 +7136,13 @@ IT:
             code: NA
         IT-NO:
             combinedCode: IT-NO
-            code: NO
+            code: 'NO'
         IT-NU:
             combinedCode: IT-NU
             code: NU
-        IT-OG:
-            combinedCode: IT-OG
-            code: OG
         IT-OR:
             combinedCode: IT-OR
             code: OR
-        IT-OT:
-            combinedCode: IT-OT
-            code: OT
         IT-PA:
             combinedCode: IT-PA
             code: PA
@@ -6672,9 +7209,6 @@ IT:
         IT-SA:
             combinedCode: IT-SA
             code: SA
-        IT-SC:
-            combinedCode: IT-SC
-            code: SC
         IT-SI:
             combinedCode: IT-SI
             code: SI
@@ -6690,6 +7224,9 @@ IT:
         IT-SS:
             combinedCode: IT-SS
             code: SS
+        IT-SU:
+            combinedCode: IT-SU
+            code: SU
         IT-SV:
             combinedCode: IT-SV
             code: SV
@@ -6738,9 +7275,6 @@ IT:
         IT-VR:
             combinedCode: IT-VR
             code: VR
-        IT-VS:
-            combinedCode: IT-VS
-            code: VS
         IT-VT:
             combinedCode: IT-VT
             code: VT
@@ -6819,12 +7353,12 @@ JO:
         JO-BA:
             combinedCode: JO-BA
             code: BA
+        JO-IR:
+            combinedCode: JO-IR
+            code: IR
         JO-JA:
             combinedCode: JO-JA
             code: JA
-        JO-JR:
-            combinedCode: JO-JR
-            code: JR
         JO-KA:
             combinedCode: JO-KA
             code: KA
@@ -6986,27 +7520,147 @@ KE:
     iso2Code: KE
     iso3Code: KEN
     regions:
-        KE-110:
-            combinedCode: KE-110
-            code: '110'
-        KE-200:
-            combinedCode: KE-200
-            code: '200'
-        KE-300:
-            combinedCode: KE-300
-            code: '300'
-        KE-400:
-            combinedCode: KE-400
-            code: '400'
-        KE-500:
-            combinedCode: KE-500
-            code: '500'
-        KE-700:
-            combinedCode: KE-700
-            code: '700'
-        KE-900:
-            combinedCode: KE-900
-            code: '900'
+        KE-01:
+            combinedCode: KE-01
+            code: '01'
+        KE-02:
+            combinedCode: KE-02
+            code: '02'
+        KE-03:
+            combinedCode: KE-03
+            code: '03'
+        KE-04:
+            combinedCode: KE-04
+            code: '04'
+        KE-05:
+            combinedCode: KE-05
+            code: '05'
+        KE-06:
+            combinedCode: KE-06
+            code: '06'
+        KE-07:
+            combinedCode: KE-07
+            code: '07'
+        KE-08:
+            combinedCode: KE-08
+            code: '08'
+        KE-09:
+            combinedCode: KE-09
+            code: '09'
+        KE-10:
+            combinedCode: KE-10
+            code: '10'
+        KE-11:
+            combinedCode: KE-11
+            code: '11'
+        KE-12:
+            combinedCode: KE-12
+            code: '12'
+        KE-13:
+            combinedCode: KE-13
+            code: '13'
+        KE-14:
+            combinedCode: KE-14
+            code: '14'
+        KE-15:
+            combinedCode: KE-15
+            code: '15'
+        KE-16:
+            combinedCode: KE-16
+            code: '16'
+        KE-17:
+            combinedCode: KE-17
+            code: '17'
+        KE-18:
+            combinedCode: KE-18
+            code: '18'
+        KE-19:
+            combinedCode: KE-19
+            code: '19'
+        KE-20:
+            combinedCode: KE-20
+            code: '20'
+        KE-21:
+            combinedCode: KE-21
+            code: '21'
+        KE-22:
+            combinedCode: KE-22
+            code: '22'
+        KE-23:
+            combinedCode: KE-23
+            code: '23'
+        KE-24:
+            combinedCode: KE-24
+            code: '24'
+        KE-25:
+            combinedCode: KE-25
+            code: '25'
+        KE-26:
+            combinedCode: KE-26
+            code: '26'
+        KE-27:
+            combinedCode: KE-27
+            code: '27'
+        KE-28:
+            combinedCode: KE-28
+            code: '28'
+        KE-29:
+            combinedCode: KE-29
+            code: '29'
+        KE-30:
+            combinedCode: KE-30
+            code: '30'
+        KE-31:
+            combinedCode: KE-31
+            code: '31'
+        KE-32:
+            combinedCode: KE-32
+            code: '32'
+        KE-33:
+            combinedCode: KE-33
+            code: '33'
+        KE-34:
+            combinedCode: KE-34
+            code: '34'
+        KE-35:
+            combinedCode: KE-35
+            code: '35'
+        KE-36:
+            combinedCode: KE-36
+            code: '36'
+        KE-37:
+            combinedCode: KE-37
+            code: '37'
+        KE-38:
+            combinedCode: KE-38
+            code: '38'
+        KE-39:
+            combinedCode: KE-39
+            code: '39'
+        KE-40:
+            combinedCode: KE-40
+            code: '40'
+        KE-41:
+            combinedCode: KE-41
+            code: '41'
+        KE-42:
+            combinedCode: KE-42
+            code: '42'
+        KE-43:
+            combinedCode: KE-43
+            code: '43'
+        KE-44:
+            combinedCode: KE-44
+            code: '44'
+        KE-45:
+            combinedCode: KE-45
+            code: '45'
+        KE-46:
+            combinedCode: KE-46
+            code: '46'
+        KE-47:
+            combinedCode: KE-47
+            code: '47'
 KG:
     iso2Code: KG
     iso3Code: KGZ
@@ -7020,12 +7674,15 @@ KG:
         KG-GB:
             combinedCode: KG-GB
             code: GB
+        KG-GO:
+            combinedCode: KG-GO
+            code: GO
         KG-J:
             combinedCode: KG-J
             code: J
         KG-N:
             combinedCode: KG-N
-            code: N
+            code: 'N'
         KG-O:
             combinedCode: KG-O
             code: O
@@ -7034,7 +7691,7 @@ KG:
             code: T
         KG-Y:
             combinedCode: KG-Y
-            code: Y
+            code: 'Y'
 KH:
     iso2Code: KH
     iso3Code: KHM
@@ -7090,6 +7747,9 @@ KH:
         KH-24:
             combinedCode: KH-24
             code: '24'
+        KH-25:
+            combinedCode: KH-25
+            code: '25'
         KH-3:
             combinedCode: KH-3
             code: '3'
@@ -7188,7 +7848,7 @@ KN:
             code: K
         KN-N:
             combinedCode: KN-N
-            code: N
+            code: 'N'
 KP:
     iso2Code: KP
     iso3Code: PRK
@@ -7226,6 +7886,12 @@ KP:
         KP-13:
             combinedCode: KP-13
             code: '13'
+        KP-14:
+            combinedCode: KP-14
+            code: '14'
+        KP-15:
+            combinedCode: KP-15
+            code: '15'
 KR:
     iso2Code: KR
     iso3Code: KOR
@@ -7278,6 +7944,9 @@ KR:
         KR-49:
             combinedCode: KR-49
             code: '49'
+        KR-50:
+            combinedCode: KR-50
+            code: '50'
 KW:
     iso2Code: KW
     iso3Code: KWT
@@ -7297,6 +7966,9 @@ KW:
         KW-KU:
             combinedCode: KW-KU
             code: KU
+        KW-MU:
+            combinedCode: KW-MU
+            code: MU
 KY:
     iso2Code: KY
     iso3Code: CYM
@@ -7305,54 +7977,66 @@ KZ:
     iso2Code: KZ
     iso3Code: KAZ
     regions:
-        KZ-AKM:
-            combinedCode: KZ-AKM
-            code: AKM
-        KZ-AKT:
-            combinedCode: KZ-AKT
-            code: AKT
-        KZ-ALA:
-            combinedCode: KZ-ALA
-            code: ALA
-        KZ-ALM:
-            combinedCode: KZ-ALM
-            code: ALM
-        KZ-AST:
-            combinedCode: KZ-AST
-            code: AST
-        KZ-ATY:
-            combinedCode: KZ-ATY
-            code: ATY
-        KZ-KAR:
-            combinedCode: KZ-KAR
-            code: KAR
-        KZ-KUS:
-            combinedCode: KZ-KUS
-            code: KUS
-        KZ-KZY:
-            combinedCode: KZ-KZY
-            code: KZY
-        KZ-MAN:
-            combinedCode: KZ-MAN
-            code: MAN
-        KZ-PAV:
-            combinedCode: KZ-PAV
-            code: PAV
-        KZ-SEV:
-            combinedCode: KZ-SEV
-            code: SEV
-        KZ-VOS:
-            combinedCode: KZ-VOS
-            code: VOS
-        KZ-YUZ:
-            combinedCode: KZ-YUZ
-            code: YUZ
-        KZ-ZAP:
-            combinedCode: KZ-ZAP
-            code: ZAP
-        KZ-ZHA:
-            combinedCode: KZ-ZHA
-            code: ZHA
+        KZ-10:
+            combinedCode: KZ-10
+            code: '10'
+        KZ-11:
+            combinedCode: KZ-11
+            code: '11'
+        KZ-15:
+            combinedCode: KZ-15
+            code: '15'
+        KZ-19:
+            combinedCode: KZ-19
+            code: '19'
+        KZ-23:
+            combinedCode: KZ-23
+            code: '23'
+        KZ-27:
+            combinedCode: KZ-27
+            code: '27'
+        KZ-31:
+            combinedCode: KZ-31
+            code: '31'
+        KZ-33:
+            combinedCode: KZ-33
+            code: '33'
+        KZ-35:
+            combinedCode: KZ-35
+            code: '35'
+        KZ-39:
+            combinedCode: KZ-39
+            code: '39'
+        KZ-43:
+            combinedCode: KZ-43
+            code: '43'
+        KZ-47:
+            combinedCode: KZ-47
+            code: '47'
+        KZ-55:
+            combinedCode: KZ-55
+            code: '55'
+        KZ-59:
+            combinedCode: KZ-59
+            code: '59'
+        KZ-61:
+            combinedCode: KZ-61
+            code: '61'
+        KZ-62:
+            combinedCode: KZ-62
+            code: '62'
+        KZ-63:
+            combinedCode: KZ-63
+            code: '63'
+        KZ-71:
+            combinedCode: KZ-71
+            code: '71'
+        KZ-75:
+            combinedCode: KZ-75
+            code: '75'
+        KZ-79:
+            combinedCode: KZ-79
+            code: '79'
 LA:
     iso2Code: LA
     iso3Code: LAO
@@ -7408,9 +8092,9 @@ LA:
         LA-XI:
             combinedCode: LA-XI
             code: XI
-        LA-XN:
-            combinedCode: LA-XN
-            code: XN
+        LA-XS:
+            combinedCode: LA-XS
+            code: XS
 LB:
     iso2Code: LB
     iso3Code: LBN
@@ -7452,9 +8136,6 @@ LC:
         LC-03:
             combinedCode: LC-03
             code: '03'
-        LC-04:
-            combinedCode: LC-04
-            code: '04'
         LC-05:
             combinedCode: LC-05
             code: '05'
@@ -7583,6 +8264,9 @@ LK:
         LK-53:
             combinedCode: LK-53
             code: '53'
+        LK-6:
+            combinedCode: LK-6
+            code: '6'
         LK-61:
             combinedCode: LK-61
             code: '61'
@@ -7638,6 +8322,9 @@ LR:
         LR-GK:
             combinedCode: LR-GK
             code: GK
+        LR-GP:
+            combinedCode: LR-GP
+            code: GP
         LR-LO:
             combinedCode: LR-LO
             code: LO
@@ -7653,6 +8340,9 @@ LR:
         LR-NI:
             combinedCode: LR-NI
             code: NI
+        LR-RG:
+            combinedCode: LR-RG
+            code: RG
         LR-RI:
             combinedCode: LR-RI
             code: RI
@@ -7697,6 +8387,186 @@ LT:
     iso2Code: LT
     iso3Code: LTU
     regions:
+        LT-01:
+            combinedCode: LT-01
+            code: '01'
+        LT-02:
+            combinedCode: LT-02
+            code: '02'
+        LT-03:
+            combinedCode: LT-03
+            code: '03'
+        LT-04:
+            combinedCode: LT-04
+            code: '04'
+        LT-05:
+            combinedCode: LT-05
+            code: '05'
+        LT-06:
+            combinedCode: LT-06
+            code: '06'
+        LT-07:
+            combinedCode: LT-07
+            code: '07'
+        LT-08:
+            combinedCode: LT-08
+            code: '08'
+        LT-09:
+            combinedCode: LT-09
+            code: '09'
+        LT-10:
+            combinedCode: LT-10
+            code: '10'
+        LT-11:
+            combinedCode: LT-11
+            code: '11'
+        LT-12:
+            combinedCode: LT-12
+            code: '12'
+        LT-13:
+            combinedCode: LT-13
+            code: '13'
+        LT-14:
+            combinedCode: LT-14
+            code: '14'
+        LT-15:
+            combinedCode: LT-15
+            code: '15'
+        LT-16:
+            combinedCode: LT-16
+            code: '16'
+        LT-17:
+            combinedCode: LT-17
+            code: '17'
+        LT-18:
+            combinedCode: LT-18
+            code: '18'
+        LT-19:
+            combinedCode: LT-19
+            code: '19'
+        LT-20:
+            combinedCode: LT-20
+            code: '20'
+        LT-21:
+            combinedCode: LT-21
+            code: '21'
+        LT-22:
+            combinedCode: LT-22
+            code: '22'
+        LT-23:
+            combinedCode: LT-23
+            code: '23'
+        LT-24:
+            combinedCode: LT-24
+            code: '24'
+        LT-25:
+            combinedCode: LT-25
+            code: '25'
+        LT-26:
+            combinedCode: LT-26
+            code: '26'
+        LT-27:
+            combinedCode: LT-27
+            code: '27'
+        LT-28:
+            combinedCode: LT-28
+            code: '28'
+        LT-29:
+            combinedCode: LT-29
+            code: '29'
+        LT-30:
+            combinedCode: LT-30
+            code: '30'
+        LT-31:
+            combinedCode: LT-31
+            code: '31'
+        LT-32:
+            combinedCode: LT-32
+            code: '32'
+        LT-33:
+            combinedCode: LT-33
+            code: '33'
+        LT-34:
+            combinedCode: LT-34
+            code: '34'
+        LT-35:
+            combinedCode: LT-35
+            code: '35'
+        LT-36:
+            combinedCode: LT-36
+            code: '36'
+        LT-37:
+            combinedCode: LT-37
+            code: '37'
+        LT-38:
+            combinedCode: LT-38
+            code: '38'
+        LT-39:
+            combinedCode: LT-39
+            code: '39'
+        LT-40:
+            combinedCode: LT-40
+            code: '40'
+        LT-41:
+            combinedCode: LT-41
+            code: '41'
+        LT-42:
+            combinedCode: LT-42
+            code: '42'
+        LT-43:
+            combinedCode: LT-43
+            code: '43'
+        LT-44:
+            combinedCode: LT-44
+            code: '44'
+        LT-45:
+            combinedCode: LT-45
+            code: '45'
+        LT-46:
+            combinedCode: LT-46
+            code: '46'
+        LT-47:
+            combinedCode: LT-47
+            code: '47'
+        LT-48:
+            combinedCode: LT-48
+            code: '48'
+        LT-49:
+            combinedCode: LT-49
+            code: '49'
+        LT-50:
+            combinedCode: LT-50
+            code: '50'
+        LT-51:
+            combinedCode: LT-51
+            code: '51'
+        LT-52:
+            combinedCode: LT-52
+            code: '52'
+        LT-53:
+            combinedCode: LT-53
+            code: '53'
+        LT-54:
+            combinedCode: LT-54
+            code: '54'
+        LT-55:
+            combinedCode: LT-55
+            code: '55'
+        LT-56:
+            combinedCode: LT-56
+            code: '56'
+        LT-57:
+            combinedCode: LT-57
+            code: '57'
+        LT-58:
+            combinedCode: LT-58
+            code: '58'
+        LT-59:
+            combinedCode: LT-59
+            code: '59'
+        LT-60:
+            combinedCode: LT-60
+            code: '60'
         LT-AL:
             combinedCode: LT-AL
             code: AL
@@ -7731,118 +8601,175 @@ LU:
     iso2Code: LU
     iso3Code: LUX
     regions:
-        LU-D:
-            combinedCode: LU-D
-            code: D
-        LU-G:
-            combinedCode: LU-G
-            code: G
-        LU-L:
-            combinedCode: LU-L
-            code: L
+        LU-CA:
+            combinedCode: LU-CA
+            code: CA
+        LU-CL:
+            combinedCode: LU-CL
+            code: CL
+        LU-DI:
+            combinedCode: LU-DI
+            code: DI
+        LU-EC:
+            combinedCode: LU-EC
+            code: EC
+        LU-ES:
+            combinedCode: LU-ES
+            code: ES
+        LU-GR:
+            combinedCode: LU-GR
+            code: GR
+        LU-LU:
+            combinedCode: LU-LU
+            code: LU
+        LU-ME:
+            combinedCode: LU-ME
+            code: ME
+        LU-RD:
+            combinedCode: LU-RD
+            code: RD
+        LU-RM:
+            combinedCode: LU-RM
+            code: RM
+        LU-VD:
+            combinedCode: LU-VD
+            code: VD
+        LU-WI:
+            combinedCode: LU-WI
+            code: WI
 LV:
     iso2Code: LV
     iso3Code: LVA
     regions:
-        LV-AI:
-            combinedCode: LV-AI
-            code: AI
-        LV-AL:
-            combinedCode: LV-AL
-            code: AL
-        LV-BL:
-            combinedCode: LV-BL
-            code: BL
-        LV-BU:
-            combinedCode: LV-BU
-            code: BU
-        LV-CE:
-            combinedCode: LV-CE
-            code: CE
-        LV-DA:
-            combinedCode: LV-DA
-            code: DA
+        LV-002:
+            combinedCode: LV-002
+            code: '002'
+        LV-007:
+            combinedCode: LV-007
+            code: '007'
+        LV-011:
+            combinedCode: LV-011
+            code: '011'
+        LV-015:
+            combinedCode: LV-015
+            code: '015'
+        LV-016:
+            combinedCode: LV-016
+            code: '016'
+        LV-022:
+            combinedCode: LV-022
+            code: '022'
+        LV-026:
+            combinedCode: LV-026
+            code: '026'
+        LV-033:
+            combinedCode: LV-033
+            code: '033'
+        LV-041:
+            combinedCode: LV-041
+            code: '041'
+        LV-042:
+            combinedCode: LV-042
+            code: '042'
+        LV-047:
+            combinedCode: LV-047
+            code: '047'
+        LV-050:
+            combinedCode: LV-050
+            code: '050'
+        LV-052:
+            combinedCode: LV-052
+            code: '052'
+        LV-054:
+            combinedCode: LV-054
+            code: '054'
+        LV-056:
+            combinedCode: LV-056
+            code: '056'
+        LV-058:
+            combinedCode: LV-058
+            code: '058'
+        LV-059:
+            combinedCode: LV-059
+            code: '059'
+        LV-062:
+            combinedCode: LV-062
+            code: '062'
+        LV-067:
+            combinedCode: LV-067
+            code: '067'
+        LV-068:
+            combinedCode: LV-068
+            code: '068'
+        LV-073:
+            combinedCode: LV-073
+            code: '073'
+        LV-077:
+            combinedCode: LV-077
+            code: '077'
+        LV-080:
+            combinedCode: LV-080
+            code: '080'
+        LV-087:
+            combinedCode: LV-087
+            code: '087'
+        LV-088:
+            combinedCode: LV-088
+            code: '088'
+        LV-089:
+            combinedCode: LV-089
+            code: '089'
+        LV-091:
+            combinedCode: LV-091
+            code: '091'
+        LV-094:
+            combinedCode: LV-094
+            code: '094'
+        LV-097:
+            combinedCode: LV-097
+            code: '097'
+        LV-099:
+            combinedCode: LV-099
+            code: '099'
+        LV-101:
+            combinedCode: LV-101
+            code: '101'
+        LV-102:
+            combinedCode: LV-102
+            code: '102'
+        LV-106:
+            combinedCode: LV-106
+            code: '106'
+        LV-111:
+            combinedCode: LV-111
+            code: '111'
+        LV-112:
+            combinedCode: LV-112
+            code: '112'
+        LV-113:
+            combinedCode: LV-113
+            code: '113'
         LV-DGV:
             combinedCode: LV-DGV
             code: DGV
-        LV-DO:
-            combinedCode: LV-DO
-            code: DO
-        LV-GU:
-            combinedCode: LV-GU
-            code: GU
         LV-JEL:
             combinedCode: LV-JEL
             code: JEL
-        LV-JK:
-            combinedCode: LV-JK
-            code: JK
-        LV-JL:
-            combinedCode: LV-JL
-            code: JL
         LV-JUR:
             combinedCode: LV-JUR
             code: JUR
-        LV-KR:
-            combinedCode: LV-KR
-            code: KR
-        LV-KU:
-            combinedCode: LV-KU
-            code: KU
-        LV-LE:
-            combinedCode: LV-LE
-            code: LE
-        LV-LM:
-            combinedCode: LV-LM
-            code: LM
         LV-LPX:
             combinedCode: LV-LPX
             code: LPX
-        LV-LU:
-            combinedCode: LV-LU
-            code: LU
-        LV-MA:
-            combinedCode: LV-MA
-            code: MA
-        LV-OG:
-            combinedCode: LV-OG
-            code: OG
-        LV-PR:
-            combinedCode: LV-PR
-            code: PR
-        LV-RE:
-            combinedCode: LV-RE
-            code: RE
         LV-REZ:
             combinedCode: LV-REZ
             code: REZ
-        LV-RI:
-            combinedCode: LV-RI
-            code: RI
         LV-RIX:
             combinedCode: LV-RIX
             code: RIX
-        LV-SA:
-            combinedCode: LV-SA
-            code: SA
-        LV-TA:
-            combinedCode: LV-TA
-            code: TA
-        LV-TU:
-            combinedCode: LV-TU
-            code: TU
-        LV-VE:
-            combinedCode: LV-VE
-            code: VE
         LV-VEN:
             combinedCode: LV-VEN
             code: VEN
-        LV-VK:
-            combinedCode: LV-VK
-            code: VK
-        LV-VM:
-            combinedCode: LV-VM
-            code: VM
 LY:
     iso2Code: LY
     iso3Code: LBY
@@ -7953,18 +8880,6 @@ MA:
         MA-12:
             combinedCode: MA-12
             code: '12'
-        MA-13:
-            combinedCode: MA-13
-            code: '13'
-        MA-14:
-            combinedCode: MA-14
-            code: '14'
-        MA-15:
-            combinedCode: MA-15
-            code: '15'
-        MA-16:
-            combinedCode: MA-16
-            code: '16'
         MA-AGD:
             combinedCode: MA-AGD
             code: AGD
@@ -7992,6 +8907,9 @@ MA:
         MA-BOM:
             combinedCode: MA-BOM
             code: BOM
+        MA-BRR:
+            combinedCode: MA-BRR
+            code: BRR
         MA-CAS:
             combinedCode: MA-CAS
             code: CAS
@@ -8004,6 +8922,9 @@ MA:
         MA-CHT:
             combinedCode: MA-CHT
             code: CHT
+        MA-DRI:
+            combinedCode: MA-DRI
+            code: DRI
         MA-ERR:
             combinedCode: MA-ERR
             code: ERR
@@ -8022,9 +8943,15 @@ MA:
         MA-FIG:
             combinedCode: MA-FIG
             code: FIG
+        MA-FQH:
+            combinedCode: MA-FQH
+            code: FQH
         MA-GUE:
             combinedCode: MA-GUE
             code: GUE
+        MA-GUF:
+            combinedCode: MA-GUF
+            code: GUF
         MA-HAJ:
             combinedCode: MA-HAJ
             code: HAJ
@@ -8064,21 +8991,24 @@ MA:
         MA-LAA:
             combinedCode: MA-LAA
             code: LAA
-        MA-LAP:
-            combinedCode: MA-LAP
-            code: LAP
+        MA-LAR:
+            combinedCode: MA-LAR
+            code: LAR
+        MA-MAR:
+            combinedCode: MA-MAR
+            code: MAR
+        MA-MDF:
+            combinedCode: MA-MDF
+            code: MDF
         MA-MED:
             combinedCode: MA-MED
             code: MED
         MA-MEK:
             combinedCode: MA-MEK
             code: MEK
-        MA-MMD:
-            combinedCode: MA-MMD
-            code: MMD
-        MA-MMN:
-            combinedCode: MA-MMN
-            code: MMN
+        MA-MID:
+            combinedCode: MA-MID
+            code: MID
         MA-MOH:
             combinedCode: MA-MOH
             code: MOH
@@ -8100,9 +9030,15 @@ MA:
         MA-OUJ:
             combinedCode: MA-OUJ
             code: OUJ
+        MA-OUZ:
+            combinedCode: MA-OUZ
+            code: OUZ
         MA-RAB:
             combinedCode: MA-RAB
             code: RAB
+        MA-REH:
+            combinedCode: MA-REH
+            code: REH
         MA-SAF:
             combinedCode: MA-SAF
             code: SAF
@@ -8115,15 +9051,24 @@ MA:
         MA-SET:
             combinedCode: MA-SET
             code: SET
+        MA-SIB:
+            combinedCode: MA-SIB
+            code: SIB
+        MA-SIF:
+            combinedCode: MA-SIF
+            code: SIF
         MA-SIK:
             combinedCode: MA-SIK
             code: SIK
+        MA-SIL:
+            combinedCode: MA-SIL
+            code: SIL
         MA-SKH:
             combinedCode: MA-SKH
             code: SKH
-        MA-SYB:
-            combinedCode: MA-SYB
-            code: SYB
+        MA-TAF:
+            combinedCode: MA-TAF
+            code: TAF
         MA-TAI:
             combinedCode: MA-TAI
             code: TAI
@@ -8142,6 +9087,9 @@ MA:
         MA-TET:
             combinedCode: MA-TET
             code: TET
+        MA-TIN:
+            combinedCode: MA-TIN
+            code: TIN
         MA-TIZ:
             combinedCode: MA-TIZ
             code: TIZ
@@ -8151,13 +9099,67 @@ MA:
         MA-TNT:
             combinedCode: MA-TNT
             code: TNT
+        MA-YUS:
+            combinedCode: MA-YUS
+            code: YUS
         MA-ZAG:
             combinedCode: MA-ZAG
             code: ZAG
 MC:
     iso2Code: MC
     iso3Code: MCO
-    regions: {  }
+    regions:
+        MC-CL:
+            combinedCode: MC-CL
+            code: CL
+        MC-CO:
+            combinedCode: MC-CO
+            code: CO
+        MC-FO:
+            combinedCode: MC-FO
+            code: FO
+        MC-GA:
+            combinedCode: MC-GA
+            code: GA
+        MC-JE:
+            combinedCode: MC-JE
+            code: JE
+        MC-LA:
+            combinedCode: MC-LA
+            code: LA
+        MC-MA:
+            combinedCode: MC-MA
+            code: MA
+        MC-MC:
+            combinedCode: MC-MC
+            code: MC
+        MC-MG:
+            combinedCode: MC-MG
+            code: MG
+        MC-MO:
+            combinedCode: MC-MO
+            code: MO
+        MC-MU:
+            combinedCode: MC-MU
+            code: MU
+        MC-PH:
+            combinedCode: MC-PH
+            code: PH
+        MC-SD:
+            combinedCode: MC-SD
+            code: SD
+        MC-SO:
+            combinedCode: MC-SO
+            code: SO
+        MC-SP:
+            combinedCode: MC-SP
+            code: SP
+        MC-SR:
+            combinedCode: MC-SR
+            code: SR
+        MC-VR:
+            combinedCode: MC-VR
+            code: VR
 MD:
     iso2Code: MD
     iso3Code: MDA
@@ -8340,6 +9342,18 @@ ME:
         ME-21:
             combinedCode: ME-21
             code: '21'
+        ME-22:
+            combinedCode: ME-22
+            code: '22'
+        ME-23:
+            combinedCode: ME-23
+            code: '23'
+        ME-24:
+            combinedCode: ME-24
+            code: '24'
+        ME-25:
+            combinedCode: ME-25
+            code: '25'
 MF:
     iso2Code: MF
     iso3Code: MAF
@@ -8442,268 +9456,256 @@ MH:
         MH-UTI:
             combinedCode: MH-UTI
             code: UTI
+        MH-WTH:
+            combinedCode: MH-WTH
+            code: WTH
         MH-WTJ:
             combinedCode: MH-WTJ
             code: WTJ
-        MH-WTN:
-            combinedCode: MH-WTN
-            code: WTN
 MK:
     iso2Code: MK
     iso3Code: MKD
     regions:
-        MK-01:
-            combinedCode: MK-01
-            code: '01'
-        MK-02:
-            combinedCode: MK-02
-            code: '02'
-        MK-03:
-            combinedCode: MK-03
-            code: '03'
-        MK-04:
-            combinedCode: MK-04
-            code: '04'
-        MK-05:
-            combinedCode: MK-05
-            code: '05'
-        MK-06:
-            combinedCode: MK-06
-            code: '06'
-        MK-07:
-            combinedCode: MK-07
-            code: '07'
-        MK-08:
-            combinedCode: MK-08
-            code: '08'
-        MK-09:
-            combinedCode: MK-09
-            code: '09'
-        MK-10:
-            combinedCode: MK-10
-            code: '10'
-        MK-11:
-            combinedCode: MK-11
-            code: '11'
-        MK-12:
-            combinedCode: MK-12
-            code: '12'
-        MK-13:
-            combinedCode: MK-13
-            code: '13'
-        MK-14:
-            combinedCode: MK-14
-            code: '14'
-        MK-15:
-            combinedCode: MK-15
-            code: '15'
-        MK-16:
-            combinedCode: MK-16
-            code: '16'
-        MK-17:
-            combinedCode: MK-17
-            code: '17'
-        MK-18:
-            combinedCode: MK-18
-            code: '18'
-        MK-19:
-            combinedCode: MK-19
-            code: '19'
-        MK-20:
-            combinedCode: MK-20
-            code: '20'
-        MK-21:
-            combinedCode: MK-21
-            code: '21'
-        MK-22:
-            combinedCode: MK-22
-            code: '22'
-        MK-23:
-            combinedCode: MK-23
-            code: '23'
-        MK-24:
-            combinedCode: MK-24
-            code: '24'
-        MK-25:
-            combinedCode: MK-25
-            code: '25'
-        MK-26:
-            combinedCode: MK-26
-            code: '26'
-        MK-27:
-            combinedCode: MK-27
-            code: '27'
-        MK-28:
-            combinedCode: MK-28
-            code: '28'
-        MK-29:
-            combinedCode: MK-29
-            code: '29'
-        MK-30:
-            combinedCode: MK-30
-            code: '30'
-        MK-31:
-            combinedCode: MK-31
-            code: '31'
-        MK-32:
-            combinedCode: MK-32
-            code: '32'
-        MK-33:
-            combinedCode: MK-33
-            code: '33'
-        MK-34:
-            combinedCode: MK-34
-            code: '34'
-        MK-35:
-            combinedCode: MK-35
-            code: '35'
-        MK-36:
-            combinedCode: MK-36
-            code: '36'
-        MK-37:
-            combinedCode: MK-37
-            code: '37'
-        MK-38:
-            combinedCode: MK-38
-            code: '38'
-        MK-39:
-            combinedCode: MK-39
-            code: '39'
-        MK-40:
-            combinedCode: MK-40
-            code: '40'
-        MK-41:
-            combinedCode: MK-41
-            code: '41'
-        MK-42:
-            combinedCode: MK-42
-            code: '42'
-        MK-43:
-            combinedCode: MK-43
-            code: '43'
-        MK-44:
-            combinedCode: MK-44
-            code: '44'
-        MK-45:
-            combinedCode: MK-45
-            code: '45'
-        MK-46:
-            combinedCode: MK-46
-            code: '46'
-        MK-47:
-            combinedCode: MK-47
-            code: '47'
-        MK-48:
-            combinedCode: MK-48
-            code: '48'
-        MK-49:
-            combinedCode: MK-49
-            code: '49'
-        MK-50:
-            combinedCode: MK-50
-            code: '50'
-        MK-51:
-            combinedCode: MK-51
-            code: '51'
-        MK-52:
-            combinedCode: MK-52
-            code: '52'
-        MK-53:
-            combinedCode: MK-53
-            code: '53'
-        MK-54:
-            combinedCode: MK-54
-            code: '54'
-        MK-55:
-            combinedCode: MK-55
-            code: '55'
-        MK-56:
-            combinedCode: MK-56
-            code: '56'
-        MK-57:
-            combinedCode: MK-57
-            code: '57'
-        MK-58:
-            combinedCode: MK-58
-            code: '58'
-        MK-59:
-            combinedCode: MK-59
-            code: '59'
-        MK-60:
-            combinedCode: MK-60
-            code: '60'
-        MK-61:
-            combinedCode: MK-61
-            code: '61'
-        MK-62:
-            combinedCode: MK-62
-            code: '62'
-        MK-63:
-            combinedCode: MK-63
-            code: '63'
-        MK-64:
-            combinedCode: MK-64
-            code: '64'
-        MK-65:
-            combinedCode: MK-65
-            code: '65'
-        MK-66:
-            combinedCode: MK-66
-            code: '66'
-        MK-67:
-            combinedCode: MK-67
-            code: '67'
-        MK-68:
-            combinedCode: MK-68
-            code: '68'
-        MK-69:
-            combinedCode: MK-69
-            code: '69'
-        MK-70:
-            combinedCode: MK-70
-            code: '70'
-        MK-71:
-            combinedCode: MK-71
-            code: '71'
-        MK-72:
-            combinedCode: MK-72
-            code: '72'
-        MK-73:
-            combinedCode: MK-73
-            code: '73'
-        MK-74:
-            combinedCode: MK-74
-            code: '74'
-        MK-75:
-            combinedCode: MK-75
-            code: '75'
-        MK-76:
-            combinedCode: MK-76
-            code: '76'
-        MK-77:
-            combinedCode: MK-77
-            code: '77'
-        MK-78:
-            combinedCode: MK-78
-            code: '78'
-        MK-79:
-            combinedCode: MK-79
-            code: '79'
-        MK-80:
-            combinedCode: MK-80
-            code: '80'
-        MK-81:
-            combinedCode: MK-81
-            code: '81'
-        MK-82:
-            combinedCode: MK-82
-            code: '82'
-        MK-83:
-            combinedCode: MK-83
-            code: '83'
-        MK-84:
-            combinedCode: MK-84
-            code: '84'
+        MK-101:
+            combinedCode: MK-101
+            code: '101'
+        MK-102:
+            combinedCode: MK-102
+            code: '102'
+        MK-103:
+            combinedCode: MK-103
+            code: '103'
+        MK-104:
+            combinedCode: MK-104
+            code: '104'
+        MK-105:
+            combinedCode: MK-105
+            code: '105'
+        MK-106:
+            combinedCode: MK-106
+            code: '106'
+        MK-107:
+            combinedCode: MK-107
+            code: '107'
+        MK-108:
+            combinedCode: MK-108
+            code: '108'
+        MK-109:
+            combinedCode: MK-109
+            code: '109'
+        MK-201:
+            combinedCode: MK-201
+            code: '201'
+        MK-202:
+            combinedCode: MK-202
+            code: '202'
+        MK-203:
+            combinedCode: MK-203
+            code: '203'
+        MK-204:
+            combinedCode: MK-204
+            code: '204'
+        MK-205:
+            combinedCode: MK-205
+            code: '205'
+        MK-206:
+            combinedCode: MK-206
+            code: '206'
+        MK-207:
+            combinedCode: MK-207
+            code: '207'
+        MK-208:
+            combinedCode: MK-208
+            code: '208'
+        MK-209:
+            combinedCode: MK-209
+            code: '209'
+        MK-210:
+            combinedCode: MK-210
+            code: '210'
+        MK-211:
+            combinedCode: MK-211
+            code: '211'
+        MK-301:
+            combinedCode: MK-301
+            code: '301'
+        MK-303:
+            combinedCode: MK-303
+            code: '303'
+        MK-304:
+            combinedCode: MK-304
+            code: '304'
+        MK-307:
+            combinedCode: MK-307
+            code: '307'
+        MK-308:
+            combinedCode: MK-308
+            code: '308'
+        MK-310:
+            combinedCode: MK-310
+            code: '310'
+        MK-311:
+            combinedCode: MK-311
+            code: '311'
+        MK-312:
+            combinedCode: MK-312
+            code: '312'
+        MK-313:
+            combinedCode: MK-313
+            code: '313'
+        MK-401:
+            combinedCode: MK-401
+            code: '401'
+        MK-402:
+            combinedCode: MK-402
+            code: '402'
+        MK-403:
+            combinedCode: MK-403
+            code: '403'
+        MK-404:
+            combinedCode: MK-404
+            code: '404'
+        MK-405:
+            combinedCode: MK-405
+            code: '405'
+        MK-406:
+            combinedCode: MK-406
+            code: '406'
+        MK-407:
+            combinedCode: MK-407
+            code: '407'
+        MK-408:
+            combinedCode: MK-408
+            code: '408'
+        MK-409:
+            combinedCode: MK-409
+            code: '409'
+        MK-410:
+            combinedCode: MK-410
+            code: '410'
+        MK-501:
+            combinedCode: MK-501
+            code: '501'
+        MK-502:
+            combinedCode: MK-502
+            code: '502'
+        MK-503:
+            combinedCode: MK-503
+            code: '503'
+        MK-504:
+            combinedCode: MK-504
+            code: '504'
+        MK-505:
+            combinedCode: MK-505
+            code: '505'
+        MK-506:
+            combinedCode: MK-506
+            code: '506'
+        MK-507:
+            combinedCode: MK-507
+            code: '507'
+        MK-508:
+            combinedCode: MK-508
+            code: '508'
+        MK-509:
+            combinedCode: MK-509
+            code: '509'
+        MK-601:
+            combinedCode: MK-601
+            code: '601'
+        MK-602:
+            combinedCode: MK-602
+            code: '602'
+        MK-603:
+            combinedCode: MK-603
+            code: '603'
+        MK-604:
+            combinedCode: MK-604
+            code: '604'
+        MK-605:
+            combinedCode: MK-605
+            code: '605'
+        MK-606:
+            combinedCode: MK-606
+            code: '606'
+        MK-607:
+            combinedCode: MK-607
+            code: '607'
+        MK-608:
+            combinedCode: MK-608
+            code: '608'
+        MK-609:
+            combinedCode: MK-609
+            code: '609'
+        MK-701:
+            combinedCode: MK-701
+            code: '701'
+        MK-702:
+            combinedCode: MK-702
+            code: '702'
+        MK-703:
+            combinedCode: MK-703
+            code: '703'
+        MK-704:
+            combinedCode: MK-704
+            code: '704'
+        MK-705:
+            combinedCode: MK-705
+            code: '705'
+        MK-706:
+            combinedCode: MK-706
+            code: '706'
+        MK-801:
+            combinedCode: MK-801
+            code: '801'
+        MK-802:
+            combinedCode: MK-802
+            code: '802'
+        MK-803:
+            combinedCode: MK-803
+            code: '803'
+        MK-804:
+            combinedCode: MK-804
+            code: '804'
+        MK-805:
+            combinedCode: MK-805
+            code: '805'
+        MK-806:
+            combinedCode: MK-806
+            code: '806'
+        MK-807:
+            combinedCode: MK-807
+            code: '807'
+        MK-808:
+            combinedCode: MK-808
+            code: '808'
+        MK-809:
+            combinedCode: MK-809
+            code: '809'
+        MK-810:
+            combinedCode: MK-810
+            code: '810'
+        MK-811:
+            combinedCode: MK-811
+            code: '811'
+        MK-812:
+            combinedCode: MK-812
+            code: '812'
+        MK-813:
+            combinedCode: MK-813
+            code: '813'
+        MK-814:
+            combinedCode: MK-814
+            code: '814'
+        MK-815:
+            combinedCode: MK-815
+            code: '815'
+        MK-816:
+            combinedCode: MK-816
+            code: '816'
+        MK-817:
+            combinedCode: MK-817
+            code: '817'
 ML:
     iso2Code: ML
     iso3Code: MLI
@@ -8711,6 +9713,9 @@ ML:
         ML-1:
             combinedCode: ML-1
             code: '1'
+        ML-10:
+            combinedCode: ML-10
+            code: '10'
         ML-2:
             combinedCode: ML-2
             code: '2'
@@ -8732,9 +9737,12 @@ ML:
         ML-8:
             combinedCode: ML-8
             code: '8'
-        ML-BK0:
-            combinedCode: ML-BK0
-            code: BK0
+        ML-9:
+            combinedCode: ML-9
+            code: '9'
+        ML-BKO:
+            combinedCode: ML-BKO
+            code: BKO
 MM:
     iso2Code: MM
     iso3Code: MMR
@@ -8906,9 +9914,15 @@ MR:
         MR-12:
             combinedCode: MR-12
             code: '12'
-        MR-NKC:
-            combinedCode: MR-NKC
-            code: NKC
+        MR-13:
+            combinedCode: MR-13
+            code: '13'
+        MR-14:
+            combinedCode: MR-14
+            code: '14'
+        MR-15:
+            combinedCode: MR-15
+            code: '15'
 MS:
     iso2Code: MS
     iso3Code: MSR
@@ -9131,15 +10145,9 @@ MU:
         MU-BL:
             combinedCode: MU-BL
             code: BL
-        MU-BR:
-            combinedCode: MU-BR
-            code: BR
         MU-CC:
             combinedCode: MU-CC
             code: CC
-        MU-CU:
-            combinedCode: MU-CU
-            code: CU
         MU-FL:
             combinedCode: MU-FL
             code: FL
@@ -9155,31 +10163,25 @@ MU:
         MU-PL:
             combinedCode: MU-PL
             code: PL
-        MU-PU:
-            combinedCode: MU-PU
-            code: PU
         MU-PW:
             combinedCode: MU-PW
             code: PW
-        MU-QB:
-            combinedCode: MU-QB
-            code: QB
         MU-RO:
             combinedCode: MU-RO
             code: RO
-        MU-RP:
-            combinedCode: MU-RP
-            code: RP
+        MU-RR:
+            combinedCode: MU-RR
+            code: RR
         MU-SA:
             combinedCode: MU-SA
             code: SA
-        MU-VP:
-            combinedCode: MU-VP
-            code: VP
 MV:
     iso2Code: MV
     iso3Code: MDV
     regions:
+        MV-00:
+            combinedCode: MV-00
+            code: '00'
         MV-01:
             combinedCode: MV-01
             code: '01'
@@ -9300,7 +10302,7 @@ MW:
             code: MZ
         MW-N:
             combinedCode: MW-N
-            code: N
+            code: 'N'
         MW-NB:
             combinedCode: MW-NB
             code: NB
@@ -9359,15 +10361,15 @@ MX:
         MX-CHP:
             combinedCode: MX-CHP
             code: CHP
+        MX-CMX:
+            combinedCode: MX-CMX
+            code: CMX
         MX-COA:
             combinedCode: MX-COA
             code: COA
         MX-COL:
             combinedCode: MX-COL
             code: COL
-        MX-DIF:
-            combinedCode: MX-DIF
-            code: DIF
         MX-DUR:
             combinedCode: MX-DUR
             code: DUR
@@ -9513,7 +10515,7 @@ MZ:
             code: MPM
         MZ-N:
             combinedCode: MZ-N
-            code: N
+            code: 'N'
         MZ-P:
             combinedCode: MZ-P
             code: P
@@ -9542,24 +10544,27 @@ NA:
         NA-KA:
             combinedCode: NA-KA
             code: KA
+        NA-KE:
+            combinedCode: NA-KE
+            code: KE
         NA-KH:
             combinedCode: NA-KH
             code: KH
         NA-KU:
             combinedCode: NA-KU
             code: KU
+        NA-KW:
+            combinedCode: NA-KW
+            code: KW
         NA-OD:
             combinedCode: NA-OD
             code: OD
         NA-OH:
             combinedCode: NA-OH
             code: OH
-        NA-OK:
-            combinedCode: NA-OK
-            code: OK
         NA-ON:
             combinedCode: NA-ON
-            code: ON
+            code: 'ON'
         NA-OS:
             combinedCode: NA-OS
             code: OS
@@ -9604,7 +10609,7 @@ NE:
 NF:
     iso2Code: NF
     iso3Code: NFK
-    regions:
+    regions: {  }
 NG:
     iso2Code: NG
     iso3Code: NGA
@@ -9695,7 +10700,7 @@ NG:
             code: OG
         NG-ON:
             combinedCode: NG-ON
-            code: ON
+            code: 'ON'
         NG-OS:
             combinedCode: NG-OS
             code: OS
@@ -9779,6 +10784,21 @@ NL:
     iso2Code: NL
     iso3Code: NLD
     regions:
+        NL-AW:
+            combinedCode: NL-AW
+            code: AW
+        NL-BQ1:
+            combinedCode: NL-BQ1
+            code: BQ1
+        NL-BQ2:
+            combinedCode: NL-BQ2
+            code: BQ2
+        NL-BQ3:
+            combinedCode: NL-BQ3
+            code: BQ3
+        NL-CW:
+            combinedCode: NL-CW
+            code: CW
         NL-DR:
             combinedCode: NL-DR
             code: DR
@@ -9806,6 +10826,9 @@ NL:
         NL-OV:
             combinedCode: NL-OV
             code: OV
+        NL-SX:
+            combinedCode: NL-SX
+            code: SX
         NL-UT:
             combinedCode: NL-UT
             code: UT
@@ -9815,134 +10838,74 @@ NL:
         NL-ZH:
             combinedCode: NL-ZH
             code: ZH
-NO:
-    iso2Code: NO
+'NO':
+    iso2Code: 'NO'
     iso3Code: NOR
     regions:
-        NO-01:
-            combinedCode: NO-01
-            code: '01'
-        NO-02:
-            combinedCode: NO-02
-            code: '02'
         NO-03:
             combinedCode: NO-03
             code: '03'
-        NO-04:
-            combinedCode: NO-04
-            code: '04'
-        NO-05:
-            combinedCode: NO-05
-            code: '05'
-        NO-06:
-            combinedCode: NO-06
-            code: '06'
-        NO-07:
-            combinedCode: NO-07
-            code: '07'
-        NO-08:
-            combinedCode: NO-08
-            code: '08'
-        NO-09:
-            combinedCode: NO-09
-            code: '09'
-        NO-10:
-            combinedCode: NO-10
-            code: '10'
         NO-11:
             combinedCode: NO-11
             code: '11'
-        NO-12:
-            combinedCode: NO-12
-            code: '12'
-        NO-14:
-            combinedCode: NO-14
-            code: '14'
         NO-15:
             combinedCode: NO-15
             code: '15'
-        NO-16:
-            combinedCode: NO-16
-            code: '16'
-        NO-17:
-            combinedCode: NO-17
-            code: '17'
         NO-18:
             combinedCode: NO-18
             code: '18'
-        NO-19:
-            combinedCode: NO-19
-            code: '19'
-        NO-20:
-            combinedCode: NO-20
-            code: '20'
         NO-21:
             combinedCode: NO-21
             code: '21'
         NO-22:
             combinedCode: NO-22
             code: '22'
+        NO-30:
+            combinedCode: NO-30
+            code: '30'
+        NO-34:
+            combinedCode: NO-34
+            code: '34'
+        NO-38:
+            combinedCode: NO-38
+            code: '38'
+        NO-42:
+            combinedCode: NO-42
+            code: '42'
+        NO-46:
+            combinedCode: NO-46
+            code: '46'
+        NO-50:
+            combinedCode: NO-50
+            code: '50'
+        NO-54:
+            combinedCode: NO-54
+            code: '54'
 NP:
     iso2Code: NP
     iso3Code: NPL
     regions:
-        NP-1:
-            combinedCode: NP-1
-            code: '1'
-        NP-2:
-            combinedCode: NP-2
-            code: '2'
-        NP-3:
-            combinedCode: NP-3
-            code: '3'
-        NP-4:
-            combinedCode: NP-4
-            code: '4'
-        NP-5:
-            combinedCode: NP-5
-            code: '5'
-        NP-BA:
-            combinedCode: NP-BA
-            code: BA
-        NP-BH:
-            combinedCode: NP-BH
-            code: BH
-        NP-DH:
-            combinedCode: NP-DH
-            code: DH
-        NP-GA:
-            combinedCode: NP-GA
-            code: GA
-        NP-JA:
-            combinedCode: NP-JA
-            code: JA
-        NP-KA:
-            combinedCode: NP-KA
-            code: KA
-        NP-KO:
-            combinedCode: NP-KO
-            code: KO
-        NP-LU:
-            combinedCode: NP-LU
-            code: LU
-        NP-MA:
-            combinedCode: NP-MA
-            code: MA
-        NP-ME:
-            combinedCode: NP-ME
-            code: ME
-        NP-NA:
-            combinedCode: NP-NA
-            code: NA
-        NP-RA:
-            combinedCode: NP-RA
-            code: RA
-        NP-SA:
-            combinedCode: NP-SA
-            code: SA
-        NP-SE:
-            combinedCode: NP-SE
-            code: SE
+        NP-P1:
+            combinedCode: NP-P1
+            code: P1
+        NP-P2:
+            combinedCode: NP-P2
+            code: P2
+        NP-P3:
+            combinedCode: NP-P3
+            code: P3
+        NP-P4:
+            combinedCode: NP-P4
+            code: P4
+        NP-P5:
+            combinedCode: NP-P5
+            code: P5
+        NP-P6:
+            combinedCode: NP-P6
+            code: P6
+        NP-P7:
+            combinedCode: NP-P7
+            code: P7
 NR:
     iso2Code: NR
     iso3Code: NRU
@@ -10021,9 +10984,6 @@ NZ:
         NZ-MWT:
             combinedCode: NZ-MWT
             code: MWT
-        NZ-N:
-            combinedCode: NZ-N
-            code: N
         NZ-NSN:
             combinedCode: NZ-NSN
             code: NSN
@@ -10033,9 +10993,6 @@ NZ:
         NZ-OTA:
             combinedCode: NZ-OTA
             code: OTA
-        NZ-S:
-            combinedCode: NZ-S
-            code: S
         NZ-STL:
             combinedCode: NZ-STL
             code: STL
@@ -10058,9 +11015,12 @@ OM:
     iso2Code: OM
     iso3Code: OMN
     regions:
-        OM-BA:
-            combinedCode: OM-BA
-            code: BA
+        OM-BJ:
+            combinedCode: OM-BJ
+            code: BJ
+        OM-BS:
+            combinedCode: OM-BS
+            code: BS
         OM-BU:
             combinedCode: OM-BU
             code: BU
@@ -10073,9 +11033,12 @@ OM:
         OM-MU:
             combinedCode: OM-MU
             code: MU
-        OM-SH:
-            combinedCode: OM-SH
-            code: SH
+        OM-SJ:
+            combinedCode: OM-SJ
+            code: SJ
+        OM-SS:
+            combinedCode: OM-SS
+            code: SS
         OM-WU:
             combinedCode: OM-WU
             code: WU
@@ -10092,6 +11055,9 @@ PA:
         PA-1:
             combinedCode: PA-1
             code: '1'
+        PA-10:
+            combinedCode: PA-10
+            code: '10'
         PA-2:
             combinedCode: PA-2
             code: '2'
@@ -10125,6 +11091,9 @@ PA:
         PA-NB:
             combinedCode: PA-NB
             code: NB
+        PA-NT:
+            combinedCode: PA-NT
+            code: NT
 PE:
     iso2Code: PE
     iso3Code: PER
@@ -10236,6 +11205,12 @@ PG:
         PG-GPK:
             combinedCode: PG-GPK
             code: GPK
+        PG-HLA:
+            combinedCode: PG-HLA
+            code: HLA
+        PG-JWK:
+            combinedCode: PG-JWK
+            code: JWK
         PG-MBA:
             combinedCode: PG-MBA
             code: MBA
@@ -10257,9 +11232,9 @@ PG:
         PG-NPP:
             combinedCode: PG-NPP
             code: NPP
-        PG-NSA:
-            combinedCode: PG-NSA
-            code: NSA
+        PG-NSB:
+            combinedCode: PG-NSB
+            code: NSB
         PG-SAN:
             combinedCode: PG-SAN
             code: SAN
@@ -10309,6 +11284,9 @@ PH:
         PH-10:
             combinedCode: PH-10
             code: '10'
+        PH-11:
+            combinedCode: PH-11
+            code: '11'
         PH-12:
             combinedCode: PH-12
             code: '12'
@@ -10417,6 +11395,9 @@ PH:
         PH-DIN:
             combinedCode: PH-DIN
             code: DIN
+        PH-DVO:
+            combinedCode: PH-DVO
+            code: DVO
         PH-EAS:
             combinedCode: PH-EAS
             code: EAS
@@ -10459,9 +11440,6 @@ PH:
         PH-MAD:
             combinedCode: PH-MAD
             code: MAD
-        PH-MAG:
-            combinedCode: PH-MAG
-            code: MAG
         PH-MAS:
             combinedCode: PH-MAS
             code: MAS
@@ -10471,6 +11449,12 @@ PH:
         PH-MDR:
             combinedCode: PH-MDR
             code: MDR
+        PH-MGN:
+            combinedCode: PH-MGN
+            code: MGN
+        PH-MGS:
+            combinedCode: PH-MGS
+            code: MGS
         PH-MOU:
             combinedCode: PH-MOU
             code: MOU
@@ -10574,79 +11558,76 @@ PK:
         PK-BA:
             combinedCode: PK-BA
             code: BA
+        PK-GB:
+            combinedCode: PK-GB
+            code: GB
         PK-IS:
             combinedCode: PK-IS
             code: IS
         PK-JK:
             combinedCode: PK-JK
             code: JK
-        PK-NA:
-            combinedCode: PK-NA
-            code: NA
-        PK-NW:
-            combinedCode: PK-NW
-            code: NW
+        PK-KP:
+            combinedCode: PK-KP
+            code: KP
         PK-PB:
             combinedCode: PK-PB
             code: PB
         PK-SD:
             combinedCode: PK-SD
             code: SD
-        PK-TA:
-            combinedCode: PK-TA
-            code: TA
 PL:
     iso2Code: PL
     iso3Code: POL
     regions:
-        PL-DS:
-            combinedCode: PL-DS
-            code: DS
-        PL-KP:
-            combinedCode: PL-KP
-            code: KP
-        PL-LB:
-            combinedCode: PL-LB
-            code: LB
-        PL-LD:
-            combinedCode: PL-LD
-            code: LD
-        PL-LU:
-            combinedCode: PL-LU
-            code: LU
-        PL-MA:
-            combinedCode: PL-MA
-            code: MA
-        PL-MZ:
-            combinedCode: PL-MZ
-            code: MZ
-        PL-OP:
-            combinedCode: PL-OP
-            code: OP
-        PL-PD:
-            combinedCode: PL-PD
-            code: PD
-        PL-PK:
-            combinedCode: PL-PK
-            code: PK
-        PL-PM:
-            combinedCode: PL-PM
-            code: PM
-        PL-SK:
-            combinedCode: PL-SK
-            code: SK
-        PL-SL:
-            combinedCode: PL-SL
-            code: SL
-        PL-WN:
-            combinedCode: PL-WN
-            code: WN
-        PL-WP:
-            combinedCode: PL-WP
-            code: WP
-        PL-ZP:
-            combinedCode: PL-ZP
-            code: ZP
+        PL-02:
+            combinedCode: PL-02
+            code: '02'
+        PL-04:
+            combinedCode: PL-04
+            code: '04'
+        PL-06:
+            combinedCode: PL-06
+            code: '06'
+        PL-08:
+            combinedCode: PL-08
+            code: '08'
+        PL-10:
+            combinedCode: PL-10
+            code: '10'
+        PL-12:
+            combinedCode: PL-12
+            code: '12'
+        PL-14:
+            combinedCode: PL-14
+            code: '14'
+        PL-16:
+            combinedCode: PL-16
+            code: '16'
+        PL-18:
+            combinedCode: PL-18
+            code: '18'
+        PL-20:
+            combinedCode: PL-20
+            code: '20'
+        PL-22:
+            combinedCode: PL-22
+            code: '22'
+        PL-24:
+            combinedCode: PL-24
+            code: '24'
+        PL-26:
+            combinedCode: PL-26
+            code: '26'
+        PL-28:
+            combinedCode: PL-28
+            code: '28'
+        PL-30:
+            combinedCode: PL-30
+            code: '30'
+        PL-32:
+            combinedCode: PL-32
+            code: '32'
 PM:
     iso2Code: PM
     iso3Code: SPM
@@ -10662,7 +11643,55 @@ PR:
 PS:
     iso2Code: PS
     iso3Code: PSE
-    regions: {  }
+    regions:
+        PS-BTH:
+            combinedCode: PS-BTH
+            code: BTH
+        PS-DEB:
+            combinedCode: PS-DEB
+            code: DEB
+        PS-GZA:
+            combinedCode: PS-GZA
+            code: GZA
+        PS-HBN:
+            combinedCode: PS-HBN
+            code: HBN
+        PS-JEM:
+            combinedCode: PS-JEM
+            code: JEM
+        PS-JEN:
+            combinedCode: PS-JEN
+            code: JEN
+        PS-JRH:
+            combinedCode: PS-JRH
+            code: JRH
+        PS-KYS:
+            combinedCode: PS-KYS
+            code: KYS
+        PS-NBS:
+            combinedCode: PS-NBS
+            code: NBS
+        PS-NGZ:
+            combinedCode: PS-NGZ
+            code: NGZ
+        PS-QQA:
+            combinedCode: PS-QQA
+            code: QQA
+        PS-RBH:
+            combinedCode: PS-RBH
+            code: RBH
+        PS-RFH:
+            combinedCode: PS-RFH
+            code: RFH
+        PS-SLT:
+            combinedCode: PS-SLT
+            code: SLT
+        PS-TBS:
+            combinedCode: PS-TBS
+            code: TBS
+        PS-TKM:
+            combinedCode: PS-TKM
+            code: TKM
 PT:
     iso2Code: PT
     iso3Code: PRT
@@ -10844,15 +11873,6 @@ QA:
         QA-DA:
             combinedCode: QA-DA
             code: DA
-        QA-GH:
-            combinedCode: QA-GH
-            code: GH
-        QA-JB:
-            combinedCode: QA-JB
-            code: JB
-        QA-JU:
-            combinedCode: QA-JU
-            code: JU
         QA-KH:
             combinedCode: QA-KH
             code: KH
@@ -10862,12 +11882,18 @@ QA:
         QA-RA:
             combinedCode: QA-RA
             code: RA
+        QA-SH:
+            combinedCode: QA-SH
+            code: SH
         QA-US:
             combinedCode: QA-US
             code: US
         QA-WA:
             combinedCode: QA-WA
             code: WA
+        QA-ZA:
+            combinedCode: QA-ZA
+            code: ZA
 RE:
     iso2Code: RE
     iso3Code: REU
@@ -11530,85 +12556,70 @@ SC:
         SC-25:
             combinedCode: SC-25
             code: '25'
+        SC-26:
+            combinedCode: SC-26
+            code: '26'
+        SC-27:
+            combinedCode: SC-27
+            code: '27'
 SD:
     iso2Code: SD
     iso3Code: SDN
     regions:
-        SD-01:
-            combinedCode: SD-01
-            code: '01'
-        SD-02:
-            combinedCode: SD-02
-            code: '02'
-        SD-03:
-            combinedCode: SD-03
-            code: '03'
-        SD-04:
-            combinedCode: SD-04
-            code: '04'
-        SD-05:
-            combinedCode: SD-05
-            code: '05'
-        SD-06:
-            combinedCode: SD-06
-            code: '06'
-        SD-07:
-            combinedCode: SD-07
-            code: '07'
-        SD-08:
-            combinedCode: SD-08
-            code: '08'
-        SD-09:
-            combinedCode: SD-09
-            code: '09'
-        SD-11:
-            combinedCode: SD-11
-            code: '11'
-        SD-12:
-            combinedCode: SD-12
-            code: '12'
-        SD-13:
-            combinedCode: SD-13
-            code: '13'
-        SD-14:
-            combinedCode: SD-14
-            code: '14'
-        SD-15:
-            combinedCode: SD-15
-            code: '15'
-        SD-16:
-            combinedCode: SD-16
-            code: '16'
-        SD-17:
-            combinedCode: SD-17
-            code: '17'
-        SD-18:
-            combinedCode: SD-18
-            code: '18'
-        SD-19:
-            combinedCode: SD-19
-            code: '19'
-        SD-20:
-            combinedCode: SD-20
-            code: '20'
-        SD-21:
-            combinedCode: SD-21
-            code: '21'
-        SD-22:
-            combinedCode: SD-22
-            code: '22'
-        SD-23:
-            combinedCode: SD-23
-            code: '23'
-        SD-24:
-            combinedCode: SD-24
-            code: '24'
-        SD-25:
-            combinedCode: SD-25
-            code: '25'
-        SD-26:
-            combinedCode: SD-26
-            code: '26'
+        SD-DC:
+            combinedCode: SD-DC
+            code: DC
+        SD-DE:
+            combinedCode: SD-DE
+            code: DE
+        SD-DN:
+            combinedCode: SD-DN
+            code: DN
+        SD-DS:
+            combinedCode: SD-DS
+            code: DS
+        SD-DW:
+            combinedCode: SD-DW
+            code: DW
+        SD-GD:
+            combinedCode: SD-GD
+            code: GD
+        SD-GK:
+            combinedCode: SD-GK
+            code: GK
+        SD-GZ:
+            combinedCode: SD-GZ
+            code: GZ
+        SD-KA:
+            combinedCode: SD-KA
+            code: KA
+        SD-KH:
+            combinedCode: SD-KH
+            code: KH
+        SD-KN:
+            combinedCode: SD-KN
+            code: KN
+        SD-KS:
+            combinedCode: SD-KS
+            code: KS
+        SD-NB:
+            combinedCode: SD-NB
+            code: NB
+        SD-NO:
+            combinedCode: SD-NO
+            code: 'NO'
+        SD-NR:
+            combinedCode: SD-NR
+            code: NR
+        SD-NW:
+            combinedCode: SD-NW
+            code: NW
+        SD-RS:
+            combinedCode: SD-RS
+            code: RS
+        SD-SI:
+            combinedCode: SD-SI
+            code: SI
 SE:
     iso2Code: SE
     iso3Code: SWE
@@ -11651,10 +12662,10 @@ SE:
             code: M
         SE-N:
             combinedCode: SE-N
-            code: N
-        SE-Q:
-            combinedCode: SE-Q
-            code: Q
+            code: 'N'
+        SE-O:
+            combinedCode: SE-O
+            code: O
         SE-S:
             combinedCode: SE-S
             code: S
@@ -11672,7 +12683,7 @@ SE:
             code: X
         SE-Y:
             combinedCode: SE-Y
-            code: Y
+            code: 'Y'
         SE-Z:
             combinedCode: SE-Z
             code: Z
@@ -11698,7 +12709,16 @@ SG:
 SH:
     iso2Code: SH
     iso3Code: SHN
-    regions: {  }
+    regions:
+        SH-AC:
+            combinedCode: SH-AC
+            code: AC
+        SH-HL:
+            combinedCode: SH-HL
+            code: HL
+        SH-TA:
+            combinedCode: SH-TA
+            code: TA
 SI:
     iso2Code: SI
     iso3Code: SVN
@@ -12333,6 +13353,12 @@ SI:
         SI-211:
             combinedCode: SI-211
             code: '211'
+        SI-212:
+            combinedCode: SI-212
+            code: '212'
+        SI-213:
+            combinedCode: SI-213
+            code: '213'
 SJ:
     iso2Code: SJ
     iso3Code: SJM
@@ -12374,7 +13400,10 @@ SL:
             code: E
         SL-N:
             combinedCode: SL-N
-            code: N
+            code: 'N'
+        SL-NW:
+            combinedCode: SL-NW
+            code: NW
         SL-S:
             combinedCode: SL-S
             code: S
@@ -12554,36 +13583,36 @@ SS:
     iso2Code: SS
     iso3Code: SSD
     regions:
-        SS-EC:
-            combinedCode: SS-EC
-            code: 'EC'
-        SS-EE:
-            combinedCode: SS-EE
-            code: 'EE'
-        SS-JG:
-            combinedCode: SS-JG
-            code: 'JG'
-        SS-LK:
-            combinedCode: SS-LK
-            code: 'LK'
         SS-BN:
             combinedCode: SS-BN
-            code: 'BN'
-        SS-UY:
-            combinedCode: SS-UY
-            code: 'UY'
-        SS-NU:
-            combinedCode: SS-NU
-            code: 'NU'
-        SS-WR:
-            combinedCode: SS-WR
-            code: 'WR'
+            code: BN
         SS-BW:
             combinedCode: SS-BW
-            code: 'BW'
+            code: BW
+        SS-EC:
+            combinedCode: SS-EC
+            code: EC
+        SS-EE:
+            combinedCode: SS-EE
+            code: EE
         SS-EW:
             combinedCode: SS-EW
-            code: 'EW'
+            code: EW
+        SS-JG:
+            combinedCode: SS-JG
+            code: JG
+        SS-LK:
+            combinedCode: SS-LK
+            code: LK
+        SS-NU:
+            combinedCode: SS-NU
+            code: NU
+        SS-UY:
+            combinedCode: SS-UY
+            code: UY
+        SS-WR:
+            combinedCode: SS-WR
+            code: WR
 ST:
     iso2Code: ST
     iso3Code: STP
@@ -12741,9 +13770,12 @@ TD:
         TD-CB:
             combinedCode: TD-CB
             code: CB
-        TD-EN:
-            combinedCode: TD-EN
-            code: EN
+        TD-EE:
+            combinedCode: TD-EE
+            code: EE
+        TD-EO:
+            combinedCode: TD-EO
+            code: EO
         TD-GR:
             combinedCode: TD-GR
             code: GR
@@ -12900,6 +13932,9 @@ TH:
         TH-37:
             combinedCode: TH-37
             code: '37'
+        TH-38:
+            combinedCode: TH-38
+            code: '38'
         TH-39:
             combinedCode: TH-39
             code: '39'
@@ -13057,12 +14092,18 @@ TJ:
     iso2Code: TJ
     iso3Code: TJK
     regions:
+        TJ-DU:
+            combinedCode: TJ-DU
+            code: DU
         TJ-GB:
             combinedCode: TJ-GB
             code: GB
         TJ-KT:
             combinedCode: TJ-KT
             code: KT
+        TJ-RA:
+            combinedCode: TJ-RA
+            code: RA
         TJ-SU:
             combinedCode: TJ-SU
             code: SU
@@ -13493,9 +14534,9 @@ TT:
         TT-DMN:
             combinedCode: TT-DMN
             code: DMN
-        TT-ETO:
-            combinedCode: TT-ETO
-            code: ETO
+        TT-MRC:
+            combinedCode: TT-MRC
+            code: MRC
         TT-PED:
             combinedCode: TT-PED
             code: PED
@@ -13508,9 +14549,6 @@ TT:
         TT-PTF:
             combinedCode: TT-PTF
             code: PTF
-        TT-RCM:
-            combinedCode: TT-RCM
-            code: RCM
         TT-SFO:
             combinedCode: TT-SFO
             code: SFO
@@ -13523,12 +14561,12 @@ TT:
         TT-SJL:
             combinedCode: TT-SJL
             code: SJL
+        TT-TOB:
+            combinedCode: TT-TOB
+            code: TOB
         TT-TUP:
             combinedCode: TT-TUP
             code: TUP
-        TT-WTO:
-            combinedCode: TT-WTO
-            code: WTO
 TV:
     iso2Code: TV
     iso3Code: TUV
@@ -13539,9 +14577,6 @@ TV:
         TV-NIT:
             combinedCode: TV-NIT
             code: NIT
-        TV-NIU:
-            combinedCode: TV-NIU
-            code: NIU
         TV-NKF:
             combinedCode: TV-NKF
             code: NKF
@@ -13554,6 +14589,9 @@ TV:
         TV-NMG:
             combinedCode: TV-NMG
             code: NMG
+        TV-NUI:
+            combinedCode: TV-NUI
+            code: NUI
         TV-VAI:
             combinedCode: TV-VAI
             code: VAI
@@ -13585,15 +14623,15 @@ TW:
         TW-KEE:
             combinedCode: TW-KEE
             code: KEE
+        TW-KHH:
+            combinedCode: TW-KHH
+            code: KHH
         TW-KIN:
             combinedCode: TW-KIN
             code: KIN
         TW-LIE:
             combinedCode: TW-LIE
             code: LIE
-        TW-KHH:
-            combinedCode: TW-KHH
-            code: KHH
         TW-MIA:
             combinedCode: TW-MIA
             code: MIA
@@ -13709,6 +14747,21 @@ TZ:
         TZ-26:
             combinedCode: TZ-26
             code: '26'
+        TZ-27:
+            combinedCode: TZ-27
+            code: '27'
+        TZ-28:
+            combinedCode: TZ-28
+            code: '28'
+        TZ-29:
+            combinedCode: TZ-29
+            code: '29'
+        TZ-30:
+            combinedCode: TZ-30
+            code: '30'
+        TZ-31:
+            combinedCode: TZ-31
+            code: '31'
 UA:
     iso2Code: UA
     iso3Code: UKR
@@ -13846,6 +14899,36 @@ UG:
         UG-116:
             combinedCode: UG-116
             code: '116'
+        UG-117:
+            combinedCode: UG-117
+            code: '117'
+        UG-118:
+            combinedCode: UG-118
+            code: '118'
+        UG-119:
+            combinedCode: UG-119
+            code: '119'
+        UG-120:
+            combinedCode: UG-120
+            code: '120'
+        UG-121:
+            combinedCode: UG-121
+            code: '121'
+        UG-122:
+            combinedCode: UG-122
+            code: '122'
+        UG-123:
+            combinedCode: UG-123
+            code: '123'
+        UG-124:
+            combinedCode: UG-124
+            code: '124'
+        UG-125:
+            combinedCode: UG-125
+            code: '125'
+        UG-126:
+            combinedCode: UG-126
+            code: '126'
         UG-201:
             combinedCode: UG-201
             code: '201'
@@ -13918,6 +15001,45 @@ UG:
         UG-224:
             combinedCode: UG-224
             code: '224'
+        UG-225:
+            combinedCode: UG-225
+            code: '225'
+        UG-226:
+            combinedCode: UG-226
+            code: '226'
+        UG-227:
+            combinedCode: UG-227
+            code: '227'
+        UG-228:
+            combinedCode: UG-228
+            code: '228'
+        UG-229:
+            combinedCode: UG-229
+            code: '229'
+        UG-230:
+            combinedCode: UG-230
+            code: '230'
+        UG-231:
+            combinedCode: UG-231
+            code: '231'
+        UG-232:
+            combinedCode: UG-232
+            code: '232'
+        UG-233:
+            combinedCode: UG-233
+            code: '233'
+        UG-234:
+            combinedCode: UG-234
+            code: '234'
+        UG-235:
+            combinedCode: UG-235
+            code: '235'
+        UG-236:
+            combinedCode: UG-236
+            code: '236'
+        UG-237:
+            combinedCode: UG-237
+            code: '237'
         UG-301:
             combinedCode: UG-301
             code: '301'
@@ -13981,6 +15103,54 @@ UG:
         UG-321:
             combinedCode: UG-321
             code: '321'
+        UG-322:
+            combinedCode: UG-322
+            code: '322'
+        UG-323:
+            combinedCode: UG-323
+            code: '323'
+        UG-324:
+            combinedCode: UG-324
+            code: '324'
+        UG-325:
+            combinedCode: UG-325
+            code: '325'
+        UG-326:
+            combinedCode: UG-326
+            code: '326'
+        UG-327:
+            combinedCode: UG-327
+            code: '327'
+        UG-328:
+            combinedCode: UG-328
+            code: '328'
+        UG-329:
+            combinedCode: UG-329
+            code: '329'
+        UG-330:
+            combinedCode: UG-330
+            code: '330'
+        UG-331:
+            combinedCode: UG-331
+            code: '331'
+        UG-332:
+            combinedCode: UG-332
+            code: '332'
+        UG-333:
+            combinedCode: UG-333
+            code: '333'
+        UG-334:
+            combinedCode: UG-334
+            code: '334'
+        UG-335:
+            combinedCode: UG-335
+            code: '335'
+        UG-336:
+            combinedCode: UG-336
+            code: '336'
+        UG-337:
+            combinedCode: UG-337
+            code: '337'
         UG-401:
             combinedCode: UG-401
             code: '401'
@@ -14038,6 +15208,54 @@ UG:
         UG-419:
             combinedCode: UG-419
             code: '419'
+        UG-420:
+            combinedCode: UG-420
+            code: '420'
+        UG-421:
+            combinedCode: UG-421
+            code: '421'
+        UG-422:
+            combinedCode: UG-422
+            code: '422'
+        UG-423:
+            combinedCode: UG-423
+            code: '423'
+        UG-424:
+            combinedCode: UG-424
+            code: '424'
+        UG-425:
+            combinedCode: UG-425
+            code: '425'
+        UG-426:
+            combinedCode: UG-426
+            code: '426'
+        UG-427:
+            combinedCode: UG-427
+            code: '427'
+        UG-428:
+            combinedCode: UG-428
+            code: '428'
+        UG-429:
+            combinedCode: UG-429
+            code: '429'
+        UG-430:
+            combinedCode: UG-430
+            code: '430'
+        UG-431:
+            combinedCode: UG-431
+            code: '431'
+        UG-432:
+            combinedCode: UG-432
+            code: '432'
+        UG-433:
+            combinedCode: UG-433
+            code: '433'
+        UG-434:
+            combinedCode: UG-434
+            code: '434'
+        UG-435:
+            combinedCode: UG-435
+            code: '435'
         UG-C:
             combinedCode: UG-C
             code: C
@@ -14046,7 +15264,7 @@ UG:
             code: E
         UG-N:
             combinedCode: UG-N
-            code: N
+            code: 'N'
         UG-W:
             combinedCode: UG-W
             code: W
@@ -14434,7 +15652,7 @@ VE:
             code: M
         VE-N:
             combinedCode: VE-N
-            code: N
+            code: 'N'
         VE-O:
             combinedCode: VE-O
             code: O
@@ -14464,7 +15682,7 @@ VE:
             code: X
         VE-Y:
             combinedCode: VE-Y
-            code: Y
+            code: 'Y'
         VE-Z:
             combinedCode: VE-Z
             code: Z
@@ -14769,6 +15987,9 @@ YE:
         YE-HJ:
             combinedCode: YE-HJ
             code: HJ
+        YE-HU:
+            combinedCode: YE-HU
+            code: HU
         YE-IB:
             combinedCode: YE-IB
             code: IB
@@ -14784,15 +16005,15 @@ YE:
         YE-MR:
             combinedCode: YE-MR
             code: MR
-        YE-MU:
-            combinedCode: YE-MU
-            code: MU
         YE-MW:
             combinedCode: YE-MW
             code: MW
         YE-RA:
             combinedCode: YE-RA
             code: RA
+        YE-SA:
+            combinedCode: YE-SA
+            code: SA
         YE-SD:
             combinedCode: YE-SD
             code: SD
@@ -14802,6 +16023,9 @@ YE:
         YE-SN:
             combinedCode: YE-SN
             code: SN
+        YE-SU:
+            combinedCode: YE-SU
+            code: SU
         YE-TA:
             combinedCode: YE-TA
             code: TA
@@ -14819,9 +16043,12 @@ ZA:
         ZA-FS:
             combinedCode: ZA-FS
             code: FS
-        ZA-GT:
-            combinedCode: ZA-GT
-            code: GT
+        ZA-GP:
+            combinedCode: ZA-GP
+            code: GP
+        ZA-KZN:
+            combinedCode: ZA-KZN
+            code: KZN
         ZA-LP:
             combinedCode: ZA-LP
             code: LP
@@ -14831,9 +16058,6 @@ ZA:
         ZA-NC:
             combinedCode: ZA-NC
             code: NC
-        ZA-NL:
-            combinedCode: ZA-NL
-            code: NL
         ZA-NW:
             combinedCode: ZA-NW
             code: NW
@@ -14871,6 +16095,9 @@ ZM:
         ZM-09:
             combinedCode: ZM-09
             code: '09'
+        ZM-10:
+            combinedCode: ZM-10
+            code: '10'
 ZW:
     iso2Code: ZW
     iso3Code: ZWE

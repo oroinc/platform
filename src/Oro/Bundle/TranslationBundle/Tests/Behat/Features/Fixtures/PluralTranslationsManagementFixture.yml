@@ -6,11 +6,11 @@ Oro\Bundle\TranslationBundle\Entity\Language:
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     title_localization_ru:
-        string: 'Russian (Russia)'
+        string: 'Russian (Russian Federation)'
 
 Oro\Bundle\LocaleBundle\Entity\Localization:
     localization_ru:
-        name: 'Russian (Russia)'
+        name: 'Russian (Russian Federation)'
         language: '@language_ru'
         formattingCode: 'ru'
         titles: ['@title_localization_ru']

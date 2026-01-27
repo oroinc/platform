@@ -4,7 +4,7 @@ data:
         id: IL-D
         attributes:
             code: D
-            name: HaDarom
+            name: 'Al Janūbī'
         relationships:
             country:
                 data:
@@ -15,7 +15,7 @@ data:
         id: IL-HA
         attributes:
             code: HA
-            name: Hefa
+            name: H̱efa
         relationships:
             country:
                 data:
@@ -26,7 +26,7 @@ data:
         id: IL-JM
         attributes:
             code: JM
-            name: 'Yerushalayim Al Quds'
+            name: 'Al Quds'
         relationships:
             country:
                 data:
@@ -37,7 +37,7 @@ data:
         id: IL-M
         attributes:
             code: M
-            name: HaMerkaz
+            name: 'Al Awsaţ'
         relationships:
             country:
                 data:
@@ -48,7 +48,7 @@ data:
         id: IL-TA
         attributes:
             code: TA
-            name: Tel-Aviv
+            name: 'Tall Abīb'
         relationships:
             country:
                 data:
@@ -59,7 +59,7 @@ data:
         id: IL-Z
         attributes:
             code: Z
-            name: HaZafon
+            name: 'Ash Shamālī'
         relationships:
             country:
                 data:

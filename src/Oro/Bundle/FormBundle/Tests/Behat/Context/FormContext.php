@@ -397,7 +397,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *            | Street          | Myronosytska 57     |
      *            | City            | Kharkiv             |
      *            | Zip/Postal Code | 61000               |
-     *            | State           | Kharkivs'ka Oblast' |
+     *            | State           | Kharkivska oblast   |
      *
      * @Given /^(?:|I )add new (?P<fieldSetLabel>[^"]+) with:$/
      */
