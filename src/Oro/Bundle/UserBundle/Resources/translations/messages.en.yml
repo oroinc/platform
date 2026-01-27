@@ -440,7 +440,7 @@ oro:
                 user_login_form:
                     title: User Login Form
                     description: |
-                        Turning off "Usernane with Password Login" will disable password-based login for all users,
+                        Turning off "Enable Username/Password Login" will disable password-based login for all users,
                         including you and other administrators. Make sure at least one external authentication method
                         is properly configured, or you may lose access to the system.
             fields:

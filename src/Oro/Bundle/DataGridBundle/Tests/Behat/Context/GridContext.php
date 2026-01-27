@@ -842,7 +842,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Email   | charlie@gmail.com   |
      *            | Phone   | +1 415-731-9375     |
      *            | Country | Ukraine             |
-     *            | State   | Kharkivs'ka Oblast' |
+     *            | State   | Kharkivska oblast   |
      * Example: Then I should see Charlie Sheen in Frontend Grid with following data:
      *            | Email   | charlie@gmail.com   |
      *            | Phone   | +1 415-731-9375     |

@@ -16,7 +16,7 @@ country:
     AT: Austria
     AU: Australia
     AW: Aruba
-    AX: 'Aland Islands'
+    AX: 'Åland Islands'
     AZ: Azerbaijan
     BA: 'Bosnia and Herzegovina'
     BB: Barbados
@@ -27,7 +27,7 @@ country:
     BH: Bahrain
     BI: Burundi
     BJ: Benin
-    BL: 'Saint Barthelemy'
+    BL: 'Saint Barthélemy'
     BM: Bermuda
     BN: 'Brunei Darussalam'
     BO: Bolivia
@@ -35,17 +35,17 @@ country:
     BR: Brazil
     BS: Bahamas
     BT: Bhutan
-    BW: Botswana
     BV: 'Bouvet Island'
+    BW: Botswana
     BY: Belarus
     BZ: Belize
     CA: Canada
-    CC: 'Cocos Islands'
-    CD: 'The Democratic Republic of Congo'
+    CC: 'Cocos (Keeling) Islands'
+    CD: 'Congo, The Democratic Republic of the'
     CF: 'Central African Republic'
-    CG: 'Republic of the Congo'
+    CG: Congo
     CH: Switzerland
-    CI: "Cote D'Ivoire"
+    CI: "Côte d'Ivoire"
     CK: 'Cook Islands'
     CL: Chile
     CM: Cameroon
@@ -53,11 +53,11 @@ country:
     CO: Colombia
     CR: 'Costa Rica'
     CU: Cuba
-    CV: 'Cape Verde'
-    CW: Curacao
+    CV: 'Cabo Verde'
+    CW: Curaçao
     CX: 'Christmas Island'
     CY: Cyprus
-    CZ: 'Czech Republic'
+    CZ: Czechia
     DE: Germany
     DJ: Djibouti
     DK: Denmark
@@ -74,7 +74,7 @@ country:
     FI: Finland
     FJ: Fiji
     FK: 'Falkland Islands (Malvinas)'
-    FM: 'Federated States of Micronesia'
+    FM: 'Micronesia, Federated States of'
     FO: 'Faroe Islands'
     FR: France
     GA: Gabon
@@ -107,9 +107,9 @@ country:
     IL: Israel
     IM: 'Isle of Man'
     IN: India
-    IO: 'British Indian Ocean Territory (the)'
+    IO: 'British Indian Ocean Territory'
     IQ: Iraq
-    IR: 'Iran (Islamic Republic of)'
+    IR: Iran
     IS: Iceland
     IT: Italy
     JE: Jersey
@@ -142,20 +142,20 @@ country:
     MC: Monaco
     MD: Moldova
     ME: Montenegro
-    MF: 'Saint Martin'
+    MF: 'Saint Martin (French part)'
     MG: Madagascar
     MH: 'Marshall Islands'
-    MK: Macedonia
+    MK: 'North Macedonia'
     ML: Mali
     MM: Myanmar
     MN: Mongolia
     MO: Macao
+    MP: 'Northern Mariana Islands'
+    MQ: Martinique
     MR: Mauritania
     MS: Montserrat
     MT: Malta
     MU: Mauritius
-    MP: 'Northern Mariana Islands'
-    MQ: Martinique
     MV: Maldives
     MW: Malawi
     MX: Mexico
@@ -168,7 +168,7 @@ country:
     NG: Nigeria
     NI: Nicaragua
     NL: Netherlands
-    NO: Norway
+    'NO': Norway
     NP: Nepal
     NR: Nauru
     NU: Niue
@@ -184,15 +184,15 @@ country:
     PM: 'Saint Pierre and Miquelon'
     PN: Pitcairn
     PR: 'Puerto Rico'
-    PS: 'Palestinian Territory'
+    PS: 'Palestine, State of'
     PT: Portugal
     PW: Palau
     PY: Paraguay
     QA: Qatar
-    RE: Reunion
+    RE: Réunion
     RO: Romania
     RS: Serbia
-    RU: Russia
+    RU: 'Russian Federation'
     RW: Rwanda
     SA: 'Saudi Arabia'
     SB: 'Solomon Islands'
@@ -200,7 +200,7 @@ country:
     SD: Sudan
     SE: Sweden
     SG: Singapore
-    SH: 'Saint Helena'
+    SH: 'Saint Helena, Ascension and Tristan da Cunha'
     SI: Slovenia
     SJ: 'Svalbard and Jan Mayen'
     SK: Slovakia
@@ -213,20 +213,20 @@ country:
     ST: 'Sao Tome and Principe'
     SV: 'El Salvador'
     SX: 'Sint Maarten (Dutch part)'
-    SY: 'Syrian Arab Republic'
-    SZ: Swaziland
-    TC: 'Turks & Caicos Islands'
+    SY: Syria
+    SZ: Eswatini
+    TC: 'Turks and Caicos Islands'
     TD: Chad
-    TF: 'French Southern Territories (the)'
+    TF: 'French Southern Territories'
     TG: Togo
     TH: Thailand
     TJ: Tajikistan
     TK: Tokelau
-    TL: 'Timor Leste'
+    TL: Timor-Leste
     TM: Turkmenistan
     TN: Tunisia
     TO: Tonga
-    TR: Turkey
+    TR: Türkiye
     TT: 'Trinidad and Tobago'
     TV: Tuvalu
     TW: Taiwan
@@ -237,17 +237,17 @@ country:
     US: 'United States'
     UY: Uruguay
     UZ: Uzbekistan
-    VA: 'Holy See (the)'
+    VA: 'Holy See (Vatican City State)'
     VC: 'Saint Vincent and the Grenadines'
     VE: Venezuela
-    VG: 'British Virgin Islands'
-    VI: 'US Virgin Islands'
-    VN: 'Viet Nam'
+    VG: 'Virgin Islands, British'
+    VI: 'Virgin Islands, U.S.'
+    VN: Vietnam
     VU: Vanuatu
-    WF: 'Wallis and Futuna Islands'
+    WF: 'Wallis and Futuna'
     WS: Samoa
     YE: Yemen
-    YT: 'Comoros and Mayotte Island'
+    YT: Mayotte
     ZA: 'South Africa'
     ZM: Zambia
     ZW: Zimbabwe
@@ -259,47 +259,47 @@ region:
     AD-06: 'Sant Julià de Lòria'
     AD-07: 'Andorra la Vella'
     AD-08: Escaldes-Engordany
-    AE-AJ: "'Ajmān"
-    AE-AZ: 'Abū Ȥaby [Abu Dhabi]'
+    AE-AJ: ‘Ajmān
+    AE-AZ: 'Abū Z̧aby'
     AE-DU: Dubayy
     AE-FU: 'Al Fujayrah'
     AE-RK: 'Ra’s al Khaymah'
     AE-SH: 'Ash Shāriqah'
     AE-UQ: 'Umm al Qaywayn'
     AF-BAL: Balkh
-    AF-BAM: Bāmīān
+    AF-BAM: Bāmyān
     AF-BDG: Bādghīs
     AF-BDS: Badakhshān
     AF-BGL: Baghlān
-    AF-DAY: Dāykondī
+    AF-DAY: Dāykundī
     AF-FRA: Farāh
     AF-FYB: Fāryāb
     AF-GHA: Ghaznī
-    AF-GHO: Ghowr
+    AF-GHO: Ghōr
     AF-HEL: Helmand
     AF-HER: Herāt
     AF-JOW: Jowzjān
-    AF-KAB: 'Kābul [Kābol]'
+    AF-KAB: Kābul
     AF-KAN: Kandahār
     AF-KAP: Kāpīsā
-    AF-KDZ: 'Kondoz [Kunduz]'
-    AF-KHO: Khowst
-    AF-KNR: 'Konar [Kunar]'
+    AF-KDZ: Kunduz
+    AF-KHO: Khōst
+    AF-KNR: Kunaṟ
     AF-LAG: Laghmān
-    AF-LOW: Lowgar
-    AF-NAN: 'Nangrahār [Nangarhār]'
-    AF-NIM: Nīmrūz
-    AF-NUR: Nūrestān
-    AF-ORU: 'Orūzgān [Urūzgān]'
-    AF-PAN: Panjshīr
+    AF-LOG: Lōgar
+    AF-NAN: Nangarhār
+    AF-NIM: Nīmrōz
+    AF-NUR: Nūristān
+    AF-PAN: Panjshayr
     AF-PAR: Parwān
-    AF-PIA: Paktīā
+    AF-PIA: Paktiyā
     AF-PKA: Paktīkā
     AF-SAM: Samangān
-    AF-SAR: 'Sar-e Pol'
+    AF-SAR: 'Sar-e Pul'
     AF-TAK: Takhār
-    AF-WAR: 'Wardak [Wardag]'
-    AF-ZAB: 'Zābol [Zābul]'
+    AF-URU: Uruzgān
+    AF-WAR: Wardak
+    AF-ZAB: Zābul
     AG-03: 'Saint George'
     AG-04: 'Saint John'
     AG-05: 'Saint Mary'
@@ -320,65 +320,29 @@ region:
     AL-10: Shkodër
     AL-11: Tiranë
     AL-12: Vlorë
-    AL-BR: Berat
-    AL-BU: Bulqizë
-    AL-DI: Dibër
-    AL-DL: Delvinë
-    AL-DR: Durrës
-    AL-DV: Devoll
-    AL-EL: Elbasan
-    AL-ER: Kolonjë
-    AL-FR: Fier
-    AL-GJ: Gjirokastër
-    AL-GR: Gramsh
-    AL-HA: Has
-    AL-KA: Kavajë
-    AL-KB: Kurbin
-    AL-KC: Kuçovë
-    AL-KO: Korçë
-    AL-KR: Krujë
-    AL-KU: Kukës
-    AL-LB: Librazhd
-    AL-LE: Lezhë
-    AL-LU: Lushnjë
-    AL-MK: Mallakastër
-    AL-MM: 'Malësi e Madhe'
-    AL-MR: Mirditë
-    AL-MT: Mat
-    AL-PG: Pogradec
-    AL-PQ: Peqin
-    AL-PR: Përmet
-    AL-PU: Pukë
-    AL-SH: Shkodër
-    AL-SK: Skrapar
-    AL-SR: Sarandë
-    AL-TE: Tepelenë
-    AL-TP: Tropojë
-    AL-TR: Tiranë
-    AL-VL: Vlorë
-    AM-AG: Aragacotn
+    AM-AG: Aragac̣otn
     AM-AR: Ararat
     AM-AV: Armavir
     AM-ER: Erevan
     AM-GR: "Geġark'unik'"
-    AM-KT: Kotayk
-    AM-LO: Lory
-    AM-SH: Sirak
+    AM-KT: "Kotayk'"
+    AM-LO: Loṙi
+    AM-SH: Širak
     AM-SU: "Syunik'"
-    AM-TV: Tavus
-    AM-VD: 'Vayoc Jor'
+    AM-TV: Tavuš
+    AM-VD: 'Vayoć Jor'
     AO-BGO: Bengo
     AO-BGU: Benguela
     AO-BIE: Bié
     AO-CAB: Cabinda
-    AO-CCU: Cuando-Cubango
+    AO-CCU: 'Cuando Cubango'
     AO-CNN: Cunene
-    AO-CNO: 'Cuanza Norte'
-    AO-CUS: 'Cuanza Sul'
+    AO-CNO: Cuanza-Norte
+    AO-CUS: Cuanza-Sul
     AO-HUA: Huambo
     AO-HUI: Huíla
-    AO-LNO: 'Lunda Norte'
-    AO-LSU: 'Lunda Sul'
+    AO-LNO: Lunda-Norte
+    AO-LSU: Lunda-Sul
     AO-LUA: Luanda
     AO-MAL: Malange
     AO-MOX: Moxico
@@ -389,7 +353,7 @@ region:
     AR-B: 'Buenos Aires'
     AR-C: 'Ciudad Autónoma de Buenos Aires'
     AR-D: 'San Luis'
-    AR-E: 'Entre Rios'
+    AR-E: 'Entre Ríos'
     AR-F: 'La Rioja'
     AR-G: 'Santiago del Estero'
     AR-H: Chaco
@@ -399,14 +363,14 @@ region:
     AR-M: Mendoza
     AR-N: Misiones
     AR-P: Formosa
-    AR-Q: Neuquen
-    AR-R: 'Rio Negro'
+    AR-Q: Neuquén
+    AR-R: 'Río Negro'
     AR-S: 'Santa Fe'
-    AR-T: Tucuman
+    AR-T: Tucumán
     AR-U: Chubut
     AR-V: 'Tierra del Fuego'
     AR-W: Corrientes
-    AR-X: Cordoba
+    AR-X: Córdoba
     AR-Y: Jujuy
     AR-Z: 'Santa Cruz'
     AT-1: Burgenland
@@ -426,7 +390,6 @@ region:
     AU-TAS: Tasmania
     AU-VIC: Victoria
     AU-WA: 'Western Australia'
-    AZ-AB: 'Əli Bayramlı'
     AZ-ABS: Abşeron
     AZ-AGA: Ağstafa
     AZ-AGC: Ağcabədi
@@ -441,19 +404,20 @@ region:
     AZ-BEY: Beyləqan
     AZ-BIL: Biləsuvar
     AZ-CAB: Cəbrayıl
-    AZ-CAL: Cəlilabab
+    AZ-CAL: Cəlilabad
     AZ-CUL: Culfa
     AZ-DAS: Daşkəsən
-    AZ-DAV: Dəvəçi
     AZ-FUZ: Füzuli
     AZ-GA: Gəncə
     AZ-GAD: Gədəbəy
     AZ-GOR: Goranboy
     AZ-GOY: Göyçay
+    AZ-GYG: Göygöl
     AZ-HAC: Hacıqabul
     AZ-IMI: İmişli
     AZ-ISM: İsmayıllı
     AZ-KAL: Kəlbəcər
+    AZ-KAN: Kǝngǝrli
     AZ-KUR: Kürdəmir
     AZ-LA: Lənkəran
     AZ-LAC: Laçın
@@ -463,6 +427,7 @@ region:
     AZ-MI: Mingəçevir
     AZ-NA: Naftalan
     AZ-NEF: Neftçala
+    AZ-NV: Naxçıvan
     AZ-NX: Naxçıvan
     AZ-OGU: Oğuz
     AZ-ORD: Ordubad
@@ -481,19 +446,19 @@ region:
     AZ-SAL: Salyan
     AZ-SAR: Şərur
     AZ-SAT: Saatlı
+    AZ-SBN: Şabran
     AZ-SIY: Siyəzən
     AZ-SKR: Şəmkir
     AZ-SM: Sumqayıt
     AZ-SMI: Şamaxı
     AZ-SMX: Samux
-    AZ-SS: Şuşa
+    AZ-SR: Şirvan
     AZ-SUS: Şuşa
     AZ-TAR: Tərtər
     AZ-TOV: Tovuz
     AZ-UCA: Ucar
     AZ-XA: Xankəndi
     AZ-XAC: Xaçmaz
-    AZ-XAN: Xanlar
     AZ-XCI: Xocalı
     AZ-XIZ: Xızı
     AZ-XVD: Xocavənd
@@ -503,16 +468,6 @@ region:
     AZ-ZAN: Zəngilan
     AZ-ZAQ: Zaqatala
     AZ-ZAR: Zərdab
-    BA-01: 'Unsko-sanski kanton'
-    BA-02: 'Posavski kanton'
-    BA-03: 'Tuzlanski kanton'
-    BA-04: 'Zeničko-dobojski kanton'
-    BA-05: 'Bosansko-podrinjski kanton'
-    BA-06: 'Srednjobosanski kanton'
-    BA-07: 'Hercegovačko-neretvanski kanton'
-    BA-08: 'Zapadnohercegovački kanton'
-    BA-09: 'Kanton Sarajevo'
-    BA-10: 'Kanton br. 10 (Livanjski kanton)'
     BA-BIH: 'Federacija Bosne i Hercegovine'
     BA-BRC: 'Brčko distrikt'
     BA-SRP: 'Republika Srpska'
@@ -527,85 +482,89 @@ region:
     BB-09: 'Saint Peter'
     BB-10: 'Saint Philip'
     BB-11: 'Saint Thomas'
-    BD-01: 'Bandarban zila'
-    BD-02: 'Barguna zila'
-    BD-03: 'Bogra zila'
-    BD-04: 'Brahmanbaria zila'
-    BD-05: 'Bagerhat zila'
-    BD-06: 'Barisal zila'
-    BD-07: 'Bhola zila'
-    BD-08: 'Comilla zila'
-    BD-09: 'Chandpur zila'
-    BD-1: 'Barisal bibhag'
-    BD-10: 'Chittagong zila'
-    BD-11: 'Cox''s Bazar zila'
-    BD-12: 'Chuadanga zila'
-    BD-13: 'Dhaka zila'
-    BD-14: 'Dinajpur zila'
-    BD-15: 'Faridpur zila'
-    BD-16: 'Feni zila'
-    BD-17: 'Gopalganj zila'
-    BD-18: 'Gazipur zila'
-    BD-19: 'Gaibandha zila'
-    BD-2: 'Chittagong bibhag'
-    BD-20: 'Habiganj zila'
-    BD-21: 'Jamalpur zila'
-    BD-22: 'Jessore zila'
-    BD-23: 'Jhenaidah zila'
-    BD-24: 'Jaipurhat zila'
-    BD-25: 'Jhalakati zila'
-    BD-26: 'Kishorganj zila'
-    BD-27: 'Khulna zila'
-    BD-28: 'Kurigram zila'
-    BD-29: 'Khagrachari zila'
-    BD-3: 'Dhaka bibhag'
-    BD-30: 'Kushtia zila'
-    BD-31: 'Lakshmipur zila'
-    BD-32: 'Lalmonirhat zila'
-    BD-33: 'Manikganj zila'
-    BD-34: 'Mymensingh zila'
-    BD-35: 'Munshiganj zila'
-    BD-36: 'Madaripur zila'
-    BD-37: 'Magura zila'
-    BD-38: 'Moulvibazar zila'
-    BD-39: 'Meherpur zila'
-    BD-4: 'Khulna bibhag'
-    BD-40: 'Narayanganj zila'
-    BD-41: 'Netrakona zila'
-    BD-42: 'Narsingdi zila'
-    BD-43: 'Narail zila'
-    BD-44: 'Natore zila'
-    BD-45: 'Nawabganj zila'
-    BD-46: 'Nilphamari zila'
-    BD-47: 'Noakhali zila'
-    BD-48: 'Naogaon zila'
-    BD-49: 'Pabna zila'
-    BD-5: 'Rajshahi bibhag'
-    BD-50: 'Pirojpur zila'
-    BD-51: 'Patuakhali zila'
-    BD-52: 'Panchagarh zila'
-    BD-53: 'Rajbari zila'
-    BD-54: 'Rajshahi zila'
-    BD-55: 'Rangpur zila'
-    BD-56: 'Rangamati zila'
-    BD-57: 'Sherpur zila'
-    BD-58: 'Satkhira zila'
-    BD-59: 'Sirajganj zila'
-    BD-6: 'Sylhet bibhag'
-    BD-60: 'Sylhet zila'
-    BD-61: 'Sunamganj zila'
-    BD-62: 'Shariatpur zila'
-    BD-63: 'Tangail zila'
-    BD-64: 'Thakurgaon zila'
-    BE-BRU: 'Brussels-Capital Region'
+    BD-01: Bandarban
+    BD-02: Barguna
+    BD-03: Bogura
+    BD-04: Brahmanbaria
+    BD-05: Bagerhat
+    BD-06: Barishal
+    BD-07: Bhola
+    BD-08: Cumilla
+    BD-09: Chandpur
+    BD-10: Chattogram
+    BD-11: "Cox's Bazar"
+    BD-12: Chuadanga
+    BD-13: Dhaka
+    BD-14: Dinajpur
+    BD-15: Faridpur
+    BD-16: Feni
+    BD-17: Gopalganj
+    BD-18: Gazipur
+    BD-19: Gaibandha
+    BD-20: Habiganj
+    BD-21: Jamalpur
+    BD-22: Jashore
+    BD-23: Jhenaidah
+    BD-24: Joypurhat
+    BD-25: Jhalakathi
+    BD-26: Kishoreganj
+    BD-27: Khulna
+    BD-28: Kurigram
+    BD-29: Khagrachhari
+    BD-30: Kushtia
+    BD-31: Lakshmipur
+    BD-32: Lalmonirhat
+    BD-33: Manikganj
+    BD-34: Mymensingh
+    BD-35: Munshiganj
+    BD-36: Madaripur
+    BD-37: Magura
+    BD-38: Moulvibazar
+    BD-39: Meherpur
+    BD-40: Narayanganj
+    BD-41: Netrakona
+    BD-42: Narsingdi
+    BD-43: Narail
+    BD-44: Natore
+    BD-45: 'Chapai Nawabganj'
+    BD-46: Nilphamari
+    BD-47: Noakhali
+    BD-48: Naogaon
+    BD-49: Pabna
+    BD-50: Pirojpur
+    BD-51: Patuakhali
+    BD-52: Panchagarh
+    BD-53: Rajbari
+    BD-54: Rajshahi
+    BD-55: Rangpur
+    BD-56: Rangamati
+    BD-57: Sherpur
+    BD-58: Satkhira
+    BD-59: Sirajganj
+    BD-60: Sylhet
+    BD-61: Sunamganj
+    BD-62: Shariatpur
+    BD-63: Tangail
+    BD-64: Thakurgaon
+    BD-A: Barishal
+    BD-B: Chattogram
+    BD-C: Dhaka
+    BD-D: Khulna
+    BD-E: Rajshahi
+    BD-F: Rangpur
+    BD-G: Sylhet
+    BD-H: Mymensingh
+    BE-BRU: 'Bruxelles-Capitale, Région de'
     BE-VAN: Antwerpen
     BE-VBR: Vlaams-Brabant
+    BE-VLG: 'Vlaams Gewest'
     BE-VLI: Limburg
     BE-VOV: Oost-Vlaanderen
     BE-VWV: West-Vlaanderen
-    BE-WBR: 'Brabant Wallon'
+    BE-WAL: 'wallonne, Région'
+    BE-WBR: 'Brabant wallon'
     BE-WHT: Hainaut
-    BE-WLG: Liege
+    BE-WLG: Liège
     BE-WLX: Luxembourg
     BE-WNA: Namur
     BF-01: 'Boucle du Mouhoun'
@@ -646,7 +605,7 @@ region:
     BF-LOR: Loroum
     BF-MOU: Mouhoun
     BF-NAM: Namentenga
-    BF-NAO: Naouri
+    BF-NAO: Nahouri
     BF-NAY: Nayala
     BF-NOU: Noumbiel
     BF-OUB: Oubritenga
@@ -660,7 +619,7 @@ region:
     BF-SOM: Soum
     BF-SOR: Sourou
     BF-TAP: Tapoa
-    BF-TUI: Tui
+    BF-TUI: Tuy
     BF-YAG: Yagha
     BF-YAT: Yatenga
     BF-ZIR: Ziro
@@ -687,17 +646,16 @@ region:
     BG-19: Silistra
     BG-20: Sliven
     BG-21: Smolyan
-    BG-22: Sofia-Grad
+    BG-22: 'Sofia (stolitsa)'
     BG-23: Sofia
     BG-24: 'Stara Zagora'
     BG-25: Targovishte
     BG-26: Haskovo
     BG-27: Shumen
     BG-28: Yambol
-    BH-13: 'Al Manāmah (Al ‘Āşimah)'
+    BH-13: 'Al ‘Āşimah'
     BH-14: 'Al Janūbīyah'
     BH-15: 'Al Muḩarraq'
-    BH-16: 'Al Wusţá'
     BH-17: 'Ash Shamālīyah'
     BI-BB: Bubanza
     BI-BL: 'Bujumbura Rural'
@@ -712,16 +670,18 @@ region:
     BI-MA: Makamba
     BI-MU: Muramvya
     BI-MW: Mwaro
+    BI-MY: Muyinga
     BI-NG: Ngozi
+    BI-RM: Rumonge
     BI-RT: Rutana
     BI-RY: Ruyigi
-    BJ-AK: Atakora
+    BJ-AK: Atacora
     BJ-AL: Alibori
     BJ-AQ: Atlantique
     BJ-BO: Borgou
     BJ-CO: Collines
     BJ-DO: Donga
-    BJ-KO: Kouffo
+    BJ-KO: Couffo
     BJ-LI: Littoral
     BJ-MO: Mono
     BJ-OU: Ouémé
@@ -751,7 +711,6 @@ region:
     BR-CE: Ceará
     BR-DF: 'Distrito Federal'
     BR-ES: 'Espírito Santo'
-    BR-FN: 'Fernando de Noronha'
     BR-GO: Goiás
     BR-MA: Maranhão
     BR-MG: 'Minas Gerais'
@@ -771,8 +730,8 @@ region:
     BR-SE: Sergipe
     BR-SP: 'São Paulo'
     BR-TO: Tocantins
-    BS-AC: 'Acklins Islands'
-    BS-BI: 'Bimini and Cat Cay'
+    BS-AK: Acklins
+    BS-BI: Bimini
     BS-BP: 'Black Point'
     BS-BY: 'Berry Islands'
     BS-CE: 'Central Eleuthera'
@@ -784,17 +743,16 @@ region:
     BS-EX: Exuma
     BS-FP: 'City of Freeport'
     BS-GC: 'Grand Cay'
-    BS-GT: 'Green Turtle Cay'
     BS-HI: 'Harbour Island'
     BS-HT: 'Hope Town'
     BS-IN: Inagua
     BS-LI: 'Long Island'
     BS-MC: 'Mangrove Cay'
     BS-MG: Mayaguana
-    BS-MI: 'Moore''s Island'
+    BS-MI: "Moore's Island"
     BS-NE: 'North Eleuthera'
     BS-NO: 'North Abaco'
-    BS-NP: "New Providence"
+    BS-NP: 'New Providence'
     BS-NS: 'North Andros'
     BS-RC: 'Rum Cay'
     BS-RI: 'Ragged Island'
@@ -806,8 +764,8 @@ region:
     BS-WG: 'West Grand Bahama'
     BT-11: Paro
     BT-12: Chhukha
-    BT-13: Ha
-    BT-14: Samtee
+    BT-13: Haa
+    BT-14: Samtse
     BT-15: Thimphu
     BT-21: Tsirang
     BT-22: Dagana
@@ -819,28 +777,34 @@ region:
     BT-34: Zhemgang
     BT-41: Trashigang
     BT-42: Monggar
-    BT-43: Pemagatshel
+    BT-43: 'Pema Gatshel'
     BT-44: Lhuentse
-    BT-45: 'Samdrup Jongkha'
+    BT-45: 'Samdrup Jongkhar'
     BT-GA: Gasa
     BT-TY: 'Trashi Yangtse'
     BW-CE: Central
+    BW-CH: Chobe
+    BW-FR: Francistown
+    BW-GA: Gaborone
     BW-GH: Ghanzi
+    BW-JW: Jwaneng
     BW-KG: Kgalagadi
     BW-KL: Kgatleng
     BW-KW: Kweneng
-    BW-NE: North-East
-    BW-NG: Ngamiland
-    BW-NW: 'North-West (Botswana)'
-    BW-SE: South-East
-    BW-SO: 'Southern (Botswana)'
-    BY-BR: 'Brèsckaja voblasc'''
-    BY-HM: 'Horad Minsk'
-    BY-HO: 'Homel''skaja voblasc'''
-    BY-HR: 'Hrodzenskaja voblasc'''
-    BY-MA: 'Mahilëuskaja voblasc'''
-    BY-MI: 'Minskaja voblasc'''
-    BY-VI: 'Vicebskaja voblasc'''
+    BW-LO: Lobatse
+    BW-NE: 'North East'
+    BW-NW: 'North West'
+    BW-SE: 'South East'
+    BW-SO: Southern
+    BW-SP: 'Selibe Phikwe'
+    BW-ST: 'Sowa Town'
+    BY-BR: 'Bresckaja voblasć'
+    BY-HM: 'Gorod Minsk'
+    BY-HO: "Gomel'skaja oblast'"
+    BY-HR: "Grodnenskaja oblast'"
+    BY-MA: 'Mahilioŭskaja voblasć'
+    BY-MI: "Minskaja oblast'"
+    BY-VI: 'Viciebskaja voblasć'
     BZ-BZ: Belize
     BZ-CY: Cayo
     BZ-CZL: Corozal
@@ -859,7 +823,7 @@ region:
     CA-PE: 'Prince Edward Island'
     CA-QC: Quebec
     CA-SK: Saskatchewan
-    CA-YT: 'Yukon Territory'
+    CA-YT: Yukon
     CD-BC: 'Kongo Central'
     CD-BU: Bas-Uélé
     CD-EQ: Équateur
@@ -897,17 +861,18 @@ region:
     CF-KG: Kémo-Gribingui
     CF-LB: Lobaye
     CF-MB: Mbomou
-    CF-MP: 'Ombella-M''poko'
+    CF-MP: Ombella-Mpoko
     CF-NM: Nana-Mambéré
     CF-OP: Ouham-Pendé
     CF-SE: Sangha
     CF-UK: Ouaka
-    CF-VR: Vakaga
+    CF-VK: Vakaga
     CG-11: Bouenza
     CG-12: Pool
     CG-13: Sangha
     CG-14: Plateaux
     CG-15: Cuvette-Ouest
+    CG-16: Pointe-Noire
     CG-2: Lékoumou
     CG-5: Kouilou
     CG-7: Likouala
@@ -917,7 +882,7 @@ region:
     CH-AG: Aargau
     CH-AI: 'Appenzell Innerrhoden'
     CH-AR: 'Appenzell Ausserrhoden'
-    CH-BE: Bern
+    CH-BE: Berne
     CH-BL: Basel-Landschaft
     CH-BS: Basel-Stadt
     CH-FR: Fribourg
@@ -954,18 +919,19 @@ region:
     CI-WR: Woroba
     CI-YM: Yamoussoukro
     CI-ZZ: Zanzan
-    CL-AI: 'Aisén del General Carlos Ibáñez del Campo'
+    CL-AI: 'Aisén del General Carlos Ibañez del Campo'
     CL-AN: Antofagasta
     CL-AP: 'Arica y Parinacota'
-    CL-AR: Araucanía
+    CL-AR: 'La Araucanía'
     CL-AT: Atacama
-    CL-BI: Bío-Bío
+    CL-BI: Biobío
     CL-CO: Coquimbo
-    CL-LI: 'Libertador General Bernardo O''Higgins'
+    CL-LI: "Libertador General Bernardo O'Higgins"
     CL-LL: 'Los Lagos'
     CL-LR: 'Los Ríos'
-    CL-MA: 'Magallanes y Antártica Chilena'
+    CL-MA: Magallanes
     CL-ML: Maule
+    CL-NB: Ñuble
     CL-RM: 'Región Metropolitana de Santiago'
     CL-TA: Tarapacá
     CL-VS: Valparaíso
@@ -975,44 +941,44 @@ region:
     CM-ES: East
     CM-LT: Littoral
     CM-NO: North
-    CM-NW: 'North-West (Cameroon)'
+    CM-NW: North-West
     CM-OU: West
     CM-SU: South
     CM-SW: South-West
-    CN-11: Beijing
-    CN-12: Tianjin
-    CN-13: Hebei
-    CN-14: Shanxi
-    CN-15: 'Nei Mongol'
-    CN-21: Liaoning
-    CN-22: Jilin
-    CN-23: Heilongjiang
-    CN-31: Shanghai
-    CN-32: Jiangsu
-    CN-33: Zhejiang
-    CN-34: Anhui
-    CN-35: Fujian
-    CN-36: Jiangxi
-    CN-37: Shandong
-    CN-41: Henan
-    CN-42: Hubei
-    CN-43: Hunan
-    CN-44: Guangdong
-    CN-45: Guangxi
-    CN-46: Hainan
-    CN-50: Chongqing
-    CN-51: Sichuan
-    CN-52: Guizhou
-    CN-53: Yunnan
-    CN-54: Xizang
-    CN-61: Shaanxi
-    CN-62: Gansu
-    CN-63: Qinghai
-    CN-64: Ningxia
-    CN-65: Xinjiang
-    CN-71: Taiwan
-    CN-91: 'Xianggang (Hong-Kong)'
-    CN-92: 'Aomen (Macau)'
+    CN-AH: 'Anhui Sheng'
+    CN-BJ: 'Beijing Shi'
+    CN-CQ: 'Chongqing Shi'
+    CN-FJ: 'Fujian Sheng'
+    CN-GD: 'Guangdong Sheng'
+    CN-GS: 'Gansu Sheng'
+    CN-GX: 'Guangxi Zhuangzu Zizhiqu'
+    CN-GZ: 'Guizhou Sheng'
+    CN-HA: 'Henan Sheng'
+    CN-HB: 'Hubei Sheng'
+    CN-HE: 'Hebei Sheng'
+    CN-HI: 'Hainan Sheng'
+    CN-HK: 'Hong Kong SAR'
+    CN-HL: 'Heilongjiang Sheng'
+    CN-HN: 'Hunan Sheng'
+    CN-JL: 'Jilin Sheng'
+    CN-JS: 'Jiangsu Sheng'
+    CN-JX: 'Jiangxi Sheng'
+    CN-LN: 'Liaoning Sheng'
+    CN-MO: 'Macao SAR'
+    CN-NM: 'Nei Mongol Zizhiqu'
+    CN-NX: 'Ningxia Huizu Zizhiqu'
+    CN-QH: 'Qinghai Sheng'
+    CN-SC: 'Sichuan Sheng'
+    CN-SD: 'Shandong Sheng'
+    CN-SH: 'Shanghai Shi'
+    CN-SN: 'Shaanxi Sheng'
+    CN-SX: 'Shanxi Sheng'
+    CN-TJ: 'Tianjin Shi'
+    CN-TW: 'Taiwan Sheng'
+    CN-XJ: 'Xinjiang Uygur Zizhiqu'
+    CN-XZ: 'Xizang Zizhiqu'
+    CN-YN: 'Yunnan Sheng'
+    CN-ZJ: 'Zhejiang Sheng'
     CO-AMA: Amazonas
     CO-ANT: Antioquia
     CO-ARA: Arauca
@@ -1053,9 +1019,8 @@ region:
     CR-L: Limón
     CR-P: Puntarenas
     CR-SJ: 'San José'
-    CU-01: 'Pinar del Rio'
-    CU-02: 'La Habana'
-    CU-03: 'Ciudad de La Habana'
+    CU-01: 'Pinar del Río'
+    CU-03: 'La Habana'
     CU-04: Matanzas
     CU-05: 'Villa Clara'
     CU-06: Cienfuegos
@@ -1067,12 +1032,14 @@ region:
     CU-12: Granma
     CU-13: 'Santiago de Cuba'
     CU-14: Guantánamo
+    CU-15: Artemisa
+    CU-16: Mayabeque
     CU-99: 'Isla de la Juventud'
     CV-B: 'Ilhas de Barlavento'
     CV-BR: Brava
     CV-BV: 'Boa Vista'
     CV-CA: 'Santa Catarina'
-    CV-CF: 'Santa Catarina de Fogo'
+    CV-CF: 'Santa Catarina do Fogo'
     CV-CR: 'Santa Cruz'
     CV-MA: Maio
     CV-MO: Mosteiros
@@ -1085,32 +1052,109 @@ region:
     CV-S: 'Ilhas de Sotavento'
     CV-SD: 'São Domingos'
     CV-SF: 'São Filipe'
-    CV-SL: 'São Lourenço dos Órgãos'
+    CV-SL: Sal
     CV-SM: 'São Miguel'
+    CV-SO: 'São Lourenço dos Órgãos'
     CV-SS: 'São Salvador do Mundo'
     CV-SV: 'São Vicente'
     CV-TA: Tarrafal
     CV-TS: 'Tarrafal de São Nicolau'
-    CY-01: Lefkosía
-    CY-02: Lemesós
-    CY-03: Lárnaka
-    CY-04: Ammóchostos
-    CY-05: Páfos
-    CY-06: Kerýneia
-    CZ-JC: 'Jihočeský kraj'
-    CZ-JM: 'Jihomoravský kraj'
-    CZ-KA: 'Karlovarský kraj'
-    CZ-KR: 'Královéhradecký kraj'
-    CZ-LI: 'Liberecký kraj'
-    CZ-MO: 'Moravskoslezský kraj'
-    CZ-OL: 'Olomoucký kraj'
-    CZ-PA: 'Pardubický kraj'
-    CZ-PL: 'Plzeňský kraj'
-    CZ-PR: 'Praha, hlavní město'
-    CZ-ST: 'Středočeský kraj'
-    CZ-US: 'Ústecký kraj'
-    CZ-VY: Vysočina
-    CZ-ZL: 'Zlínský kraj'
+    CY-01: Lefkosia
+    CY-02: Lemesos
+    CY-03: Larnaka
+    CY-04: Ammochostos
+    CY-05: Baf
+    CY-06: Girne
+    CZ-10: 'Praha, Hlavní město'
+    CZ-20: 'Středočeský kraj'
+    CZ-201: Benešov
+    CZ-202: Beroun
+    CZ-203: Kladno
+    CZ-204: Kolín
+    CZ-205: 'Kutná Hora'
+    CZ-206: Mělník
+    CZ-207: 'Mladá Boleslav'
+    CZ-208: Nymburk
+    CZ-209: Praha-východ
+    CZ-20A: Praha-západ
+    CZ-20B: Příbram
+    CZ-20C: Rakovník
+    CZ-31: 'Jihočeský kraj'
+    CZ-311: 'České Budějovice'
+    CZ-312: 'Český Krumlov'
+    CZ-313: 'Jindřichův Hradec'
+    CZ-314: Písek
+    CZ-315: Prachatice
+    CZ-316: Strakonice
+    CZ-317: Tábor
+    CZ-32: 'Plzeňský kraj'
+    CZ-321: Domažlice
+    CZ-322: Klatovy
+    CZ-323: Plzeň-město
+    CZ-324: Plzeň-jih
+    CZ-325: Plzeň-sever
+    CZ-326: Rokycany
+    CZ-327: Tachov
+    CZ-41: 'Karlovarský kraj'
+    CZ-411: Cheb
+    CZ-412: 'Karlovy Vary'
+    CZ-413: Sokolov
+    CZ-42: 'Ústecký kraj'
+    CZ-421: Děčín
+    CZ-422: Chomutov
+    CZ-423: Litoměřice
+    CZ-424: Louny
+    CZ-425: Most
+    CZ-426: Teplice
+    CZ-427: 'Ústí nad Labem'
+    CZ-51: 'Liberecký kraj'
+    CZ-511: 'Česká Lípa'
+    CZ-512: 'Jablonec nad Nisou'
+    CZ-513: Liberec
+    CZ-514: Semily
+    CZ-52: 'Královéhradecký kraj'
+    CZ-521: 'Hradec Králové'
+    CZ-522: Jičín
+    CZ-523: Náchod
+    CZ-524: 'Rychnov nad Kněžnou'
+    CZ-525: Trutnov
+    CZ-53: 'Pardubický kraj'
+    CZ-531: Chrudim
+    CZ-532: Pardubice
+    CZ-533: Svitavy
+    CZ-534: 'Ústí nad Orlicí'
+    CZ-63: 'Kraj Vysočina'
+    CZ-631: 'Havlíčkův Brod'
+    CZ-632: Jihlava
+    CZ-633: Pelhřimov
+    CZ-634: Třebíč
+    CZ-635: 'Žďár nad Sázavou'
+    CZ-64: 'Jihomoravský kraj'
+    CZ-641: Blansko
+    CZ-642: Brno-město
+    CZ-643: Brno-venkov
+    CZ-644: Břeclav
+    CZ-645: Hodonín
+    CZ-646: Vyškov
+    CZ-647: Znojmo
+    CZ-71: 'Olomoucký kraj'
+    CZ-711: Jeseník
+    CZ-712: Olomouc
+    CZ-713: Prostějov
+    CZ-714: Přerov
+    CZ-715: Šumperk
+    CZ-72: 'Zlínský kraj'
+    CZ-721: Kroměříž
+    CZ-722: 'Uherské Hradiště'
+    CZ-723: Vsetín
+    CZ-724: Zlín
+    CZ-80: 'Moravskoslezský kraj'
+    CZ-801: Bruntál
+    CZ-802: Frýdek-Místek
+    CZ-803: Karviná
+    CZ-804: 'Nový Jičín'
+    CZ-805: Opava
+    CZ-806: Ostrava-město
     DE-BB: Brandenburg
     DE-BE: Berlin
     DE-BW: Baden-Württemberg
@@ -1138,7 +1182,6 @@ region:
     DK-83: Syddanmark
     DK-84: Hovedstaden
     DK-85: Sjælland
-    DM-01: 'Saint Peter'
     DM-02: 'Saint Andrew'
     DM-03: 'Saint David'
     DM-04: 'Saint George'
@@ -1148,14 +1191,15 @@ region:
     DM-08: 'Saint Mark'
     DM-09: 'Saint Patrick'
     DM-10: 'Saint Paul'
+    DM-11: 'Saint Peter'
     DO-01: 'Distrito Nacional (Santo Domingo)'
     DO-02: Azua
-    DO-03: Bahoruco
+    DO-03: Baoruco
     DO-04: Barahona
     DO-05: Dajabón
     DO-06: Duarte
-    DO-07: 'La Estrelleta [Elías Piña]'
-    DO-08: 'El Seybo [El Seibo]'
+    DO-07: 'Elías Piña'
+    DO-08: 'El Seibo'
     DO-09: Espaillat
     DO-10: Independencia
     DO-11: 'La Altagracia'
@@ -1166,7 +1210,7 @@ region:
     DO-16: Pedernales
     DO-17: Peravia
     DO-18: 'Puerto Plata'
-    DO-19: Salcedo
+    DO-19: 'Hermanas Mirabal'
     DO-20: Samaná
     DO-21: 'San Cristóbal'
     DO-22: 'San Juan'
@@ -1178,6 +1222,18 @@ region:
     DO-28: 'Monseñor Nouel'
     DO-29: 'Monte Plata'
     DO-30: 'Hato Mayor'
+    DO-31: 'San José de Ocoa'
+    DO-32: 'Santo Domingo'
+    DO-33: 'Cibao Nordeste'
+    DO-34: 'Cibao Noroeste'
+    DO-35: 'Cibao Norte'
+    DO-36: 'Cibao Sur'
+    DO-37: 'El Valle'
+    DO-38: Enriquillo
+    DO-39: Higuamo
+    DO-40: Ozama
+    DO-41: Valdesia
+    DO-42: Yuma
     DZ-01: Adrar
     DZ-02: Chlef
     DZ-03: Laghouat
@@ -1188,7 +1244,7 @@ region:
     DZ-08: Béchar
     DZ-09: Blida
     DZ-10: Bouira
-    DZ-11: Tamanghasset
+    DZ-11: Tamanrasset
     DZ-12: Tébessa
     DZ-13: Tlemcen
     DZ-14: Tiaret
@@ -1205,7 +1261,7 @@ region:
     DZ-25: Constantine
     DZ-26: Médéa
     DZ-27: Mostaganem
-    DZ-28: Msila
+    DZ-28: "M'sila"
     DZ-29: Mascara
     DZ-30: Ouargla
     DZ-31: Oran
@@ -1226,6 +1282,16 @@ region:
     DZ-46: 'Aïn Témouchent'
     DZ-47: Ghardaïa
     DZ-48: Relizane
+    DZ-49: Timimoun
+    DZ-50: 'Bordj Badji Mokhtar'
+    DZ-51: 'Ouled Djellal'
+    DZ-52: 'Béni Abbès'
+    DZ-53: 'In Salah'
+    DZ-54: 'In Guezzam'
+    DZ-55: Touggourt
+    DZ-56: Djanet
+    DZ-57: 'El Meghaier'
+    DZ-58: 'El Meniaa'
     EC-A: Azuay
     EC-B: Bolívar
     EC-C: Carchi
@@ -1241,7 +1307,7 @@ region:
     EC-O: 'El Oro'
     EC-P: Pichincha
     EC-R: 'Los Ríos'
-    EC-S: Morona-Santiago
+    EC-S: 'Morona Santiago'
     EC-SD: 'Santo Domingo de los Tsáchilas'
     EC-SE: 'Santa Elena'
     EC-T: Tungurahua
@@ -1249,68 +1315,146 @@ region:
     EC-W: Galápagos
     EC-X: Cotopaxi
     EC-Y: Pastaza
-    EC-Z: Zamora-Chinchipe
+    EC-Z: 'Zamora Chinchipe'
+    EE-130: Alutaguse
+    EE-141: Anija
+    EE-142: Antsla
+    EE-171: Elva
+    EE-184: Haapsalu
+    EE-191: Haljala
+    EE-198: Harku
+    EE-205: Hiiumaa
+    EE-214: Häädemeeste
+    EE-245: Jõelähtme
+    EE-247: Jõgeva
+    EE-251: Jõhvi
+    EE-255: Järva
+    EE-272: Kadrina
+    EE-283: Kambja
+    EE-284: Kanepi
+    EE-291: Kastre
+    EE-293: Kehtna
+    EE-296: Keila
+    EE-303: Kihnu
+    EE-305: Kiili
+    EE-317: Kohila
+    EE-321: Kohtla-Järve
+    EE-338: Kose
+    EE-353: Kuusalu
     EE-37: Harjumaa
     EE-39: Hiiumaa
-    EE-44: Ida-Virumaa
-    EE-49: Jõgevamaa
-    EE-51: Järvamaa
-    EE-57: Läänemaa
-    EE-59: Lääne-Virumaa
-    EE-65: Põlvamaa
-    EE-67: Pärnumaa
-    EE-70: Raplamaa
+    EE-424: Loksa
+    EE-430: Lääneranna
+    EE-431: Lääne-Harju
+    EE-432: Luunja
+    EE-441: Lääne-Nigula
+    EE-442: Lüganuse
+    EE-446: Maardu
+    EE-45: Ida-Virumaa
+    EE-478: Muhu
+    EE-480: Mulgi
+    EE-486: Mustvee
+    EE-50: Jõgevamaa
+    EE-503: Märjamaa
+    EE-511: Narva
+    EE-514: Narva-Jõesuu
+    EE-52: Järvamaa
+    EE-528: Nõo
+    EE-557: Otepää
+    EE-56: Läänemaa
+    EE-567: Paide
+    EE-586: Peipsiääre
+    EE-60: Lääne-Virumaa
+    EE-615: Põhja-Sakala
+    EE-618: Põltsamaa
+    EE-622: Põlva
+    EE-624: Pärnu
+    EE-638: Põhja-Pärnumaa
+    EE-64: Põlvamaa
+    EE-651: Raasiku
+    EE-653: Rae
+    EE-661: Rakvere
+    EE-663: Rakvere
+    EE-668: Rapla
+    EE-68: Pärnumaa
+    EE-689: Ruhnu
+    EE-698: Rõuge
+    EE-708: Räpina
+    EE-71: Raplamaa
+    EE-712: Saarde
+    EE-714: Saaremaa
+    EE-719: Saku
+    EE-726: Saue
+    EE-732: Setomaa
+    EE-735: Sillamäe
     EE-74: Saaremaa
-    EE-78: Tartumaa
-    EE-82: Valgamaa
+    EE-784: Tallinn
+    EE-79: Tartumaa
+    EE-792: Tapa
+    EE-793: Tartu
+    EE-796: Tartu
+    EE-803: Toila
+    EE-809: Tori
+    EE-81: Valgamaa
+    EE-824: Tõrva
+    EE-834: Türi
     EE-84: Viljandimaa
-    EE-86: Võrumaa
+    EE-855: Valga
+    EE-87: Võrumaa
+    EE-890: Viimsi
+    EE-897: Viljandi
+    EE-899: Viljandi
+    EE-901: Vinni
+    EE-903: Viru-Nigula
+    EE-907: Vormsi
+    EE-917: Võru
+    EE-919: Võru
+    EE-928: Väike-Maarja
     EG-ALX: 'Al Iskandarīyah'
     EG-ASN: Aswān
-    EG-AST: Asyūt
-    EG-BA: 'Al Bahr al Ahmar'
-    EG-BH: 'Al Buhayrah'
+    EG-AST: Asyūţ
+    EG-BA: 'Al Baḩr al Aḩmar'
+    EG-BH: 'Al Buḩayrah'
     EG-BNS: 'Banī Suwayf'
     EG-C: 'Al Qāhirah'
     EG-DK: 'Ad Daqahlīyah'
-    EG-DT: Dumyāt
+    EG-DT: Dumyāţ
     EG-FYM: 'Al Fayyūm'
     EG-GH: 'Al Gharbīyah'
     EG-GZ: 'Al Jīzah'
-    EG-HU: Ḩulwān
-    EG-IS: 'Al Ismā`īlīyah'
-    EG-JS: 'Janūb Sīnā'''
+    EG-IS: "Al Ismā'īlīyah"
+    EG-JS: "Janūb Sīnā'"
     EG-KB: 'Al Qalyūbīyah'
     EG-KFS: 'Kafr ash Shaykh'
     EG-KN: Qinā
+    EG-LX: 'Al Uqşur'
     EG-MN: 'Al Minyā'
     EG-MNF: 'Al Minūfīyah'
-    EG-MT: Matrūh
-    EG-PTS: 'Būr Sa`īd'
+    EG-MT: Maţrūḩ
+    EG-PTS: 'Būr Sa‘īd'
     EG-SHG: Sūhāj
     EG-SHR: 'Ash Sharqīyah'
-    EG-SIN: 'Shamal Sīnā'''
-    EG-SU: 'As Sādis min Uktūbar'
+    EG-SIN: "Shamāl Sīnā'"
     EG-SUZ: 'As Suways'
     EG-WAD: 'Al Wādī al Jadīd'
-    ER-AN: Anseba
-    ER-DK: 'Debubawi Keyih Bahri [Debub-Keih-Bahri]'
-    ER-DU: Debub
+    ER-AN: Ansabā
+    ER-DK: 'Debubawi K’eyyĭḥ Baḥri'
+    ER-DU: 'Al Janūbī'
     ER-GB: Gash-Barka
-    ER-MA: 'Maakel [Maekel]'
-    ER-SK: 'Semenawi Keyih Bahri [Semien-Keih-Bahri]'
-    ES-A: Alicante
+    ER-MA: 'Al Awsaţ'
+    ER-SK: 'Semienawi K’eyyĭḥ Baḥri'
+    ES-A: 'Alacant*'
     ES-AB: Albacete
     ES-AL: Almería
     ES-AN: Andalucía
     ES-AR: Aragón
     ES-AS: 'Asturias, Principado de'
     ES-AV: Ávila
-    ES-B: Barcelona
+    ES-B: 'Barcelona [Barcelona]'
     ES-BA: Badajoz
-    ES-BI: 'Vizcayaa / Bizkaia'
+    ES-BI: Bizkaia
     ES-BU: Burgos
-    ES-C: 'A Coruña'
+    ES-C: 'A Coruña [La Coruña]'
     ES-CA: Cádiz
     ES-CB: Cantabria
     ES-CC: Cáceres
@@ -1320,71 +1464,100 @@ region:
     ES-CN: Canarias
     ES-CO: Córdoba
     ES-CR: 'Ciudad Real'
-    ES-CS: Castellón
-    ES-CT: Catalunya
+    ES-CS: 'Castelló*'
+    ES-CT: 'Catalunya [Cataluña]'
     ES-CU: Cuenca
     ES-EX: Extremadura
-    ES-GA: Galicia
+    ES-GA: 'Galicia [Galicia]'
     ES-GC: 'Las Palmas'
-    ES-GI: Girona
+    ES-GI: 'Girona [Gerona]'
     ES-GR: Granada
     ES-GU: Guadalajara
     ES-H: Huelva
     ES-HU: Huesca
-    ES-IB: Balears
+    ES-IB: 'Illes Balears [Islas Baleares]'
     ES-J: Jaén
-    ES-L: Lleida
+    ES-L: 'Lleida [Lérida]'
     ES-LE: León
     ES-LO: 'La Rioja'
-    ES-LU: Lugo
+    ES-LU: 'Lugo [Lugo]'
     ES-M: Madrid
     ES-MA: Málaga
     ES-MC: 'Murcia, Región de'
     ES-MD: 'Madrid, Comunidad de'
     ES-ML: Melilla
     ES-MU: Murcia
-    ES-NA: 'Navarra / Nafarroa'
-    ES-NC: 'Navarra, Comunidad Foral de / Nafarroako Foru Komunitatea'
+    ES-NA: 'Nafarroa*'
+    ES-NC: 'Nafarroako Foru Komunitatea*'
     ES-O: Asturias
-    ES-OR: Ourense
+    ES-OR: 'Ourense [Orense]'
     ES-P: Palencia
-    ES-PM: 'Illes Balears'
-    ES-PO: Pontevedra
-    ES-PV: 'País Vasco / Euskal Herria'
+    ES-PM: 'Illes Balears [Islas Baleares]'
+    ES-PO: 'Pontevedra [Pontevedra]'
+    ES-PV: 'Euskal Herria'
     ES-RI: 'La Rioja'
     ES-S: Cantabria
     ES-SA: Salamanca
     ES-SE: Sevilla
     ES-SG: Segovia
     ES-SO: Soria
-    ES-SS: 'Guipúzcoa / Gipuzkoa'
-    ES-T: Tarragona
+    ES-SS: Gipuzkoa
+    ES-T: 'Tarragona [Tarragona]'
     ES-TE: Teruel
     ES-TF: 'Santa Cruz de Tenerife'
     ES-TO: Toledo
-    ES-V: 'Valencia / València'
+    ES-V: Valencia
     ES-VA: Valladolid
-    ES-VC: 'Valenciana, Comunidad / Valenciana, Comunitat '
-    ES-VI: Álava
+    ES-VC: 'Valenciana, Comunidad'
+    ES-VI: 'Araba*'
     ES-Z: Zaragoza
     ES-ZA: Zamora
-    ET-AA: 'Ādīs Ābeba'
-    ET-AF: Āfar
-    ET-AM: Āmara
-    ET-BE: 'Bīnshangul Gumuz'
-    ET-DD: 'Dirē Dawa'
-    ET-GA: 'Gambēla Hizboch'
-    ET-HA: 'Hārerī Hizb'
-    ET-OR: Oromīya
-    ET-SN: 'YeDebub Bihēroch Bihēreseboch na Hizboch'
-    ET-SO: Sumalē
-    ET-TI: Tigray
-    FI-AL: 'Ahvenanmaan lääni'
-    FI-ES: 'Etelä-Suomen lääni'
-    FI-IS: 'Itä-Suomen lääni'
-    FI-LL: 'Lapin lääni'
-    FI-LS: 'Länsi-Suomen lääni'
-    FI-OL: 'Oulun lääni'
+    ET-AA: 'Addis Ababa'
+    ET-AF: Afar
+    ET-AM: Amara
+    ET-BE: Benshangul-Gumaz
+    ET-DD: 'Dire Dawa'
+    ET-GA: 'Gambela Peoples'
+    ET-HA: 'Harari People'
+    ET-OR: Oromia
+    ET-SI: Sidama
+    ET-SN: 'Southern Nations, Nationalities and Peoples'
+    ET-SO: Somali
+    ET-SW: 'Southwest Ethiopia Peoples'
+    ET-TI: Tigrai
+    FI-01: 'Landskapet Åland'
+    FI-02: Etelä-Karjala
+    FI-03: Etelä-Pohjanmaa
+    FI-04: Etelä-Savo
+    FI-05: Kainuu
+    FI-06: Kanta-Häme
+    FI-07: Keski-Pohjanmaa
+    FI-08: Keski-Suomi
+    FI-09: Kymenlaakso
+    FI-10: Lappi
+    FI-11: Pirkanmaa
+    FI-12: Pohjanmaa
+    FI-13: Pohjois-Karjala
+    FI-14: Pohjois-Pohjanmaa
+    FI-15: Pohjois-Savo
+    FI-16: Päijät-Häme
+    FI-17: Satakunta
+    FI-18: Uusimaa
+    FI-19: Varsinais-Suomi
+    FJ-01: Ba
+    FJ-02: Bua
+    FJ-03: Cakaudrove
+    FJ-04: Kadavu
+    FJ-05: Lau
+    FJ-06: Lomaiviti
+    FJ-07: Macuata
+    FJ-08: 'Nadroga and Navosa'
+    FJ-09: Naitasiri
+    FJ-10: Namosi
+    FJ-11: Ra
+    FJ-12: Rewa
+    FJ-13: Serua
+    FJ-14: Tailevu
     FJ-C: Central
     FJ-E: Eastern
     FJ-N: Northern
@@ -1413,8 +1586,9 @@ region:
     FR-17: Charente-Maritime
     FR-18: Cher
     FR-19: Corrèze
-    FR-21: 'Côte-d''Or'
-    FR-22: 'Côtes-d''Armor'
+    FR-20R: Corse
+    FR-21: "Côte-d'Or"
+    FR-22: "Côtes-d'Armor"
     FR-23: Creuse
     FR-24: Dordogne
     FR-25: Doubs
@@ -1464,12 +1638,14 @@ region:
     FR-67: Bas-Rhin
     FR-68: Haut-Rhin
     FR-69: Rhône
+    FR-69M: 'Métropole de Lyon'
+    FR-6AE: Alsace
     FR-70: Haute-Saône
     FR-71: Saône-et-Loire
     FR-72: Sarthe
     FR-73: Savoie
     FR-74: Haute-Savoie
-    FR-75: Paris
+    FR-75C: Paris
     FR-76: Seine-Maritime
     FR-77: Seine-et-Marne
     FR-78: Yvelines
@@ -1489,42 +1665,32 @@ region:
     FR-92: Hauts-de-Seine
     FR-93: Seine-Saint-Denis
     FR-94: Val-de-Marne
-    FR-95: 'Val d''Oise'
-    FR-A: Alsace
-    FR-B: Aquitaine
+    FR-95: "Val-d'Oise"
+    FR-971: Guadeloupe
+    FR-972: Martinique
+    FR-973: 'Guyane (française)'
+    FR-974: 'La Réunion'
+    FR-976: Mayotte
+    FR-ARA: Auvergne-Rhône-Alpes
+    FR-BFC: Bourgogne-Franche-Comté
     FR-BL: Saint-Barthélemy
-    FR-C: Auvergne
+    FR-BRE: Bretagne
     FR-CP: Clipperton
-    FR-D: Bourgogne
-    FR-E: Bretagne
-    FR-F: Centre
-    FR-G: Champagne-Ardenne
-    FR-GF: Guyane
-    FR-GP: Guadeloupe
-    FR-H: Corse
-    FR-I: Franche-Comté
-    FR-J: Île-de-France
-    FR-K: Languedoc-Roussillon
-    FR-L: Limousin
-    FR-M: Lorraine
+    FR-CVL: 'Centre-Val de Loire'
+    FR-GES: Grand-Est
+    FR-HDF: Hauts-de-France
+    FR-IDF: Île-de-France
     FR-MF: Saint-Martin
-    FR-MQ: Martinique
-    FR-N: Midi-Pyrénées
+    FR-NAQ: Nouvelle-Aquitaine
     FR-NC: Nouvelle-Calédonie
-    FR-O: 'Nord - Pas-de-Calais'
-    FR-P: Basse-Normandie
+    FR-NOR: Normandie
+    FR-OCC: Occitanie
+    FR-PAC: Provence-Alpes-Côte-d’Azur
+    FR-PDL: Pays-de-la-Loire
     FR-PF: 'Polynésie française'
     FR-PM: Saint-Pierre-et-Miquelon
-    FR-Q: Haute-Normandie
-    FR-R: 'Pays de la Loire'
-    FR-RE: Réunion
-    FR-S: Picardie
-    FR-T: Poitou-Charentes
     FR-TF: 'Terres australes françaises'
-    FR-U: 'Provence-Alpes-Côte d''Azur'
-    FR-V: Rhône-Alpes
     FR-WF: Wallis-et-Futuna
-    FR-YT: Mayotte
     GA-1: Estuaire
     GA-2: Haut-Ogooué
     GA-3: Moyen-Ogooué
@@ -1534,29 +1700,26 @@ region:
     GA-7: Ogooué-Lolo
     GA-8: Ogooué-Maritime
     GA-9: Woleu-Ntem
+    GB-ABC: 'Armagh City, Banbridge and Craigavon'
     GB-ABD: Aberdeenshire
     GB-ABE: 'Aberdeen City'
     GB-AGB: 'Argyll and Bute'
-    GB-AGY: 'Isle of Anglesey;Sir Ynys Môn'
+    GB-AGY: 'Isle of Anglesey [Sir Ynys Môn GB-YNM]'
+    GB-AND: 'Ards and North Down'
+    GB-ANN: 'Antrim and Newtownabbey'
     GB-ANS: Angus
-    GB-ANT: Antrim
-    GB-ARD: Ards
-    GB-ARM: Armagh
     GB-BAS: 'Bath and North East Somerset'
     GB-BBD: 'Blackburn with Darwen'
+    GB-BCP: 'Bournemouth, Christchurch and Poole'
     GB-BDF: Bedford
     GB-BDG: 'Barking and Dagenham'
     GB-BEN: Brent
     GB-BEX: Bexley
-    GB-BFS: Belfast
-    GB-BGE: 'Bridgend;Pen-y-bont ar Ogwr'
+    GB-BFS: 'Belfast City'
+    GB-BGE: 'Bridgend [Pen-y-bont ar Ogwr GB-POG]'
     GB-BGW: 'Blaenau Gwent'
     GB-BIR: Birmingham
     GB-BKM: Buckinghamshire
-    GB-BLA: Ballymena
-    GB-BLY: Ballymoney
-    GB-BMH: Bournemouth
-    GB-BNB: Banbridge
     GB-BNE: Barnet
     GB-BNH: 'Brighton and Hove'
     GB-BNS: Barnsley
@@ -1568,58 +1731,51 @@ region:
     GB-BST: 'Bristol, City of'
     GB-BUR: Bury
     GB-CAM: Cambridgeshire
-    GB-CAY: Caerphilly;Caerffili
+    GB-CAY: 'Caerphilly [Caerffili GB-CAF]'
     GB-CBF: 'Central Bedfordshire'
-    GB-CGN: 'Ceredigion;Sir Ceredigion'
-    GB-CGV: Craigavon
+    GB-CCG: 'Causeway Coast and Glens'
+    GB-CGN: 'Ceredigion [Sir Ceredigion]'
     GB-CHE: 'Cheshire East'
     GB-CHW: 'Cheshire West and Chester'
-    GB-CKF: Carrickfergus
-    GB-CKT: Cookstown
     GB-CLD: Calderdale
     GB-CLK: Clackmannanshire
-    GB-CLR: Coleraine
     GB-CMA: Cumbria
     GB-CMD: Camden
-    GB-CMN: 'Carmarthenshire;Sir Gaerfyrddin'
+    GB-CMN: 'Carmarthenshire [Sir Gaerfyrddin GB-GFY]'
     GB-CON: Cornwall
     GB-COV: Coventry
-    GB-CRF: Cardiff;Caerdydd
+    GB-CRF: 'Cardiff [Caerdydd GB-CRD]'
     GB-CRY: Croydon
-    GB-CSR: Castlereagh
     GB-CWY: Conwy
     GB-DAL: Darlington
     GB-DBY: Derbyshire
-    GB-DEN: 'Denbighshire;Sir Ddinbych'
+    GB-DEN: 'Denbighshire [Sir Ddinbych GB-DDB]'
     GB-DER: Derby
     GB-DEV: Devon
-    GB-DGN: Dungannon
     GB-DGY: 'Dumfries and Galloway'
     GB-DNC: Doncaster
     GB-DND: 'Dundee City'
     GB-DOR: Dorset
-    GB-DOW: Down
-    GB-DRY: Derry
+    GB-DRS: 'Derry and Strabane'
     GB-DUD: Dudley
-    GB-DUR: Durham
+    GB-DUR: 'Durham, County'
     GB-EAL: Ealing
-    GB-EAW: 'England and Wales'
     GB-EAY: 'East Ayrshire'
     GB-EDH: 'Edinburgh, City of'
     GB-EDU: 'East Dunbartonshire'
     GB-ELN: 'East Lothian'
     GB-ELS: 'Eilean Siar'
     GB-ENF: Enfield
+    GB-ENG: England
     GB-ERW: 'East Renfrewshire'
     GB-ERY: 'East Riding of Yorkshire'
     GB-ESS: Essex
     GB-ESX: 'East Sussex'
     GB-FAL: Falkirk
-    GB-FER: Fermanagh
     GB-FIF: Fife
-    GB-FLN: 'Flintshire;Sir y Fflint'
+    GB-FLN: 'Flintshire [Sir y Fflint GB-FFL]'
+    GB-FMO: 'Fermanagh and Omagh'
     GB-GAT: Gateshead
-    GB-GBN: 'Great Britain'
     GB-GLG: 'Glasgow City'
     GB-GLS: Gloucestershire
     GB-GRE: Greenwich
@@ -1628,15 +1784,16 @@ region:
     GB-HAM: Hampshire
     GB-HAV: Havering
     GB-HCK: Hackney
-    GB-HED: Highland
     GB-HEF: Herefordshire
     GB-HIL: Hillingdon
+    GB-HLD: Highland
     GB-HMF: 'Hammersmith and Fulham'
     GB-HNS: Hounslow
     GB-HPL: Hartlepool
     GB-HRT: Hertfordshire
     GB-HRW: Harrow
     GB-HRY: Haringey
+    GB-IOS: 'Isles of Scilly'
     GB-IOW: 'Isle of Wight'
     GB-ISL: Islington
     GB-IVC: Inverclyde
@@ -1647,6 +1804,7 @@ region:
     GB-KTT: 'Kingston upon Thames'
     GB-KWL: Knowsley
     GB-LAN: Lancashire
+    GB-LBC: 'Lisburn and Castlereagh'
     GB-LBH: Lambeth
     GB-LCE: Leicester
     GB-LDS: Leeds
@@ -1654,25 +1812,21 @@ region:
     GB-LEW: Lewisham
     GB-LIN: Lincolnshire
     GB-LIV: Liverpool
-    GB-LMV: Limavady
     GB-LND: 'London, City of'
-    GB-LRN: Larne
-    GB-LSB: Lisburn
     GB-LUT: Luton
     GB-MAN: Manchester
     GB-MDB: Middlesbrough
     GB-MDW: Medway
-    GB-MFT: Magherafelt
+    GB-MEA: 'Mid and East Antrim'
     GB-MIK: 'Milton Keynes'
     GB-MLN: Midlothian
-    GB-MON: 'Monmouthshire;Sir Fynwy'
+    GB-MON: 'Monmouthshire [Sir Fynwy GB-FYN]'
     GB-MRT: Merton
     GB-MRY: Moray
-    GB-MTY: 'Merthyr Tydfil;Merthyr Tudful'
-    GB-MYL: Moyle
+    GB-MTY: 'Merthyr Tydfil [Merthyr Tudful GB-MTU]'
+    GB-MUL: Mid-Ulster
     GB-NAY: 'North Ayrshire'
     GB-NBL: Northumberland
-    GB-NDN: 'North Down'
     GB-NEL: 'North East Lincolnshire'
     GB-NET: 'Newcastle upon Tyne'
     GB-NFK: Norfolk
@@ -1680,30 +1834,27 @@ region:
     GB-NIR: 'Northern Ireland'
     GB-NLK: 'North Lanarkshire'
     GB-NLN: 'North Lincolnshire'
+    GB-NMD: 'Newry, Mourne and Down'
+    GB-NNH: 'North Northamptonshire'
     GB-NSM: 'North Somerset'
-    GB-NTA: Newtownabbey
-    GB-NTH: Northamptonshire
-    GB-NTL: 'Neath Port Talbot;Castell-nedd Port Talbot'
+    GB-NTL: 'Neath Port Talbot [Castell-nedd Port Talbot GB-CTL]'
     GB-NTT: Nottinghamshire
     GB-NTY: 'North Tyneside'
     GB-NWM: Newham
-    GB-NWP: Newport;Casnewydd
+    GB-NWP: 'Newport [Casnewydd GB-CNW]'
     GB-NYK: 'North Yorkshire'
-    GB-NYM: 'Newry and Mourne'
     GB-OLD: Oldham
-    GB-OMH: Omagh
-    GB-ORR: 'Orkney Islands'
+    GB-ORK: 'Orkney Islands'
     GB-OXF: Oxfordshire
-    GB-PEM: 'Pembrokeshire;Sir Benfro'
+    GB-PEM: 'Pembrokeshire [Sir Benfro GB-BNF]'
     GB-PKN: 'Perth and Kinross'
     GB-PLY: Plymouth
-    GB-POL: Poole
     GB-POR: Portsmouth
     GB-POW: Powys
     GB-PTE: Peterborough
     GB-RCC: 'Redcar and Cleveland'
     GB-RCH: Rochdale
-    GB-RCT: 'Rhondda, Cynon, Taff;Rhondda, Cynon,Taf'
+    GB-RCT: 'Rhondda Cynon Taff [Rhondda CynonTaf]'
     GB-RDB: Redbridge
     GB-RDG: Reading
     GB-RFW: Renfrewshire
@@ -1712,7 +1863,7 @@ region:
     GB-RUT: Rutland
     GB-SAW: Sandwell
     GB-SAY: 'South Ayrshire'
-    GB-SCB: 'Scottish Borders, The'
+    GB-SCB: 'Scottish Borders'
     GB-SCT: Scotland
     GB-SFK: Suffolk
     GB-SFT: Sefton
@@ -1729,7 +1880,6 @@ region:
     GB-SOM: Somerset
     GB-SOS: Southend-on-Sea
     GB-SRY: Surrey
-    GB-STB: Strabane
     GB-STE: Stoke-on-Trent
     GB-STG: Stirling
     GB-STH: Southampton
@@ -1737,35 +1887,36 @@ region:
     GB-STS: Staffordshire
     GB-STT: Stockton-on-Tees
     GB-STY: 'South Tyneside'
-    GB-SWA: Swansea;Abertawe
+    GB-SWA: 'Swansea [Abertawe GB-ATA]'
     GB-SWD: Swindon
     GB-SWK: Southwark
     GB-TAM: Tameside
     GB-TFW: 'Telford and Wrekin'
     GB-THR: Thurrock
     GB-TOB: Torbay
-    GB-TOF: Torfaen;Tor-faen
+    GB-TOF: 'Torfaen [Tor-faen]'
     GB-TRF: Trafford
     GB-TWH: 'Tower Hamlets'
-    GB-UKM: 'United Kingdom'
-    GB-VGL: 'Vale of Glamorgan, The;Bro Morgannwg'
+    GB-VGL: 'Vale of Glamorgan, The [Bro Morgannwg GB-BMG]'
     GB-WAR: Warwickshire
-    GB-WBX: 'West Berkshire'
+    GB-WBK: 'West Berkshire'
     GB-WDU: 'West Dunbartonshire'
     GB-WFT: 'Waltham Forest'
     GB-WGN: Wigan
+    GB-WIL: Wiltshire
     GB-WKF: Wakefield
     GB-WLL: Walsall
     GB-WLN: 'West Lothian'
-    GB-WLS: Wales
+    GB-WLS: 'Wales [Cymru GB-CYM]'
     GB-WLV: Wolverhampton
     GB-WND: Wandsworth
+    GB-WNH: 'West Northamptonshire'
     GB-WNM: 'Windsor and Maidenhead'
     GB-WOK: Wokingham
     GB-WOR: Worcestershire
     GB-WRL: Wirral
     GB-WRT: Warrington
-    GB-WRX: Wrexham;Wrecsam
+    GB-WRX: 'Wrexham [Wrecsam GB-WRC]'
     GB-WSM: Westminster
     GB-WSX: 'West Sussex'
     GB-YOR: York
@@ -1780,28 +1931,35 @@ region:
     GE-AB: Abkhazia
     GE-AJ: Ajaria
     GE-GU: Guria
-    GE-IM: Imeret’i
-    GE-KA: Kakhet’i
-    GE-KK: 'K’vemo K’art’li'
-    GE-MM: Mts’khet’a-Mt’ianet’i
-    GE-RL: 'Racha-Lech’khumi-K’vemo Svanet’i'
-    GE-SJ: Samts’khe-Javakhet’i
-    GE-SK: 'Shida K’art’li'
-    GE-SZ: 'Samegrelo-Zemo Svanet’i'
-    GE-TB: T’bilisi
+    GE-IM: Imereti
+    GE-KA: "K'akheti"
+    GE-KK: 'Kvemo Kartli'
+    GE-MM: Mtskheta-Mtianeti
+    GE-RL: "Rach'a-Lechkhumi-Kvemo Svaneti"
+    GE-SJ: Samtskhe-Javakheti
+    GE-SK: 'Shida Kartli'
+    GE-SZ: 'Samegrelo-Zemo Svaneti'
+    GE-TB: Tbilisi
     GH-AA: 'Greater Accra'
+    GH-AF: Ahafo
     GH-AH: Ashanti
-    GH-BA: Brong-Ahafo
+    GH-BE: 'Bono East'
+    GH-BO: Bono
     GH-CP: Central
     GH-EP: Eastern
+    GH-NE: 'North East'
     GH-NP: Northern
+    GH-OT: Oti
+    GH-SV: Savannah
     GH-TV: Volta
     GH-UE: 'Upper East'
     GH-UW: 'Upper West'
+    GH-WN: 'Western North'
     GH-WP: Western
+    GL-AV: 'Avannaata Kommunia'
     GL-KU: 'Kommune Kujalleq'
-    GL-QA: 'Qaasuitsup Kommunia'
     GL-QE: 'Qeqqata Kommunia'
+    GL-QT: 'Kommune Qeqertalik'
     GL-SM: 'Kommuneqarfik Sermersooq'
     GM-B: Banjul
     GM-L: 'Lower River'
@@ -1850,104 +2008,54 @@ region:
     GN-TE: Télimélé
     GN-TO: Tougué
     GN-YO: Yomou
-    GQ-AN: Annobón
-    GQ-BN: 'Bioko Norte'
-    GQ-BS: 'Bioko Sur'
-    GQ-C: 'Región Continental'
-    GQ-CS: 'Centro Sur'
-    GQ-I: 'Región Insular'
+    GQ-AN: Annobon
+    GQ-BN: 'Bioko Nord'
+    GQ-BS: 'Bioko Sud'
+    GQ-C: 'Région Continentale'
+    GQ-CS: 'Centro Sud'
+    GQ-DJ: Djibloho
+    GQ-I: 'Région Insulaire'
     GQ-KN: Kié-Ntem
-    GQ-LI: Litoral
-    GQ-WN: Wele-Nzás
-    GR-01: 'Aitolia kai Akarnania'
-    GR-03: Voiotia
-    GR-04: Evvoias
-    GR-05: Evrytania
-    GR-06: Fthiotida
-    GR-07: Fokida
-    GR-11: Argolida
-    GR-12: Arkadia
-    GR-13: Achaïa
-    GR-14: Ileia
-    GR-15: Korinthia
-    GR-16: Lakonia
-    GR-17: Messinia
-    GR-21: Zakynthos
-    GR-22: Kerkyra
-    GR-23: Kefallonia
-    GR-24: Lefkada
-    GR-31: Arta
-    GR-32: Thesprotia
-    GR-33: Ioannina
-    GR-34: Preveza
-    GR-41: Karditsa
-    GR-42: Larisa
-    GR-43: Magnisia
-    GR-44: Trikala
-    GR-51: Grevena
-    GR-52: Drama
-    GR-53: Imathia
-    GR-54: Thessaloniki
-    GR-55: Kavala
-    GR-56: Kastoria
-    GR-57: Kilkis
-    GR-58: Kozani
-    GR-59: Pella
-    GR-61: Pieria
-    GR-62: Serres
-    GR-63: Florina
-    GR-64: Chalkidiki
-    GR-69: 'Agio Oros'
-    GR-71: Evros
-    GR-72: Xanthi
-    GR-73: Rodopi
-    GR-81: Dodekanisos
-    GR-82: Kyklades
-    GR-83: Lesvos
-    GR-84: Samos
-    GR-85: Chios
-    GR-91: Irakleio
-    GR-92: Lasithi
-    GR-93: Rethymno
-    GR-94: Chania
-    GR-A: 'Anatoliki Makedonia kai Thraki'
-    GR-A1: Attiki
-    GR-B: 'Kentriki Makedonia'
-    GR-C: 'Dytiki Makedonia'
-    GR-D: Ipeiros
-    GR-E: Thessalia
-    GR-F: 'Ionia Nisia'
-    GR-G: 'Dytiki Ellada'
-    GR-H: 'Sterea Ellada'
-    GR-I: Attiki
-    GR-J: Peloponnisos
-    GR-K: 'Voreio Aigaio'
-    GR-L: 'Notio Aigaio'
-    GR-M: Kriti
-    GT-AV: 'Alta Verapaz'
-    GT-BV: 'Baja Verapaz'
-    GT-CM: Chimaltenango
-    GT-CQ: Chiquimula
-    GT-ES: Escuintla
-    GT-GU: Guatemala
-    GT-HU: Huehuetenango
-    GT-IZ: Izabal
-    GT-JA: Jalapa
-    GT-JU: Jutiapa
-    GT-PE: Petén
-    GT-PR: 'El Progreso'
-    GT-QC: Quiché
-    GT-QZ: Quetzaltenango
-    GT-RE: Retalhuleu
-    GT-SA: Sacatepéquez
-    GT-SM: 'San Marcos'
-    GT-SO: Sololá
-    GT-SR: 'Santa Rosa'
-    GT-SU: Suchitepéquez
-    GT-TO: Totonicapán
-    GT-ZA: Zacapa
+    GQ-LI: Littoral
+    GQ-WN: Wele-Nzas
+    GR-69: 'Ágion Óros'
+    GR-A: 'Anatolikí Makedonía kai Thráki'
+    GR-B: 'Kentrikí Makedonía'
+    GR-C: 'Dytikí Makedonía'
+    GR-D: Ípeiros
+    GR-E: Thessalía
+    GR-F: 'Ionía Nísia'
+    GR-G: 'Dytikí Elláda'
+    GR-H: 'Stereá Elláda'
+    GR-I: Attikí
+    GR-J: Pelopónnisos
+    GR-K: 'Vóreio Aigaío'
+    GR-L: 'Nótio Aigaío'
+    GR-M: Kríti
+    GT-01: Guatemala
+    GT-02: 'El Progreso'
+    GT-03: Sacatepéquez
+    GT-04: Chimaltenango
+    GT-05: Escuintla
+    GT-06: 'Santa Rosa'
+    GT-07: Sololá
+    GT-08: Totonicapán
+    GT-09: Quetzaltenango
+    GT-10: Suchitepéquez
+    GT-11: Retalhuleu
+    GT-12: 'San Marcos'
+    GT-13: Huehuetenango
+    GT-14: Quiché
+    GT-15: 'Baja Verapaz'
+    GT-16: 'Alta Verapaz'
+    GT-17: Petén
+    GT-18: Izabal
+    GT-19: Zacapa
+    GT-20: Chiquimula
+    GT-21: Jalapa
+    GT-22: Jutiapa
     GW-BA: Bafatá
-    GW-BL: Bolama
+    GW-BL: 'Bolama / Bijagós'
     GW-BM: Biombo
     GW-BS: Bissau
     GW-CA: Cacheu
@@ -2009,9 +2117,10 @@ region:
     HR-21: 'Grad Zagreb'
     HT-AR: Artibonite
     HT-CE: Centre
-    HT-GA: Grande-Anse
+    HT-GA: Grande’Anse
     HT-ND: Nord
     HT-NE: Nord-Est
+    HT-NI: Nippes
     HT-NO: Nord-Ouest
     HT-OU: Ouest
     HT-SD: Sud
@@ -2022,7 +2131,7 @@ region:
     HU-BK: Bács-Kiskun
     HU-BU: Budapest
     HU-BZ: Borsod-Abaúj-Zemplén
-    HU-CS: Csongrád
+    HU-CS: Csongrád-Csanád
     HU-DE: Debrecen
     HU-DU: Dunaújváros
     HU-EG: Eger
@@ -2055,17 +2164,16 @@ region:
     HU-TB: Tatabánya
     HU-TO: Tolna
     HU-VA: Vas
-    HU-VE: 'Veszprém (county)'
+    HU-VE: Veszprém
     HU-VM: Veszprém
     HU-ZA: Zala
     HU-ZE: Zalaegerszeg
     ID-AC: Aceh
     ID-BA: Bali
-    ID-BB: 'Bangka Belitung'
+    ID-BB: 'Kepulauan Bangka Belitung'
     ID-BE: Bengkulu
     ID-BT: Banten
     ID-GO: Gorontalo
-    ID-IJ: Papua
     ID-JA: Jambi
     ID-JB: 'Jawa Barat'
     ID-JI: 'Jawa Timur'
@@ -2078,29 +2186,37 @@ region:
     ID-KR: 'Kepulauan Riau'
     ID-KS: 'Kalimantan Selatan'
     ID-KT: 'Kalimantan Tengah'
+    ID-KU: 'Kalimantan Utara'
     ID-LA: Lampung
     ID-MA: Maluku
+    ID-ML: Maluku
     ID-MU: 'Maluku Utara'
     ID-NB: 'Nusa Tenggara Barat'
     ID-NT: 'Nusa Tenggara Timur'
     ID-NU: 'Nusa Tenggara'
     ID-PA: Papua
     ID-PB: 'Papua Barat'
+    ID-PD: 'Papua Barat Daya'
+    ID-PE: 'Papua Pengunungan'
+    ID-PP: Papua
+    ID-PS: 'Papua Selatan'
+    ID-PT: 'Papua Tengah'
     ID-RI: Riau
     ID-SA: 'Sulawesi Utara'
-    ID-SB: 'Sumatra Barat'
+    ID-SB: 'Sumatera Barat'
     ID-SG: 'Sulawesi Tenggara'
     ID-SL: Sulawesi
     ID-SM: Sumatera
     ID-SN: 'Sulawesi Selatan'
     ID-SR: 'Sulawesi Barat'
-    ID-SS: 'Sumatra Selatan'
+    ID-SS: 'Sumatera Selatan'
     ID-ST: 'Sulawesi Tengah'
     ID-SU: 'Sumatera Utara'
     ID-YO: Yogyakarta
-    IE-C: Cork
+    IE-C: Connaught
     IE-CE: Clare
     IE-CN: Cavan
+    IE-CO: Cork
     IE-CW: Carlow
     IE-D: Dublin
     IE-DL: Donegal
@@ -2127,30 +2243,30 @@ region:
     IE-WH: Westmeath
     IE-WW: Wicklow
     IE-WX: Wexford
-    IL-D: HaDarom
-    IL-HA: Hefa
-    IL-JM: 'Yerushalayim Al Quds'
-    IL-M: HaMerkaz
-    IL-TA: Tel-Aviv
-    IL-Z: HaZafon
+    IL-D: 'Al Janūbī'
+    IL-HA: H̱efa
+    IL-JM: 'Al Quds'
+    IL-M: 'Al Awsaţ'
+    IL-TA: 'Tall Abīb'
+    IL-Z: 'Ash Shamālī'
     IN-AN: 'Andaman and Nicobar Islands'
     IN-AP: 'Andhra Pradesh'
     IN-AR: 'Arunāchal Pradesh'
     IN-AS: Assam
     IN-BR: Bihār
+    IN-CG: Chhattīsgarh
     IN-CH: Chandīgarh
-    IN-CT: Chhattīsgarh
-    IN-DD: 'Damān and Diu'
+    IN-DH: 'Dādra and Nagar Haveli and Damān and Diu'
     IN-DL: Delhi
-    IN-DN: 'Dādra and Nagar Haveli'
     IN-GA: Goa
     IN-GJ: Gujarāt
     IN-HP: 'Himāchal Pradesh'
     IN-HR: Haryāna
-    IN-JH: Jharkhand
+    IN-JH: Jhārkhand
     IN-JK: 'Jammu and Kashmīr'
     IN-KA: Karnātaka
     IN-KL: Kerala
+    IN-LA: Ladākh
     IN-LD: Lakshadweep
     IN-MH: Mahārāshtra
     IN-ML: Meghālaya
@@ -2158,66 +2274,68 @@ region:
     IN-MP: 'Madhya Pradesh'
     IN-MZ: Mizoram
     IN-NL: Nāgāland
-    IN-OR: Orissa
+    IN-OD: Odisha
     IN-PB: Punjab
-    IN-PY: Pondicherry
+    IN-PY: Puducherry
     IN-RJ: Rājasthān
     IN-SK: Sikkim
     IN-TN: 'Tamil Nādu'
     IN-TR: Tripura
-    IN-UL: Uttaranchal
+    IN-TS: Telangāna
+    IN-UK: Uttarākhand
     IN-UP: 'Uttar Pradesh'
     IN-WB: 'West Bengal'
-    IQ-AN: 'Al Anbar'
-    IQ-AR: Arbil
-    IQ-BA: 'Al Basrah'
-    IQ-BB: Babil
-    IQ-BG: Baghdad
-    IQ-DA: Dahuk
-    IQ-DI: Diyala
-    IQ-DQ: 'Dhi Qar'
-    IQ-KA: 'Karbala'''
-    IQ-MA: Maysan
-    IQ-MU: 'Al Muthanna'
-    IQ-NA: 'An Najef'
-    IQ-NI: Ninawa
-    IQ-QA: 'Al Qadisiyah'
-    IQ-SD: 'Salah ad Din'
-    IQ-SW: 'As Sulaymaniyah'
-    IQ-TS: 'At Ta''mim'
-    IQ-WA: Wasit
-    IR-01: 'Āzarbāyjān-e Sharqī'
-    IR-02: 'Āzarbāyjān-e Gharbī'
-    IR-03: Ardabīl
-    IR-04: Eşfahān
-    IR-05: Īlām
-    IR-06: Būshehr
-    IR-07: Tehrān
-    IR-08: 'Chahār Mahāll va Bakhtīārī'
-    IR-10: Khūzestān
-    IR-11: Zanjān
-    IR-12: Semnān
-    IR-13: 'Sīstān va Balūchestān'
-    IR-14: Fārs
-    IR-15: Kermān
-    IR-16: Kordestān
-    IR-17: Kermānshāh
-    IR-18: 'Kohgīlūyeh va Būyer Ahmad'
-    IR-19: Gīlān
-    IR-20: Lorestān
-    IR-21: Māzandarān
-    IR-22: Markazī
-    IR-23: Hormozgān
-    IR-24: Hamadān
-    IR-25: Yazd
-    IR-26: Qom
+    IQ-AN: 'Al Anbār'
+    IQ-AR: Arbīl
+    IQ-BA: 'Al Başrah'
+    IQ-BB: Bābil
+    IQ-BG: Baghdād
+    IQ-DA: Dahūk
+    IQ-DI: Diyālá
+    IQ-DQ: 'Dhī Qār'
+    IQ-KA: Karbalā’
+    IQ-KI: Kirkūk
+    IQ-KR: 'Herêm-î Kurdistan'
+    IQ-MA: Maysān
+    IQ-MU: 'Al Muthanná'
+    IQ-NA: 'An Najaf'
+    IQ-NI: Nīnawá
+    IQ-QA: 'Al Qādisīyah'
+    IQ-SD: 'Şalāḩ ad Dīn'
+    IQ-SU: 'As Sulaymānīyah'
+    IQ-WA: Wāsiţ
+    IR-00: Markazī
+    IR-01: Gīlān
+    IR-02: Māzandarān
+    IR-03: 'Āz̄ārbāyjān-e Shārqī'
+    IR-04: 'Āz̄ārbāyjān-e Ghārbī'
+    IR-05: Kermānshāh
+    IR-06: Khūzestān
+    IR-07: Fārs
+    IR-08: Kermān
+    IR-09: 'Khorāsān-e Raẕavī'
+    IR-10: Eşfahān
+    IR-11: 'Sīstān va Balūchestān'
+    IR-12: Kordestān
+    IR-13: Hamadān
+    IR-14: 'Chahār Maḩāl va Bakhtīārī'
+    IR-15: Lorestān
+    IR-16: Īlām
+    IR-17: 'Kohgīlūyeh va Bowyer Aḩmad'
+    IR-18: Būshehr
+    IR-19: Zanjān
+    IR-20: Semnān
+    IR-21: Yazd
+    IR-22: Hormozgān
+    IR-23: Tehrān
+    IR-24: Ardabīl
+    IR-25: Qom
+    IR-26: Qazvīn
     IR-27: Golestān
-    IR-28: Qazvīn
-    IR-29: 'Khorāsān-e Janūbī'
-    IR-30: 'Khorāsān-e Razavī'
-    IR-31: 'Khorāsān-e Shemālī'
-    IS-0: Reykjavík
-    IS-1: Höfuðborgarsvæðið
+    IR-28: 'Khorāsān-e Shomālī'
+    IR-29: 'Khorāsān-e Jonūbī'
+    IR-30: Alborz
+    IS-1: Höfuðborgarsvæði
     IS-2: Suðurnes
     IS-3: Vesturland
     IS-4: Vestfirðir
@@ -2225,12 +2343,76 @@ region:
     IS-6: 'Norðurland eystra'
     IS-7: Austurland
     IS-8: Suðurland
+    IS-AKN: Akraneskaupstaður
+    IS-AKU: Akureyrarbær
+    IS-ARN: Árneshreppur
+    IS-ASA: Ásahreppur
+    IS-BLA: Bláskógabyggð
+    IS-BOG: Borgarbyggð
+    IS-BOL: Bolungarvíkurkaupstaður
+    IS-DAB: Dalabyggð
+    IS-DAV: Dalvíkurbyggð
+    IS-EOM: 'Eyja- og Miklaholtshreppur'
+    IS-EYF: Eyjafjarðarsveit
+    IS-FJD: Fjarðabyggð
+    IS-FJL: Fjallabyggð
+    IS-FLA: Flóahreppur
+    IS-FLR: Fljótsdalshreppur
+    IS-GAR: Garðabær
+    IS-GOG: 'Grímsnes- og Grafningshreppur'
+    IS-GRN: Grindavíkurbær
+    IS-GRU: Grundarfjarðarbær
+    IS-GRY: Grýtubakkahreppur
+    IS-HAF: Hafnarfjarðarkaupstaður
+    IS-HRG: Hörgársveit
+    IS-HRU: Hrunamannahreppur
+    IS-HUG: Húnabyggð
+    IS-HUV: 'Húnaþing vestra'
+    IS-HVA: Hvalfjarðarsveit
+    IS-HVE: Hveragerðisbær
+    IS-ISA: Ísafjarðarbær
+    IS-KAL: Kaldrananeshreppur
+    IS-KJO: Kjósarhreppur
+    IS-KOP: Kópavogsbær
+    IS-LAN: Langanesbyggð
+    IS-MOS: Mosfellsbær
+    IS-MUL: Múlaþing
+    IS-MYR: Mýrdalshreppur
+    IS-NOR: Norðurþing
+    IS-RGE: 'Rangárþing eystra'
+    IS-RGY: 'Rangárþing ytra'
+    IS-RHH: Reykhólahreppur
+    IS-RKN: Reykjanesbær
+    IS-RKV: Reykjavíkurborg
+    IS-SBT: Svalbarðsstrandarhreppur
+    IS-SDN: Suðurnesjabær
+    IS-SDV: Súðavíkurhreppur
+    IS-SEL: Seltjarnarnesbær
+    IS-SFA: 'Sveitarfélagið Árborg'
+    IS-SHF: 'Sveitarfélagið Hornafjörður'
+    IS-SKF: Skaftárhreppur
+    IS-SKG: Skagabyggð
+    IS-SKO: Skorradalshreppur
+    IS-SKR: Skagafjörður
+    IS-SNF: Snæfellsbær
+    IS-SOG: 'Skeiða- og Gnúpverjahreppur'
+    IS-SOL: 'Sveitarfélagið Ölfus'
+    IS-SSS: 'Sveitarfélagið Skagaströnd'
+    IS-STR: Strandabyggð
+    IS-STY: Stykkishólmsbær
+    IS-SVG: 'Sveitarfélagið Vogar'
+    IS-TAL: Tálknafjarðarhreppur
+    IS-THG: Þingeyjarsveit
+    IS-TJO: Tjörneshreppur
+    IS-VEM: Vestmannaeyjabær
+    IS-VER: Vesturbyggð
+    IS-VOP: Vopnafjarðarhreppur
     IT-21: Piemonte
-    IT-23: 'Valle d''Aosta'
+    IT-23: "Val d'Aoste"
     IT-25: Lombardia
     IT-32: 'Trentino-Alto Adige'
     IT-34: Veneto
-    IT-36: 'Friuli-Venezia Giulia'
+    IT-36: 'Friuli Venezia Giulia'
     IT-42: Liguria
     IT-45: Emilia-Romagna
     IT-52: Toscana
@@ -2248,9 +2430,8 @@ region:
     IT-AG: Agrigento
     IT-AL: Alessandria
     IT-AN: Ancona
-    IT-AO: Aosta
     IT-AP: 'Ascoli Piceno'
-    IT-AQ: 'L''Aquila'
+    IT-AQ: "L'Aquila"
     IT-AR: Arezzo
     IT-AT: Asti
     IT-AV: Avellino
@@ -2268,7 +2449,6 @@ region:
     IT-CB: Campobasso
     IT-CE: Caserta
     IT-CH: Chieti
-    IT-CI: Carbonia-Iglesias
     IT-CL: Caltanissetta
     IT-CN: Cuneo
     IT-CO: Como
@@ -2296,6 +2476,7 @@ region:
     IT-LT: Latina
     IT-LU: Lucca
     IT-MB: 'Monza e Brianza'
+    IT-MC: Macerata
     IT-ME: Messina
     IT-MI: Milano
     IT-MN: Mantova
@@ -2305,9 +2486,7 @@ region:
     IT-NA: Napoli
     IT-NO: Novara
     IT-NU: Nuoro
-    IT-OG: Ogliastra
     IT-OR: Oristano
-    IT-OT: Olbia-Tempio
     IT-PA: Palermo
     IT-PC: Piacenza
     IT-PD: Padova
@@ -2330,12 +2509,12 @@ region:
     IT-RN: Rimini
     IT-RO: Rovigo
     IT-SA: Salerno
-    IT-SC: Macerata
     IT-SI: Siena
     IT-SO: Sondrio
     IT-SP: 'La Spezia'
     IT-SR: Siracusa
     IT-SS: Sassari
+    IT-SU: 'Sud Sardegna'
     IT-SV: Savona
     IT-TA: Taranto
     IT-TE: Teramo
@@ -2352,7 +2531,6 @@ region:
     IT-VE: Venezia
     IT-VI: Vicenza
     IT-VR: Verona
-    IT-VS: 'Medio Campidano'
     IT-VT: Viterbo
     IT-VV: 'Vibo Valentia'
     JM-01: Kingston
@@ -2369,18 +2547,18 @@ region:
     JM-12: Manchester
     JM-13: Clarendon
     JM-14: 'Saint Catherine'
-    JO-AJ: '`Ajlun'
-    JO-AM: Amman
-    JO-AQ: 'Al `Aqabah'
+    JO-AJ: ‘Ajlūn
+    JO-AM: 'Al ‘A̅şimah'
+    JO-AQ: 'Al ‘Aqabah'
     JO-AT: 'Aţ Ţafīlah'
-    JO-AZ: 'Az Zarqā'''
-    JO-BA: 'Al Balqā'''
+    JO-AZ: 'Az Zarqā’'
+    JO-BA: 'Al Balqā’'
+    JO-IR: Irbid
     JO-JA: Jarash
-    JO-JR: Irbid
     JO-KA: 'Al Karak'
     JO-MA: 'Al Mafraq'
     JO-MD: Mādabā
-    JO-MN: Ma`ān
+    JO-MN: Ma‘ān
     JP-01: Hokkaido
     JP-02: Aomori
     JP-03: Iwate
@@ -2428,23 +2606,64 @@ region:
     JP-45: Miyazaki
     JP-46: Kagoshima
     JP-47: Okinawa
-    KE-110: 'Nairobi Municipality'
-    KE-200: Central
-    KE-300: Coast
-    KE-400: Eastern
-    KE-500: 'North-Eastern Kaskazini Mashariki'
-    KE-700: 'Rift Valley'
-    KE-900: 'Western Magharibi'
+    KE-01: Baringo
+    KE-02: Bomet
+    KE-03: Bungoma
+    KE-04: Busia
+    KE-05: Elgeyo/Marakwet
+    KE-06: Embu
+    KE-07: Garissa
+    KE-08: 'Homa Bay'
+    KE-09: Isiolo
+    KE-10: Kajiado
+    KE-11: Kakamega
+    KE-12: Kericho
+    KE-13: Kiambu
+    KE-14: Kilifi
+    KE-15: Kirinyaga
+    KE-16: Kisii
+    KE-17: Kisumu
+    KE-18: Kitui
+    KE-19: Kwale
+    KE-20: Laikipia
+    KE-21: Lamu
+    KE-22: Machakos
+    KE-23: Makueni
+    KE-24: Mandera
+    KE-25: Marsabit
+    KE-26: Meru
+    KE-27: Migori
+    KE-28: Mombasa
+    KE-29: "Murang'a"
+    KE-30: 'Nairobi City'
+    KE-31: Nakuru
+    KE-32: Nandi
+    KE-33: Narok
+    KE-34: Nyamira
+    KE-35: Nyandarua
+    KE-36: Nyeri
+    KE-37: Samburu
+    KE-38: Siaya
+    KE-39: Taita/Taveta
+    KE-40: 'Tana River'
+    KE-41: Tharaka-Nithi
+    KE-42: 'Trans Nzoia'
+    KE-43: Turkana
+    KE-44: 'Uasin Gishu'
+    KE-45: Vihiga
+    KE-46: Wajir
+    KE-47: 'West Pokot'
     KG-B: Batken
-    KG-C: Chü
-    KG-GB: Bishkek
-    KG-J: Jalal-Abad
+    KG-C: "Chuyskaya oblast'"
+    KG-GB: 'Bishkek Shaary'
+    KG-GO: 'Gorod Osh'
+    KG-J: "Dzhalal-Abadskaya oblast'"
     KG-N: Naryn
     KG-O: Osh
     KG-T: Talas
-    KG-Y: Ysyk-Köl
-    KH-1: 'Banteay Mean Chey'
-    KH-10: Krachoh
+    KG-Y: "Issyk-Kul'skaja oblast'"
+    KH-1: 'Banteay Mean Choăy'
+    KH-10: Kracheh
     KH-11: 'Mondol Kiri'
     KH-12: 'Phnom Penh'
     KH-13: 'Preah Vihear'
@@ -2452,27 +2671,28 @@ region:
     KH-15: Pousaat
     KH-16: 'Rotanak Kiri'
     KH-17: 'Siem Reab'
-    KH-18: 'Krong Preah Sihanouk'
-    KH-19: 'Stueng Traeng'
-    KH-2: Battambang
+    KH-18: 'Preah Sihanouk'
+    KH-19: 'Stoĕng Trêng'
+    KH-2: 'Baat Dambang'
     KH-20: 'Svaay Rieng'
     KH-21: Taakaev
     KH-22: 'Otdar Mean Chey'
-    KH-23: 'Krong Kaeb'
-    KH-24: 'Krong Pailin'
-    KH-3: 'Kampong Cham'
+    KH-23: Kaeb
+    KH-24: Pailin
+    KH-25: 'Tbong Khmum'
+    KH-3: 'Kampong Chaam'
     KH-4: 'Kampong Chhnang'
-    KH-5: 'Kampong Speu'
-    KH-6: 'Kampong Thom'
+    KH-5: 'Kampong Spueu'
+    KH-6: 'Kampong Thum'
     KH-7: Kampot
-    KH-8: Kandal
-    KH-9: 'Kach Kong'
+    KH-8: Kandaal
+    KH-9: 'Kaoh Kong'
     KI-G: 'Gilbert Islands'
     KI-L: 'Line Islands'
     KI-P: 'Phoenix Islands'
-    KM-A: 'Andjouân (Anjwān)'
-    KM-G: 'Andjazîdja (Anjazījah)'
-    KM-M: 'Moûhîlî (Mūhīlī)'
+    KM-A: Anjouan
+    KM-G: 'Grande Comore'
+    KM-M: Mohéli
     KN-01: 'Christ Church Nichola Town'
     KN-02: 'Saint Anne Sandy Point'
     KN-03: 'Saint George Basseterre'
@@ -2489,54 +2709,62 @@ region:
     KN-15: 'Trinity Palmetto Point'
     KN-K: 'Saint Kitts'
     KN-N: Nevis
-    KP-01: P’yŏngyang
-    KP-02: P’yŏngan-namdo
-    KP-03: P’yŏngan-bukto
+    KP-01: "P'yǒngyang"
+    KP-02: "P'yǒngan-namdo"
+    KP-03: "P'yǒngan-bukto"
     KP-04: Chagang-do
     KP-05: Hwanghae-namdo
     KP-06: Hwanghae-bukto
-    KP-07: Kangwŏn-do
-    KP-08: Hamgyŏng-namdo
-    KP-09: Hamgyŏng-bukto
-    KP-10: Yanggang-do
-    KP-13: 'Nasŏn (Najin-Sŏnbong)'
-    KR-11: 'Seoul Teugbyeolsi'
-    KR-26: 'Busan Gwang''yeogsi'
-    KR-27: 'Daegu Gwang''yeogsi'
-    KR-28: 'Incheon Gwang''yeogsi'
-    KR-29: 'Gwangju Gwang''yeogsi'
-    KR-30: 'Daejeon Gwang''yeogsi'
-    KR-31: 'Ulsan Gwang''yeogsi'
-    KR-41: Gyeonggido
-    KR-42: 'Gang''weondo'
-    KR-43: Chungcheongbukdo
-    KR-44: Chungcheongnamdo
-    KR-45: Jeonrabukdo
-    KR-46: Jeonranamdo
-    KR-47: Gyeongsangbukdo
-    KR-48: Gyeongsangnamdo
-    KR-49: Jejudo
-    KW-AH: 'Al Ahmadi'
+    KP-07: Kangweonto
+    KP-08: Hamgyǒng-namdo
+    KP-09: Hamgyǒng-bukto
+    KP-10: Ryanggang-do
+    KP-13: Raseon
+    KP-14: Nampho
+    KP-15: Kaeseong
+    KR-11: Seoul-teukbyeolsi
+    KR-26: Busan-gwangyeoksi
+    KR-27: Daegu-gwangyeoksi
+    KR-28: Incheon-gwangyeoksi
+    KR-29: Gwangju-gwangyeoksi
+    KR-30: Daejeon-gwangyeoksi
+    KR-31: Ulsan-gwangyeoksi
+    KR-41: Gyeonggi-do
+    KR-42: Gangwon-teukbyeoljachido
+    KR-43: Chungcheongbuk-do
+    KR-44: Chungcheongnam-do
+    KR-45: Jeollabuk-do
+    KR-46: Jeollanam-do
+    KR-47: Gyeongsangbuk-do
+    KR-48: Gyeongsangnam-do
+    KR-49: Jeju-teukbyeoljachido
+    KR-50: Sejong
+    KW-AH: 'Al Aḩmadī'
     KW-FA: 'Al Farwānīyah'
-    KW-HA: Hawallī
-    KW-JA: 'Al Jahrah'
-    KW-KU: 'Al Kuwayt'
-    KZ-AKM: 'Aqmola oblysy'
-    KZ-AKT: 'Aqtöbe oblysy'
-    KZ-ALA: Almaty
-    KZ-ALM: 'Almaty oblysy'
-    KZ-AST: Astana
-    KZ-ATY: 'Atyraū oblysy'
-    KZ-KAR: 'Qaraghandy oblysy'
-    KZ-KUS: 'Qostanay oblysy'
-    KZ-KZY: 'Qyzylorda oblysy'
-    KZ-MAN: 'Mangghystaū oblysy'
-    KZ-PAV: 'Pavlodar oblysy'
-    KZ-SEV: 'Soltüstik Quzaqstan oblysy'
-    KZ-VOS: 'Shyghys Qazaqstan oblysy'
-    KZ-YUZ: 'Ongtüstik Qazaqstan oblysy'
-    KZ-ZAP: 'Batys Quzaqstan oblysy'
-    KZ-ZHA: 'Zhambyl oblysy'
+    KW-HA: Ḩawallī
+    KW-JA: 'Al Jahrā’'
+    KW-KU: 'Al ‘Āşimah'
+    KW-MU: 'Mubārak al Kabīr'
+    KZ-10: 'Abajskaja oblast’'
+    KZ-11: "Akmolinskaja oblast'"
+    KZ-15: "Aktjubinskaja oblast'"
+    KZ-19: "Almatinskaja oblast'"
+    KZ-23: "Atyrauskaja oblast'"
+    KZ-27: 'Batys Qazaqstan oblysy'
+    KZ-31: 'Zhambyl oblysy'
+    KZ-33: 'Zhetisū oblysy'
+    KZ-35: "Karagandinskaja oblast'"
+    KZ-39: "Kostanajskaja oblast'"
+    KZ-43: "Kyzylordinskaja oblast'"
+    KZ-47: 'Mangghystaū oblysy'
+    KZ-55: 'Pavlodar oblysy'
+    KZ-59: "Severo-Kazahstanskaja oblast'"
+    KZ-61: "Turkestankaya oblast'"
+    KZ-62: 'Ulytauskaja oblast’'
+    KZ-63: 'Shyghys Qazaqstan oblysy'
+    KZ-71: Astana
+    KZ-75: Almaty
+    KZ-79: Shymkent
     LA-AT: Attapu
     LA-BK: Bokèo
     LA-BL: Bolikhamxai
@@ -2549,20 +2777,20 @@ region:
     LA-PH: Phôngsali
     LA-SL: Salavan
     LA-SV: Savannakhét
-    LA-VI: Vientiane
-    LA-VT: Vientiane
+    LA-VI: Viangchan
+    LA-VT: Viangchan
     LA-XA: Xaignabouli
     LA-XE: Xékong
-    LA-XI: Xiangkhoang
-    LA-XN: Xiasômboun
+    LA-XI: Xiangkhouang
+    LA-XS: Xaisômboun
     LB-AK: Aakkâr
-    LB-AS: Liban-Nord
-    LB-BA: Beyrouth
+    LB-AS: 'Ash Shimāl'
+    LB-BA: Bayrūt
     LB-BH: Baalbek-Hermel
-    LB-BI: Béqaa
-    LB-JA: Liban-Sud
-    LB-JL: Mont-Liban
-    LB-NA: Nabatîyé
+    LB-BI: 'Al Biqā‘'
+    LB-JA: 'Al Janūb'
+    LB-JL: 'Jabal Lubnān'
+    LB-NA: 'An Nabaţīyah'
     LC-01: 'Anse la Raye'
     LC-02: Castries
     LC-03: Choiseul
@@ -2584,116 +2812,197 @@ region:
     LI-09: Triesen
     LI-10: Triesenberg
     LI-11: Vaduz
-    LK-1: 'Basnāhira paḷāta'
-    LK-11: Kŏḷamba
+    LK-1: 'Western Province'
+    LK-11: Colombo
     LK-12: Gampaha
-    LK-13: Kaḷutara
-    LK-2: 'Madhyama paḷāta'
-    LK-21: Mahanuvara
-    LK-22: Mātale
-    LK-23: 'Nuvara Ĕliya'
-    LK-3: 'Dakuṇu paḷāta'
-    LK-31: Gālla
-    LK-32: Mātara
-    LK-33: Hambantŏṭa
-    LK-4: 'Uturu paḷāta'
-    LK-41: Yāpanaya
-    LK-42: Kilinŏchchi
-    LK-43: Mannārama
-    LK-44: Vavuniyāva
-    LK-45: Mulativ
-    LK-5: 'Næ̆gĕnahira paḷāta'
-    LK-51: Maḍakalapuva
-    LK-52: Ampāara
-    LK-53: Trikuṇāmalaya
-    LK-61: Kuruṇægala
-    LK-62: Puttalama
-    LK-7: 'Uturumæ̆da paḷāta'
-    LK-71: Anurādhapura
-    LK-72: Pŏḷŏnnaruva
-    LK-8: 'Ūva paḷāta'
+    LK-13: Kalutara
+    LK-2: 'Central Province'
+    LK-21: Kandy
+    LK-22: Matale
+    LK-23: 'Nuwara Eliya'
+    LK-3: 'Southern Province'
+    LK-31: Galle
+    LK-32: Matara
+    LK-33: Hambantota
+    LK-4: 'Northern Province'
+    LK-41: Jaffna
+    LK-42: Kilinochchi
+    LK-43: Mannar
+    LK-44: Vavuniya
+    LK-45: Mullaittivu
+    LK-5: 'Eastern Province'
+    LK-51: Batticaloa
+    LK-52: Ampara
+    LK-53: Trincomalee
+    LK-6: 'North Western Province'
+    LK-61: Kurunegala
+    LK-62: Puttalam
+    LK-7: 'North Central Province'
+    LK-71: Anuradhapura
+    LK-72: Polonnaruwa
+    LK-8: 'Uva Province'
     LK-81: Badulla
-    LK-82: Mŏṇarāgala
-    LK-9: 'Sabaragamuva paḷāta'
+    LK-82: Monaragala
+    LK-9: 'Sabaragamuwa Province'
     LK-91: Ratnapura
-    LK-92: Kægalla
+    LK-92: Kegalla
     LR-BG: Bong
     LR-BM: Bomi
     LR-CM: 'Grand Cape Mount'
     LR-GB: 'Grand Bassa'
     LR-GG: 'Grand Gedeh'
     LR-GK: 'Grand Kru'
+    LR-GP: Gbarpolu
     LR-LO: Lofa
     LR-MG: Margibi
     LR-MO: Montserrado
     LR-MY: Maryland
     LR-NI: Nimba
-    LR-RI: Rivercess
+    LR-RG: 'River Gee'
+    LR-RI: 'River Cess'
     LR-SI: Sinoe
     LS-A: Maseru
-    LS-B: Butha-Buthe
+    LS-B: Botha-Bothe
     LS-C: Leribe
     LS-D: Berea
     LS-E: Mafeteng
-    LS-F: 'Mohale''s Hoek'
+    LS-F: "Mohale's Hoek"
     LS-G: Quthing
-    LS-H: 'Qacha''s Nek'
+    LS-H: "Qacha's Nek"
     LS-J: Mokhotlong
     LS-K: Thaba-Tseka
-    LT-AL: 'Alytaus Apskritis'
-    LT-KL: 'Klaipėdos Apskritis'
-    LT-KU: 'Kauno Apskritis'
-    LT-MR: 'Marijampolės Apskritis'
-    LT-PN: 'Panevėžio Apskritis'
-    LT-SA: 'Šiaulių Apskritis'
-    LT-TA: 'Tauragés Apskritis'
-    LT-TE: 'Telšių Apskritis'
-    LT-UT: 'Utenos Apskritis'
-    LT-VL: 'Vilniaus Apskritis'
-    LU-D: Diekirch
-    LU-G: Grevenmacher
-    LU-L: Luxembourg
-    LV-AI: Aizkraukle
-    LV-AL: Alūksne
-    LV-BL: Balvi
-    LV-BU: Bauska
-    LV-CE: Cēsis
-    LV-DA: Daugavpils
+    LT-01: Akmenė
+    LT-02: 'Alytaus miestas'
+    LT-03: Alytus
+    LT-04: Anykščiai
+    LT-05: Birštonas
+    LT-06: Biržai
+    LT-07: Druskininkai
+    LT-08: Elektrėnai
+    LT-09: Ignalina
+    LT-10: Jonava
+    LT-11: Joniškis
+    LT-12: Jurbarkas
+    LT-13: Kaišiadorys
+    LT-14: Kalvarija
+    LT-15: 'Kauno miestas'
+    LT-16: Kaunas
+    LT-17: 'Kazlų Rūdos'
+    LT-18: Kėdainiai
+    LT-19: Kelmė
+    LT-20: 'Klaipėdos miestas'
+    LT-21: Klaipėda
+    LT-22: Kretinga
+    LT-23: Kupiškis
+    LT-24: Lazdijai
+    LT-25: Marijampolė
+    LT-26: Mažeikiai
+    LT-27: Molėtai
+    LT-28: Neringa
+    LT-29: Pagėgiai
+    LT-30: Pakruojis
+    LT-31: 'Palangos miestas'
+    LT-32: 'Panevėžio miestas'
+    LT-33: Panevėžys
+    LT-34: Pasvalys
+    LT-35: Plungė
+    LT-36: Prienai
+    LT-37: Radviliškis
+    LT-38: Raseiniai
+    LT-39: Rietavas
+    LT-40: Rokiškis
+    LT-41: Šakiai
+    LT-42: Šalčininkai
+    LT-43: 'Šiaulių miestas'
+    LT-44: Šiauliai
+    LT-45: Šilalė
+    LT-46: Šilutė
+    LT-47: Širvintos
+    LT-48: Skuodas
+    LT-49: Švenčionys
+    LT-50: Tauragė
+    LT-51: Telšiai
+    LT-52: Trakai
+    LT-53: Ukmergė
+    LT-54: Utena
+    LT-55: Varėna
+    LT-56: Vilkaviškis
+    LT-57: 'Vilniaus miestas'
+    LT-58: Vilnius
+    LT-59: Visaginas
+    LT-60: Zarasai
+    LT-AL: 'Alytaus apskritis'
+    LT-KL: 'Klaipėdos apskritis'
+    LT-KU: 'Kauno apskritis'
+    LT-MR: 'Marijampolės apskritis'
+    LT-PN: 'Panevėžio apskritis'
+    LT-SA: 'Šiaulių apskritis'
+    LT-TA: 'Tauragės apskritis'
+    LT-TE: 'Telšių apskritis'
+    LT-UT: 'Utenos apskritis'
+    LT-VL: 'Vilniaus apskritis'
+    LU-CA: Capellen
+    LU-CL: Clervaux
+    LU-DI: Diekirch
+    LU-EC: Echternach
+    LU-ES: Esch-sur-Alzette
+    LU-GR: Grevenmacher
+    LU-LU: Luxembourg
+    LU-ME: Mersch
+    LU-RD: Redange
+    LU-RM: Remich
+    LU-VD: Vianden
+    LU-WI: Wiltz
+    LV-002: 'Aizkraukles novads'
+    LV-007: 'Alūksnes novads'
+    LV-011: 'Ādažu novads'
+    LV-015: 'Balvu novads'
+    LV-016: 'Bauskas novads'
+    LV-022: 'Cēsu novads'
+    LV-026: 'Dobeles novads'
+    LV-033: 'Gulbenes novads'
+    LV-041: 'Jelgavas novads'
+    LV-042: 'Jēkabpils novads'
+    LV-047: 'Krāslavas novads'
+    LV-050: 'Kuldīgas novads'
+    LV-052: 'Ķekavas novads'
+    LV-054: 'Limbažu novads'
+    LV-056: 'Līvānu novads'
+    LV-058: 'Ludzas novads'
+    LV-059: 'Madonas novads'
+    LV-062: 'Mārupes novads'
+    LV-067: 'Ogres novads'
+    LV-068: 'Olaines novads'
+    LV-073: 'Preiļu novads'
+    LV-077: 'Rēzeknes novads'
+    LV-080: 'Ropažu novads'
+    LV-087: 'Salaspils novads'
+    LV-088: 'Saldus novads'
+    LV-089: 'Saulkrastu novads'
+    LV-091: 'Siguldas novads'
+    LV-094: 'Smiltenes novads'
+    LV-097: 'Talsu novads'
+    LV-099: 'Tukuma novads'
+    LV-101: 'Valkas novads'
+    LV-102: 'Varakļānu novads'
+    LV-106: 'Ventspils novads'
+    LV-111: 'Augšdaugavas novads'
+    LV-112: 'Dienvidkurzemes Novads'
+    LV-113: 'Valmieras Novads'
     LV-DGV: Daugavpils
-    LV-DO: Dobele
-    LV-GU: Gulbene
     LV-JEL: Jelgava
-    LV-JK: Jēkabpils
-    LV-JL: Jelgava
     LV-JUR: Jūrmala
-    LV-KR: Krāslava
-    LV-KU: Kuldīga
-    LV-LE: Liepāja
-    LV-LM: Limbaži
     LV-LPX: Liepāja
-    LV-LU: Ludza
-    LV-MA: Madona
-    LV-OG: Ogre
-    LV-PR: Preiļi
-    LV-RE: Rēzekne
     LV-REZ: Rēzekne
-    LV-RI: Rīga
     LV-RIX: Rīga
-    LV-SA: Saldus
-    LV-TA: Talsi
-    LV-TU: Tukums
-    LV-VE: Ventspils
     LV-VEN: Ventspils
-    LV-VK: Valka
-    LV-VM: Valmiera
     LY-BA: Banghāzī
     LY-BU: 'Al Buţnān'
     LY-DR: Darnah
     LY-GT: Ghāt
     LY-JA: 'Al Jabal al Akhḑar'
-    LY-JB: Jaghbūb
     LY-JG: 'Al Jabal al Gharbī'
-    LY-JI: 'Al Jifārah'
+    LY-JI: 'Al Jafārah'
     LY-JU: 'Al Jufrah'
     LY-KF: 'Al Kufrah'
     LY-MB: 'Al Marqab'
@@ -2701,96 +3010,121 @@ region:
     LY-MJ: 'Al Marj'
     LY-MQ: Murzuq
     LY-NL: Nālūt
-    LY-NQ: 'An Nuqaţ al Khams'
+    LY-NQ: 'An Nuqāţ al Khams'
     LY-SB: Sabhā
     LY-SR: Surt
     LY-TB: Ţarābulus
-    LY-WA: 'Al Wāḩāt'
+    LY-WA: 'Al Wāḩāt'
     LY-WD: 'Wādī al Ḩayāt'
-    LY-WS: 'Wādī ash Shāţiʾ'
+    LY-WS: 'Wādī ash Shāţi’'
     LY-ZA: 'Az Zāwiyah'
-    MA-01: Tanger-Tétouan
-    MA-02: 'Gharb-Chrarda-Beni Hssen'
-    MA-03: 'Taza-Al Hoceima-Taounate'
-    MA-04: 'L''Oriental'
-    MA-05: Fès-Boulemane
-    MA-06: Meknès-Tafilalet
-    MA-07: Rabat-Salé-Zemmour-Zaer
-    MA-08: 'Grand Casablanca'
-    MA-09: Chaouia-Ouardigha
-    MA-10: Doukhala-Abda
-    MA-11: 'Marrakech-Tensift-Al Haouz'
-    MA-12: Tadla-Azilal
-    MA-13: Sous-Massa-Draa
-    MA-14: 'Guelmim-Es Smara'
-    MA-15: 'Laâyoune-Boujdour-Sakia el Hamra'
-    MA-16: 'Oued ed Dahab-Lagouira'
-    MA-AGD: Agadir-Ida-Outanane
-    MA-AOU: Aousserd
-    MA-ASZ: Assa-Zag
+    MA-01: 'Tanger-Tétouan-Al Hoceïma'
+    MA-02: "L'Oriental"
+    MA-03: Fès-Meknès
+    MA-04: Rabat-Salé-Kénitra
+    MA-05: 'Béni Mellal-Khénifra'
+    MA-06: Casablanca-Settat
+    MA-07: Marrakech-Safi
+    MA-08: Drâa-Tafilalet
+    MA-09: Souss-Massa
+    MA-10: 'Guelmim-Oued Noun (EH-partial)'
+    MA-11: 'Laâyoune-Sakia El Hamra (EH-partial)'
+    MA-12: 'Dakhla-Oued Ed-Dahab (EH)'
+    MA-AGD: Agadir-Ida-Ou-Tanane
+    MA-AOU: 'Aousserd (EH)'
+    MA-ASZ: 'Assa-Zag (EH-partial)'
     MA-AZI: Azilal
-    MA-BEM: 'Beni Mellal'
+    MA-BEM: 'Béni Mellal'
     MA-BER: Berkane
-    MA-BES: 'Ben Slimane'
+    MA-BES: Benslimane
     MA-BOD: 'Boujdour (EH)'
     MA-BOM: Boulemane
-    MA-CAS: 'Casablanca [Dar el Beïda]'
+    MA-BRR: Berrechid
+    MA-CAS: Casablanca
     MA-CHE: Chefchaouen
     MA-CHI: Chichaoua
     MA-CHT: 'Chtouka-Ait Baha'
+    MA-DRI: Driouch
     MA-ERR: Errachidia
     MA-ESI: Essaouira
-    MA-ESM: 'Es Smara (EH)'
-    MA-FAH: 'Fahs-Beni Makada'
-    MA-FES: Fès-Dar-Dbibegh
+    MA-ESM: 'Es-Semara (EH-partial)'
+    MA-FAH: Fahs-Anjra
+    MA-FES: Fès
     MA-FIG: Figuig
+    MA-FQH: 'Fquih Ben Salah'
     MA-GUE: Guelmim
+    MA-GUF: Guercif
     MA-HAJ: 'El Hajeb'
     MA-HAO: 'Al Haouz'
     MA-HOC: 'Al Hoceïma'
     MA-IFR: Ifrane
     MA-INE: 'Inezgane-Ait Melloul'
     MA-JDI: 'El Jadida'
-    MA-JRA: Jrada
+    MA-JRA: Jerada
     MA-KEN: Kénitra
-    MA-KES: 'Kelaat es Sraghna'
-    MA-KHE: Khemisaet
-    MA-KHN: Khenifra
+    MA-KES: 'El Kelâa des Sraghna'
+    MA-KHE: Khémisset
+    MA-KHN: Khénifra
     MA-KHO: Khouribga
     MA-LAA: 'Laâyoune (EH)'
-    MA-LAP: Larache
+    MA-LAR: Larache
+    MA-MAR: Marrakech
+    MA-MDF: M’diq-Fnideq
     MA-MED: Médiouna
     MA-MEK: Meknès
-    MA-MMD: Marrakech-Medina
-    MA-MMN: Marrakech-Menara
+    MA-MID: Midelt
     MA-MOH: Mohammadia
     MA-MOU: 'Moulay Yacoub'
     MA-NAD: Nador
     MA-NOU: Nouaceur
     MA-OUA: Ouarzazate
-    MA-OUD: 'Oued ed Dahab (EH)'
+    MA-OUD: 'Oued Ed-Dahab (EH)'
     MA-OUJ: Oujda-Angad
+    MA-OUZ: Ouezzane
     MA-RAB: Rabat
+    MA-REH: Rehamna
     MA-SAF: Safi
     MA-SAL: Salé
     MA-SEF: Sefrou
     MA-SET: Settat
-    MA-SIK: 'Sidl Kacem'
+    MA-SIB: 'Sidi Bennour'
+    MA-SIF: 'Sidi Ifni'
+    MA-SIK: 'Sidi Kacem'
+    MA-SIL: 'Sidi Slimane'
     MA-SKH: Skhirate-Témara
-    MA-SYB: 'Sidi Youssef Ben Ali'
+    MA-TAF: 'Tarfaya (EH-partial)'
     MA-TAI: Taourirt
     MA-TAO: Taounate
-    MA-TAR: Taroudant
+    MA-TAR: Taroudannt
     MA-TAT: Tata
     MA-TAZ: Taza
     MA-TET: Tétouan
+    MA-TIN: Tinghir
     MA-TIZ: Tiznit
     MA-TNG: Tanger-Assilah
-    MA-TNT: Tan-Tan
+    MA-TNT: 'Tan-Tan (EH-partial)'
+    MA-YUS: Youssoufia
     MA-ZAG: Zagora
+    MC-CL: 'La Colle'
+    MC-CO: 'La Condamine'
+    MC-FO: Fontvieille
+    MC-GA: 'La Gare'
+    MC-JE: 'Jardin Exotique'
+    MC-LA: Larvotto
+    MC-MA: Malbousquet
+    MC-MC: Monte-Carlo
+    MC-MG: Moneghetti
+    MC-MO: Monaco-Ville
+    MC-MU: Moulins
+    MC-PH: Port-Hercule
+    MC-SD: Sainte-Dévote
+    MC-SO: 'La Source'
+    MC-SP: Spélugues
+    MC-SR: Saint-Roman
+    MC-VR: 'Vallon de la Rousse'
     MD-AN: 'Anenii Noi'
     MD-BA: Bălți
-    MD-BD: Tighina
+    MD-BD: 'Bender [Tighina]'
     MD-BR: Briceni
     MD-BS: Basarabeasca
     MD-CA: Cahul
@@ -2806,7 +3140,7 @@ region:
     MD-ED: Edineț
     MD-FA: Fălești
     MD-FL: Florești
-    MD-GA: 'Găgăuzia, Unitatea teritorială autonomă'
+    MD-GA: 'Găgăuzia, Unitatea teritorială autonomă (UTAG)'
     MD-GL: Glodeni
     MD-HI: Hîncești
     MD-IA: Ialoveni
@@ -2846,6 +3180,10 @@ region:
     ME-19: Tivat
     ME-20: Ulcinj
     ME-21: Žabljak
+    ME-22: Gusinje
+    ME-23: Petnjica
+    ME-24: Tuzi
+    ME-25: Zeta
     MG-A: Toamasina
     MG-D: Antsiranana
     MG-F: Fianarantsoa
@@ -2857,10 +3195,10 @@ region:
     MH-ARN: Arno
     MH-AUR: Aur
     MH-EBO: Ebon
-    MH-ENI: Enewetak
+    MH-ENI: 'Enewetak & Ujelang'
     MH-JAB: Jabat
     MH-JAL: Jaluit
-    MH-KIL: Kili
+    MH-KIL: 'Bikini & Kili'
     MH-KWA: Kwajalein
     MH-L: 'Ralik chain'
     MH-LAE: Lae
@@ -2875,94 +3213,91 @@ region:
     MH-RON: Rongelap
     MH-T: 'Ratak chain'
     MH-UJA: Ujae
-    MH-UTI: Utirik
+    MH-UTI: Utrik
+    MH-WTH: Wotho
     MH-WTJ: Wotje
-    MH-WTN: Wotho
-    MK-01: Aerodrom
-    MK-02: Aračinovo
-    MK-03: Berovo
-    MK-04: Bitola
-    MK-05: Bogdanci
-    MK-06: Bogovinje
-    MK-07: Bosilovo
-    MK-08: Brvenica
-    MK-09: Butel
-    MK-10: Valandovo
-    MK-11: Vasilevo
-    MK-12: Vevčani
-    MK-13: Veles
-    MK-14: Vinica
-    MK-15: Vraneštica
-    MK-16: Vrapčište
-    MK-17: 'Gazi Baba'
-    MK-18: Gevgelija
-    MK-19: Gostivar
-    MK-20: Gradsko
-    MK-21: Debar
-    MK-22: Debarca
-    MK-23: Delčevo
-    MK-24: 'Demir Kapija'
-    MK-25: 'Demir Hisar'
-    MK-26: Dojran
-    MK-27: Dolneni
-    MK-28: Drugovo
-    MK-29: 'Gjorče Petrov'
-    MK-30: Želino
-    MK-31: Zajas
-    MK-32: Zelenikovo
-    MK-33: Zrnovci
-    MK-34: Ilinden
-    MK-35: Jegunovce
-    MK-36: Kavadarci
-    MK-37: Karbinci
-    MK-38: Karpoš
-    MK-39: 'Kisela Voda'
-    MK-40: Kičevo
-    MK-41: Konče
-    MK-42: Kočani
-    MK-43: Kratovo
-    MK-44: 'Kriva Palanka'
-    MK-45: Krivogaštani
-    MK-46: Kruševo
-    MK-47: Kumanovo
-    MK-48: Lipkovo
-    MK-49: Lozovo
-    MK-50: Mavrovo-i-Rostuša
-    MK-51: 'Makedonska Kamenica'
-    MK-52: 'Makedonski Brod'
-    MK-53: Mogila
-    MK-54: Negotino
-    MK-55: Novaci
-    MK-56: 'Novo Selo'
-    MK-57: Oslomej
-    MK-58: Ohrid
-    MK-59: Petrovec
-    MK-60: Pehčevo
-    MK-61: Plasnica
-    MK-62: Prilep
-    MK-63: Probištip
-    MK-64: Radoviš
-    MK-65: Rankovce
-    MK-66: Resen
-    MK-67: Rosoman
-    MK-68: Saraj
-    MK-69: 'Sveti Nikole'
-    MK-70: Sopište
-    MK-71: 'Staro Nagoričane'
-    MK-72: Struga
-    MK-73: Strumica
-    MK-74: Studeničani
-    MK-75: Tearce
-    MK-76: Tetovo
-    MK-77: Centar
-    MK-78: 'Centar Župa'
-    MK-79: Čair
-    MK-80: Čaška
-    MK-81: Češinovo-Obleševo
-    MK-82: 'Čučer Sandevo'
-    MK-83: Štip
-    MK-84: 'Šuto Orizari'
+    MK-101: Veles
+    MK-102: Gradsko
+    MK-103: 'Demir Kapija'
+    MK-104: Kavadarci
+    MK-105: Lozovo
+    MK-106: Negotino
+    MK-107: Rosoman
+    MK-108: 'Sveti Nikole'
+    MK-109: Čaška
+    MK-201: Berovo
+    MK-202: Vinica
+    MK-203: Delčevo
+    MK-204: Zrnovci
+    MK-205: Karbinci
+    MK-206: Kočani
+    MK-207: 'Makedonska Kamenica'
+    MK-208: Pehčevo
+    MK-209: Probištip
+    MK-210: Češinovo-Obleševo
+    MK-211: Štip
+    MK-301: Vevčani
+    MK-303: Debar
+    MK-304: Debrca
+    MK-307: Kičevo
+    MK-308: 'Makedonski Brod'
+    MK-310: Ohrid
+    MK-311: Plasnica
+    MK-312: Struga
+    MK-313: 'Centar Župa'
+    MK-401: Bogdanci
+    MK-402: Bosilovo
+    MK-403: Valandovo
+    MK-404: Vasilevo
+    MK-405: Gevgelija
+    MK-406: Dojran
+    MK-407: Konče
+    MK-408: 'Novo Selo'
+    MK-409: Radoviš
+    MK-410: Strumica
+    MK-501: Bitola
+    MK-502: 'Demir Hisar'
+    MK-503: Dolneni
+    MK-504: Krivogaštani
+    MK-505: Kruševo
+    MK-506: Mogila
+    MK-507: Novaci
+    MK-508: Prilep
+    MK-509: Resen
+    MK-601: Bogovinje
+    MK-602: Brvenica
+    MK-603: Vrapčište
+    MK-604: Gostivar
+    MK-605: Želino
+    MK-606: Jegunovce
+    MK-607: 'Mavrovo i Rostuše'
+    MK-608: Tearce
+    MK-609: Tetovo
+    MK-701: Kratovo
+    MK-702: 'Kriva Palanka'
+    MK-703: Kumanovo
+    MK-704: Lipkovo
+    MK-705: Rankovce
+    MK-706: 'Staro Nagoričane'
+    MK-801: 'Aerodrom †'
+    MK-802: Aračinovo
+    MK-803: 'Butel †'
+    MK-804: 'Gazi Baba †'
+    MK-805: 'Gjorče Petrov †'
+    MK-806: Zelenikovo
+    MK-807: Ilinden
+    MK-808: 'Karpoš †'
+    MK-809: 'Kisela Voda †'
+    MK-810: Petrovec
+    MK-811: 'Saraj †'
+    MK-812: Sopište
+    MK-813: Studeničani
+    MK-814: 'Centar †'
+    MK-815: 'Čair †'
+    MK-816: Čučer-Sandevo
+    MK-817: 'Šuto Orizari †'
     ML-1: Kayes
+    ML-10: Taoudénit
     ML-2: Koulikoro
     ML-3: Sikasso
     ML-4: Ségou
@@ -2970,7 +3305,8 @@ region:
     ML-6: Tombouctou
     ML-7: Gao
     ML-8: Kidal
-    ML-BK0: Bamako
+    ML-9: Ménaka
+    ML-BKO: Bamako
     MM-01: Sagaing
     MM-02: Bago
     MM-03: Magway
@@ -2995,32 +3331,34 @@ region:
     MN-047: Töv
     MN-049: Selenge
     MN-051: Sühbaatar
-    MN-053: Ömnögovi
+    MN-053: Ömnögovĭ
     MN-055: Övörhangay
     MN-057: Dzavhan
-    MN-059: Dundgovi
+    MN-059: Dundgovĭ
     MN-061: Dornod
-    MN-063: Dornogovi
-    MN-064: Govi-Sumber
-    MN-065: Govi-Altay
+    MN-063: Dornogovĭ
+    MN-064: Govĭ-Sümber
+    MN-065: Govĭ-Altay
     MN-067: Bulgan
     MN-069: Bayanhongor
     MN-071: Bayan-Ölgiy
     MN-073: Arhangay
-    MN-1: Ulanbaatar
+    MN-1: Ulaanbaatar
     MR-01: 'Hodh ech Chargui'
-    MR-02: 'Hodh el Charbi'
+    MR-02: 'Hodh el Gharbi'
     MR-03: Assaba
     MR-04: Gorgol
     MR-05: Brakna
     MR-06: Trarza
     MR-07: Adrar
-    MR-08: 'Dakhlet Nouadhibou'
+    MR-08: 'Dakhlet Nouâdhibou'
     MR-09: Tagant
     MR-10: Guidimaka
     MR-11: 'Tiris Zemmour'
     MR-12: Inchiri
-    MR-NKC: Nouakchott
+    MR-13: 'Nouakchott Ouest'
+    MR-14: 'Nouakchott Nord'
+    MR-15: 'Nouakchott Sud'
     MT-01: Attard
     MT-02: Balzan
     MT-03: Birgu
@@ -3065,66 +3403,62 @@ region:
     MT-42: Qala
     MT-43: Qormi
     MT-44: Qrendi
-    MT-45: 'Rabat Għawdex'
+    MT-45: 'Rabat Gozo'
     MT-46: 'Rabat Malta'
     MT-47: Safi
-    MT-48: 'San Ġiljan'
-    MT-49: 'San Ġwann'
-    MT-50: 'San Lawrenz'
-    MT-51: 'San Pawl il-Baħar'
+    MT-48: "Saint Julian's"
+    MT-49: 'Saint John'
+    MT-50: 'Saint Lawrence'
+    MT-51: "Saint Paul's Bay"
     MT-52: Sannat
-    MT-53: 'Santa Luċija'
+    MT-53: "Saint Lucia's"
     MT-54: 'Santa Venera'
     MT-55: Siġġiewi
     MT-56: Sliema
     MT-57: Swieqi
-    MT-58: 'Ta’ Xbiex'
+    MT-58: "Ta' Xbiex"
     MT-59: Tarxien
     MT-60: Valletta
     MT-61: Xagħra
     MT-62: Xewkija
     MT-63: Xgħajra
     MT-64: Żabbar
-    MT-65: 'Żebbuġ Għawdex'
+    MT-65: 'Żebbuġ Gozo'
     MT-66: 'Żebbuġ Malta'
     MT-67: Żejtun
     MT-68: Żurrieq
     MU-AG: 'Agalega Islands'
     MU-BL: 'Black River'
-    MU-BR: 'Beau Bassin-Rose Hill'
     MU-CC: 'Cargados Carajos Shoals'
-    MU-CU: Curepipe
     MU-FL: Flacq
     MU-GP: 'Grand Port'
     MU-MO: Moka
     MU-PA: Pamplemousses
     MU-PL: 'Port Louis'
-    MU-PU: 'Port Louis'
     MU-PW: 'Plaines Wilhems'
-    MU-QB: 'Quatre Bornes'
     MU-RO: 'Rodrigues Island'
-    MU-RP: 'Rivière du Rempart'
+    MU-RR: 'Rivière du Rempart'
     MU-SA: Savanne
-    MU-VP: Vacoas-Phoenix
-    MV-01: Seenu
-    MV-02: Alif
-    MV-03: Lhaviyani
-    MV-04: Vaavu
-    MV-05: Laamu
-    MV-07: 'Haa Alif'
-    MV-08: Thaa
-    MV-12: Meemu
-    MV-13: Raa
-    MV-14: Faafu
-    MV-17: Dhaalu
-    MV-20: Baa
-    MV-23: 'Haa Dhaalu'
-    MV-24: Shaviyani
-    MV-25: Noonu
-    MV-26: Kaafu
-    MV-27: 'Gaafu Aliff'
-    MV-28: 'Gaafu Daalu'
-    MV-29: Gnaviyani
+    MV-00: 'South Ari Atoll'
+    MV-01: 'Addu City'
+    MV-02: 'North Ari Atoll'
+    MV-03: Faadhippolhu
+    MV-04: 'Felidhu Atoll'
+    MV-05: Hahdhunmathi
+    MV-07: 'North Thiladhunmathi'
+    MV-08: Kolhumadulu
+    MV-12: 'Mulaku Atoll'
+    MV-13: 'North Maalhosmadulu'
+    MV-14: 'North Nilandhe Atoll'
+    MV-17: 'South Nilandhe Atoll'
+    MV-20: 'South Maalhosmadulu'
+    MV-23: 'South Thiladhunmathi'
+    MV-24: 'North Miladhunmadulu'
+    MV-25: 'South Miladhunmadulu'
+    MV-26: 'Male Atoll'
+    MV-27: 'North Huvadhu Atoll'
+    MV-28: 'South Huvadhu Atoll'
+    MV-29: Fuvammulah
     MV-MLE: Male
     MW-BA: Balaka
     MW-BL: Blantyre
@@ -3163,16 +3497,16 @@ region:
     MX-CAM: Campeche
     MX-CHH: Chihuahua
     MX-CHP: Chiapas
-    MX-COA: Coahuila
+    MX-CMX: 'Ciudad de México'
+    MX-COA: 'Coahuila de Zaragoza'
     MX-COL: Colima
-    MX-DIF: 'Distrito Federal'
     MX-DUR: Durango
     MX-GRO: Guerrero
     MX-GUA: Guanajuato
     MX-HID: Hidalgo
     MX-JAL: Jalisco
     MX-MEX: México
-    MX-MIC: Michoacán
+    MX-MIC: 'Michoacán de Ocampo'
     MX-MOR: Morelos
     MX-NAY: Nayarit
     MX-NLE: 'Nuevo León'
@@ -3186,7 +3520,7 @@ region:
     MX-TAB: Tabasco
     MX-TAM: Tamaulipas
     MX-TLA: Tlaxcala
-    MX-VER: Veracruz
+    MX-VER: 'Veracruz de Ignacio de la Llave'
     MX-YUC: Yucatán
     MX-ZAC: Zacatecas
     MY-01: Johor
@@ -3210,21 +3544,22 @@ region:
     MZ-G: Gaza
     MZ-I: Inhambane
     MZ-L: Maputo
-    MZ-MPM: 'Maputo (city)'
-    MZ-N: Numpula
+    MZ-MPM: Maputo
+    MZ-N: Nampula
     MZ-P: 'Cabo Delgado'
-    MZ-Q: Zambezia
+    MZ-Q: Zambézia
     MZ-S: Sofala
     MZ-T: Tete
-    NA-CA: Caprivi
+    NA-CA: Zambezi
     NA-ER: Erongo
     NA-HA: Hardap
-    NA-KA: Karas
+    NA-KA: //Karas
+    NA-KE: 'Kavango East'
     NA-KH: Khomas
     NA-KU: Kunene
+    NA-KW: 'Kavango West'
     NA-OD: Otjozondjupa
     NA-OH: Omaheke
-    NA-OK: Okavango
     NA-ON: Oshana
     NA-OS: Omusati
     NA-OT: Oshikoto
@@ -3251,7 +3586,7 @@ region:
     NG-ED: Edo
     NG-EK: Ekiti
     NG-EN: Enugu
-    NG-FC: 'Abuja Capital Territory'
+    NG-FC: 'Abuja Federal Capital Territory'
     NG-GO: Gombe
     NG-IM: Imo
     NG-JI: Jigawa
@@ -3262,7 +3597,7 @@ region:
     NG-KT: Katsina
     NG-KW: Kwara
     NG-LA: Lagos
-    NG-NA: Nassarawa
+    NG-NA: Nasarawa
     NG-NI: Niger
     NG-OG: Ogun
     NG-ON: Ondo
@@ -3274,8 +3609,8 @@ region:
     NG-TA: Taraba
     NG-YO: Yobe
     NG-ZA: Zamfara
-    NI-AN: 'Atlántico Norte'
-    NI-AS: 'Atlántico Sur'
+    NI-AN: 'Costa Caribe Norte'
+    NI-AS: 'Costa Caribe Sur'
     NI-BO: Boaco
     NI-CA: Carazo
     NI-CI: Chinandega
@@ -3291,63 +3626,49 @@ region:
     NI-NS: 'Nueva Segovia'
     NI-RI: Rivas
     NI-SJ: 'Río San Juan'
+    NL-AW: Aruba
+    NL-BQ1: Bonaire
+    NL-BQ2: Saba
+    NL-BQ3: 'Sint Eustatius'
+    NL-CW: Curaçao
     NL-DR: Drenthe
     NL-FL: Flevoland
-    NL-FR: Friesland
+    NL-FR: Fryslân
     NL-GE: Gelderland
     NL-GR: Groningen
     NL-LI: Limburg
     NL-NB: Noord-Brabant
     NL-NH: Noord-Holland
     NL-OV: Overijssel
+    NL-SX: 'Sint Maarten'
     NL-UT: Utrecht
     NL-ZE: Zeeland
     NL-ZH: Zuid-Holland
-    NO-01: Østfold
-    NO-02: Akershus
     NO-03: Oslo
-    NO-04: Hedmark
-    NO-05: Oppland
-    NO-06: Buskerud
-    NO-07: Vestfold
-    NO-08: Telemark
-    NO-09: Aust-Agder
-    NO-10: Vest-Agder
     NO-11: Rogaland
-    NO-12: Hordaland
-    NO-14: 'Sogn og Fjordane'
     NO-15: 'Møre og Romsdal'
-    NO-16: Sør-Trøndelag
-    NO-17: Nord-Trøndelag
     NO-18: Nordland
-    NO-19: Troms
-    NO-20: Finnmark
-    NO-21: Svalbard
-    NO-22: 'Jan Mayen'
-    NP-1: Madhyamanchal
-    NP-2: 'Madhya Pashchimanchal'
-    NP-3: Pashchimanchal
-    NP-4: Purwanchal
-    NP-5: 'Sudur Pashchimanchal'
-    NP-BA: Bagmati
-    NP-BH: Bheri
-    NP-DH: Dhawalagiri
-    NP-GA: Gandaki
-    NP-JA: Janakpur
-    NP-KA: Karnali
-    NP-KO: Kosi
-    NP-LU: Lumbini
-    NP-MA: Mahakali
-    NP-ME: Mechi
-    NP-NA: Narayani
-    NP-RA: Rapti
-    NP-SA: Sagarmatha
-    NP-SE: Seti
+    NO-21: 'Svalbard (Arctic Region)'
+    NO-22: 'Jan Mayen (Arctic Region)'
+    NO-30: Viken
+    NO-34: Innlandet
+    NO-38: 'Vestfold og Telemark'
+    NO-42: Agder
+    NO-46: Vestland
+    NO-50: Trööndelage
+    NO-54: 'Romssa ja Finnmárkku'
+    NP-P1: Koshi
+    NP-P2: Madhesh
+    NP-P3: Bagmati
+    NP-P4: Gandaki
+    NP-P5: Lumbini
+    NP-P6: Karnali
+    NP-P7: Sudurpashchim
     NR-01: Aiwo
     NR-02: Anabar
     NR-03: Anetan
     NR-04: Anibare
-    NR-05: Baiti
+    NR-05: Baitsi
     NR-06: Boe
     NR-07: Buada
     NR-08: Denigomodu
@@ -3361,31 +3682,32 @@ region:
     NZ-BOP: 'Bay of Plenty'
     NZ-CAN: Canterbury
     NZ-CIT: 'Chatham Islands Territory'
-    NZ-GIS: 'Gisborne District'
-    NZ-HKB: 'Hawke''s Bay'
-    NZ-MBH: 'Marlborough District'
-    NZ-MWT: Manawatu-Wanganui
-    NZ-N: 'North Island'
-    NZ-NSN: 'Nelson City'
+    NZ-GIS: Gisborne
+    NZ-HKB: "Hawke's Bay"
+    NZ-MBH: Marlborough
+    NZ-MWT: Manawatū-Whanganui
+    NZ-NSN: Nelson
     NZ-NTL: Northland
     NZ-OTA: Otago
-    NZ-S: 'South Island'
     NZ-STL: Southland
-    NZ-TAS: 'Tasman District'
+    NZ-TAS: Tasman
     NZ-TKI: Taranaki
-    NZ-WGN: Wellington
+    NZ-WGN: 'Greater Wellington'
     NZ-WKO: Waikato
     NZ-WTC: 'West Coast'
-    OM-BA: 'Al Bāţinah'
+    OM-BJ: 'Janūb al Bāţinah'
+    OM-BS: 'Shamāl al Bāţinah'
     OM-BU: 'Al Buraymī'
-    OM-DA: 'Ad Dākhilīya'
+    OM-DA: 'Ad Dākhilīyah'
     OM-MA: Masqaţ
     OM-MU: Musandam
-    OM-SH: 'Ash Sharqīyah'
+    OM-SJ: 'Janūb ash Sharqīyah'
+    OM-SS: 'Shamāl ash Sharqīyah'
     OM-WU: 'Al Wusţá'
     OM-ZA: 'Az̧ Z̧āhirah'
     OM-ZU: Z̧ufār
     PA-1: 'Bocas del Toro'
+    PA-10: 'Panamá Oeste'
     PA-2: Coclé
     PA-3: Colón
     PA-4: Chiriquí
@@ -3395,31 +3717,32 @@ region:
     PA-8: Panamá
     PA-9: Veraguas
     PA-EM: Emberá
-    PA-KY: 'Kuna Yala'
-    PA-NB: Ngöbe-Buglé
-    PE-AMA: Amazonas
+    PA-KY: 'Guna Yala'
+    PA-NB: Ngäbe-Buglé
+    PA-NT: 'Naso Tjër Di'
+    PE-AMA: Amarumayu
     PE-ANC: Ancash
-    PE-APU: Apurímac
+    PE-APU: Apurimaq
     PE-ARE: Arequipa
     PE-AYA: Ayacucho
     PE-CAJ: Cajamarca
     PE-CAL: 'El Callao'
-    PE-CUS: 'Cusco [Cuzco]'
+    PE-CUS: Cusco
     PE-HUC: Huánuco
     PE-HUV: Huancavelica
     PE-ICA: Ica
-    PE-JUN: Junín
+    PE-JUN: Hunin
     PE-LAL: 'La Libertad'
     PE-LAM: Lambayeque
     PE-LIM: Lima
-    PE-LMA: 'Municipalidad Metropolitana de Lima'
+    PE-LMA: 'Lima hatun llaqta'
     PE-LOR: Loreto
     PE-MDD: 'Madre de Dios'
     PE-MOQ: Moquegua
     PE-PAS: Pasco
     PE-PIU: Piura
     PE-PUN: Puno
-    PE-SAM: 'San Martín'
+    PE-SAM: 'San Martin'
     PE-TAC: Tacna
     PE-TUM: Tumbes
     PE-UCA: Ucayali
@@ -3430,6 +3753,8 @@ region:
     PG-EPW: Enga
     PG-ESW: 'East Sepik'
     PG-GPK: Gulf
+    PG-HLA: Hela
+    PG-JWK: Jiwaka
     PG-MBA: 'Milne Bay'
     PG-MPL: Morobe
     PG-MPM: Madang
@@ -3437,8 +3762,8 @@ region:
     PG-NCD: 'National Capital District (Port Moresby)'
     PG-NIK: 'New Ireland'
     PG-NPP: Northern
-    PG-NSA: 'North Solomons'
-    PG-SAN: Sandaun
+    PG-NSB: Bougainville
+    PG-SAN: 'West Sepik'
     PG-SHM: 'Southern Highlands'
     PG-WBK: 'West New Britain'
     PG-WHM: 'Western Highlands'
@@ -3453,12 +3778,13 @@ region:
     PH-08: 'Eastern Visayas (Region VIII)'
     PH-09: 'Zamboanga Peninsula (Region IX)'
     PH-10: 'Northern Mindanao (Region X)'
+    PH-11: 'Davao (Region XI)'
     PH-12: 'Soccsksargen (Region XII)'
     PH-13: 'Caraga (Region XIII)'
     PH-14: 'Autonomous Region in Muslim Mindanao (ARMM)'
     PH-15: 'Cordillera Administrative Region (CAR)'
-    PH-40: 'CALABARZON (Region IV-A)'
-    PH-41: 'MIMAROPA (Region IV-B)'
+    PH-40: 'Calabarzon (Region IV-A)'
+    PH-41: 'Mimaropa (Region IV-B)'
     PH-ABR: Abra
     PH-AGN: 'Agusan del Norte'
     PH-AGS: 'Agusan del Sur'
@@ -3467,7 +3793,7 @@ region:
     PH-ANT: Antique
     PH-APA: Apayao
     PH-AUR: Aurora
-    PH-BAN: Batasn
+    PH-BAN: Bataan
     PH-BAS: Basilan
     PH-BEN: Benguet
     PH-BIL: Biliran
@@ -3484,11 +3810,12 @@ region:
     PH-CAT: Catanduanes
     PH-CAV: Cavite
     PH-CEB: Cebu
-    PH-COM: 'Compostela Valley'
+    PH-COM: 'Davao de Oro'
     PH-DAO: 'Davao Oriental'
     PH-DAS: 'Davao del Sur'
     PH-DAV: 'Davao del Norte'
     PH-DIN: 'Dinagat Islands'
+    PH-DVO: 'Davao Occidental'
     PH-EAS: 'Eastern Samar'
     PH-GUI: Guimaras
     PH-IFU: Ifugao
@@ -3496,22 +3823,23 @@ region:
     PH-ILN: 'Ilocos Norte'
     PH-ILS: 'Ilocos Sur'
     PH-ISA: Isabela
-    PH-KAL: Kalinga-Apayso
+    PH-KAL: Kalinga
     PH-LAG: Laguna
     PH-LAN: 'Lanao del Norte'
     PH-LAS: 'Lanao del Sur'
     PH-LEY: Leyte
     PH-LUN: 'La Union'
     PH-MAD: Marinduque
-    PH-MAG: Maguindanao
     PH-MAS: Masbate
     PH-MDC: 'Mindoro Occidental'
     PH-MDR: 'Mindoro Oriental'
+    PH-MGN: 'Maguindanao del Norte'
+    PH-MGS: 'Maguindanao del Sur'
     PH-MOU: 'Mountain Province'
     PH-MSC: 'Misamis Occidental'
     PH-MSR: 'Misamis Oriental'
-    PH-NCO: 'North Cotabato'
-    PH-NEC: 'Negroe Occidental'
+    PH-NCO: Cotabato
+    PH-NEC: 'Negros Occidental'
     PH-NER: 'Negros Oriental'
     PH-NSA: 'Northern Samar'
     PH-NUE: 'Nueva Ecija'
@@ -3534,35 +3862,50 @@ region:
     PH-SUR: 'Surigao del Sur'
     PH-TAR: Tarlac
     PH-TAW: Tawi-Tawi
-    PH-WSA: 'Western Samar'
+    PH-WSA: Samar
     PH-ZAN: 'Zamboanga del Norte'
     PH-ZAS: 'Zamboanga del Sur'
     PH-ZMB: Zambales
     PH-ZSI: 'Zamboanga Sibugay'
     PK-BA: Balochistan
+    PK-GB: Gilgit-Baltistan
     PK-IS: Islamabad
-    PK-JK: 'Azad Kashmir'
-    PK-NA: 'Northern Areas'
-    PK-NW: 'North-West Frontier'
+    PK-JK: 'Azad Jammu and Kashmir'
+    PK-KP: 'Khyber Pakhtunkhwa'
     PK-PB: Punjab
     PK-SD: Sindh
-    PK-TA: 'Federally Administered Tribal Areas'
-    PL-DS: Dolnośląskie
-    PL-KP: Kujawsko-pomorskie
-    PL-LB: Lubuskie
-    PL-LD: Łódzkie
-    PL-LU: Lubelskie
-    PL-MA: Małopolskie
-    PL-MZ: Mazowieckie
-    PL-OP: Opolskie
-    PL-PD: Podlaskie
-    PL-PK: Podkarpackie
-    PL-PM: Pomorskie
-    PL-SK: Świętokrzyskie
-    PL-SL: Śląskie
-    PL-WN: Warmińsko-mazurskie
-    PL-WP: Wielkopolskie
-    PL-ZP: Zachodniopomorskie
+    PL-02: Dolnośląskie
+    PL-04: Kujawsko-Pomorskie
+    PL-06: Lubelskie
+    PL-08: Lubuskie
+    PL-10: Łódzkie
+    PL-12: Małopolskie
+    PL-14: Mazowieckie
+    PL-16: Opolskie
+    PL-18: Podkarpackie
+    PL-20: Podlaskie
+    PL-22: Pomorskie
+    PL-24: Śląskie
+    PL-26: Świętokrzyskie
+    PL-28: Warmińsko-Mazurskie
+    PL-30: Wielkopolskie
+    PL-32: Zachodniopomorskie
+    PS-BTH: Bethlehem
+    PS-DEB: 'Deir El Balah'
+    PS-GZA: Gaza
+    PS-HBN: Hebron
+    PS-JEM: Jerusalem
+    PS-JEN: Jenin
+    PS-JRH: 'Jericho and Al Aghwar'
+    PS-KYS: 'Khan Yunis'
+    PS-NBS: Nablus
+    PS-NGZ: 'North Gaza'
+    PS-QQA: Qalqilya
+    PS-RBH: Ramallah
+    PS-RFH: Rafah
+    PS-SLT: Salfit
+    PS-TBS: Tubas
+    PS-TKM: Tulkarm
     PT-01: Aveiro
     PT-02: Beja
     PT-03: Braga
@@ -3586,7 +3929,7 @@ region:
     PW-002: Aimeliik
     PW-004: Airai
     PW-010: Angaur
-    PW-050: Hatobohei
+    PW-050: Hatohobei
     PW-100: Kayangel
     PW-150: Koror
     PW-212: Melekeok
@@ -3617,15 +3960,14 @@ region:
     PY-8: Misiones
     PY-9: Paraguarí
     PY-ASU: Asunción
-    QA-DA: 'Ad Dawhah'
-    QA-GH: 'Al Ghuwayriyah'
-    QA-JB: 'Jariyan al Batnah'
-    QA-JU: 'Al Jumayliyah'
-    QA-KH: 'Al Khawr'
-    QA-MS: 'Madinat ash Shamal'
-    QA-RA: 'Ar Rayyan'
-    QA-US: 'Umm Salal'
+    QA-DA: 'Ad Dawḩah'
+    QA-KH: 'Al Khawr wa adh Dhakhīrah'
+    QA-MS: 'Ash Shamāl'
+    QA-RA: 'Ar Rayyān'
+    QA-SH: 'Ash Shīḩānīyah'
+    QA-US: 'Umm Şalāl'
     QA-WA: 'Al Wakrah'
+    QA-ZA: 'Az̧ Z̧a‘āyin'
     RO-AB: Alba
     RO-AG: Argeș
     RO-AR: Arad
@@ -3700,113 +4042,113 @@ region:
     RS-29: 'Kosovsko-Pomoravski okrug'
     RS-KM: Kosovo-Metohija
     RS-VO: Vojvodina
-    RU-AD: 'Adygeya, Respublika'
-    RU-AL: 'Altay, Respublika'
-    RU-ALT: 'Altayskiy kray'
-    RU-AMU: 'Amurskaya oblast'''
-    RU-ARK: 'Arkhangel''skaya oblast'''
-    RU-AST: 'Astrakhanskaya oblast'''
+    RU-AD: 'Adygeja, Respublika'
+    RU-AL: 'Altaj, Respublika'
+    RU-ALT: 'Altajskij kraj'
+    RU-AMU: "Amurskaja oblast'"
+    RU-ARK: "Arhangel'skaja oblast'"
+    RU-AST: "Astrahanskaja oblast'"
     RU-BA: 'Bashkortostan, Respublika'
-    RU-BEL: 'Belgorodskaya oblast'''
-    RU-BRY: 'Bryanskaya oblast'''
-    RU-BU: 'Buryatiya, Respublika'
+    RU-BEL: "Belgorodskaja oblast'"
+    RU-BRY: "Brjanskaja oblast'"
+    RU-BU: 'Burjatija, Respublika'
     RU-CE: 'Chechenskaya Respublika'
-    RU-CHE: 'Chelyabinskaya oblast'''
+    RU-CHE: "Chelyabinskaya oblast'"
     RU-CHU: 'Chukotskiy avtonomnyy okrug'
     RU-CU: 'Chuvashskaya Respublika'
     RU-DA: 'Dagestan, Respublika'
-    RU-IN: 'Respublika Ingushetiya'
-    RU-IRK: 'Irkutiskaya oblast'''
-    RU-IVA: 'Ivanovskaya oblast'''
+    RU-IN: 'Ingushetiya, Respublika'
+    RU-IRK: "Irkutskaja oblast'"
+    RU-IVA: "Ivanovskaja oblast'"
     RU-KAM: 'Kamchatskiy kray'
-    RU-KB: 'Kabardino-Balkarskaya Respublika'
+    RU-KB: 'Kabardino-Balkarskaja Respublika'
     RU-KC: 'Karachayevo-Cherkesskaya Respublika'
-    RU-KDA: 'Krasnodarskiy kray'
-    RU-KEM: 'Kemerovskaya oblast'''
-    RU-KGD: 'Kaliningradskaya oblast'''
-    RU-KGN: 'Kurganskaya oblast'''
-    RU-KHA: 'Khabarovskiy kray'
-    RU-KHM: 'Khanty-Mansiysky avtonomnyy okrug-Yugra'
-    RU-KIR: 'Kirovskaya oblast'''
-    RU-KK: 'Khakasiya, Respublika'
-    RU-KL: 'Kalmykiya, Respublika'
-    RU-KLU: 'Kaluzhskaya oblast'''
+    RU-KDA: 'Krasnodarskij kraj'
+    RU-KEM: "Kemerovskaja oblast'"
+    RU-KGD: "Kaliningradskaja oblast'"
+    RU-KGN: "Kurganskaja oblast'"
+    RU-KHA: 'Habarovskij kraj'
+    RU-KHM: 'Hanty-Mansijskij avtonomnyj okrug'
+    RU-KIR: "Kirovskaja oblast'"
+    RU-KK: 'Hakasija, Respublika'
+    RU-KL: 'Kalmykija, Respublika'
+    RU-KLU: "Kaluzhskaya oblast'"
     RU-KO: 'Komi, Respublika'
-    RU-KOS: 'Kostromskaya oblast'''
-    RU-KR: 'Kareliya, Respublika'
-    RU-KRS: 'Kurskaya oblast'''
-    RU-KYA: 'Krasnoyarskiy kray'
-    RU-LEN: 'Leningradskaya oblast'''
-    RU-LIP: 'Lipetskaya oblast'''
-    RU-MAG: 'Magadanskaya oblast'''
-    RU-ME: 'Mariy El, Respublika'
-    RU-MO: 'Mordoviya, Respublika'
-    RU-MOS: 'Moskovskaya oblast'''
+    RU-KOS: "Kostromskaja oblast'"
+    RU-KR: 'Karelija, Respublika'
+    RU-KRS: "Kurskaja oblast'"
+    RU-KYA: 'Krasnojarskij kraj'
+    RU-LEN: "Leningradskaja oblast'"
+    RU-LIP: "Lipeckaja oblast'"
+    RU-MAG: "Magadanskaja oblast'"
+    RU-ME: 'Marij Èl, Respublika'
+    RU-MO: 'Mordovija, Respublika'
+    RU-MOS: "Moskovskaja oblast'"
     RU-MOW: Moskva
-    RU-MUR: 'Murmanskaya oblast'''
-    RU-NEN: 'Nenetskiy avtonomnyy okrug'
-    RU-NGR: 'Novgorodskaya oblast'''
-    RU-NIZ: 'Nizhegorodskaya oblast'''
-    RU-NVS: 'Novosibirskaya oblast'''
-    RU-OMS: 'Omskaya oblast'''
-    RU-ORE: 'Orenburgskaya oblast'''
-    RU-ORL: 'Orlovskaya oblast'''
-    RU-PER: 'Permskiy kray'
-    RU-PNZ: 'Penzenskaya oblast'''
-    RU-PRI: 'Primorskiy kray'
-    RU-PSK: 'Pskovskaya oblast'''
-    RU-ROS: 'Rostovskaya oblast'''
-    RU-RYA: 'Ryazanskaya oblast'''
-    RU-SA: 'Sakha, Respublika [Yakutiya]'
-    RU-SAK: 'Sakhalinskaya oblast'''
-    RU-SAM: 'Samaraskaya oblast'''
-    RU-SAR: 'Saratovskaya oblast'''
-    RU-SE: 'Severnaya Osetiya-Alaniya, Respublika'
-    RU-SMO: 'Smolenskaya oblast'''
+    RU-MUR: "Murmanskaja oblast'"
+    RU-NEN: 'Neneckij avtonomnyj okrug'
+    RU-NGR: "Novgorodskaja oblast'"
+    RU-NIZ: "Nizhegorodskaya oblast'"
+    RU-NVS: "Novosibirskaja oblast'"
+    RU-OMS: "Omskaja oblast'"
+    RU-ORE: "Orenburgskaja oblast'"
+    RU-ORL: "Orlovskaja oblast'"
+    RU-PER: 'Permskij kraj'
+    RU-PNZ: "Penzenskaja oblast'"
+    RU-PRI: 'Primorskij kraj'
+    RU-PSK: "Pskovskaja oblast'"
+    RU-ROS: "Rostovskaja oblast'"
+    RU-RYA: "Rjazanskaja oblast'"
+    RU-SA: 'Saha, Respublika'
+    RU-SAK: "Sahalinskaja oblast'"
+    RU-SAM: "Samarskaja oblast'"
+    RU-SAR: "Saratovskaja oblast'"
+    RU-SE: 'Severnaja Osetija, Respublika'
+    RU-SMO: "Smolenskaja oblast'"
     RU-SPE: Sankt-Peterburg
-    RU-STA: 'Stavropol''skiy kray'
-    RU-SVE: 'Sverdlovskaya oblast'''
+    RU-STA: "Stavropol'skij kraj"
+    RU-SVE: "Sverdlovskaja oblast'"
     RU-TA: 'Tatarstan, Respublika'
-    RU-TAM: 'Tambovskaya oblast'''
-    RU-TOM: 'Tomskaya oblast'''
-    RU-TUL: 'Tul''skaya oblast'''
-    RU-TVE: 'Tverskaya oblast'''
-    RU-TY: 'Tyva, Respublika [Tuva]'
-    RU-TYU: 'Tyumenskaya oblast'''
-    RU-UD: 'Udmurtskaya Respublika'
-    RU-ULY: 'Ul''yanovskaya oblast'''
-    RU-VGG: 'Volgogradskaya oblast'''
-    RU-VLA: 'Vladimirskaya oblast'''
-    RU-VLG: 'Vologodskaya oblast'''
-    RU-VOR: 'Voronezhskaya oblast'''
-    RU-YAN: 'Yamalo-Nenetskiy avtonomnyy okrug'
-    RU-YAR: 'Yaroslavskaya oblast'''
-    RU-YEV: 'Yevreyskaya avtonomnaya oblast'''
-    RU-ZAB: 'Zabajkal''skij kraj'
-    RW-01: 'Ville de Kigali'
-    RW-02: Est
-    RW-03: Nord
-    RW-04: Ouest
-    RW-05: Sud
-    SA-01: 'Ar Riyāḍ'
-    SA-02: Makkah
-    SA-03: 'Al Madīnah'
+    RU-TAM: "Tambovskaja oblast'"
+    RU-TOM: "Tomskaja oblast'"
+    RU-TUL: "Tul'skaja oblast'"
+    RU-TVE: "Tverskaja oblast'"
+    RU-TY: 'Tyva, Respublika'
+    RU-TYU: "Tjumenskaja oblast'"
+    RU-UD: 'Udmurtskaja Respublika'
+    RU-ULY: "Ul'janovskaja oblast'"
+    RU-VGG: "Volgogradskaja oblast'"
+    RU-VLA: "Vladimirskaja oblast'"
+    RU-VLG: "Vologodskaja oblast'"
+    RU-VOR: "Voronezhskaya oblast'"
+    RU-YAN: 'Jamalo-Neneckij avtonomnyj okrug'
+    RU-YAR: "Jaroslavskaja oblast'"
+    RU-YEV: "Evrejskaja avtonomnaja oblast'"
+    RU-ZAB: "Zabajkal'skij kraj"
+    RW-01: 'City of Kigali'
+    RW-02: Eastern
+    RW-03: Northern
+    RW-04: Western
+    RW-05: Southern
+    SA-01: 'Ar Riyāḑ'
+    SA-02: 'Makkah al Mukarramah'
+    SA-03: 'Al Madīnah al Munawwarah'
     SA-04: 'Ash Sharqīyah'
     SA-05: 'Al Qaşīm'
-    SA-06: 'Ḥā''il'
+    SA-06: "Ḩā'il"
     SA-07: Tabūk
-    SA-08: 'Al Ḥudūd ash Shamāliyah'
-    SA-09: Jīzan
+    SA-08: 'Al Ḩudūd ash Shamālīyah'
+    SA-09: Jāzān
     SA-10: Najrān
-    SA-11: 'Al Bāhah'
+    SA-11: 'Al Bāḩah'
     SA-12: 'Al Jawf'
-    SA-14: '`Asīr'
+    SA-14: "'Asīr"
     SB-CE: Central
     SB-CH: Choiseul
     SB-CT: 'Capital Territory (Honiara)'
     SB-GU: Guadalcanal
     SB-IS: Isabel
-    SB-MK: Makira
+    SB-MK: Makira-Ulawa
     SB-ML: Malaita
     SB-RB: 'Rennell and Bellona'
     SB-TE: Temotu
@@ -3814,7 +4156,7 @@ region:
     SC-01: 'Anse aux Pins'
     SC-02: 'Anse Boileau'
     SC-03: 'Anse Etoile'
-    SC-04: 'Anse Louis'
+    SC-04: 'Au Cap'
     SC-05: 'Anse Royale'
     SC-06: 'Baie Lazare'
     SC-07: 'Baie Sainte Anne'
@@ -3836,57 +4178,55 @@ region:
     SC-23: Takamaka
     SC-24: 'Les Mamelles'
     SC-25: 'Roche Caiman'
-    SD-01: 'Ash Shamālīyah'
-    SD-02: 'Shamāl Dārfūr'
-    SD-03: 'Al Kharţūm'
-    SD-04: 'An Nīl'
-    SD-05: Kassalā
-    SD-06: 'Al Qaḑārif'
-    SD-07: 'Al Jazīrah'
-    SD-08: 'An Nīl al Abyaḑ'
-    SD-09: 'Shamāl Kurdufān'
-    SD-11: 'Janūb Dārfūr'
-    SD-12: 'Gharb Dārfūr'
-    SD-13: 'Janūb Kurdufān'
-    SD-14: 'Gharb Baḩr al Ghazāl'
-    SD-15: 'Shamāl Baḩr al Ghazāl'
-    SD-16: 'Gharb al Istiwā''īyah'
-    SD-17: 'Baḩr al Jabal'
-    SD-18: 'Al Buḩayrāt'
-    SD-19: 'Sharq al Istiwā''īyah'
-    SD-20: Jūnqalī
-    SD-21: Wārāb
-    SD-22: 'Al Waḩdah'
-    SD-23: 'A‘ālī an Nīl'
-    SD-24: 'An Nīl al Azraq'
-    SD-25: Sinnār
-    SD-26: 'Al Baḩr al Aḩmar'
-    SE-AB: 'Stockholms län'
-    SE-AC: 'Västerbottens län'
-    SE-BD: 'Norrbottens län'
-    SE-C: 'Uppsala län'
-    SE-D: 'Södermanlands län'
-    SE-E: 'Östergötlands län'
-    SE-F: 'Jönköpings län'
-    SE-G: 'Kronobergs län'
-    SE-H: 'Kalmar län'
-    SE-I: 'Gotlands län'
-    SE-K: 'Blekinge län'
-    SE-M: 'Skåne län'
-    SE-N: 'Hallands län'
-    SE-Q: 'Västra Götalands län'
-    SE-S: 'Värmlands län'
-    SE-T: 'Örebro län'
-    SE-U: 'Västmanlands län'
-    SE-W: 'Dalarnas län'
-    SE-X: 'Gävleborgs län'
-    SE-Y: 'Västernorrlands län'
-    SE-Z: 'Jämtlande län'
+    SC-26: 'Ile Perseverance I'
+    SC-27: 'Ile Perseverance II'
+    SD-DC: 'Central Darfur'
+    SD-DE: 'East Darfur'
+    SD-DN: 'North Darfur'
+    SD-DS: 'South Darfur'
+    SD-DW: 'West Darfur'
+    SD-GD: Gedaref
+    SD-GK: 'West Kordofan'
+    SD-GZ: Gezira
+    SD-KA: Kassala
+    SD-KH: Khartoum
+    SD-KN: 'North Kordofan'
+    SD-KS: 'South Kordofan'
+    SD-NB: 'Blue Nile'
+    SD-NO: Northern
+    SD-NR: 'River Nile'
+    SD-NW: 'White Nile'
+    SD-RS: 'Red Sea'
+    SD-SI: Sennar
+    SE-AB: 'Stockholms län [SE-01]'
+    SE-AC: 'Västerbottens län [SE-24]'
+    SE-BD: 'Norrbottens län [SE-25]'
+    SE-C: 'Uppsala län [SE-03]'
+    SE-D: 'Södermanlands län [SE-04]'
+    SE-E: 'Östergötlands län [SE-05]'
+    SE-F: 'Jönköpings län [SE-06]'
+    SE-G: 'Kronobergs län [SE-07]'
+    SE-H: 'Kalmar län [SE-08]'
+    SE-I: 'Gotlands län [SE-09]'
+    SE-K: 'Blekinge län [SE-10]'
+    SE-M: 'Skåne län [SE-12]'
+    SE-N: 'Hallands län [SE-13]'
+    SE-O: 'Västra Götalands län [SE-14]'
+    SE-S: 'Värmlands län [SE-17]'
+    SE-T: 'Örebro län [SE-18]'
+    SE-U: 'Västmanlands län [SE-19]'
+    SE-W: 'Dalarnas län [SE-20]'
+    SE-X: 'Gävleborgs län [SE-21]'
+    SE-Y: 'Västernorrlands län [SE-22]'
+    SE-Z: 'Jämtlands län [SE-23]'
     SG-01: 'Central Singapore'
     SG-02: 'North East'
     SG-03: 'North West'
     SG-04: 'South East'
     SG-05: 'South West'
+    SH-AC: Ascension
+    SH-HL: 'Saint Helena'
+    SH-TA: 'Tristan da Cunha'
     SI-001: Ajdovščina
     SI-002: Beltinci
     SI-003: Bled
@@ -3926,17 +4266,17 @@ region:
     SI-037: Ig
     SI-038: 'Ilirska Bistrica'
     SI-039: 'Ivančna Gorica'
-    SI-040: Izola/Isola
+    SI-040: Izola
     SI-041: Jesenice
     SI-042: Juršinci
     SI-043: Kamnik
-    SI-044: Kanal
+    SI-044: 'Kanal ob Soči'
     SI-045: Kidričevo
     SI-046: Kobarid
     SI-047: Kobilje
     SI-048: Kočevje
     SI-049: Komen
-    SI-050: Koper/Capodistria
+    SI-050: Koper
     SI-051: Kozje
     SI-052: Kranj
     SI-053: 'Kranjska Gora'
@@ -3945,7 +4285,7 @@ region:
     SI-056: Kuzma
     SI-057: Laško
     SI-058: Lenart
-    SI-059: Lendava/Lendva
+    SI-059: Lendava
     SI-060: Litija
     SI-061: Ljubljana
     SI-062: Ljubno
@@ -3971,12 +4311,12 @@ region:
     SI-082: Naklo
     SI-083: Nazarje
     SI-084: 'Nova Gorica'
-    SI-085: 'Novo mesto'
+    SI-085: 'Novo Mesto'
     SI-086: Odranci
     SI-087: Ormož
     SI-088: Osilnica
     SI-089: Pesnica
-    SI-090: Piran/Pirano
+    SI-090: Piran
     SI-091: Pivka
     SI-092: Podčetrtek
     SI-093: Podvelka
@@ -4001,8 +4341,8 @@ region:
     SI-112: 'Slovenj Gradec'
     SI-113: 'Slovenska Bistrica'
     SI-114: 'Slovenske Konjice'
-    SI-115: Starče
-    SI-116: 'Sveti Jurij'
+    SI-115: Starše
+    SI-116: 'Sveti Jurij ob Ščavnici'
     SI-117: Šenčur
     SI-118: Šentilj
     SI-119: Šentjernej
@@ -4041,12 +4381,12 @@ region:
     SI-153: Cerkvenjak
     SI-154: Dobje
     SI-155: Dobrna
-    SI-156: Dobrovnik/Dobronak
+    SI-156: Dobrovnik
     SI-157: 'Dolenjske Toplice'
     SI-158: Grad
     SI-159: Hajdina
     SI-160: Hoče-Slivnica
-    SI-161: Hodoš/Hodos
+    SI-161: Hodoš
     SI-162: Horjul
     SI-163: Jezersko
     SI-164: Komenda
@@ -4067,10 +4407,10 @@ region:
     SI-179: Sodražica
     SI-180: Solčava
     SI-181: 'Sveta Ana'
-    SI-182: 'Sveta Andraž v Slovenskih Goricah'
+    SI-182: 'Sveti Andraž v Slovenskih goricah'
     SI-183: Šempeter-Vrtojba
     SI-184: Tabor
-    SI-185: 'Trnovska vas'
+    SI-185: 'Trnovska Vas'
     SI-186: Trzin
     SI-187: 'Velika Polana'
     SI-188: Veržej
@@ -4082,21 +4422,23 @@ region:
     SI-194: 'Šmartno pri Litiji'
     SI-195: Apače
     SI-196: Cirkulane
-    SI-197: 'Kosanjevica na Krki'
+    SI-197: 'Kostanjevica na Krki'
     SI-198: Makole
     SI-199: Mokronog-Trebelno
     SI-200: Poljčane
     SI-201: Renče-Vogrsko
     SI-202: 'Središče ob Dravi'
     SI-203: Straža
-    SI-204: 'Sveta Trojica v Slovenskih Goricah'
+    SI-204: 'Sveta Trojica v Slovenskih goricah'
     SI-205: 'Sveti Tomaž'
-    SI-206: 'Šmarjeske Topliče'
+    SI-206: 'Šmarješke Toplice'
     SI-207: Gorje
     SI-208: Log-Dragomer
     SI-209: 'Rečica ob Savinji'
-    SI-210: 'Sveti Jurij v Slovenskih Goricah'
+    SI-210: 'Sveti Jurij v Slovenskih goricah'
     SI-211: Šentrupert
+    SI-212: Mirna
+    SI-213: Ankaran
     SK-BC: 'Banskobystrický kraj'
     SK-BL: 'Bratislavský kraj'
     SK-KI: 'Košický kraj'
@@ -4107,7 +4449,8 @@ region:
     SK-ZI: 'Žilinský kraj'
     SL-E: Eastern
     SL-N: Northern
-    SL-S: 'Southern (Sierra Leone)'
+    SL-NW: 'North Western'
+    SL-S: Southern
     SL-W: 'Western Area (Freetown)'
     SM-01: Acquaviva
     SM-02: Chiesanuova
@@ -4115,7 +4458,7 @@ region:
     SM-04: Faetano
     SM-05: Fiorentino
     SM-06: 'Borgo Maggiore'
-    SM-07: 'San Marino'
+    SM-07: 'Città di San Marino'
     SM-08: Montegiardino
     SM-09: Serravalle
     SN-DB: Diourbel
@@ -4139,12 +4482,12 @@ region:
     SO-BY: Bay
     SO-GA: Galguduud
     SO-GE: Gedo
-    SO-HI: Hiirsan
+    SO-HI: Hiiraan
     SO-JD: 'Jubbada Dhexe'
     SO-JH: 'Jubbada Hoose'
     SO-MU: Mudug
     SO-NU: Nugaal
-    SO-SA: Saneag
+    SO-SA: Sanaag
     SO-SD: 'Shabeellaha Dhexe'
     SO-SH: 'Shabeellaha Hoose'
     SO-SO: Sool
@@ -4160,16 +4503,16 @@ region:
     SR-SA: Saramacca
     SR-SI: Sipaliwini
     SR-WA: Wanica
+    SS-BN: 'Northern Bahr el Ghazal'
+    SS-BW: 'Western Bahr el Ghazal'
     SS-EC: 'Central Equatoria'
     SS-EE: 'Eastern Equatoria'
+    SS-EW: 'Western Equatoria'
     SS-JG: Jonglei
     SS-LK: Lakes
-    SS-BN: 'Northern Bahr el Ghazal'
-    SS-UY: Unity
     SS-NU: 'Upper Nile'
+    SS-UY: Unity
     SS-WR: Warrap
-    SS-BW: 'Western Bahr el Ghazal'
-    SS-EW: 'Western Equatoria'
     ST-01: 'Água Grande'
     ST-02: Cantagalo
     ST-03: Caué
@@ -4192,51 +4535,52 @@ region:
     SV-UN: 'La Unión'
     SV-US: Usulután
     SY-DI: Dimashq
-    SY-DR: 'Dar''a'
+    SY-DR: "Dar'ā"
     SY-DY: 'Dayr az Zawr'
-    SY-HA: 'Al Hasakah'
-    SY-HI: Homs
-    SY-HL: Halab
-    SY-HM: Hamah
+    SY-HA: 'Al Ḩasakah'
+    SY-HI: Ḩimş
+    SY-HL: Ḩalab
+    SY-HM: Ḩamāh
     SY-ID: Idlib
-    SY-LA: 'Al Ladhiqiyah'
-    SY-QU: 'Al Qunaytirah'
+    SY-LA: 'Al Lādhiqīyah'
+    SY-QU: 'Al Qunayţirah'
     SY-RA: 'Ar Raqqah'
-    SY-RD: 'Rif Dimashq'
-    SY-SU: 'As Suwayda'''
-    SY-TA: Tartus
+    SY-RD: 'Rīf Dimashq'
+    SY-SU: "As Suwaydā'"
+    SY-TA: Ţarţūs
     SZ-HH: Hhohho
     SZ-LU: Lubombo
     SZ-MA: Manzini
     SZ-SH: Shiselweni
-    TD-BA: 'Al Baṭḩah'
-    TD-BG: 'Baḩr al Ghazāl'
-    TD-BO: Būrkū
-    TD-CB: 'Shārī Bāqirmī'
-    TD-EN: Innīdī
-    TD-GR: Qīrā
-    TD-HL: 'Ḥajjar Lamīs'
-    TD-KA: Kānim
-    TD-LC: 'Al Buḩayrah'
-    TD-LO: 'Lūqūn al Gharbī'
-    TD-LR: 'Lūqūn ash Sharqī'
-    TD-MA: Māndūl
-    TD-MC: 'Shārī al Awsaṭ'
-    TD-ME: 'Māyū Kībbī ash Sharqī'
-    TD-MO: 'Māyū Kībbī al Gharbī'
-    TD-ND: 'Madīnat Injamīnā'
-    TD-OD: Waddāy
-    TD-SA: Salāmāt
-    TD-SI: Sīlā
-    TD-TA: Tānjilī
-    TD-TI: Tibastī
-    TD-WF: 'Wādī Fīrā'
-    TG-C: 'Région du Centre'
-    TG-K: 'Région de la Kara'
-    TG-M: 'Région Maritime'
-    TG-P: 'Région des Plateaux'
-    TG-S: 'Région des Savannes'
-    TH-10: 'Krung Thep Maha Nakhon Bangkok'
+    TD-BA: Batha
+    TD-BG: 'Bahr el Ghazal'
+    TD-BO: Borkou
+    TD-CB: Chari-Baguirmi
+    TD-EE: Ennedi-Est
+    TD-EO: Ennedi-Ouest
+    TD-GR: Guéra
+    TD-HL: 'Hadjer Lamis'
+    TD-KA: Kanem
+    TD-LC: Lac
+    TD-LO: Logone-Occidental
+    TD-LR: Logone-Oriental
+    TD-MA: Mandoul
+    TD-MC: Moyen-Chari
+    TD-ME: Mayo-Kebbi-Est
+    TD-MO: Mayo-Kebbi-Ouest
+    TD-ND: 'Ville de Ndjamena'
+    TD-OD: Ouaddaï
+    TD-SA: Salamat
+    TD-SI: Sila
+    TD-TA: Tandjilé
+    TD-TI: Tibesti
+    TD-WF: 'Wadi Fira'
+    TG-C: Centrale
+    TG-K: Kara
+    TG-M: 'Maritime (Région)'
+    TG-P: Plateaux
+    TG-S: Savanes
+    TH-10: 'Krung Thep Maha Nakhon'
     TH-11: 'Samut Prakan'
     TH-12: Nonthaburi
     TH-13: 'Pathum Thani'
@@ -4262,6 +4606,7 @@ region:
     TH-35: Yasothon
     TH-36: Chaiyaphum
     TH-37: 'Amnat Charoen'
+    TH-38: 'Bueng Kan'
     TH-39: 'Nong Bua Lam Phu'
     TH-40: 'Khon Kaen'
     TH-41: 'Udon Thani'
@@ -4313,22 +4658,24 @@ region:
     TH-95: Yala
     TH-96: Narathiwat
     TH-S: Phatthaya
-    TJ-GB: Gorno-Badakhshan
+    TJ-DU: Dushanbe
+    TJ-GB: 'Kŭhistoni Badakhshon'
     TJ-KT: Khatlon
+    TJ-RA: 'nohiyahoi tobei jumhurí'
     TJ-SU: Sughd
     TL-AL: Aileu
     TL-AN: Ainaro
     TL-BA: Baucau
     TL-BO: Bobonaro
     TL-CO: 'Cova Lima'
-    TL-DI: Dili
+    TL-DI: Díli
     TL-ER: Ermera
-    TL-LA: Lautem
-    TL-LI: Liquiça
+    TL-LA: Lautein
+    TL-LI: Likisá
     TL-MF: Manufahi
     TL-MT: Manatuto
-    TL-OE: Oecussi
-    TL-VI: Viqueque
+    TL-OE: Oekusi-Ambenu
+    TL-VI: Vikeke
     TM-A: Ahal
     TM-B: Balkan
     TM-D: Daşoguz
@@ -4336,7 +4683,7 @@ region:
     TM-M: Mary
     TM-S: Aşgabat
     TN-11: Tunis
-    TN-12: 'L''Ariana'
+    TN-12: "L'Ariana"
     TN-13: 'Ben Arous'
     TN-14: 'La Manouba'
     TN-21: Nabeul
@@ -4355,18 +4702,18 @@ region:
     TN-61: Sfax
     TN-71: Gafsa
     TN-72: Tozeur
-    TN-73: Kebili
+    TN-73: Kébili
     TN-81: Gabès
-    TN-82: Medenine
+    TN-82: Médenine
     TN-83: Tataouine
-    TO-01: '''Eua'
-    TO-02: 'Ha''apai'
+    TO-01: "'Eua"
+    TO-02: "Ha'apai"
     TO-03: Niuas
     TO-04: Tongatapu
-    TO-05: 'Vava''u'
+    TO-05: "Vava'u"
     TR-01: Adana
     TR-02: Adıyaman
-    TR-03: Afyon
+    TR-03: Afyonkarahisar
     TR-04: Ağrı
     TR-05: Amasya
     TR-06: Ankara
@@ -4396,7 +4743,7 @@ region:
     TR-30: Hakkâri
     TR-31: Hatay
     TR-32: Isparta
-    TR-33: İçel
+    TR-33: Mersin
     TR-34: İstanbul
     TR-35: İzmir
     TR-36: Kars
@@ -4449,37 +4796,36 @@ region:
     TT-CHA: Chaguanas
     TT-CTT: Couva-Tabaquite-Talparo
     TT-DMN: 'Diego Martin'
-    TT-ETO: 'Eastern Tobago'
+    TT-MRC: 'Mayaro-Rio Claro'
     TT-PED: Penal-Debe
     TT-POS: 'Port of Spain'
     TT-PRT: 'Princes Town'
     TT-PTF: 'Point Fortin'
-    TT-RCM: 'Rio Claro-Mayaro'
     TT-SFO: 'San Fernando'
     TT-SGE: 'Sangre Grande'
     TT-SIP: Siparia
     TT-SJL: 'San Juan-Laventille'
+    TT-TOB: Tobago
     TT-TUP: Tunapuna-Piarco
-    TT-WTO: 'Western Tobago'
     TV-FUN: Funafuti
     TV-NIT: Niutao
-    TV-NIU: Nui
     TV-NKF: Nukufetau
     TV-NKL: Nukulaelae
     TV-NMA: Nanumea
-    TV-NMG: Nanumanga
+    TV-NMG: Nanumaga
+    TV-NUI: Nui
     TV-VAI: Vaitupu
     TW-CHA: Changhua
-    TW-CYI: 'Chiayi City'
+    TW-CYI: Chiayi
     TW-CYQ: Chiayi
     TW-HSQ: Hsinchu
-    TW-HSZ: 'Hsinchu City'
+    TW-HSZ: Hsinchu
     TW-HUA: Hualien
     TW-ILA: Yilan
-    TW-KEE: 'Keelung City'
+    TW-KEE: Keelung
+    TW-KHH: Kaohsiung
     TW-KIN: Kinmen
     TW-LIE: Lienchiang
-    TW-KHH: Kaohsiung
     TW-MIA: Miaoli
     TW-NAN: Nantou
     TW-NWT: 'New Taipei'
@@ -4492,24 +4838,24 @@ region:
     TW-TXG: Taichung
     TW-YUN: Yunlin
     TZ-01: Arusha
-    TZ-02: Dar-es-Salaam
+    TZ-02: 'Dar es Salaam'
     TZ-03: Dodoma
     TZ-04: Iringa
     TZ-05: Kagera
-    TZ-06: 'Kaskazini Pemba'
-    TZ-07: 'Kaskazini Unguja'
+    TZ-06: 'Pemba North'
+    TZ-07: 'Zanzibar North'
     TZ-08: Kigoma
     TZ-09: Kilimanjaro
-    TZ-10: 'Kusini Pemba'
-    TZ-11: 'Kusini Unguja'
+    TZ-10: 'Pemba South'
+    TZ-11: 'Zanzibar South'
     TZ-12: Lindi
     TZ-13: Mara
     TZ-14: Mbeya
-    TZ-15: 'Mjini Magharibi'
+    TZ-15: 'Zanzibar West'
     TZ-16: Morogoro
     TZ-17: Mtwara
     TZ-18: Mwanza
-    TZ-19: Pwani
+    TZ-19: Coast
     TZ-20: Rukwa
     TZ-21: Ruvuma
     TZ-22: Shinyanga
@@ -4517,33 +4863,38 @@ region:
     TZ-24: Tabora
     TZ-25: Tanga
     TZ-26: Manyara
-    UA-05: 'Vinnyts''ka Oblast'''
-    UA-07: 'Volyns''ka Oblast'''
-    UA-09: 'Luhans''ka Oblast'''
-    UA-12: 'Dnipropetrovs''ka Oblast'''
-    UA-14: 'Donets''ka Oblast'''
-    UA-18: 'Zhytomyrs''ka Oblast'''
-    UA-21: 'Zakarpats''ka Oblast'''
-    UA-23: 'Zaporiz''ka Oblast'''
-    UA-26: 'Ivano-Frankivs''ka Oblast'''
-    UA-30: 'Kyïvs''ka mis''ka rada'
-    UA-32: 'Kyïvs''ka Oblast'''
-    UA-35: 'Kirovohrads''ka Oblast'''
+    TZ-27: Geita
+    TZ-28: Katavi
+    TZ-29: Njombe
+    TZ-30: Simiyu
+    TZ-31: Songwe
+    UA-05: 'Vinnytska oblast'
+    UA-07: 'Volynska oblast'
+    UA-09: 'Luhanska oblast'
+    UA-12: 'Dnipropetrovska oblast'
+    UA-14: 'Donetska oblast'
+    UA-18: 'Zhytomyrska oblast'
+    UA-21: 'Zakarpatska oblast'
+    UA-23: 'Zaporizka oblast'
+    UA-26: 'Ivano-Frankivska oblast'
+    UA-30: Kyiv
+    UA-32: 'Kyivska oblast'
+    UA-35: 'Kirovohradska oblast'
     UA-40: Sevastopol
-    UA-43: 'Respublika Krym'
-    UA-46: 'L''vivs''ka Oblast'''
-    UA-48: 'Mykolaïvs''ka Oblast'''
-    UA-51: 'Odes''ka Oblast'''
-    UA-53: 'Poltavs''ka Oblast'''
-    UA-56: 'Rivnens''ka Oblast'''
-    UA-59: 'Sums ''ka Oblast'''
-    UA-61: 'Ternopil''s''ka Oblast'''
-    UA-63: 'Kharkivs''ka Oblast'''
-    UA-65: 'Khersons''ka Oblast'''
-    UA-68: 'Khmel''nyts''ka Oblast'''
-    UA-71: 'Cherkas''ka Oblast'''
-    UA-74: 'Chernihivs''ka Oblast'''
-    UA-77: 'Chernivets''ka Oblast'''
+    UA-43: 'Avtonomna Respublika Krym'
+    UA-46: 'Lvivska oblast'
+    UA-48: 'Mykolaivska oblast'
+    UA-51: 'Odeska oblast'
+    UA-53: 'Poltavska oblast'
+    UA-56: 'Rivnenska oblast'
+    UA-59: 'Sumska oblast'
+    UA-61: 'Ternopilska oblast'
+    UA-63: 'Kharkivska oblast'
+    UA-65: 'Khersonska oblast'
+    UA-68: 'Khmelnytska oblast'
+    UA-71: 'Cherkaska oblast'
+    UA-74: 'Chernihivska oblast'
+    UA-77: 'Chernivetska oblast'
     UG-101: Kalangala
     UG-102: Kampala
     UG-103: Kiboga
@@ -4557,9 +4908,19 @@ region:
     UG-111: Sembabule
     UG-112: Kayunga
     UG-113: Wakiso
-    UG-114: Mityana
-    UG-115: Nakaseke
-    UG-116: Lyantonde
+    UG-114: Lyantonde
+    UG-115: Mityana
+    UG-116: Nakaseke
+    UG-117: Buikwe
+    UG-118: Bukomansibi
+    UG-119: Butambala
+    UG-120: Buvuma
+    UG-121: Gomba
+    UG-122: Kalungu
+    UG-123: Kyankwanzi
+    UG-124: Lwengo
+    UG-125: Kyotera
+    UG-126: Kasanda
     UG-201: Bugiri
     UG-202: Busia
     UG-203: Iganga
@@ -4577,13 +4938,26 @@ region:
     UG-215: Sironko
     UG-216: Amuria
     UG-217: Budaka
-    UG-218: Bukwa
-    UG-219: Butaleja
-    UG-220: Kaliro
-    UG-221: Manafwa
-    UG-222: Namutumba
-    UG-223: Bududa
-    UG-224: Bukedea
+    UG-218: Bududa
+    UG-219: Bukedea
+    UG-220: Bukwo
+    UG-221: Butaleja
+    UG-222: Kaliro
+    UG-223: Manafwa
+    UG-224: Namutumba
+    UG-225: Bulambuli
+    UG-226: Buyende
+    UG-227: Kibuku
+    UG-228: Kween
+    UG-229: Luuka
+    UG-230: Namayingo
+    UG-231: Ngora
+    UG-232: Serere
+    UG-233: Butebo
+    UG-234: Namisindwa
+    UG-235: Bugweri
+    UG-236: Kapelebyong
+    UG-237: Kalaki
     UG-301: Adjumani
     UG-302: Apac
     UG-303: Arua
@@ -4597,14 +4971,30 @@ region:
     UG-311: Nakapiripirit
     UG-312: Pader
     UG-313: Yumbe
-    UG-314: Amolatar
-    UG-315: Kaabong
-    UG-316: Koboko
-    UG-317: Abim
-    UG-318: Dokolo
-    UG-319: Amuru
+    UG-314: Abim
+    UG-315: Amolatar
+    UG-316: Amuru
+    UG-317: Dokolo
+    UG-318: Kaabong
+    UG-319: Koboko
     UG-320: Maracha
     UG-321: Oyam
+    UG-322: Agago
+    UG-323: Alebtong
+    UG-324: Amudat
+    UG-325: Kole
+    UG-326: Lamwo
+    UG-327: Napak
+    UG-328: Nwoya
+    UG-329: Otuke
+    UG-330: Zombo
+    UG-331: Omoro
+    UG-332: Pakwach
+    UG-333: Kwania
+    UG-334: Nabilatuk
+    UG-335: Karenga
+    UG-336: Madi-Okollo
+    UG-337: Obongi
     UG-401: Bundibugyo
     UG-402: Bushenyi
     UG-403: Hoima
@@ -4620,10 +5010,26 @@ region:
     UG-413: Kamwenge
     UG-414: Kanungu
     UG-415: Kyenjojo
-    UG-416: Ibanda
-    UG-417: Isingiro
-    UG-418: Kiruhura
-    UG-419: Buliisa
+    UG-416: Buliisa
+    UG-417: Ibanda
+    UG-418: Isingiro
+    UG-419: Kiruhura
+    UG-420: Buhweju
+    UG-421: Kiryandongo
+    UG-422: Kyegegwa
+    UG-423: Mitooma
+    UG-424: Ntoroko
+    UG-425: Rubirizi
+    UG-426: Sheema
+    UG-427: Kagadi
+    UG-428: Kakumiro
+    UG-429: Rubanda
+    UG-430: Bunyangabu
+    UG-431: Rukiga
+    UG-432: Kikuube
+    UG-433: Kazo
+    UG-434: Kitagwenda
+    UG-435: Rwampara
     UG-C: Central
     UG-E: Eastern
     UG-N: Northern
@@ -4685,10 +5091,10 @@ region:
     US-SD: 'South Dakota'
     US-TN: Tennessee
     US-TX: Texas
-    US-UM: 'Minor Outlying Islands'
+    US-UM: 'United States Minor Outlying Islands'
     US-UT: Utah
     US-VA: Virginia
-    US-VI: 'Virgin Islands'
+    US-VI: 'Virgin Islands, U.S.'
     US-VT: Vermont
     US-WA: Washington
     US-WI: Wisconsin
@@ -4715,12 +5121,12 @@ region:
     UY-TT: 'Treinta y Tres'
     UZ-AN: Andijon
     UZ-BU: Buxoro
-    UZ-FA: 'Farg''ona'
+    UZ-FA: Farg‘ona
     UZ-JI: Jizzax
     UZ-NG: Namangan
     UZ-NW: Navoiy
     UZ-QA: Qashqadaryo
-    UZ-QR: 'Qoraqalpog''iston Respublikasi'
+    UZ-QR: 'Qoraqalpog‘iston Respublikasi'
     UZ-SA: Samarqand
     UZ-SI: Sirdaryo
     UZ-SU: Surxondaryo
@@ -4733,7 +5139,7 @@ region:
     VC-04: 'Saint George'
     VC-05: 'Saint Patrick'
     VC-06: Grenadines
-    VE-A: 'Distrito Federal'
+    VE-A: 'Distrito Capital'
     VE-B: Anzoátegui
     VE-C: Apure
     VE-D: Aragua
@@ -4755,7 +5161,7 @@ region:
     VE-U: Yaracuy
     VE-V: Zulia
     VE-W: 'Dependencias Federales'
-    VE-X: Vargas
+    VE-X: 'La Guaira'
     VE-Y: 'Delta Amacuro'
     VE-Z: Amazonas
     VN-01: 'Lai Châu'
@@ -4830,45 +5236,47 @@ region:
     WF-AL: Alo
     WF-SG: Sigave
     WF-UV: Uvea
-    WS-AA: 'A''ana'
+    WS-AA: "A'ana"
     WS-AL: Aiga-i-le-Tai
     WS-AT: Atua
-    WS-FA: 'Fa''asaleleaga'
-    WS-GE: 'Gaga''emauga'
+    WS-FA: "Fa'asaleleaga"
+    WS-GE: "Gaga'emauga"
     WS-GI: Gagaifomauga
     WS-PA: Palauli
-    WS-SA: 'Satupa''itea'
+    WS-SA: "Satupa'itea"
     WS-TU: Tuamasaga
-    WS-VF: 'Va''a-o-Fonoti'
+    WS-VF: "Va'a-o-Fonoti"
     WS-VS: Vaisigano
-    YE-AB: Abyān
-    YE-AD: '''Adan'
-    YE-AM: '''Amrān'
-    YE-BA: 'Al Bayḑā'''
-    YE-DA: 'Aḑ Ḑāli‘'
+    YE-AB: Abyan
+    YE-AD: ‘Adan
+    YE-AM: ‘Amrān
+    YE-BA: 'Al Bayḑā’'
+    YE-DA: 'Aḑ Ḑāli‘'
     YE-DH: Dhamār
     YE-HD: Ḩaḑramawt
     YE-HJ: Ḩajjah
+    YE-HU: 'Al Ḩudaydah'
     YE-IB: Ibb
     YE-JA: 'Al Jawf'
     YE-LA: Laḩij
-    YE-MA: 'Ma''rib'
+    YE-MA: Ma’rib
     YE-MR: 'Al Mahrah'
-    YE-MU: 'Al Ḩudaydah'
     YE-MW: 'Al Maḩwīt'
     YE-RA: Raymah
-    YE-SD: 'Şa''dah'
+    YE-SA: 'Amānat al ‘Āşimah [city]'
+    YE-SD: Şāʻdah
     YE-SH: Shabwah
-    YE-SN: 'Şan''ā'''
-    YE-TA: 'Tā''izz'
+    YE-SN: Şanʻā’
+    YE-SU: 'Arkhabīl Suquţrá'
+    YE-TA: Tāʻizz
     ZA-EC: 'Eastern Cape'
     ZA-FS: 'Free State'
-    ZA-GT: Gauteng
+    ZA-GP: Gauteng
+    ZA-KZN: Kwazulu-Natal
     ZA-LP: Limpopo
     ZA-MP: Mpumalanga
     ZA-NC: 'Northern Cape'
-    ZA-NL: Kwazulu-Natal
-    ZA-NW: 'North-West (South Africa)'
+    ZA-NW: North-West
     ZA-WC: 'Western Cape'
     ZM-01: Western
     ZM-02: Central
@@ -4876,9 +5284,10 @@ region:
     ZM-04: Luapula
     ZM-05: Northern
     ZM-06: North-Western
-    ZM-07: 'Southern (Zambia)'
+    ZM-07: Southern
     ZM-08: Copperbelt
     ZM-09: Lusaka
+    ZM-10: Muchinga
     ZW-BU: Bulawayo
     ZW-HA: Harare
     ZW-MA: Manicaland

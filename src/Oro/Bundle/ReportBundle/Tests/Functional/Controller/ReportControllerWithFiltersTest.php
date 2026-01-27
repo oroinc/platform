@@ -109,7 +109,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
             'expected' => ['Note1']
         ];
 
-        yield 'Date between with Atlantic/Cape Verde timezone' => [
+        yield 'Date between with Atlantic/Cabo Verde timezone' => [
             'timezone' => 'Atlantic/Cape_Verde', // (UTC -01:00)
             'definition' => $this->buildFilter(AbstractDateFilterType::TYPE_BETWEEN, '-3 minutes'),
             'actual' => $this->buildEntities(['Note1' => ['+58 minutes'], 'Note2' => ['+56 minutes']]),
@@ -226,7 +226,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
             'expected' => ['Note2', 'Note3'],
         ];
 
-        yield 'Date not between with Atlantic/Cape Verde timezone' => [
+        yield 'Date not between with Atlantic/Cabo Verde timezone' => [
             'timezone' => 'Atlantic/Cape_Verde', // (UTC -01:00)
             'definition' => $this->buildFilter(AbstractDateFilterType::TYPE_NOT_BETWEEN, '-3 minutes'),
             'actual' => $this->buildEntities(['Note1' => ['+58 minutes'], 'Note2' => ['+56 minutes']]),
@@ -240,7 +240,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
             'expected' => ['Note1']
         ];
 
-        yield 'Date later than with Atlantic/Cape Verde timezone' => [
+        yield 'Date later than with Atlantic/Cabo Verde timezone' => [
             'timezone' => 'Atlantic/Cape_Verde', // (UTC -01:00)
             'definition' => $this->buildFilter(AbstractDateFilterType::TYPE_MORE_THAN),
             'actual' => $this->buildEntities(['Note1' => ['+1 hour +5 minutes'], 'Note2' => ['+55 minutes']]),
@@ -254,7 +254,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
             'expected' => ['Note1']
         ];
 
-        yield 'Date earlier than with Atlantic/Cape Verde timezone' => [
+        yield 'Date earlier than with Atlantic/Cabo Verde timezone' => [
             'timezone' => 'Atlantic/Cape_Verde', // (UTC -01:00)
             'definition' => $this->buildFilter(AbstractDateFilterType::TYPE_LESS_THAN),
             'actual' => $this->buildEntities(['Note1' => ['+59 minutes'], 'Note2' => ['+1 hour +1 minutes']]),
@@ -268,7 +268,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
             'expected' => ['Note1']
         ];
 
-        yield 'Date equals with Atlantic/Cape Verde timezone' => [
+        yield 'Date equals with Atlantic/Cabo Verde timezone' => [
             'timezone' => 'Atlantic/Cape_Verde', // (UTC -01:00)
             'definition' => $this->buildFilter(AbstractDateFilterType::TYPE_EQUAL),
             'actual' => $this->buildEntities(['Note1' => ['-1 hour'], 'Note2' => [], 'Note3' => ['+1 hour']]),
@@ -282,7 +282,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
             'expected' => ['Note2', 'Note3']
         ];
 
-        yield 'Date not equals with Atlantic/Cape Verde timezone' => [
+        yield 'Date not equals with Atlantic/Cabo Verde timezone' => [
             'timezone' => 'Atlantic/Cape_Verde', // (UTC -01:00)
             'definition' => $this->buildFilter(AbstractDateFilterType::TYPE_NOT_EQUAL),
             'actual' => $this->buildEntities(['Note1' => [], 'Note2' => ['+1 hour'], 'Note3' => ['-1 hour']]),
