@@ -134,7 +134,12 @@ define(function(require) {
             const state = {};
             _.each(this.filters, function(filter, name) {
                 const shortName = '__' + name;
-                if (_.has(this.collection.initialState.filters, name) && !filter.isEmptyValue()) {
+                // Check if filter has a non-empty default value in initialState
+                // If so, always pass current value to allow overriding the default
+                const initialValue = this.collection.initialState.filters[name];
+                const hasDefaultValue = initialValue !== undefined &&
+                    !tools.isEqualsLoosely(initialValue, filter.emptyValue);
+                if (hasDefaultValue) {
                     state[name] = filter.getValue();
                 } else if (filter.renderable) {
                     if (!filter.isEmptyValue()) {

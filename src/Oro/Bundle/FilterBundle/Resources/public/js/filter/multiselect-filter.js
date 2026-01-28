@@ -113,7 +113,8 @@ define(function(require) {
          */
         _normalizeValue: function(value) {
             // means that all checkboxes are unchecked
-            if (value.value === null || value.value === undefined) {
+            if (value.value === null || value.value === undefined ||
+                (Array.isArray(value.value) && value.value.length === 0)) {
                 value.value = [FILTER_EMPTY_VALUE];
                 return value;
             }
