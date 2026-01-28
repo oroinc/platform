@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException;
@@ -21,6 +22,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CleanupAsyncOperationsCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
+    private const OPERATINON_DELETE_CHUNK_SIZE = 100;
+
     /** @var string */
     protected static $defaultName = 'oro:cron:api:async_operations:cleanup';
 
@@ -127,6 +130,8 @@ HELP
             }
         }
 
+        $this->removeOutdatedAsyncOperationsData($minDate);
+
         $output->writeln('<info>The deletion complete.</info>');
 
         return Command::SUCCESS;
@@ -142,5 +147,25 @@ HELP
                 'datetime' => $minDate,
                 'operation_timeout' => $operationTimeout
             ]);
+    }
+
+    private function removeOutdatedAsyncOperationsData(\DateTime $minDate): void
+    {
+        $connection = $this->doctrineHelper->getManager()->getConnection();
+
+        do {
+            $subQuery = $connection->createQueryBuilder()
+                ->select('ad.name')
+                ->from('oro_api_async_data', 'ad')
+                ->where('ad.updated_at <= :minDate')
+                ->setMaxResults(self::OPERATINON_DELETE_CHUNK_SIZE);
+
+            $deleteQb = $connection->createQueryBuilder();
+            $deleted = $deleteQb
+                ->delete('oro_api_async_data')
+                ->where($deleteQb->expr()->in('name', $subQuery->getSQL()))
+                ->setParameter('minDate', $minDate->getTimestamp(), ParameterType::INTEGER)
+                ->execute();
+        } while ($deleted > 0);
     }
 }
