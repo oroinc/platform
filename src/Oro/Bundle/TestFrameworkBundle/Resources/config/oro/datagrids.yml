@@ -18,6 +18,33 @@ datagrids:
             stringValue:
                 label: stringValue
 
+    items-grid-with-default-filter:
+        source:
+            type: orm
+            query:
+                select:
+                    - item.id
+                    - item.stringValue
+                    - item.booleanValue
+                from:
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\Item, alias: item }
+        columns:
+            id:
+                label: id
+            stringValue:
+                label: stringValue
+            booleanValue:
+                label: booleanValue
+                frontend_type: boolean
+        filters:
+            default:
+                booleanValue:
+                    value: Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType::TYPE_YES
+            columns:
+                booleanValue:
+                    type: boolean
+                    data_name: item.booleanValue
+
     items-values-grid:
         source:
             hints:
