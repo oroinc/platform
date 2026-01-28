@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Command\CleanupAsyncOperationsCommand;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
+use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadExpiredAsyncData;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadOperationFilesData;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -131,5 +132,29 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
         foreach ($notOutdatedOperationIds as $id) {
             self::assertNotNull($em->find(AsyncOperation::class, $id));
         }
+    }
+
+    public function testProcessOperationsCleanupAsyncData(): void
+    {
+        $this->loadFixtures([LoadExpiredAsyncData::class]);
+
+        $data = $this->getAllAsyncData();
+        self::assertCount(102, $data);
+
+        self::runCommand('oro:cron:api:async_operations:cleanup');
+
+        $data = $this->getAllAsyncData();
+        self::assertCount(1, $data);
+        self::assertEquals(LoadExpiredAsyncData::RECENT_RECORD_NAME, reset($data)['name']);
+    }
+
+    private function getAllAsyncData(): array
+    {
+        return self::getContainer()->get('doctrine')->getConnection()
+            ->createQueryBuilder()
+            ->select('*')
+            ->from('oro_api_async_data')
+            ->execute()
+            ->fetchAllAssociative();
     }
 }
