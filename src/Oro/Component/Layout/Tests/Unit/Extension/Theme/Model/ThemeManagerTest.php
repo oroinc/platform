@@ -679,4 +679,54 @@ final class ThemeManagerTest extends TestCase
 
         self::assertSame([], $manager->getThemeOption('default', 'fonts'));
     }
+
+    public function testResetClearsInMemoryStateButNotCache(): void
+    {
+        $themeMock = $this->createMock(Theme::class);
+
+        $this->factory->expects(self::exactly(2))
+            ->method('create')
+            ->with('base', ['label' => 'Oro Base theme'])
+            ->willReturn($themeMock);
+
+        $manager = $this->createManager(['base' => ['label' => 'Oro Base theme']]);
+
+        // First call - creates and caches the theme instance
+        $manager->getTheme('base');
+
+        // Cache should NOT be cleared during reset
+        $this->cache->expects(self::never())
+            ->method('clear');
+
+        // Reset the manager
+        $manager->reset();
+
+        // Second call after reset - should create the theme again
+        // because in-memory instances were cleared
+        $manager->getTheme('base');
+    }
+
+    public function testResetClearsThemeNamesCache(): void
+    {
+        $themeMock = $this->createMock(Theme::class);
+
+        $this->factory->expects(self::any())
+            ->method('create')
+            ->willReturn($themeMock);
+
+        $manager = $this->createManager(['base' => [], 'custom' => []]);
+
+        // Load themes into memory
+        $manager->getAllThemes();
+
+        // Cache should NOT be cleared during reset
+        $this->cache->expects(self::never())
+            ->method('clear');
+
+        // Reset the manager
+        $manager->reset();
+
+        // Verify the manager still works after reset
+        self::assertSame(['base', 'custom'], $manager->getThemeNames());
+    }
 }
