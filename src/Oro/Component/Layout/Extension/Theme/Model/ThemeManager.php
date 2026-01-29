@@ -284,7 +284,6 @@ class ThemeManager implements ResetInterface
     {
         $this->instances = [];
         $this->themes = [];
-        $this->cache->clear();
     }
 
     private function getHierarchyThemeOption(string $themeName, string $optionName, bool $isConfig = false): mixed
