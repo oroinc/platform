@@ -14,7 +14,6 @@ class DateTimeFilter implements Filter
     public function apply($object, $property, $objectCopier): void
     {
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($object, new \DateTime('now', new \DateTimeZone('UTC')));
     }
 }

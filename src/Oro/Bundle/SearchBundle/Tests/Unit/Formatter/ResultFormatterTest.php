@@ -49,7 +49,6 @@ class ResultFormatterTest extends TestCase
             Product::class,
             'id'
         );
-        $reflectionProperty->setAccessible(true);
         $productMetadata->reflFields['id'] = $reflectionProperty;
 
         // create category stubs
@@ -71,7 +70,6 @@ class ResultFormatterTest extends TestCase
             Category::class,
             'id'
         );
-        $reflectionProperty->setAccessible(true);
         $categoryMetadata->reflFields['id'] = $reflectionProperty;
 
         $this->doctrineHelper->expects($this->any())

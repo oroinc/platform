@@ -207,7 +207,6 @@ class LayoutDataCollector extends DataCollector
         $contextHash = $context->getHash();
         $class = new \ReflectionClass(LayoutContext::class);
         $property = $class->getProperty('items');
-        $property->setAccessible(true);
 
         $items = $property->getValue($context);
         foreach ($items as $key => $value) {
@@ -227,7 +226,6 @@ class LayoutDataCollector extends DataCollector
         $contextHash = $context->getHash();
         $class = new \ReflectionClass(ContextDataCollection::class);
         $property = $class->getProperty('items');
-        $property->setAccessible(true);
 
         foreach ($property->getValue($context->data()) as $key => $value) {
             if (is_object($value)) {

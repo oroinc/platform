@@ -48,7 +48,6 @@ class PropertyMetadata extends MemberMetadata
         } else {
             $member = ReflectionVirtualProperty::create($this->getName());
         }
-        $member->setAccessible(true);
 
         return $member;
     }

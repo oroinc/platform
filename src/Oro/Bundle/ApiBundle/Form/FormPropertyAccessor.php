@@ -82,9 +82,6 @@ class FormPropertyAccessor implements PropertyAccessorInterface
         }
 
         $property = $refl->getProperty($propertyName);
-        if (!$property->isPublic()) {
-            $property->setAccessible(true);
-        }
         $property->setValue($object, $value);
 
         return true;

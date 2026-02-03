@@ -281,7 +281,6 @@ class QueryModifier
                 \get_class($join)
             ));
         }
-        $joinTypeProperty->setAccessible(true);
         $joinTypeProperty->setValue($join, Expr\Join::INNER_JOIN);
     }
 }

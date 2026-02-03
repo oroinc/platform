@@ -66,7 +66,6 @@ class OptionsResolver implements Options
                 $reflClass->name
             ));
         }
-        $defaultsProperty->setAccessible(true);
 
         return $defaultsProperty->getValue($this->optionsResolver);
     }

@@ -116,7 +116,6 @@ class RootAclWrapper
         if (!empty($rootAces)) {
             $entryReflection = new \ReflectionClass(FieldEntry::class);
             $fieldProperty = $entryReflection->getProperty('field');
-            $fieldProperty->setAccessible(true);
 
             /** @var FieldEntry $rootAce */
             foreach ($rootAces as $rootAce) {

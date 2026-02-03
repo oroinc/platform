@@ -217,9 +217,6 @@ class EntityIdHelper
                         $fieldName
                     ));
                 }
-                if (!$property->isPublic()) {
-                    $property->setAccessible(true);
-                }
                 $identifier[$fieldName] = $property->getValue($entity);
             }
         }
@@ -319,9 +316,6 @@ class EntityIdHelper
                 ));
             }
 
-            if (!$property->isPublic()) {
-                $property->setAccessible(true);
-            }
             $property->setValue($entity, $value);
         }
     }

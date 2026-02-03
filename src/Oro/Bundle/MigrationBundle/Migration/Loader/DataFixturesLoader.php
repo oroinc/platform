@@ -77,7 +77,6 @@ class DataFixturesLoader extends Loader
     {
         if (!$this->ref) {
             $this->ref = new \ReflectionProperty(Loader::class, 'fixtures');
-            $this->ref->setAccessible(true);
         }
 
         return $this->ref->getValue($this);

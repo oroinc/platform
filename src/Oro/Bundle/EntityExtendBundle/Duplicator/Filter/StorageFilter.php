@@ -22,7 +22,6 @@ class StorageFilter implements Filter
         }
 
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);
-        $reflectionProperty->setAccessible(true);
 
         $oldStorage = $reflectionProperty->getValue($object);
 

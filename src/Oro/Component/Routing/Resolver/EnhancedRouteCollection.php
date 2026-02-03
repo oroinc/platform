@@ -127,7 +127,6 @@ class EnhancedRouteCollection extends RouteCollection
         // to insert a route at the specified position except to use the reflection
         $r = new \ReflectionClass(RouteCollection::class);
         $p = $r->getProperty('routes');
-        $p->setAccessible(true);
         $p->setValue($this, $routes);
     }
 }

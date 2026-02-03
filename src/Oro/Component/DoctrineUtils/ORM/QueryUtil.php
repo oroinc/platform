@@ -182,7 +182,6 @@ class QueryUtil
                 \get_class($query)
             ));
         }
-        $resultSetMappingProperty->setAccessible(true);
         $resultSetMappingProperty->setValue($query, null);
     }
 

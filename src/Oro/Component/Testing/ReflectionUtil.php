@@ -24,7 +24,6 @@ class ReflectionUtil
     public static function setPropertyValue(object $object, string $propertyName, mixed $propertyValue): void
     {
         $property = self::getProperty(new EntityReflectionClass($object), $propertyName);
-        $property->setAccessible(true);
         $property->setValue($object, $propertyValue);
     }
 
@@ -34,7 +33,6 @@ class ReflectionUtil
     public static function getPropertyValue(object $object, string $propertyName): mixed
     {
         $property = self::getProperty(new EntityReflectionClass($object), $propertyName);
-        $property->setAccessible(true);
 
         return $property->getValue($object);
     }
@@ -54,7 +52,6 @@ class ReflectionUtil
                 $reflClass->getName()
             ), $e->getCode(), $e);
         }
-        $method->setAccessible(true);
 
         return $method->invokeArgs($object, $args);
     }

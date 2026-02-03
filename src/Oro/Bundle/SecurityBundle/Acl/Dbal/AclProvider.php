@@ -463,15 +463,10 @@ class AclProvider implements AclProviderInterface
         // we need these to set protected properties on hydrated objects
         $aclReflection = new \ReflectionClass(Acl::class);
         $aclClassAcesProperty = $aclReflection->getProperty('classAces');
-        $aclClassAcesProperty->setAccessible(true);
         $aclClassFieldAcesProperty = $aclReflection->getProperty('classFieldAces');
-        $aclClassFieldAcesProperty->setAccessible(true);
         $aclObjectAcesProperty = $aclReflection->getProperty('objectAces');
-        $aclObjectAcesProperty->setAccessible(true);
         $aclObjectFieldAcesProperty = $aclReflection->getProperty('objectFieldAces');
-        $aclObjectFieldAcesProperty->setAccessible(true);
         $aclParentAclProperty = $aclReflection->getProperty('parentAcl');
-        $aclParentAclProperty->setAccessible(true);
 
         // fetchAll() consumes more memory than consecutive calls to fetch(),
         // but it is faster
@@ -649,13 +644,6 @@ class AclProvider implements AclProviderInterface
                 continue;
             }
         }
-
-        // reset reflection changes
-        $aclClassAcesProperty->setAccessible(false);
-        $aclClassFieldAcesProperty->setAccessible(false);
-        $aclObjectAcesProperty->setAccessible(false);
-        $aclObjectFieldAcesProperty->setAccessible(false);
-        $aclParentAclProperty->setAccessible(false);
 
         // this should never be true if the database integrity hasn't been compromised
         if ($processed < count($parentIdToFill)) {

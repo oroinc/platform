@@ -70,7 +70,6 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
             $value = $this->serializer->denormalize($value, '', $format, $context);
 
             $reflectionProperty = $classMetadata->getReflectionProperty($name);
-            $reflectionProperty->setAccessible(true);
             $reflectionProperty->setValue($entity, $value);
         }
 

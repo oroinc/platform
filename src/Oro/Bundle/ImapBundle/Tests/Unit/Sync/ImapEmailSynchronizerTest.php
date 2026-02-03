@@ -66,7 +66,6 @@ class ImapEmailSynchronizerTest extends TestCase
 
         $reflection = new \ReflectionClass($this->imapEmailSynchronizer);
         $method = $reflection->getMethod('addCredentialFilter');
-        $method->setAccessible(true);
         $result = $method->invoke($this->imapEmailSynchronizer, $queryBuilder);
 
         $this->assertSame($queryBuilder, $result);

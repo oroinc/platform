@@ -69,7 +69,6 @@ class FullAccessFieldRootAclBuilder
     {
         $aclReflection = new \ReflectionClass(Acl::class);
         $aclClassFieldAcesProperty = $aclReflection->getProperty('classFieldAces');
-        $aclClassFieldAcesProperty->setAccessible(true);
         $aclClassFieldAcesProperty->setValue($acl, $rootEntries);
     }
 }

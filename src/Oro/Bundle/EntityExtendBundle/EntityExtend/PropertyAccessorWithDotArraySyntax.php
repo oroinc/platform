@@ -711,7 +711,6 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             }
         } elseif ($this->getReflectionClass($object::class)->hasProperty($property)) {
             $prop = $this->getReflectionClass($object::class)->getProperty($property);
-            $prop->setAccessible(true);
             $value = $prop->getValue($object);
             $result[self::VALUE] = $value;
             if (isset($zval[self::REF])) {

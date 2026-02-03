@@ -492,18 +492,11 @@ class EntityMapper
 
     private static function getPropertyValue(mixed $object, \ReflectionProperty $property): mixed
     {
-        if (!$property->isPublic()) {
-            $property->setAccessible(true);
-        }
-
         return $property->getValue($object);
     }
 
     private static function setPropertyValue(object $object, \ReflectionProperty $property, mixed $value): void
     {
-        if (!$property->isPublic()) {
-            $property->setAccessible(true);
-        }
         $property->setValue($object, $value);
     }
 

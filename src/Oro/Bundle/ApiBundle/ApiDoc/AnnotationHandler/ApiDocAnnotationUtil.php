@@ -28,7 +28,6 @@ final class ApiDocAnnotationUtil
     {
         if (null === self::$statusCodesReflProperty) {
             self::$statusCodesReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'statusCodes');
-            self::$statusCodesReflProperty->setAccessible(true);
         }
 
         return self::$statusCodesReflProperty->getValue($annotation);
@@ -38,7 +37,6 @@ final class ApiDocAnnotationUtil
     {
         if (null === self::$responseReflProperty) {
             self::$responseReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'response');
-            self::$responseReflProperty->setAccessible(true);
         }
 
         $result = self::$responseReflProperty->getValue($annotation);
@@ -53,7 +51,6 @@ final class ApiDocAnnotationUtil
     {
         if (null === self::$filtersReflProperty) {
             self::$filtersReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'filters');
-            self::$filtersReflProperty->setAccessible(true);
         }
 
         self::$filtersReflProperty->setValue($annotation, $filters);
@@ -63,7 +60,6 @@ final class ApiDocAnnotationUtil
     {
         if (null === self::$inputReflProperty) {
             self::$inputReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'input');
-            self::$inputReflProperty->setAccessible(true);
         }
 
         self::$inputReflProperty->setValue($annotation, $input);
@@ -73,7 +69,6 @@ final class ApiDocAnnotationUtil
     {
         if (null === self::$outputReflProperty) {
             self::$outputReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'output');
-            self::$outputReflProperty->setAccessible(true);
         }
 
         self::$outputReflProperty->setValue($annotation, $input);

@@ -109,7 +109,6 @@ class WebsocketServerConsoleHandlerTest extends TestCase
     private function getConsoleHandlerOutput(): ?OutputInterface
     {
         $property = new \ReflectionProperty($this->consoleHandler, 'output');
-        $property->setAccessible(true);
 
         return $property->getValue($this->consoleHandler);
     }

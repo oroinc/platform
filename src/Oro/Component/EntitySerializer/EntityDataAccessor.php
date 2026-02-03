@@ -114,8 +114,6 @@ class EntityDataAccessor implements DataAccessorInterface
             $propertyObject = ReflectionUtil::getProperty($reflClass, $property);
             if (null === $propertyObject) {
                 $propertyObject = self::NO_PROPERTY;
-            } elseif (!$propertyObject->isPublic()) {
-                $propertyObject->setAccessible(true);
             }
             $this->propertyCache[$reflClass->name][$property] = $propertyObject;
         }

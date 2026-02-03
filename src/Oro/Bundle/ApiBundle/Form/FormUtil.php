@@ -248,7 +248,6 @@ class FormUtil
             if (str_starts_with($cause->getPropertyPath(), 'data' . $path)) {
                 $property = ReflectionUtil::getProperty(new \ReflectionClass($cause), 'propertyPath');
                 if (null !== $property) {
-                    $property->setAccessible(true);
                     $property->setValue($cause, str_replace($path, '.', $cause->getPropertyPath()));
                 }
             }
@@ -311,7 +310,6 @@ class FormUtil
                 \get_class($fieldConfig)
             ));
         }
-        $optionsProperty->setAccessible(true);
         $optionsProperty->setValue($fieldConfig, $options);
     }
 }

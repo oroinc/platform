@@ -77,7 +77,6 @@ class FeatureDependedFirewallMap extends FirewallMap
     private function getContext(Request $request): ?FirewallContext
     {
         $method = new \ReflectionMethod($this, 'getFirewallContext');
-        $method->setAccessible(true);
 
         $context = $method->invoke($this, $request);
         // removing the stateless attribute for a csrf-protected api requests that should be stateful

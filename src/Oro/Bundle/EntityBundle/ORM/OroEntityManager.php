@@ -121,7 +121,6 @@ class OroEntityManager extends EntityManager
     private function getPrivateIdentifierFlattener($class, $object)
     {
         $property = new \ReflectionProperty($class, 'identifierFlattener');
-        $property->setAccessible(true);
 
         return $property->getValue($object);
     }
@@ -134,7 +133,6 @@ class OroEntityManager extends EntityManager
     private function setPrivateMetadataFactory($class, $object, ClassMetadataFactory $metadataFactory)
     {
         $property = new \ReflectionProperty($class, 'metadataFactory');
-        $property->setAccessible(true);
         $property->setValue($object, $metadataFactory);
     }
 

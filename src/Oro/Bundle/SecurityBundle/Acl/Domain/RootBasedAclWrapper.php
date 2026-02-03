@@ -146,7 +146,6 @@ class RootBasedAclWrapper implements AclInterface
             // to get it is to use the reflection
             $r = new \ReflectionClass(\get_class($this->acl));
             $p = $r->getProperty('permissionGrantingStrategy');
-            $p->setAccessible(true);
             $this->permissionGrantingStrategy = $p->getValue($this->acl);
         }
 

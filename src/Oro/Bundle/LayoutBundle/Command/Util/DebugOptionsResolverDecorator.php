@@ -101,8 +101,6 @@ class DebugOptionsResolverDecorator
             throw new \RuntimeException(sprintf('Property "%s" does not exist.', $propertyName));
         }
 
-        $property->setAccessible(true);
-
         return $property->getValue($object);
     }
 }

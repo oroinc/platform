@@ -657,9 +657,6 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
                 $propertyName
             ));
         }
-        if (!$property->isPublic()) {
-            $property->setAccessible(true);
-        }
 
         return $property->getValue($entity);
     }

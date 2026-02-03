@@ -93,7 +93,6 @@ class EntityOwnerAccessor
             try {
                 $reflectionClass = new EntityReflectionClass($object);
                 $reflectionProperty = $reflectionClass->getProperty($property);
-                $reflectionProperty->setAccessible(true);
 
                 return $reflectionProperty->getValue($object);
             } catch (\ReflectionException $ex) {
