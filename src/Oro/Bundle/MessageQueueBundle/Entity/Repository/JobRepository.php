@@ -88,6 +88,7 @@ class JobRepository extends EntityRepository implements JobRepositoryInterface
             ->setParameter('jobName', $jobName)
             ->setParameter('statuses', $statuses)
             ->setParameter('interrupted', true)
+            ->orderBy('job.id', 'DESC')
             ->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();
