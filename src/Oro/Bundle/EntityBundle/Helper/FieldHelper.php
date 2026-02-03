@@ -253,12 +253,10 @@ class FieldHelper
 
         if ($class && ExtendHelper::isExtendEntity($class)) {
             $reflection = ReflectionVirtualProperty::create($fieldName);
-            $reflection->setAccessible(true);
 
             return $reflection->getValue($object);
         } elseif ($class) {
             $reflection = new \ReflectionProperty($class, $fieldName);
-            $reflection->setAccessible(true);
 
             return $reflection->getValue($object);
         } else {
@@ -309,7 +307,6 @@ class FieldHelper
 
         if ($class) {
             $reflection = new \ReflectionProperty($class, $fieldName);
-            $reflection->setAccessible(true);
             $reflection->setValue($object, $value);
         } else {
             throw $exception;

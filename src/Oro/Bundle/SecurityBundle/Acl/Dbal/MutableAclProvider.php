@@ -483,9 +483,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             // ACL instances for object identities of the same type that are already in-memory
             if (count($sharedPropertyChanges) > 0) {
                 $classAcesProperty = new \ReflectionProperty(Acl::class, 'classAces');
-                $classAcesProperty->setAccessible(true);
                 $classFieldAcesProperty = new \ReflectionProperty(Acl::class, 'classFieldAces');
-                $classFieldAcesProperty->setAccessible(true);
 
                 foreach ($this->loadedAcls[$oidKey] as $sidKey => $sameTypeAcl) {
                     if (isset($sharedPropertyChanges['classAces'])) {
@@ -1141,7 +1139,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                     $this->loadedAces[$aceId]->attach($ace->getAcl(), $ace);
 
                     $aceIdProperty = new \ReflectionProperty(Entry::class, 'id');
-                    $aceIdProperty->setAccessible(true);
                     $aceIdProperty->setValue($ace, (int) $aceId);
                 }
             }
@@ -1232,7 +1229,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 $this->loadedAces[$aceId]->attach($ace->getAcl(), $ace);
 
                 $aceIdProperty = new \ReflectionProperty($ace, 'id');
-                $aceIdProperty->setAccessible(true);
                 $aceIdProperty->setValue($ace, (int) $aceId);
             }
         }

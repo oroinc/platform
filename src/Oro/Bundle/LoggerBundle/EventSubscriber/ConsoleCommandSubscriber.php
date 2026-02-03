@@ -67,7 +67,6 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
         $class = new \ReflectionClass($input);
 
         $property = $class->getProperty('arguments');
-        $property->setAccessible(true);
 
         $arguments = $property->getValue($input);
         if ($arguments) {
@@ -75,7 +74,6 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
         }
 
         $property = $class->getProperty('options');
-        $property->setAccessible(true);
 
         $options = $property->getValue($input);
         if ($options) {

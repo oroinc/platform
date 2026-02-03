@@ -102,7 +102,6 @@ class PersistentConnection extends Connection
         static $rp = null;
         if (false == $rp) {
             $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', 'transactionNestingLevel');
-            $rp->setAccessible(true);
         }
 
         $rp->setValue($this, $level);

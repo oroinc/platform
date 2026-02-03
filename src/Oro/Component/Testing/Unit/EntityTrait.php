@@ -79,7 +79,6 @@ trait EntityTrait
             }
 
             $method = $reflectionClass->getProperty($property);
-            $method->setAccessible(true);
             $method->setValue($object, $value);
         }
         $this->cleanExtendEntityStorage($object);

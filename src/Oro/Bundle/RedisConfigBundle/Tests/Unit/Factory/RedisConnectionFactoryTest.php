@@ -92,7 +92,6 @@ class RedisConnectionFactoryTest extends TestCase
         $this->assertInstanceOf(SentinelReplication::class, $connection);
 
         $preferSlaveProperty = new \ReflectionProperty(SentinelReplication::class, 'preferSlave');
-        $preferSlaveProperty->setAccessible(true);
         $this->assertEquals($expectedPreferSlave, $preferSlaveProperty->getValue($connection));
     }
 

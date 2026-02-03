@@ -67,9 +67,7 @@ class ExtendReflectionErrorHandler
                 $exceptionReflection = $exceptionReflection->getParentClass();
             }
             $traceReflection = $exceptionReflection->getProperty('trace');
-            $traceReflection->setAccessible(true);
             $traceReflection->setValue($exception, $trace);
-            $traceReflection->setAccessible(false);
         }
 
         return $exception;

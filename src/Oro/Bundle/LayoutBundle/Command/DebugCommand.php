@@ -193,7 +193,6 @@ HELP
         $context->resolve();
         $class = new \ReflectionClass(LayoutContext::class);
         $property = $class->getProperty('items');
-        $property->setAccessible(true);
 
         return $property->getValue($context);
     }

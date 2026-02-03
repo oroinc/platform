@@ -87,7 +87,6 @@ class InverseAssociationAccessor implements AccessorInterface
                     ClassUtils::getClass($relatedEntity),
                     $metadata->getDoctrineMetadata()->getFieldName()
                 );
-                $reflection->setAccessible(true);
                 $reflection->setValue($relatedEntity, $value);
             }
         }

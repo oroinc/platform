@@ -114,7 +114,6 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
             throw new \RuntimeException(sprintf('The "%s" property does not exist.', $propertyName));
         }
         $p = $r->getProperty($propertyName);
-        $p->setAccessible(true);
         $p->setValue($this, $value);
     }
 }

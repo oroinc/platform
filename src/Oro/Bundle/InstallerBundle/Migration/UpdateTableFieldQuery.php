@@ -113,7 +113,6 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
                 $alteredClass = $this->replaceStringValue($originalClass, $from, $to);
                 if ($alteredClass !== $originalClass) {
                     $reflectionProperty = new \ReflectionProperty(get_class($value), 'className');
-                    $reflectionProperty->setAccessible(true);
                     $reflectionProperty->setValue($value, $alteredClass);
                 }
             }

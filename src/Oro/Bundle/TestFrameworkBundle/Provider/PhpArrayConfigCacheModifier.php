@@ -39,7 +39,6 @@ class PhpArrayConfigCacheModifier
     private function getProviderPrivateProperty(string $propertyName): \ReflectionProperty
     {
         $property = ReflectionUtil::getProperty(new \ReflectionClass($this->provider), $propertyName);
-        $property->setAccessible(true);
 
         return $property;
     }

@@ -64,7 +64,6 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
         } else {
             $class = new \ReflectionClass($other);
             $prop = $class->getProperty($this->propertyName);
-            $prop->setAccessible(true);
             $prop->setValue($other, $this->testValue);
         }
 

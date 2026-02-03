@@ -15,7 +15,6 @@ class UuidFilter implements Filter
     public function apply($object, $property, $objectCopier): void
     {
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($object, UUIDGenerator::v4());
     }
 }

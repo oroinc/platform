@@ -56,7 +56,6 @@ class FilteredEntityReaderTest extends WebTestCase
         $reader = clone $this->reader;
         $reflectionClass = new \ReflectionClass(get_class($reader));
         $method = $reflectionClass->getProperty('entityIdentityReaders');
-        $method->setAccessible(true);
         $method->setValue($reader, []);
 
         $reader->getIds(User::class, [

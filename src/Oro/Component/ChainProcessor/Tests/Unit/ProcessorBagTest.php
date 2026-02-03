@@ -615,7 +615,6 @@ class ProcessorBagTest extends TestCase
     private function callCalculatePriority(int $processorPriority, ?int $groupPriority = null): int
     {
         $method = new \ReflectionMethod($this->builder, 'calculatePriority');
-        $method->setAccessible(true);
 
         return $method->invokeArgs(null, [$processorPriority, $groupPriority]);
     }

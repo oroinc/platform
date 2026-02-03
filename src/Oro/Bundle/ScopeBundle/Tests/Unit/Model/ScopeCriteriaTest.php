@@ -29,7 +29,6 @@ class ScopeCriteriaTest extends TestCase
     public function testGetIdentifier(): void
     {
         $entityIdReflProperty = new \ReflectionProperty(StubEntity::class, 'id');
-        $entityIdReflProperty->setAccessible(true);
         $entityClassMetadata = new ClassMetadata(StubEntity::class);
         $entityClassMetadata->fieldMappings = ['id' => []];
         $entityClassMetadata->reflFields = ['id' => $entityIdReflProperty];

@@ -76,9 +76,7 @@ class OrmMetadataFactoryClearer implements ClearerInterface
             $listenersProperty = ReflectionUtil::getProperty(new \ReflectionClass($eventManager), 'listeners');
             $initializedProperty = ReflectionUtil::getProperty(new \ReflectionClass($eventManager), 'initialized');
             if (null !== $listenersProperty && null !== $initializedProperty) {
-                $listenersProperty->setAccessible(true);
                 $listeners = $listenersProperty->getValue($eventManager);
-                $initializedProperty->setAccessible(true);
                 $initialized = $initializedProperty->getValue($eventManager);
                 if (is_array($listeners) && is_array($initialized)) {
                     $eventNames = array_keys($listeners);

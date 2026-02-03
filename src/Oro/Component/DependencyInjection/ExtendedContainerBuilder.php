@@ -23,13 +23,10 @@ class ExtendedContainerBuilder extends ContainerBuilder
     {
         $classRef            = new \ReflectionClass('Symfony\Component\DependencyInjection\ContainerBuilder');
         $extensionConfigsRef = $classRef->getProperty('extensionConfigs');
-        $extensionConfigsRef->setAccessible(true);
 
         $newConfig        = $extensionConfigsRef->getValue($this);
         $newConfig[$name] = $config;
         $extensionConfigsRef->setValue($this, $newConfig);
-
-        $extensionConfigsRef->setAccessible(false);
     }
 
     /**
@@ -53,7 +50,6 @@ class ExtendedContainerBuilder extends ContainerBuilder
             throw new InvalidArgumentException(sprintf('Invalid compiler pass type "%s".', $type));
         }
         $prop = $class->getProperty($propName);
-        $prop->setAccessible(true);
         $passes = $prop->getValue($passConfig);
 
         $resultPasses = [];

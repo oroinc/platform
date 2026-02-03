@@ -65,9 +65,6 @@ class EntityInstantiator
                     continue;
                 }
 
-                if (!$property->isPublic()) {
-                    $property->setAccessible(true);
-                }
                 $property->setValue($entity, new ArrayCollection());
             }
         }

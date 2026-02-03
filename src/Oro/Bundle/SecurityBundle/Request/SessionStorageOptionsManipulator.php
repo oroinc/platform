@@ -37,8 +37,6 @@ class SessionStorageOptionsManipulator
                 )
             );
         }
-
-        $parametersProperty->setAccessible(true);
         $parameters = $parametersProperty->getValue($this->container);
         $parameters['session.storage.options'] = $options;
         $parametersProperty->setValue($this->container, $parameters);

@@ -139,7 +139,6 @@ class ObjectNormalizer
 
         $properties = $refl->getProperties();
         foreach ($properties as $property) {
-            $property->setAccessible(true);
             $result[$property->getName()] = $this->normalizeValue($property->getValue($object), $nextLevel, $context);
         }
 
