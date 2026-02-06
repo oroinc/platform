@@ -30,7 +30,7 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * @return TokenStorageInterface
      */
-    protected function getSecurityTokenStorage()
+    protected function getTokenStorage()
     {
         return $this->container->get(TokenStorageInterface::class);
     }
@@ -69,13 +69,7 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function getRequestedRemindersData()
     {
-        /** @var User|null */
-        $user = null;
-        $token = $this->getSecurityTokenStorage()->getToken();
-        if (null !== $token) {
-            $user = $token->getUser();
-        }
-
+        $user = $this->getTokenStorage()->getToken()?->getUser();
         if ($user instanceof User) {
             $reminders = $this->getEntityManager()
                 ->getRepository(Reminder::class)

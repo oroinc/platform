@@ -249,7 +249,7 @@ class ImportExportController extends AbstractController
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
         $filePrefix = $request->get('filePrefix', null);
         $options = $this->getOptionsFromRequest($request);
-        $token = $this->getSecurityToken()->getToken();
+        $token = $this->getTokenStorage()->getToken();
 
         $this->container->get(MessageProducerInterface::class)->send(PreExportTopic::getName(), [
             'jobName' => $jobName,
@@ -377,7 +377,7 @@ class ImportExportController extends AbstractController
             throw new ImportExportExpiredException();
         }
 
-        $jobRepository = $this->container->get('doctrine')->getManagerForClass(Job::class)->getRepository(Job::class);
+        $jobRepository = $this->container->get(ManagerRegistry::class)->getRepository(Job::class);
         $job = $jobRepository->find($result->getJobId());
 
         if (!$job) {
@@ -402,7 +402,8 @@ class ImportExportController extends AbstractController
                 GetImportExportConfigurationExtension::class,
                 ExportHandler::class,
                 ImportExportResultSummarizer::class,
-                'doctrine' => ManagerRegistry::class,
+                ManagerRegistry::class,
+                TokenStorageInterface::class,
                 FeatureChecker::class
             ]
         );
@@ -504,9 +505,9 @@ class ImportExportController extends AbstractController
         return $this->container->get(CsvFileHandler::class);
     }
 
-    private function getSecurityToken(): TokenStorageInterface
+    private function getTokenStorage(): TokenStorageInterface
     {
-        return $this->container->get('security.token_storage');
+        return $this->container->get(TokenStorageInterface::class);
     }
 
     private function getTranslator(): TranslatorInterface

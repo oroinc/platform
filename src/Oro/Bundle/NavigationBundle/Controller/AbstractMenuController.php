@@ -33,6 +33,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -188,7 +189,8 @@ abstract class AbstractMenuController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var EntityManagerInterface $entityManager */
-            $entityManager = $this->container->get('doctrine')->getManagerForClass($this->getEntityClass());
+            $entityManager = $this->container->get(TokenStorageInterface::class)
+                ->getManagerForClass($this->getEntityClass());
             $scope = $this->container->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context);
             $updates = $this->getMenuUpdateMoveManager()->moveMenuItems(
                 $menu,
@@ -311,9 +313,7 @@ abstract class AbstractMenuController extends AbstractController
 
     protected function getCurrentOrganization(): ?Organization
     {
-        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return null;
-        }
+        $token = $this->container->get(TokenStorageInterface::class)->getToken();
 
         return $token instanceof OrganizationAwareTokenInterface
             ? $token->getOrganization()
@@ -363,7 +363,8 @@ abstract class AbstractMenuController extends AbstractController
                 MenuUpdateMoveManager::class,
                 MenuUpdateDisplayManager::class,
                 UpdateHandlerFacade::class,
-                'doctrine' => ManagerRegistry::class
+                ManagerRegistry::class,
+                TokenStorageInterface::class
             ]
         );
     }
