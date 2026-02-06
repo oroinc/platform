@@ -6,13 +6,14 @@ use Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProviderInt
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DatagridDataConverterTest extends TestCase
 {
-    private DatagridColumnsFromContextProviderInterface&MockObject $datagridColumnsFromContextProvider;
+    private DatagridColumnsFromContextProviderInterface&MockObject $datagridColumnsProvider;
     private TranslatorInterface&MockObject $translator;
     private Context&MockObject $context;
     private DatagridDataConverter $datagridDataConverter;
@@ -20,17 +21,17 @@ class DatagridDataConverterTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
+        $this->datagridColumnsProvider = $this->createMock(DatagridColumnsFromContextProviderInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->datagridColumnsFromContextProvider = $this->createMock(
-            DatagridColumnsFromContextProviderInterface::class
-        );
         $this->context = $this->createMock(Context::class);
 
-        $this->datagridDataConverter = new DatagridDataConverter(
-            $this->datagridColumnsFromContextProvider,
-            $this->translator,
-            $this->createMock(FormatterProvider::class)
-        );
+        $container = TestContainerBuilder::create()
+            ->add(DatagridColumnsFromContextProviderInterface::class, $this->datagridColumnsProvider)
+            ->add(TranslatorInterface::class, $this->translator)
+            ->add(FormatterProvider::class, $this->createMock(FormatterProvider::class))
+            ->getContainer($this);
+
+        $this->datagridDataConverter = new DatagridDataConverter($container);
     }
 
     /**
@@ -38,7 +39,7 @@ class DatagridDataConverterTest extends TestCase
      */
     public function testConvertToExportFormat(array $columns, array $exportedRecord, array $expected): void
     {
-        $this->datagridColumnsFromContextProvider->expects(self::any())
+        $this->datagridColumnsProvider->expects(self::any())
             ->method('getColumnsFromContext')
             ->with($this->context)
             ->willReturn($columns);

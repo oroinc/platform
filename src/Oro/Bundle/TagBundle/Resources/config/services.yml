@@ -209,7 +209,6 @@ services:
 
     oro_tag.formatter.tags_formatter:
         class: Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter
-        public: true
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: tags, format_type: excel }
 
