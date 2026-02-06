@@ -12,23 +12,32 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterfa
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Adds --current-user global command option to specify the user for the security context if necessary.
  */
-class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
+class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
+    }
 
-    public function __construct(ContainerInterface $container)
+    #[\Override]
+    public static function getSubscribedServices(): array
     {
-        $this->container = $container;
+        return [
+            ManagerRegistry::class,
+            TokenStorageInterface::class,
+            UserManager::class
+        ];
     }
 
     #[\Override]
@@ -63,11 +72,10 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         }
 
         $token = $this->createToken($user);
-        $this->getSecurityTokenStorage()->setToken($token);
-
         if ($token instanceof OrganizationAwareTokenInterface) {
             $this->setOrganization($organization, $token);
         }
+        $this->getTokenStorage()->setToken($token);
     }
 
     /**
@@ -158,27 +166,24 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         $organizationRepository = $this->getDoctrine()->getRepository(Organization::class);
         $organizationId = \filter_var($organization, FILTER_VALIDATE_INT);
         if ($organizationId) {
-            /** @noinspection PhpIncompatibleReturnTypeInspection */
             return $organizationRepository->find($organizationId);
         }
 
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $organizationRepository->findOneBy(['name' => $organization]);
     }
 
     private function getDoctrine(): ManagerRegistry
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->container->get('doctrine');
+        return $this->container->get(ManagerRegistry::class);
     }
 
-    private function getSecurityTokenStorage(): TokenStorageInterface
+    private function getTokenStorage(): TokenStorageInterface
     {
-        return $this->container->get('security.token_storage');
+        return $this->container->get(TokenStorageInterface::class);
     }
 
     private function getUserManager(): UserManager
     {
-        return $this->container->get('oro_user.manager');
+        return $this->container->get(UserManager::class);
     }
 }

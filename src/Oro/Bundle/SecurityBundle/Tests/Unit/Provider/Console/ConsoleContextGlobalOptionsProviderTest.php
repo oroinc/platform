@@ -19,7 +19,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 class ConsoleContextGlobalOptionsProviderTest extends TestCase
 {
     private ManagerRegistry&MockObject $doctrine;
-    private TokenStorage $tokenStorage;
+    private TokenStorageInterface&MockObject $tokenStorage;
     private UserManager&MockObject $userManager;
     private ConsoleContextGlobalOptionsProvider $provider;
 
@@ -35,13 +35,13 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->tokenStorage = new TokenStorage();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->userManager = $this->createMock(UserManager::class);
 
         $container = TestContainerBuilder::create()
-            ->add('doctrine', $this->doctrine)
-            ->add('security.token_storage', $this->tokenStorage)
-            ->add('oro_user.manager', $this->userManager)
+            ->add(ManagerRegistry::class, $this->doctrine)
+            ->add(TokenStorageInterface::class, $this->tokenStorage)
+            ->add(UserManager::class, $this->userManager)
             ->getContainer($this);
 
         $this->provider = new ConsoleContextGlobalOptionsProvider($container);
@@ -87,17 +87,11 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
 
         $this->provider->addGlobalOptions($command);
         self::assertEquals(
-            [
-                'current-user',
-                'current-organization',
-            ],
+            ['current-user', 'current-organization'],
             array_keys($command->getApplication()->getDefinition()->getOptions())
         );
         self::assertEquals(
-            [
-                'current-user',
-                'current-organization',
-            ],
+            ['current-user', 'current-organization'],
             array_keys($command->getDefinition()->getOptions())
         );
     }
@@ -107,10 +101,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn(null, null);
 
         $this->provider->resolveGlobalOptions($input);
@@ -122,10 +113,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn(null, $organizationId);
 
         $this->provider->resolveGlobalOptions($input);
@@ -137,10 +125,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($userId, null);
 
         $repository = $this->getUserRepository();
@@ -160,10 +145,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($userId, null);
 
         $organization = new Organization();
@@ -181,9 +163,11 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
         $expectedToken->setOrganization($organization);
+        $this->tokenStorage->expects(self::once())
+            ->method('setToken')
+            ->with($expectedToken);
 
         $this->provider->resolveGlobalOptions($input);
-        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenNoOrganizationAndUserHaveAccessToMultipleOrgs(): void
@@ -192,10 +176,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($userId, null);
 
         $organization1 = new Organization();
@@ -249,9 +230,11 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
         $expectedToken->setOrganization($organization2);
+        $this->tokenStorage->expects(self::once())
+            ->method('setToken')
+            ->with($expectedToken);
 
         $this->provider->resolveGlobalOptions($input);
-        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenNoOrganizationAndUserHaveNoOrgs(): void
@@ -260,10 +243,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($userId, null);
 
         $role = $this->createMock(Role::class);
@@ -287,10 +267,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($username, null);
 
         $organization = new Organization();
@@ -307,9 +284,11 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
         $expectedToken->setOrganization($organization);
+        $this->tokenStorage->expects(self::once())
+            ->method('setToken')
+            ->with($expectedToken);
 
         $this->provider->resolveGlobalOptions($input);
-        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenUserIsStringAndOrganizationIsNotFound(): void
@@ -319,10 +298,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($username, $organizationId);
 
         $user = new User();
@@ -349,10 +325,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($username, $organizationId);
 
         $user = new User();
@@ -382,10 +355,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($username, $organizationId);
 
         $organization = new Organization();
@@ -420,10 +390,7 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $input = $this->createMock(InputInterface::class);
         $input->expects(self::exactly(2))
             ->method('getOption')
-            ->withConsecutive(
-                ['current-user'],
-                ['current-organization']
-            )
+            ->withConsecutive(['current-user'], ['current-organization'])
             ->willReturn($username, $organizationId);
 
         $organization = new Organization();
@@ -448,8 +415,10 @@ class ConsoleContextGlobalOptionsProviderTest extends TestCase
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
         $expectedToken->setOrganization($organization);
+        $this->tokenStorage->expects(self::once())
+            ->method('setToken')
+            ->with($expectedToken);
 
         $this->provider->resolveGlobalOptions($input);
-        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 }

@@ -31,12 +31,11 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
 
         $result = self::runCommand('oro:notification:alerts:cleanup', [
             '--current-user' => '999',
-            '--current-organization' => '1',
+            '--current-organization' => '1'
         ]);
 
         self::assertStringContainsString(
-            "In ConsoleContextGlobalOptionsProvider.php line 84: Can't find user with "
-            . 'identifier 999 oro:notification:alerts:cleanup',
+            'Can\'t find user with identifier 999 oro:notification:alerts:cleanup',
             $result
         );
 
@@ -67,7 +66,7 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
 
         $result = self::runCommand('oro:notification:alerts:cleanup', [
             '--current-user' => 'simple_user',
-            '--current-organization' => '1',
+            '--current-organization' => '1'
         ]);
 
         self::assertStringContainsString('There are no notification alerts.', $result);
