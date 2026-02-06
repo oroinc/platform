@@ -22,6 +22,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -198,7 +199,7 @@ class ResetController extends AbstractController
         if ($this->container->get(ResetHandler::class)->process($user)) {
             // force user logout
             $session->invalidate();
-            $this->container->get('security.token_storage')->setToken(null);
+            $this->container->get(TokenStorageInterface::class)->setToken(null);
 
             $session->getFlashBag()->add(
                 'success',
@@ -280,6 +281,7 @@ class ResetController extends AbstractController
                 LoggerInterface::class,
                 ResetPasswordHandler::class,
                 UserPasswordResetHandler::class,
+                TokenStorageInterface::class,
                 'oro_user.form.reset' => Form::class,
                 'oro_user.form.type.set_password.form' => Form::class,
             ]

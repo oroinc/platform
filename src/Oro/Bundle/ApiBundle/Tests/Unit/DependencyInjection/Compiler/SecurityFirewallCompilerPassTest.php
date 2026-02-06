@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SecurityFirewallCompilerPassTest extends TestCase
 {
@@ -157,7 +158,7 @@ class SecurityFirewallCompilerPassTest extends TestCase
         self::assertEquals(
             [
                 new Reference('oro_security.context_listener.main'),
-                new Reference('security.token_storage')
+                new Reference(TokenStorageInterface::class)
             ],
             $contextFirewallListener->getArguments()
         );

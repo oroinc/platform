@@ -5,31 +5,19 @@ namespace Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * Registers email synchronizers in the dependency injection container.
- *
- * Collects all services tagged with `oro_email.email_synchronizer` and registers them
+ * Collects all services tagged with "oro_email.email_synchronizer" and registers them
  * with the email synchronization manager, injecting the security token storage for authentication.
  */
 class EmailSynchronizerPass implements CompilerPassInterface
 {
-    public const SERVICE_KEY = 'oro_email.email_synchronization_manager';
-    public const TAG         = 'oro_email.email_synchronizer';
-
-    public const SERVICE_TOKEN_STORAGE = 'security.token_storage';
-
     #[\Override]
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition(self::SERVICE_KEY)) {
-            return;
-        }
-
-        $tokenStorageRef = new Reference(self::SERVICE_TOKEN_STORAGE);
-
-        $selectorDef    = $container->getDefinition(self::SERVICE_KEY);
-        $taggedServices = $container->findTaggedServiceIds(self::TAG);
+        $selectorDef = $container->getDefinition('oro_email.email_synchronization_manager');
+        $taggedServices = $container->findTaggedServiceIds('oro_email.email_synchronizer');
         foreach ($taggedServices as $synchronizerServiceId => $tagAttributes) {
             /**
              * We use the service id instead of the reference object
@@ -37,8 +25,8 @@ class EmailSynchronizerPass implements CompilerPassInterface
              */
             $selectorDef->addMethodCall('addSynchronizer', [$synchronizerServiceId]);
 
-            $synchronizerDef = $container->getDefinition($synchronizerServiceId);
-            $synchronizerDef->addMethodCall('setTokenStorage', [$tokenStorageRef]);
+            $container->getDefinition($synchronizerServiceId)
+                ->addMethodCall('setTokenStorage', [new Reference(TokenStorageInterface::class)]);
         }
     }
 }

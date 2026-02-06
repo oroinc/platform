@@ -15,30 +15,28 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 
 class OrganizationRememberMeAuthenticationAuthenticatorTest extends TestCase
 {
-    private MockObject&RememberMeHandlerInterface $rememberMeHandler;
-    private TokenStorage $tokenStorage;
+    private RememberMeHandlerInterface&MockObject $rememberMeHandler;
+    private OrganizationGuesserInterface&MockObject $organizationGuesser;
+    private OrganizationRememberMeTokenFactoryInterface&MockObject $tokenFactory;
     private OrganizationRememberMeAuthenticationAuthenticator $authenticator;
-    private MockObject&OrganizationGuesserInterface $organizationGuesser;
-    private MockObject&OrganizationRememberMeTokenFactoryInterface $tokenFactory;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
-        $this->tokenStorage = new TokenStorage();
         $this->organizationGuesser = $this->createMock(OrganizationGuesserInterface::class);
         $this->tokenFactory = $this->createMock(OrganizationRememberMeTokenFactoryInterface::class);
+
         $this->authenticator = new OrganizationRememberMeAuthenticationAuthenticator(
             $this->rememberMeHandler,
             's3cr3t',
-            $this->tokenStorage,
+            new TokenStorage(),
             '_remember_me_cookie'
         );
         $this->authenticator->setTokenFactory($this->tokenFactory);
@@ -50,12 +48,12 @@ class OrganizationRememberMeAuthenticationAuthenticatorTest extends TestCase
         $user = $this->createMock(AbstractUser::class);
         $organization = new Organization();
 
-        $this->organizationGuesser->expects($this->once())
+        $this->organizationGuesser->expects(self::once())
             ->method('guess')
-            ->with($this->identicalTo($user))
+            ->with(self::identicalTo($user))
             ->willReturn($organization);
 
-        $this->rememberMeHandler->expects($this->once())
+        $this->rememberMeHandler->expects(self::once())
             ->method('consumeRememberMeCookie')
             ->willReturn($user);
 
@@ -64,8 +62,7 @@ class OrganizationRememberMeAuthenticationAuthenticatorTest extends TestCase
 
         $resultPassport = $this->authenticator->authenticate($request);
 
-        $this->assertInstanceOf(Passport::class, $resultPassport);
-        $this->assertEquals($organization, $resultPassport->getAttribute('organization'));
+        self::assertEquals($organization, $resultPassport->getAttribute('organization'));
     }
 
     public function testCreateToken(): void
@@ -75,31 +72,21 @@ class OrganizationRememberMeAuthenticationAuthenticatorTest extends TestCase
         $token = $this->createMock(OrganizationRememberMeToken::class);
         $firewallName = 'main';
 
-        $this->tokenFactory->expects($this->once())
+        $this->tokenFactory->expects(self::once())
             ->method('create')
-            ->with(
-                $this->identicalTo($user),
-                $this->equalTo($firewallName),
-                $this->equalTo('s3cr3t'),
-                $this->identicalTo($organization)
-            )
+            ->with(self::identicalTo($user), $firewallName, 's3cr3t', self::identicalTo($organization))
             ->willReturn($token);
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects($this->once())
+        $passport->expects(self::once())
             ->method('getAttribute')
-            ->with(
-                $this->identicalTo('organization'),
-            )
+            ->with('organization')
             ->willReturn($organization);
 
-        $passport->expects($this->once())
+        $passport->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
-        $resultToken = $this->authenticator->createToken($passport, $firewallName);
-
-        $this->assertInstanceOf(TokenInterface::class, $resultToken);
-        $this->assertSame($token, $resultToken);
+        self::assertSame($token, $this->authenticator->createToken($passport, $firewallName));
     }
 }

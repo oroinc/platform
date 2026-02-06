@@ -743,9 +743,11 @@ services:
     oro_security.provider.console.console_context_global_options_provider:
         class: Oro\Bundle\SecurityBundle\Provider\Console\ConsoleContextGlobalOptionsProvider
         arguments:
-            - '@service_container'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: oro_platform.console.global_options_provider }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_user.manager, key: Oro\Bundle\UserBundle\Entity\UserManager }
 
     oro_security.csrf.cookie_token_storage:
         class: Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage

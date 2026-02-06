@@ -3,56 +3,38 @@
 namespace Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Compiler pass that registers type formatters with the formatter provider service.
- *
- * This pass collects all services tagged with `oro_importexport.formatter.formatter`,
- * validates that they are public, and registers them with the formatter provider.
- * It organizes formatters by alias and by format type/data type combinations,
- * enabling the provider to locate the appropriate formatter for any given type conversion.
+ * Registers import/export formatters.
  */
 class FormatterProviderPass implements CompilerPassInterface
 {
-    public const SERVICE_ID = 'oro_importexport.formatter.formatter_provider';
-    public const TAG_NAME   = 'oro_importexport.formatter.formatter';
-
     #[\Override]
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition(self::SERVICE_ID)) {
-            return;
-        }
-
-        $providerDefinition = $container->getDefinition(self::SERVICE_ID);
-
-        $formatterIds   = [];
+        $formatters = [];
         $typeFormatters = [];
-
-        foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tags) {
-            $definition = $container->getDefinition($serviceId);
-            if (!$definition->isPublic()) {
-                throw new \InvalidArgumentException(
-                    sprintf('The service "%s" tagged "%s" must be public.', $serviceId, self::TAG_NAME)
-                );
-            }
-            foreach ($tags as $tag) {
-                if (isset($tag['alias'])) {
-                    $formatterIds[$tag['alias']] = $serviceId;
-                }
-                if (isset($tag['data_type'])) {
-                    if (!isset($tag['format_type'])) {
-                        throw new \InvalidArgumentException(
-                            sprintf('"format_type" tag attribute must be defined for service "%s"', $serviceId)
-                        );
+        $taggedServices = $container->findTaggedServiceIds('oro_importexport.formatter.formatter');
+        foreach ($taggedServices as $id => $tags) {
+            $formatters[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                if (isset($attributes['data_type'])) {
+                    if (!isset($attributes['format_type'])) {
+                        throw new \InvalidArgumentException(\sprintf(
+                            '"format_type" tag attribute must be defined for service "%s"',
+                            $id
+                        ));
                     }
-                    $typeFormatters[$tag['format_type']][$tag['data_type']] = $serviceId;
+                    $typeFormatters[$attributes['format_type']][$attributes['data_type']] = $id;
                 }
             }
         }
 
-        $providerDefinition->replaceArgument(1, $formatterIds);
-        $providerDefinition->replaceArgument(2, $typeFormatters);
+        $container->getDefinition('oro_importexport.formatter.formatter_provider')
+            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $formatters))
+            ->replaceArgument(1, $typeFormatters);
     }
 }

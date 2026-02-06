@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Changes the class for "security.firewall.map" service to be able to disable API firewall listeners.
@@ -79,7 +80,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
             ->register($apiContextListenerId, ContextListener::class)
             ->setArguments([
                 new Reference($listenerId),
-                new Reference('security.token_storage')
+                new Reference(TokenStorageInterface::class)
             ])
             ->addMethodCall('setCsrfRequestManager', [new Reference('oro_security.csrf_request_manager')])
             ->addMethodCall(

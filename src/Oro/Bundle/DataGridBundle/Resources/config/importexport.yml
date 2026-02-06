@@ -8,11 +8,12 @@ services:
 
     oro_datagrid.importexport.data_converter:
         class: Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter
-        lazy: true
         arguments:
-            - '@oro_datagrid.importexport.datagrid_columns_from_context_provider'
-            - '@translator'
-            - '@oro_importexport.formatter.formatter_provider'
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_datagrid.importexport.datagrid_columns_from_context_provider, key: Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProviderInterface }
+            - { name: container.service_subscriber, id: oro_importexport.formatter.formatter_provider, key: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider }
 
     oro_datagrid.importexport.export_filtered_reader:
         class: Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader
@@ -33,10 +34,9 @@ services:
 
     oro_datagrid.importexport.datagrid_columns_from_context_provider:
         class: Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProvider
-        lazy: true
         arguments:
-        - '@oro_datagrid.datagrid.manager'
-        - '@oro_datagrid.provider.state.columns'
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_datagrid.provider.state.columns'
 
     oro_datagrid.importexport.materialized_view_reader:
         class: Oro\Bundle\DataGridBundle\ImportExport\DatagridMaterializedViewReader

@@ -8,7 +8,8 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
-use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -17,84 +18,50 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * - sorts columns according to their "order";
  * - excludes non-renderable columns.
  */
-class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
+class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface, ServiceSubscriberInterface
 {
-    /**
-     * @var DatagridColumnsFromContextProviderInterface
-     */
-    private $datagridColumnsFromContextProvider;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var FormatterProvider
-     */
-    protected $formatterProvider;
-
-    /**
-     * @var ContextInterface
-     */
-    protected $context;
-
-    /**
-     * @var TypeFormatterInterface[]
-     */
-    protected $formatters = [];
-
-    /**
-     * Contains grid columns cache for current context
-     *
-     * @var array
-     */
-    private $gridColumns = [];
+    private ContextInterface $context;
+    private array $gridColumns = [];
 
     public function __construct(
-        DatagridColumnsFromContextProviderInterface $datagridColumnsFromContextProvider,
-        TranslatorInterface $translator,
-        FormatterProvider $formatterProvider
+        private readonly ContainerInterface $container
     ) {
-        $this->datagridColumnsFromContextProvider = $datagridColumnsFromContextProvider;
-        $this->translator = $translator;
-        $this->formatterProvider = $formatterProvider;
+    }
+
+    #[\Override]
+    public static function getSubscribedServices(): array
+    {
+        return [
+            DatagridColumnsFromContextProviderInterface::class,
+            TranslatorInterface::class,
+            FormatterProvider::class
+        ];
+    }
+
+    #[\Override]
+    public function setImportExportContext(ContextInterface $context): void
+    {
+        $this->context = $context;
+        // Clear grid columns cache because it is not actual for new context.
+        $this->gridColumns = [];
     }
 
     #[\Override]
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
-        $columns = $this->getGridColumns();
-
         $result = [];
-        foreach ($columns as $columnName => $column) {
-            $val = array_key_exists($columnName, $exportedRecord) ? $exportedRecord[$columnName] : null;
-            $val = $this->applyFrontendFormatting($val, $column);
-            $columnLabel = isset($column['label']) ? $this->translator->trans($column['label']) : '';
-
+        $gridColumns = $this->getGridColumns();
+        foreach ($gridColumns as $columnName => $column) {
+            $val = $this->applyFrontendFormatting($exportedRecord[$columnName] ?? null, $column);
+            $columnLabel = isset($column['label']) ? $this->getTranslator()->trans($column['label']) : '';
             $label = $columnLabel;
-            if (array_key_exists($columnLabel, $result)) {
-                $label = sprintf('%s_%s', $columnLabel, $columnName);
+            if (\array_key_exists($columnLabel, $result)) {
+                $label = \sprintf('%s_%s', $columnLabel, $columnName);
             }
             $result[$label] = $val;
         }
 
         return $result;
-    }
-
-    /**
-     * Returns columns from the datagrid configuration.
-     * Caches grid columns in gridColumns property until the new context is set.
-     *
-     * @return array
-     */
-    protected function getGridColumns()
-    {
-        if (!$this->gridColumns) {
-            $this->gridColumns = $this->datagridColumnsFromContextProvider->getColumnsFromContext($this->context);
-        }
-
-        return $this->gridColumns;
     }
 
     #[\Override]
@@ -104,41 +71,36 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * @param mixed $val
-     * @param array $options
-     *
-     * @return string|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function applyFrontendFormatting($val, $options)
+    private function applyFrontendFormatting(mixed $val, array $options): ?string
     {
         if (null !== $val) {
-            $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
-
-            $formatter = $this->getFormatterForType($frontendType);
+            $frontendType = $options['frontend_type'] ?? null;
+            $formatType = $this->context->getOption(FormatterProvider::FORMAT_TYPE);
+            $formatter = $frontendType && $formatType
+                ? $this->getFormatterProvider()->getFormatterFor($formatType, $frontendType)
+                : null;
             if ($formatter) {
                 $val = $formatter->formatType($val, $frontendType);
             } else {
                 switch ($frontendType) {
                     case PropertyInterface::TYPE_SELECT:
                         if (isset($options['choices'][$val])) {
-                            $val = $this->translator->trans($options['choices'][$val]);
+                            $val = $this->getTranslator()->trans($options['choices'][$val]);
                         }
                         break;
                     case PropertyInterface::TYPE_MULTI_SELECT:
-                        if (is_array($val) && count($val)) {
+                        if (\is_array($val) && \count($val)) {
                             $val = implode(',', array_map(function ($value) use ($options) {
-                                return array_key_exists($value, $options['choices'])
+                                return \array_key_exists($value, $options['choices'])
                                     ? $options['choices'][$value]
                                     : '';
                             }, $val));
                         }
                         break;
                     case PropertyInterface::TYPE_HTML:
-                        $val = $this->formatHtmlFrontendType(
-                            $val,
-                            isset($options['export_type']) ? $options['export_type'] : null
-                        );
+                        $val = $this->formatHtmlFrontendType($val, $options['export_type'] ?? null);
                         break;
                 }
             }
@@ -147,15 +109,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         return $val;
     }
 
-    /**
-     * Converts HTML to its string representation
-     *
-     * @param string $val
-     * @param string $exportType
-     *
-     * @return string
-     */
-    protected function formatHtmlFrontendType($val, $exportType)
+    private function formatHtmlFrontendType(string $val, ?string $exportType): string
     {
         $result = trim(
             str_replace(
@@ -164,35 +118,34 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
                 html_entity_decode(strip_tags($val), CREDITS_ALL)
             )
         );
-        if ($exportType === 'list') {
+        if ('list' === $exportType) {
             $result = preg_replace('/\s*\n\s*/', ';', $result);
         }
 
         return $result;
     }
 
-    #[\Override]
-    public function setImportExportContext(ContextInterface $context)
+    private function getGridColumns(): array
     {
-        $this->context = $context;
-        // Clear grid columns cache because it is not actual for new context.
-        $this->gridColumns = [];
+        if (!$this->gridColumns) {
+            $this->gridColumns = $this->getDatagridColumnsProvider()->getColumnsFromContext($this->context);
+        }
+
+        return $this->gridColumns;
     }
 
-    /**
-     * @param string $type
-     *
-     * @return TypeFormatterInterface
-     */
-    protected function getFormatterForType($type)
+    private function getDatagridColumnsProvider(): DatagridColumnsFromContextProviderInterface
     {
-        $formatType = $this->context->getOption(FormatterProvider::FORMAT_TYPE);
-        if (isset($this->formatters[$formatType][$type])) {
-            return $this->formatters[$formatType][$type];
-        }
-        $formatter = $this->formatterProvider->getFormatterFor($formatType, $type);
-        $this->formatters[$formatType][$type] = $formatter;
+        return $this->container->get(DatagridColumnsFromContextProviderInterface::class);
+    }
 
-        return $formatter;
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->container->get(TranslatorInterface::class);
+    }
+
+    private function getFormatterProvider(): FormatterProvider
+    {
+        return $this->container->get(FormatterProvider::class);
     }
 }

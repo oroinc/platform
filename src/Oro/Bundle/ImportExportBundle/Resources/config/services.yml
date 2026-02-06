@@ -24,13 +24,11 @@ services:
     oro_importexport.formatter.formatter_provider:
         class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
         arguments:
-            - '@service_container'
-            - []
-            - []
+            - ~ # container; it is set by Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass
+            - [] # format types; it is set by Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass
 
     oro_importexport.formatter.excel_datetime:
         class: Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter
-        public: true
         arguments:
             - '@oro_locale.settings'
             - '@translator'
@@ -41,7 +39,6 @@ services:
 
     oro_importexport.formatter.locale_number:
         class: Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter
-        public: true
         arguments:
             - '@oro_locale.formatter.number'
         tags:

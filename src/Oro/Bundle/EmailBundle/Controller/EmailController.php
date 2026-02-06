@@ -55,6 +55,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -230,7 +231,7 @@ class EmailController extends AbstractController
             $emails[] = $entity;
         } else {
             $emails = $this->getEmailThreadProvider()->getThreadEmails(
-                $this->container->get('doctrine')->getManager(),
+                $this->container->get(ManagerRegistry::class)->getManager(),
                 $entity
             );
             $targetActivityClass = $request->get('targetActivityClass');
@@ -296,12 +297,12 @@ class EmailController extends AbstractController
             $emails[] = $entity;
         } else {
             $emails = $this->getEmailThreadProvider()->getUserThreadEmails(
-                $this->container->get('doctrine')->getManager(),
+                $this->container->get(ManagerRegistry::class)->getManager(),
                 $entity,
                 $this->getUser(),
                 $this->container->get(MailboxManager::class)->findAvailableMailboxes(
                     $this->getUser(),
-                    $this->container->get('security.token_storage')->getToken()->getOrganization()
+                    $this->container->get(TokenStorageInterface::class)->getToken()->getOrganization()
                 )
             );
         }
@@ -333,7 +334,9 @@ class EmailController extends AbstractController
         $emails = [];
         $ids = $this->prepareArrayParam($request, 'ids');
         if (count($ids) !== 0) {
-            $emails = $this->container->get('doctrine')->getRepository(Email::class)->findEmailsByIds($ids);
+            $emails = $this->container->get(ManagerRegistry::class)
+                ->getRepository(Email::class)
+                ->findEmailsByIds($ids);
         }
         $this->loadEmailBody($emails);
 
@@ -842,7 +845,7 @@ class EmailController extends AbstractController
             $entityClass = $request->get('entityClass');
             $entityId = $request->get('entityId');
             if ($entityClass && $entityId) {
-                $em = $this->container->get('doctrine')->getManagerForClass($entityClass);
+                $em = $this->container->get(ManagerRegistry::class)->getManagerForClass($entityClass);
                 $relatedEntity = $em->getReference($entityClass, $entityId);
                 if ($relatedEntity === $this->getUser()) {
                     $relatedEntity = null;
@@ -903,7 +906,7 @@ class EmailController extends AbstractController
 
     protected function getOrganizationRepository(): EntityRepository
     {
-        return $this->container->get('doctrine')->getRepository(Organization::class);
+        return $this->container->get(ManagerRegistry::class)->getRepository(Organization::class);
     }
 
     private function getMessageProducer(): MessageProducerInterface
@@ -1132,9 +1135,10 @@ class EmailController extends AbstractController
                 EmailCacheManager::class,
                 EmailManager::class,
                 ImapEmailAttachmentLoader::class,
+                TokenStorageInterface::class,
+                ManagerRegistry::class,
                 'oro_config.user' => ConfigManager::class,
                 'oro_entity_config.provider.attachment' => ConfigProvider::class,
-                'doctrine' => ManagerRegistry::class,
             ]
         );
     }
