@@ -86,8 +86,8 @@ oro:
                 label: Public Slug
                 description: Specify the URL slug for downloading the OpenAPI specification without authorization. Leave this blank if unauthorized access is not permitted.
             view:
-                label: API Type (View)
-                description: The API type for which the OpenAPI specification should be created.
+                label: API
+                description: The API for which the OpenAPI specification should be created.
             format:
                 label: Format
                 description: The format in which the OpenAPI specification should be created.
