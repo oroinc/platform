@@ -88,6 +88,21 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
       selector: 'div[data-page-component-name="users-grid"]'
 
+    Role Users Grid:
+      selector: 'div[data-page-component-name="role-users-grid"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+
+    Role Users GridFilters:
+      selector: 'div[data-page-component-name="role-users-grid"] div.filter-box'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters
+
+    Role Users GridToolbarActions:
+      selector: 'div[data-page-component-name="role-users-grid"] .toolbar .actions-panel'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolbarActions
+
+    Role Users GridFiltersState:
+      selector: 'div[data-page-component-name="role-users-grid"] .filters-state'
+
     Generate Key:
       selector: '#btn-apigen'
 
