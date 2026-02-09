@@ -64,9 +64,6 @@ entity_config:
                     options:
                         translatable:       true
                         priority:           50
-                    constraints:
-                        - Length:
-                            max:            500
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\TextareaType
                         options:
@@ -74,6 +71,7 @@ entity_config:
                             block:          general
                             required:       false
                             strip_tags:     true
+                            empty_data:     ''
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#entity
         field:
             form:
