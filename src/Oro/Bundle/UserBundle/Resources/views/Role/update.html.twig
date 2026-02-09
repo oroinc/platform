@@ -138,7 +138,7 @@
             {
                 'title' : null,
                 'useSpan': false,
-                'data' : [dataGrid.renderGrid(gridName, {role_id: entityId}, { cssClass: 'inner-grid' })]
+                'data' : [dataGrid.renderGrid(gridName, {role_id: entityId|default(entity.id)}, { cssClass: 'inner-grid' })]
             }
         ]
     }]) %}

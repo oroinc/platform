@@ -67,8 +67,18 @@ Feature: Managing users roles
     Then the number of records decreased by 1
     And I should not see "Edited test role"
 
+  Scenario: Clone role and verify users grid filtering works
+    Given I go to System/User Management/Roles
+    When I click "Clone" on row "Administrator" in grid
+    And I click "Users"
+    And I filter First Name as contains "John" in "Role Users Grid"
+    Then I should see following "Role Users Grid" grid containing rows:
+      | First Name |
+      | John       |
+
   Scenario: Check should see only the following actions
     Given I go to System/User Management/Roles
+    And I accept alert
     And I should see only following actions for row #1 on grid:
       | Clone   |
       | View    |
