@@ -113,8 +113,9 @@ class RolePageListenerTest extends TestCase
             ->with(
                 '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
-                    'entity'     => $entity,
-                    'isReadonly' => false
+                    'entity'         => $entity,
+                    'isReadonly'     => false,
+                    'privilegesJson' => null
                 ]
             )
             ->willReturn($renderedHtml);
@@ -165,8 +166,9 @@ class RolePageListenerTest extends TestCase
             ->with(
                 '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
-                    'entity'     => $entity,
-                    'isReadonly' => false
+                    'entity'         => $entity,
+                    'isReadonly'     => false,
+                    'privilegesJson' => null
                 ]
             )
             ->willReturn($renderedHtml);
@@ -196,6 +198,54 @@ class RolePageListenerTest extends TestCase
             ['oro_user_role_create'],
             ['oro_action_widget_form', ['operationName' => 'clone_role']],
         ];
+    }
+
+    public function testOnUpdatePageRenderPassesPrivilegesJson(): void
+    {
+        $entity = new Role();
+        $form = new FormView();
+        $form->vars['value'] = new \stdClass();
+        $twig = $this->createMock(Environment::class);
+        $privilegesJson = '{"entity":[]}';
+        $event = new BeforeFormRenderEvent(
+            $form,
+            [
+                'dataBlocks' => [
+                    ['first block'],
+                    'second' => ['second block'],
+                    ['third block']
+                ],
+                'privilegesJson' => $privilegesJson,
+            ],
+            $twig,
+            $entity
+        );
+
+        $renderedHtml = '<div>Rendered datagrid position</div>';
+        $twig->expects($this->once())
+            ->method('render')
+            ->with(
+                '@OroWorkflow/Datagrid/aclGrid.html.twig',
+                [
+                    'entity'         => $entity,
+                    'isReadonly'     => false,
+                    'privilegesJson' => $privilegesJson
+                ]
+            )
+            ->willReturn($renderedHtml);
+
+        $this->requestStack->push(
+            new Request([], [], ['_route' => 'oro_user_role_update', '_route_params' => []])
+        );
+
+        $this->listener->onUpdatePageRender($event);
+
+        $data = $event->getFormData();
+        $workflowBlock = $data['dataBlocks'][2];
+        $this->assertEquals(
+            [['data' => [$renderedHtml]]],
+            $workflowBlock['subblocks']
+        );
     }
 
     public function testOnViewPageRenderWithoutRequest(): void
@@ -248,8 +298,9 @@ class RolePageListenerTest extends TestCase
             ->with(
                 '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
-                    'entity'     => $entity,
-                    'isReadonly' => true
+                    'entity'         => $entity,
+                    'isReadonly'     => true,
+                    'privilegesJson' => null
                 ]
             )
             ->willReturn($renderedHtml);

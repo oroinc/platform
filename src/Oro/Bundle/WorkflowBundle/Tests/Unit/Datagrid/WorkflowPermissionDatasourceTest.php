@@ -115,6 +115,36 @@ class WorkflowPermissionDatasourceTest extends TestCase
         $this->validateResult($result);
     }
 
+    public function testGetResultsWithPrivilegesJson(): void
+    {
+        $role = new Role();
+        $privilegesJson = '{"workflow":[]}';
+        $parameters = new ParameterBag();
+        $parameters->add(['role' => $role, 'privilegesJson' => $privilegesJson]);
+        $datagridConfig = $this->createMock(DatagridConfiguration::class);
+        $grid = new Datagrid('test', $datagridConfig, $parameters);
+
+        $this->datasource->process($grid, []);
+
+        $privilege = new AclPrivilege();
+        $privilege->setIdentity(new AclPrivilegeIdentity('workflow:workflow1', 'workflow 1'));
+        $privilege->addPermission(new AclPermission('VIEW_WORKFLOW', 0));
+        $privileges = new ArrayCollection(['workflow' => new ArrayCollection([$privilege])]);
+
+        $this->aclRoleHandler->expects($this->once())
+            ->method('getAllPrivileges')
+            ->willReturn($privileges);
+        $this->aclRoleHandler->expects($this->once())
+            ->method('applyPrivilegesFromJson')
+            ->with($this->isType('array'), 'workflow', $privilegesJson);
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(fn ($value) => 'translated: ' . $value);
+
+        $this->datasource->getResults();
+    }
+
     private function validateResult(array $result): void
     {
         $this->assertCount(2, $result);

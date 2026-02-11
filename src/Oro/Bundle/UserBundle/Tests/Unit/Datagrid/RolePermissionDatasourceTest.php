@@ -122,6 +122,49 @@ class RolePermissionDatasourceTest extends TestCase
         $this->checkResult($result);
     }
 
+    public function testGetResultsWithPrivilegesJson(): void
+    {
+        $role = new Role();
+        $privilegesJson = '{"entity":[]}';
+        $parameters = new ParameterBag();
+        $parameters->add(['role' => $role, 'privilegesJson' => $privilegesJson]);
+        $datagridConfig = $this->createMock(DatagridConfiguration::class);
+        $grid = new Datagrid('test', $datagridConfig, $parameters);
+
+        $this->datasource->process($grid, []);
+
+        $privilege1 = new AclPrivilege();
+        $privilege1->setIdentity(new AclPrivilegeIdentity('entity:Acme\Test1Entity', 'test entity'));
+        $privilege1->setCategory('testCategory');
+        $privilege1->addPermission(new AclPermission('VIEW', 0));
+        $privileges = new ArrayCollection(['entity' => new ArrayCollection([$privilege1])]);
+
+        $this->aclRoleHandler->expects($this->once())
+            ->method('getAllPrivileges')
+            ->willReturn($privileges);
+        $this->aclRoleHandler->expects($this->once())
+            ->method('applyPrivilegesFromJson')
+            ->with($this->isType('array'), 'entity', $privilegesJson);
+
+        $category = new PrivilegeCategory('testCategory', 'testCategory', true, 1);
+        $this->categoryProvider->expects($this->any())
+            ->method('getCategories')
+            ->willReturn([$category]);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(fn ($value) => $value);
+        $this->permissionManager->expects($this->any())
+            ->method('getPermissionByName')
+            ->willReturnCallback(function ($permissionName) {
+                $permission = new Permission();
+                $permission->setName($permissionName);
+                $permission->setLabel($permissionName);
+                return $permission;
+            });
+
+        $this->datasource->getResults();
+    }
+
     private function checkResult(ResultRecord $result)
     {
         $this->assertEquals('entity:Acme\Test1Entity', $result->getValue('identity'));
