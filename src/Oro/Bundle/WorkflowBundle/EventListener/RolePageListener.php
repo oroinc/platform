@@ -89,7 +89,12 @@ class RolePageListener
             if ($key === $entityBlockIndex) {
                 $resultBlocks[] = [
                     'title'     => $this->translator->trans('oro.workflow.workflowdefinition.entity_plural_label'),
-                    'subblocks' => [['data' => [$this->getRenderedGridHtml($twigEnvironment, $entity, $readOnly)]]]
+                    'subblocks' => [['data' => [$this->getRenderedGridHtml(
+                        $twigEnvironment,
+                        $entity,
+                        $readOnly,
+                        $pageData['privilegesJson'] ?? null,
+                    )]]]
                 ];
             }
         }
@@ -98,11 +103,15 @@ class RolePageListener
         return $pageData;
     }
 
-    private function getRenderedGridHtml(Environment $twigEnvironment, Role $entity, bool $readOnly): string
-    {
+    private function getRenderedGridHtml(
+        Environment $twigEnvironment,
+        Role $entity,
+        bool $readOnly,
+        ?string $privilegesJson = null,
+    ): string {
         return $twigEnvironment->render(
             '@OroWorkflow/Datagrid/aclGrid.html.twig',
-            ['entity' => $entity, 'isReadonly' => $readOnly]
+            ['entity' => $entity, 'isReadonly' => $readOnly, 'privilegesJson' => $privilegesJson]
         );
     }
 }

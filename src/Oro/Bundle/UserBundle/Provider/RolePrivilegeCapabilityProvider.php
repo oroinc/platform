@@ -13,14 +13,15 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
 {
     /**
      * @param AbstractRole $role
+     * @param string|null $privilegesJson
      *
      * @return array
      */
-    public function getCapabilities(AbstractRole $role)
+    public function getCapabilities(AbstractRole $role, ?string $privilegesJson = null): array
     {
         $categories = $this->categoryProvider->getCategories();
         $capabilitiesData = $this->getCapabilitiesData($categories);
-        $allPrivileges = $this->preparePrivileges($role, 'action');
+        $allPrivileges = $this->preparePrivileges($role, 'action', $privilegesJson);
         foreach ($allPrivileges as $privilege) {
             $permissions = $privilege->getPermissions()->toArray();
             if ($permissions) {
@@ -79,13 +80,14 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
 
     /**
      * @param AbstractRole $role
+     * @param string|null $privilegesJson
      *
      * @return array
      */
-    public function getCapabilitySetOptions(AbstractRole $role)
+    public function getCapabilitySetOptions(AbstractRole $role, ?string $privilegesJson = null): array
     {
         return [
-            'data'   => $this->getCapabilities($role),
+            'data'   => $this->getCapabilities($role, $privilegesJson),
             'tabIds' => $this->categoryProvider->getTabIds()
         ];
     }

@@ -1,6 +1,6 @@
 {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 {{ dataGrid.renderGrid(
     'workflow-permission-grid',
-    { role: entity },
+    { role: entity, privilegesJson: privilegesJson|default(null) },
     { cssClass: 'workflow-permission-grid inner-permissions-grid', themeOptions: {readonly: isReadonly} }
 ) }}

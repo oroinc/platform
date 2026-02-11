@@ -26,14 +26,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
-    /** @var PermissionManager */
-    protected $permissionManager;
-
-    /** @var ConfigManager */
-    protected $configEntityManager;
-
-    /** @var AbstractRole */
-    protected $role;
+    protected PermissionManager $permissionManager;
+    protected ConfigManager $configEntityManager;
+    protected AbstractRole $role;
+    protected ?string $privilegesJson = null;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -51,6 +47,7 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     public function process(DatagridInterface $grid, array $config)
     {
         $this->role = $grid->getParameters()->get('role');
+        $this->privilegesJson = $grid->getParameters()->get('privilegesJson');
         $grid->setDatasource(clone $this);
     }
 
@@ -58,7 +55,7 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     public function getResults()
     {
         $gridData = [];
-        $allPrivileges = $this->preparePrivileges($this->role, 'workflow');
+        $allPrivileges = $this->preparePrivileges($this->role, 'workflow', $this->privilegesJson);
         $categories = [];
         foreach ($allPrivileges as $privilege) {
             /** @var AclPrivilege $privilege */

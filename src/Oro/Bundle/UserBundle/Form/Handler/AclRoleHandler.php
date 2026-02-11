@@ -502,4 +502,63 @@ class AclRoleHandler
 
         return $privileges;
     }
+
+    /**
+     * @param AclPrivilege[] $privileges
+     */
+    public function applyPrivilegesFromJson(array $privileges, string $type, string $json): void
+    {
+        $decoded = $this->decodePrivilegesByType($json, $type);
+        if (!$decoded) {
+            return;
+        }
+
+        $map = [];
+        foreach ($decoded as $privilege) {
+            $this->collectPermissionLevels($privilege, $map);
+        }
+
+        foreach ($privileges as $privilege) {
+            $this->applyPermissionLevels($privilege, $map);
+        }
+    }
+
+    private function collectPermissionLevels(AclPrivilege $privilege, array &$map): void
+    {
+        $id = $privilege->getIdentity()->getId();
+        foreach ($privilege->getPermissions() as $perm) {
+            $map[$id][$perm->getName()] = $perm->getAccessLevel();
+        }
+        foreach ($privilege->getFields() as $field) {
+            $this->collectPermissionLevels($field, $map);
+        }
+    }
+
+    private function applyPermissionLevels(AclPrivilege $privilege, array $map): void
+    {
+        $id = $privilege->getIdentity()->getId();
+        if (isset($map[$id])) {
+            foreach ($privilege->getPermissions() as $perm) {
+                if (isset($map[$id][$perm->getName()])) {
+                    $perm->setAccessLevel($map[$id][$perm->getName()]);
+                }
+            }
+        }
+        foreach ($privilege->getFields() as $field) {
+            $this->applyPermissionLevels($field, $map);
+        }
+    }
+
+    /**
+     * @return AclPrivilege[]
+     */
+    private function decodePrivilegesByType(string $json, string $type): array
+    {
+        $decoded = json_decode($json, true);
+        if (!\is_array($decoded) || !isset($decoded[$type], $this->privilegeConfig[$type])) {
+            return [];
+        }
+
+        return $this->decodeAclPrivileges($decoded[$type], $this->privilegeConfig[$type]);
+    }
 }
