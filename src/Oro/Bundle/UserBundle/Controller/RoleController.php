@@ -112,13 +112,17 @@ class RoleController extends AbstractController
         $form = $aclRoleHandler->createView();
         $tabs = $this->getRolePrivilegeCategoryProvider()->getTabs();
 
+        $privilegesJson = $request->request->all('oro_user_role_form')['privileges'] ?? null;
+
         return [
             'entity' => $role,
             'form' => $form,
             'tabsOptions' => [
                 'data' => $tabs
             ],
-            'capabilitySetOptions' => $this->getRolePrivilegeCapabilityProvider()->getCapabilitySetOptions($role),
+            'capabilitySetOptions' => $this->getRolePrivilegeCapabilityProvider()
+                ->getCapabilitySetOptionsWithPredefinedData($role, $privilegesJson),
+            'privilegesJson' => $privilegesJson,
             'privilegesConfig' => $this->getParameter('oro_user.privileges'),
             'allow_delete' => $role->getId() && !$this->hasAssignedUsers($role)
         ];

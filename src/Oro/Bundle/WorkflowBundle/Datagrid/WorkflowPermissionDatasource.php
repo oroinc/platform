@@ -35,6 +35,8 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     /** @var AbstractRole */
     protected $role;
 
+    protected ?string $privilegesJson = null;
+
     public function __construct(
         TranslatorInterface $translator,
         PermissionManager $permissionManager,
@@ -51,6 +53,7 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     public function process(DatagridInterface $grid, array $config)
     {
         $this->role = $grid->getParameters()->get('role');
+        $this->privilegesJson = $grid->getParameters()->get('privilegesJson');
         $grid->setDatasource(clone $this);
     }
 
@@ -58,7 +61,7 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     public function getResults()
     {
         $gridData = [];
-        $allPrivileges = $this->preparePrivileges($this->role, 'workflow');
+        $allPrivileges = $this->preparePrivilegesWithPredefinedData($this->role, 'workflow', $this->privilegesJson);
         $categories = [];
         foreach ($allPrivileges as $privilege) {
             /** @var AclPrivilege $privilege */

@@ -7,7 +7,9 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
+use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Component\Testing\ReflectionUtil;
@@ -81,5 +83,40 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new ArrayCollection([$privilege1, $privilege2]));
 
         self::assertEquals([], $this->handler->getAllPrivileges($role));
+    }
+
+    public function testApplyPrivilegesFromJson(): void
+    {
+        $handler = new AclRoleHandler(
+            $this->createMock(FormFactory::class),
+            $this->createMock(AclCacheInterface::class),
+            $this->createMock(DoctrineAclCacheProvider::class),
+            ['entity' => ['types' => ['entity'], 'fix_values' => false, 'show_default' => true, 'default_value' => 5]]
+        );
+
+        $field = new AclPrivilege();
+        $field->setIdentity(new AclPrivilegeIdentity('entity:Acme\Entity::name', 'name'));
+        $field->addPermission(new AclPermission('VIEW', 0));
+
+        $privilege = new AclPrivilege();
+        $privilege->setIdentity(new AclPrivilegeIdentity('entity:Acme\Entity', 'Test'));
+        $privilege->addPermission(new AclPermission('VIEW', 0));
+        $privilege->addPermission(new AclPermission('EDIT', 0));
+        $privilege->setFields(new ArrayCollection([$field]));
+
+        $json = json_encode(['entity' => [[
+            'identity' => ['id' => 'entity:Acme\Entity', 'name' => 'Test'],
+            'permissions' => [['name' => 'VIEW', 'accessLevel' => 4], ['name' => 'EDIT', 'accessLevel' => 3]],
+            'fields' => [[
+                'identity' => ['id' => 'entity:Acme\Entity::name', 'name' => 'name'],
+                'permissions' => [['name' => 'VIEW', 'accessLevel' => 2]],
+            ]],
+        ]]]);
+
+        $handler->applyPrivilegesFromJson([$privilege], 'entity', $json);
+
+        self::assertEquals(4, $privilege->getPermissions()['VIEW']->getAccessLevel());
+        self::assertEquals(3, $privilege->getPermissions()['EDIT']->getAccessLevel());
+        self::assertEquals(2, $field->getPermissions()['VIEW']->getAccessLevel());
     }
 }

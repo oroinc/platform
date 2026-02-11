@@ -18,9 +18,25 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
      */
     public function getCapabilities(AbstractRole $role)
     {
+        return $this->buildCapabilities($role);
+    }
+
+    /**
+     * @param AbstractRole $role
+     * @param string|null $privilegesJson
+     *
+     * @return array
+     */
+    public function getCapabilitiesWithPredefinedData(AbstractRole $role, ?string $privilegesJson = null): array
+    {
+        return $this->buildCapabilities($role, $privilegesJson);
+    }
+
+    private function buildCapabilities(AbstractRole $role, ?string $privilegesJson = null): array
+    {
         $categories = $this->categoryProvider->getCategories();
         $capabilitiesData = $this->getCapabilitiesData($categories);
-        $allPrivileges = $this->preparePrivileges($role, 'action');
+        $allPrivileges = $this->preparePrivilegesWithPredefinedData($role, 'action', $privilegesJson);
         foreach ($allPrivileges as $privilege) {
             $permissions = $privilege->getPermissions()->toArray();
             if ($permissions) {
@@ -86,6 +102,22 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
     {
         return [
             'data'   => $this->getCapabilities($role),
+            'tabIds' => $this->categoryProvider->getTabIds()
+        ];
+    }
+
+    /**
+     * @param AbstractRole $role
+     * @param string|null $privilegesJson
+     *
+     * @return array
+     */
+    public function getCapabilitySetOptionsWithPredefinedData(
+        AbstractRole $role,
+        ?string $privilegesJson = null
+    ): array {
+        return [
+            'data'   => $this->getCapabilitiesWithPredefinedData($role, $privilegesJson),
             'tabIds' => $this->categoryProvider->getTabIds()
         ];
     }
