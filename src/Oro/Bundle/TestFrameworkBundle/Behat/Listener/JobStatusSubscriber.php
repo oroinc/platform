@@ -89,7 +89,8 @@ class JobStatusSubscriber implements EventSubscriberInterface
         /** @var Connection $connection */
         $connection = $doctrine->getManagerForClass(Job::class)->getConnection();
 
-        $endTime = new \DateTime('+900 seconds');
+        $waitTime = getenv('BEHAT_JOB_STATUS_WAIT_TIME_INTERVAL') ?: '+900 seconds';
+        $endTime = new \DateTime($waitTime);
         $isSearchIndex = false;
         while (true) {
             $this->startConsumerIfNotRunning();
@@ -120,11 +121,13 @@ class JobStatusSubscriber implements EventSubscriberInterface
             }
         }
 
+        $activeJobs = array_map(fn ($job) => sprintf('id: %s, name: %s', $job['id'], $job['name']), (array)$activeJobs);
         throw new \RuntimeException(
             sprintf(
-                'The application has not been able to finish processing jobs within the last 900 seconds. ' .
+                'The application has not been able to finish processing jobs within the last %s. ' .
                 'Unprocessed jobs: %s',
-                implode(', ', (array)$activeJobs)
+                $waitTime,
+                implode('; ', $activeJobs)
             )
         );
     }
