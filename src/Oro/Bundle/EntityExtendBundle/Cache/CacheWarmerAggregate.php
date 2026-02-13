@@ -85,6 +85,10 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
             $cacheWarmer->enableOptionalWarmers();
         }
 
+        if (\is_string($buildDir)) {
+            return $cacheWarmer->warmUp($cacheDir, $buildDir);
+        }
+
         return $cacheWarmer->warmUp($cacheDir);
     }
 }
