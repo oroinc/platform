@@ -946,6 +946,7 @@ services:
             - '@oro_entity_extend.cache.validator_mapping'
             - '@validator.builder'
             - '%validator.mapping.cache.file%'
+            - '@validator.expression_language'
         tags:
             - { name: kernel.cache_warmer }
 

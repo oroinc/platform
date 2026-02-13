@@ -24,7 +24,9 @@ class ThemeConfigurationTypeProvider
     public function getTypes(): array
     {
         if (empty($this->types)) {
-            $this->types = \array_map(static fn ($typeProvider) => $typeProvider->getType(), $this->typeProviders);
+            foreach ($this->typeProviders as $typeProvider) {
+                $this->types[] = $typeProvider->getType();
+            }
         }
 
         return $this->types;

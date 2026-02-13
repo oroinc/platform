@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FrontendBundle\Form\Type\ThemeSelectType;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\ThemeBundle\Form\EventListener\ThemeConfigurationSubscriber;
 use Oro\Bundle\ThemeBundle\Form\Provider\ConfigurationBuildersProvider;
 use Oro\Bundle\ThemeBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType;
+use Oro\Bundle\ThemeBundle\Form\Type\ThemeSelectType;
 use Oro\Bundle\ThemeBundle\Tests\Unit\Form\Type\Stub\ThemeSelectTypeStub;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;

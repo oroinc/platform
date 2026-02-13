@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate;
 use Oro\Component\DependencyInjection\ServiceLink;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as SymfonyCacheWarmerAggregate;
 
 class CacheWarmerAggregateTest extends TestCase
@@ -62,6 +63,44 @@ class CacheWarmerAggregateTest extends TestCase
             ->method('enableOptionalWarmers');
 
         $this->cacheWarmerAggregate->warmUp($cacheDir);
+    }
+
+    public function testWarmUpPassesBuildDir(): void
+    {
+        $cacheDir = 'test';
+        $buildDir = 'test_build';
+
+        $this->cacheWarmer->expects(self::once())
+            ->method('warmUp')
+            ->with($cacheDir, $buildDir)
+            ->willReturn([]);
+
+        $this->cacheWarmerAggregate->warmUp($cacheDir, $buildDir);
+    }
+
+    public function testWarmUpWithNullBuildDir(): void
+    {
+        $cacheDir = 'test';
+
+        $this->cacheWarmer->expects(self::once())
+            ->method('warmUp')
+            ->with($cacheDir)
+            ->willReturn([]);
+
+        $this->cacheWarmerAggregate->warmUp($cacheDir, null);
+    }
+
+    public function testWarmUpWithSymfonyStyleBuildDir(): void
+    {
+        $cacheDir = 'test';
+        $io = $this->createMock(SymfonyStyle::class);
+
+        $this->cacheWarmer->expects(self::once())
+            ->method('warmUp')
+            ->with($cacheDir)
+            ->willReturn([]);
+
+        $this->cacheWarmerAggregate->warmUp($cacheDir, $io);
     }
 
     public function testWarmUpWithOptionalWarmers(): void

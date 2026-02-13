@@ -40,6 +40,9 @@ oro:
 
       fallback:
           label: Theme Configuration
+      feature:
+        label: Theme Configuration
+        description: Enables theme configuration management. Automatically disabled when no theme configuration types are available.
     system_configuration:
       fields:
         theme_configuration:

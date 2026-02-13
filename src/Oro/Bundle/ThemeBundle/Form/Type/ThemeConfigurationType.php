@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ThemeBundle\Form\Type;
 
-use Oro\Bundle\FrontendBundle\Form\Type\ThemeSelectType;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\ThemeBundle\Form\EventListener\ThemeConfigurationSubscriber;
 use Symfony\Component\Form\AbstractType;
