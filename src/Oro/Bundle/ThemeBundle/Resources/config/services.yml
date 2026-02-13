@@ -84,3 +84,10 @@ services:
             - 'Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration'
         tags:
             - { name: doctrine.repository_service }
+
+    oro_theme.feature.voter.theme_configuration:
+        class: Oro\Bundle\ThemeBundle\Checker\Voter\ThemeConfigurationFeatureVoter
+        arguments:
+            - '@oro_theme.provider.theme_configuration_type'
+        tags:
+            - { name: oro_featuretogle.voter }

@@ -19,6 +19,21 @@ services:
       tags:
           - { name: form.type, alias: oro_theme_configuration_select }
 
+  oro_theme.form.type.theme_select:
+      class: Oro\Bundle\ThemeBundle\Form\Type\ThemeSelectType
+      arguments:
+          - '@oro_layout.theme_manager'
+      tags:
+          - { name: form.type }
+
+  ### FORM EXTENSIONS ###
+  oro_theme.form.extension.theme_configuration_type:
+      class: Oro\Bundle\ThemeBundle\Form\Extension\ThemeConfigurationTypeExtension
+      arguments:
+          - '@oro_theme.provider.theme_configuration_type'
+      tags:
+          - { name: form.type_extension }
+
   ### CONFIGURATION CHILDREN BUILDER ###
   _instanceof:
       Oro\Bundle\ThemeBundle\Form\Configuration\ConfigurationChildBuilderInterface:
