@@ -1,0 +1,13 @@
+features:
+    theme_configuration:
+        label: oro.theme.themeconfiguration.feature.label
+        description: oro.theme.themeconfiguration.feature.description
+        routes:
+            - oro_theme_configuration_index
+            - oro_theme_configuration_view
+            - oro_theme_configuration_create
+            - oro_theme_configuration_update
+        navigation_items:
+            - application_menu.system_tab.theme_configuration
+        entities:
+            - Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration
