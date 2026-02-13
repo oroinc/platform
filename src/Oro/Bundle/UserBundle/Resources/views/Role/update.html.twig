@@ -111,7 +111,7 @@
             options: tabsOptions
         }) }}></div>
         <div id="{{ entityTabPanelId }}" class="tab-content" role="tabpanel">
-            {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
+            {{ dataGrid.renderGrid('role-permission-grid', {role: entity, privilegesJson: privilegesJson|default(null)}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
             <div {{ UI.renderPageComponentAttributes({
                 module: 'orouser/js/components/role/capability-set-component',
                 options: capabilitySetOptions
@@ -146,6 +146,7 @@
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,
         'dataBlocks': dataBlocks,
+        'privilegesJson': privilegesJson|default(null),
     } %}
     {{ parent() }}
 {% endblock content_data %}

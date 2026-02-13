@@ -18,6 +18,12 @@ use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides workflow permission data for role privilege management in datagrids.
+ *
+ * This datasource extends the role privilege provider to supply workflow-specific permission
+ * information, enabling administrators to manage workflow access levels and permissions for roles.
+ */
 class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
     /** @var PermissionManager */
@@ -28,6 +34,8 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
 
     /** @var AbstractRole */
     protected $role;
+
+    protected ?string $privilegesJson = null;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -47,6 +55,7 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     public function process(DatagridInterface $grid, array $config)
     {
         $this->role = $grid->getParameters()->get('role');
+        $this->privilegesJson = $grid->getParameters()->get('privilegesJson');
         $grid->setDatasource(clone $this);
     }
 
@@ -56,7 +65,7 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     public function getResults()
     {
         $gridData = [];
-        $allPrivileges = $this->preparePrivileges($this->role, 'workflow');
+        $allPrivileges = $this->preparePrivilegesWithPredefinedData($this->role, 'workflow', $this->privilegesJson);
         $categories = [];
         foreach ($allPrivileges as $privilege) {
             /** @var AclPrivilege $privilege */

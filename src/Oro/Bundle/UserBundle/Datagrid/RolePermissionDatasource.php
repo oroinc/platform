@@ -33,6 +33,8 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var AbstractRole */
     protected $role;
 
+    protected ?string $privilegesJson = null;
+
     public function __construct(
         TranslatorInterface $translator,
         PermissionManager $permissionManager,
@@ -51,6 +53,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     public function process(DatagridInterface $grid, array $config)
     {
         $this->role = $grid->getParameters()->get('role');
+        $this->privilegesJson = $grid->getParameters()->get('privilegesJson');
         $grid->setDatasource(clone $this);
     }
 
@@ -60,7 +63,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     public function getResults()
     {
         $gridData = [];
-        $allPrivileges = $this->preparePrivileges($this->role, 'entity');
+        $allPrivileges = $this->preparePrivilegesWithPredefinedData($this->role, 'entity', $this->privilegesJson);
         $categories = $this->categoryProvider->getCategories();
 
         foreach ($allPrivileges as $privilege) {

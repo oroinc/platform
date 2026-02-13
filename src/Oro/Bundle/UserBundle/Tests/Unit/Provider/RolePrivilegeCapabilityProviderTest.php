@@ -59,6 +59,32 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->capabilityProvider->getCapabilities($role));
     }
 
+    public function testGetCapabilitiesWithPrivilegesJson(): void
+    {
+        $role = $this->createMock(AbstractRole::class);
+        $privilegesJson = '{"action":[]}';
+
+        $category = new PrivilegeCategory('cat1', '', true, 1);
+        $this->categoryProvider->expects($this->once())
+            ->method('getCategories')
+            ->willReturn([$category]);
+
+        $permission = new AclPermission('perm1');
+        $identity = new AclPrivilegeIdentity(ActionAclExtension::NAME, 'cap1');
+        $privilege = new AclPrivilege();
+        $privilege->addPermission($permission)->setIdentity($identity)->setCategory('cat1');
+
+        $this->aclRoleHandler->expects($this->once())
+            ->method('getAllPrivileges')
+            ->with($role)
+            ->willReturn(['action' => new ArrayCollection([$privilege])]);
+        $this->aclRoleHandler->expects($this->once())
+            ->method('applyPrivilegesFromJson')
+            ->with($this->isType('array'), 'action', $privilegesJson);
+
+        $this->capabilityProvider->getCapabilitiesWithPredefinedData($role, $privilegesJson);
+    }
+
     public function getCapabilitiesDataProvider(): array
     {
         $category1 = new PrivilegeCategory('category1', '', true, 1);

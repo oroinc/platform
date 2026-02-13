@@ -16,14 +16,9 @@ abstract class RolePrivilegeAbstractProvider
 {
     private const DEFAULT_ACTION_CATEGORY = 'account_management';
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var RolePrivilegeCategoryProvider */
-    protected $categoryProvider;
-
-    /** @var AclRoleHandler */
-    protected $aclRoleHandler;
+    protected TranslatorInterface $translator;
+    protected RolePrivilegeCategoryProvider $categoryProvider;
+    protected AclRoleHandler $aclRoleHandler;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -68,6 +63,24 @@ abstract class RolePrivilegeAbstractProvider
             if ($privilegeType === $type) {
                 $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
             }
+        }
+
+        return $allPrivileges;
+    }
+
+    /**
+     * @param AbstractRole $role
+     * @param string       $type
+     * @param string|null  $privilegesJson
+     *
+     * @return AclPrivilege[]
+     */
+    protected function preparePrivilegesWithPredefinedData(AbstractRole $role, string $type, ?string $privilegesJson)
+    {
+        $allPrivileges = $this->preparePrivileges($role, $type);
+
+        if ($privilegesJson) {
+            $this->aclRoleHandler->applyPrivilegesFromJson($allPrivileges, $type, $privilegesJson);
         }
 
         return $allPrivileges;
