@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Stub;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 
-class TwigExtensionStub1 extends AbstractExtension implements ServiceSubscriberInterface
+class TwigExtensionStub3 extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            LoggerInterface::class,
-            'translator' => TranslatorInterface::class
+            TranslatorInterface::class
         ];
     }
 }
