@@ -73,6 +73,8 @@ class OroMainContext extends MinkContext implements
     private bool $debug = false;
     private string $rememberedURL = '';
 
+    public const SHOULD_SEE_TEXT_PATTERN = '/^(I\s)?should see\s+"([^"]+)"$/i';
+
     /**
      * @BeforeScenario
      */
@@ -145,14 +147,62 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+        $stepText = $scope->getStep()->getText();
+        if (preg_match(self::SKIP_WAIT_PATTERN, $stepText)) {
             // Don't wait when we need assert the flash message, because it can disappear until ajax in process
             return;
         }
 
+        $this->validateTextNotInFlashMessage($stepText);
+
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
         $driver->waitPageToLoad();
+    }
+
+    /**
+     * Validate that "should see" text assertions are not targeting flash messages
+     */
+    private function validateTextNotInFlashMessage($stepText): void
+    {
+        if (!preg_match(self::SHOULD_SEE_TEXT_PATTERN, $stepText, $matches)) {
+            return;
+        }
+
+        $searchText = $matches[2];
+
+        $textIsInFlashMessage = false;
+        foreach ($this->findAllElements('Flash Message') as $flashMessage) {
+            if (false === $flashMessage->isVisible()) {
+                continue;
+            }
+
+            if (false !== mb_stripos($flashMessage->getText(), $searchText)) {
+                $textIsInFlashMessage = true;
+                break;
+            }
+        }
+
+        if ($textIsInFlashMessage) {
+            $pageText = $this->getSession()->getPage()->getText();
+            $totalCount = mb_substr_count(mb_strtolower($pageText), mb_strtolower($searchText));
+            if (1 === $totalCount) {
+                self::fail(sprintf(
+                    'The text "%s" was found only in a flash message.'
+                        . PHP_EOL
+                        . 'Asserting flash messages as a regular text may lead to the flaky tests'
+                        . ' due to logic for skipping wait not being called.'
+                        . PHP_EOL
+                        . '(see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::SKIP_WAIT_PATTERN)'
+                        . PHP_EOL
+                        . 'Use the flash message assertion instead:'
+                        . PHP_EOL
+                        . 'I should see "%s" flash message',
+                    $searchText,
+                    $searchText
+                ));
+            }
+        }
     }
 
     /**
