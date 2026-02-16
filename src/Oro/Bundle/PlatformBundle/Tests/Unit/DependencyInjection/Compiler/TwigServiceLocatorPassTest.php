@@ -318,7 +318,7 @@ class TwigServiceLocatorPassTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Detected ambiguous service alias in the "oro_platform.twig.service_locator" service locator.'
-            . ' The alias "Psr\Log\LoggerInterface" has two service with different IDs,'
+            . ' The alias "Psr\Log\LoggerInterface" has two services with different IDs,'
             . ' "logger" (defined in "twig.extension_1" service)'
             . ' and "Psr\Log\LoggerInterface" (defined in "twig.extension_2" service).'
         );

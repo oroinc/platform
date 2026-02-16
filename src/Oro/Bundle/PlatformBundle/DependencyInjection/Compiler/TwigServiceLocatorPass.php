@@ -42,7 +42,7 @@ class TwigServiceLocatorPass implements CompilerPassInterface
                     if ($id !== $existingId) {
                         throw new InvalidArgumentException(\sprintf(
                             'Detected ambiguous service alias in the "%s" service locator.'
-                            . ' The alias "%s" has two service with different IDs,'
+                            . ' The alias "%s" has two services with different IDs,'
                             . ' "%s" (defined in "%s" service) and "%s" (defined in "%s" service).',
                             self::TWIG_SERVICE_LOCATOR_SERVICE_ID,
                             $alias,

@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\PlatformBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -16,25 +18,23 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
 {
-    private string $tagName;
-    private string $serviceLocatorServiceId;
-
-    public function __construct(string $tagName, string $serviceLocatorServiceId)
-    {
-        $this->tagName = $tagName;
-        $this->serviceLocatorServiceId = $serviceLocatorServiceId;
+    public function __construct(
+        private readonly string $tagName,
+        private readonly string $serviceLocatorServiceId
+    ) {
     }
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $serviceLocatorDefinition = $this->getServiceLocatorDefinition($container);
         $services = $serviceLocatorDefinition->getArgument(0);
 
         $locators = [];
+        $servicesIds = [];
         $taggedServices = $container->findTaggedServiceIds($this->tagName);
         foreach ($taggedServices as $id => $tags) {
             $foundLocators = $this->findServiceLocators($container, $id);
@@ -42,8 +42,17 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
                 foreach ($foundLocators as $locator) {
                     $locators[$id][] = $locator;
                     foreach ($locator[0]->getArgument(0) as $serviceId => $serviceRef) {
-                        if (!isset($services[$serviceId])) {
+                        if (isset($services[$serviceId])) {
+                            $this->assertServicesEqual(
+                                $serviceId,
+                                $id,
+                                $serviceRef,
+                                $servicesIds[$serviceId],
+                                $services[$serviceId]
+                            );
+                        } else {
                             $services[$serviceId] = $serviceRef;
+                            $servicesIds[$serviceId] = $id;
                         }
                     }
                 }
@@ -132,5 +141,44 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
         }
 
         return $this->getArgumentServiceLocatorDefinition($container, $factory[0]);
+    }
+
+    private function assertServicesEqual(
+        string $serviceAlias,
+        string $sourceServiceId,
+        mixed $serviceRef,
+        string $existingSourceServiceId,
+        mixed $existingServiceRef
+    ): void {
+        $serviceId = $this->getTargetServiceId($serviceRef, $serviceAlias, $sourceServiceId);
+        $existingServiceId = $this->getTargetServiceId($existingServiceRef, $serviceAlias, $existingSourceServiceId);
+        if ($serviceId !== $existingServiceId) {
+            throw new InvalidArgumentException(\sprintf(
+                'Detected ambiguous service alias in the "%s" service locator.'
+                . ' The alias "%s" has two services with different IDs,'
+                . ' "%s" (defined in "%s" service) and "%s" (defined in "%s" service).',
+                $this->serviceLocatorServiceId,
+                $serviceAlias,
+                $existingServiceId,
+                $existingSourceServiceId,
+                $serviceId,
+                $sourceServiceId
+            ));
+        }
+    }
+
+    private function getTargetServiceId(mixed $serviceRef, string $serviceAlias, string $sourceServiceId): string
+    {
+        if ($serviceRef instanceof ServiceClosureArgument) {
+            $serviceRefValue = $serviceRef->getValues()[0];
+            if ($serviceRefValue instanceof Reference) {
+                return (string)$serviceRefValue;
+            }
+        }
+        throw new \LogicException(\sprintf(
+            'Cannot retrieve the target service ID for the service alias "%s" (defined in "%s" service).',
+            $serviceAlias,
+            $sourceServiceId
+        ));
     }
 }
