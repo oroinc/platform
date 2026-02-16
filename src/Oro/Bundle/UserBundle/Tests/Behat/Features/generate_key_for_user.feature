@@ -12,4 +12,4 @@ Feature: Generate Key for user
     And I go to System/User Management/Users
     And I click View Charlie in grid
     And I click "Generate Key"
-    And I should see "Generate key was successful. New key: "
+    And I should see "Generate key was successful. New key: " flash message
