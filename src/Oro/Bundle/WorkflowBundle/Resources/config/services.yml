@@ -234,9 +234,9 @@ services:
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: container.service_subscriber, id: oro_workflow.database_checker }
-            - { name: container.service_subscriber, id: oro_workflow.permission_registry }
-            - { name: container.service_subscriber, id: oro_workflow.restriction.manager }
+            - { name: container.service_subscriber, id: oro_workflow.database_checker, key: Oro\Bundle\EntityBundle\Tools\DatabaseChecker }
+            - { name: container.service_subscriber, id: oro_workflow.permission_registry, key: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry }
+            - { name: container.service_subscriber, id: oro_workflow.restriction.manager, key: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager }
 
     oro_workflow.restriction.manager:
         class: 'Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager'

@@ -321,7 +321,7 @@ services:
             - [setClassName, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
         tags:
             - { name: security.voter }
-            - { name: container.service_subscriber, id: oro_config.manager }
+            - { name: container.service_subscriber }
 
     oro_locale.provider.localization_choices:
         class: Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider

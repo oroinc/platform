@@ -32,21 +32,19 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
         EmailAttachment::class,
     ];
 
-    private AuthorizationCheckerInterface $authorizationChecker;
-    private ContainerInterface $container;
     private ?MailboxManager $mailboxManager = null;
 
-    public function __construct(AuthorizationCheckerInterface $authorizationChecker, ContainerInterface $container)
-    {
-        $this->authorizationChecker = $authorizationChecker;
-        $this->container = $container;
+    public function __construct(
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_email.mailbox.manager' => MailboxManager::class
+            MailboxManager::class
         ];
     }
 
@@ -143,7 +141,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
     private function getMailboxManager(): MailboxManager
     {
         if (null === $this->mailboxManager) {
-            $this->mailboxManager = $this->container->get('oro_email.mailbox.manager');
+            $this->mailboxManager = $this->container->get(MailboxManager::class);
         }
 
         return $this->mailboxManager;

@@ -73,9 +73,9 @@ class LanguageCodeFormatter
 
         $lang = $this->localeSettings->getLanguage();
 
-        return Locales::exists($code) ?
-            Locales::getName($code, $lang) :
-            $this->formatNotExistsLocaleCode($code, $lang);
+        return Locales::exists($code)
+            ? Locales::getName($code, $lang)
+            : $this->formatNotExistsLocaleCode($code, $lang);
     }
 
     /**

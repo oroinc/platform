@@ -7,12 +7,11 @@ services:
         class: 'Oro\Bundle\PdfGeneratorBundle\Acl\Voter\PdfDocumentVoter'
         arguments:
             $doctrineHelper: '@oro_entity.doctrine_helper'
+            $authorizationChecker: '@security.authorization_checker'
         calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
             - [ 'setClassName', [ 'Oro\Bundle\PdfGeneratorBundle\Entity\PdfDocument' ] ]
         tags:
             - { name: 'security.voter' }
-            - { name: 'container.service_subscriber', id: 'oro_security.authorization_checker' }
 
     oro_pdf_generator.pdf_document.factory.generic:
         class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Factory\GenericPdfDocumentFactory'

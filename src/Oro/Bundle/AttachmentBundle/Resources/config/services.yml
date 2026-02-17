@@ -345,9 +345,9 @@ services:
             - [setClassName, ['Oro\Bundle\AttachmentBundle\Entity\File']]
         tags:
             - { name: security.voter }
-            - { name: container.service_subscriber, id: oro_attachment.acl.file_access_control_checker }
-            - { name: container.service_subscriber, id: oro_attachment.provider.file_applications }
-            - { name: container.service_subscriber, id: oro_action.provider.current_application }
+            - { name: container.service_subscriber, id: oro_attachment.acl.file_access_control_checker, key: Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker }
+            - { name: container.service_subscriber, id: oro_attachment.provider.file_applications, key: Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider }
+            - { name: container.service_subscriber, id: oro_action.provider.current_application, key: Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface }
 
     oro_attachment.acl.file_access_control_checker:
         class: 'Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker'

@@ -16,19 +16,18 @@ class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscrib
 {
     protected $supportedAttributes = [BasicPermission::DELETE];
 
-    private ContainerInterface $container;
-
-    public function __construct(DoctrineHelper $doctrineHelper, ContainerInterface $container)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        private readonly ContainerInterface $container
+    ) {
         parent::__construct($doctrineHelper);
-        $this->container = $container;
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_workflow.permission_registry' => WorkflowPermissionRegistry::class
+            WorkflowPermissionRegistry::class
         ];
     }
 
@@ -50,6 +49,6 @@ class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscrib
 
     private function getPermissionRegistry(): WorkflowPermissionRegistry
     {
-        return $this->container->get('oro_workflow.permission_registry');
+        return $this->container->get(WorkflowPermissionRegistry::class);
     }
 }

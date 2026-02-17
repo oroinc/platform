@@ -1085,7 +1085,7 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: security.voter }
-            - { name: container.service_subscriber, id: oro_email.mailbox.manager }
+            - { name: container.service_subscriber, id: oro_email.mailbox.manager, key: Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager }
 
     oro_email.acl.voter.acl_voter:
         class: Oro\Bundle\EmailBundle\Acl\Voter\AclVoter
@@ -1292,9 +1292,6 @@ services:
         public: true
         arguments:
             - '@doctrine'
-
-    Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager:
-        alias: 'oro_email.mailbox.manager'
 
     oro_email.workflow.condition.instanceof:
         class: Oro\Bundle\EmailBundle\Model\Condition\IsInstanceOf

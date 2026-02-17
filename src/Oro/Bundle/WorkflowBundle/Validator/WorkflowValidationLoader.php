@@ -16,21 +16,18 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_workflow.database_checker'    => DatabaseChecker::class,
-            'oro_workflow.permission_registry' => WorkflowPermissionRegistry::class,
-            'oro_workflow.restriction.manager' => RestrictionManager::class
+            DatabaseChecker::class,
+            WorkflowPermissionRegistry::class,
+            RestrictionManager::class
         ];
     }
 
@@ -59,16 +56,16 @@ class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscrib
 
     private function getDatabaseChecker(): DatabaseChecker
     {
-        return $this->container->get('oro_workflow.database_checker');
+        return $this->container->get(DatabaseChecker::class);
     }
 
     private function getPermissionRegistry(): WorkflowPermissionRegistry
     {
-        return $this->container->get('oro_workflow.permission_registry');
+        return $this->container->get(WorkflowPermissionRegistry::class);
     }
 
     private function getRestrictionManager(): RestrictionManager
     {
-        return $this->container->get('oro_workflow.restriction.manager');
+        return $this->container->get(RestrictionManager::class);
     }
 }

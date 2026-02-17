@@ -26,7 +26,7 @@ class EmailVoterTest extends TestCase
         $this->mailboxManager = $this->createMock(MailboxManager::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_email.mailbox.manager', $this->mailboxManager)
+            ->add(MailboxManager::class, $this->mailboxManager)
             ->getContainer($this);
 
         $this->emailVoter = new EmailVoter($this->authorizationChecker, $container);

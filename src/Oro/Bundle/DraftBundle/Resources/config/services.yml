@@ -59,7 +59,7 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: security.voter }
-            - { name: container.service_subscriber, id: oro_draft.helper.draft_permission_helper }
+            - { name: container.service_subscriber, id: oro_draft.helper.draft_permission_helper, key: Oro\Bundle\DraftBundle\Helper\DraftPermissionHelper }
 
     oro_draft.voter.acl_voter:
         class: Oro\Bundle\DraftBundle\Voter\AclVoter

@@ -13,6 +13,10 @@ services:
         tags:
             - { name: oro_integration.connector, type: connector1, channel_type: foo }
 
+    oro_integration.tests.sync_scheduler:
+        alias: oro_integration.sync_scheduler
+        public: true
+
     oro_integration.tests.entity_name_resolver.data_loader:
         class: Oro\Bundle\IntegrationBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoader
         decorates: oro_entity.tests.entity_name_resolver.data_loader

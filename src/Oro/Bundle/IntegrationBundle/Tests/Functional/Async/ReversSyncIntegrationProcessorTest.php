@@ -32,7 +32,7 @@ class ReversSyncIntegrationProcessorTest extends WebTestCase
         ]);
 
         $this->channelManager = self::getContainer()->get('doctrine')->getManagerForClass(Channel::class);
-        $this->syncScheduler = self::getContainer()->get('oro_integration.sync_scheduler');
+        $this->syncScheduler = self::getContainer()->get('oro_integration.tests.sync_scheduler');
     }
 
     public function testProcess(): void

@@ -18,18 +18,18 @@ class LocalizationVoter extends AbstractEntityVoter implements ServiceSubscriber
 {
     protected $supportedAttributes = [BasicPermission::DELETE];
 
-    private ContainerInterface $container;
-
-    public function __construct(DoctrineHelper $doctrineHelper, ContainerInterface $container)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        private readonly ContainerInterface $container
+    ) {
         parent::__construct($doctrineHelper);
-        $this->container = $container;
     }
+
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_config.manager' => ConfigManager::class
+            ConfigManager::class
         ];
     }
 
@@ -60,6 +60,6 @@ class LocalizationVoter extends AbstractEntityVoter implements ServiceSubscriber
 
     private function getConfigManager(): ConfigManager
     {
-        return $this->container->get('oro_config.manager');
+        return $this->container->get(ConfigManager::class);
     }
 }
