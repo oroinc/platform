@@ -11,7 +11,8 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: 'oro_attachment.imagine.filter_service', key: Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService }
+            - { name: container.service_subscriber, id: oro_attachment.imagine.filter_service, key: Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService }
+            - { name: container.service_subscriber, id: oro_attachment.tools.webp_configuration, key: Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration }
             - { name: monolog.logger, channel: oro_attachment }
 
     oro_attachment.controller.file:
@@ -22,6 +23,7 @@ services:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: oro_attachment.manager.image_resize, key: Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface }
             - { name: container.service_subscriber, id: oro_attachment.provider.file_name, key: Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface }
+            - { name: container.service_subscriber, id: oro_attachment.tools.webp_configuration, key: Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration }
 
     Oro\Bundle\AttachmentBundle\Controller\AttachmentController:
         calls:

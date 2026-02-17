@@ -13,8 +13,7 @@ services:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: oro_entity.entity_field_provider }
-            - { name: container.service_subscriber, id: oro_featuretoggle.checker.feature_checker }
+            - { name: container.service_subscriber, id: oro_entity.entity_field_provider, key: Oro\Bundle\EntityBundle\Provider\EntityFieldProvider }
 
     Oro\Bundle\EntityConfigBundle\Controller\AttributeController:
         calls:
