@@ -55,16 +55,14 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $this->dynamicFieldsHelper = $this->createMock(DynamicFieldsHelper::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_entity_config.manager.attribute_manager', $this->attributeManager)
-            ->add('oro_entity_config.config.attributes_config_helper', $this->attributeConfigHelper)
-            ->add('oro_entity_extend.form.extension.dynamic_fields_helper', $this->dynamicFieldsHelper)
+            ->add(ConfigManager::class, $this->configManager)
+            ->add(DoctrineHelper::class, $this->doctrineHelper)
+            ->add(AttributeManager::class, $this->attributeManager)
+            ->add(AttributeConfigHelper::class, $this->attributeConfigHelper)
+            ->add(DynamicFieldsHelper::class, $this->dynamicFieldsHelper)
             ->getContainer($this);
 
-        $this->extension = new DynamicAttributesExtension(
-            $this->configManager,
-            $this->doctrineHelper,
-            $container
-        );
+        $this->extension = new DynamicAttributesExtension($container);
     }
 
     public function notApplicableDataProvider(): array

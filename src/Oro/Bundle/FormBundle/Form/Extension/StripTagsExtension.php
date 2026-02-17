@@ -21,19 +21,16 @@ class StripTagsExtension extends AbstractTypeExtension implements ServiceSubscri
 
     public const OPTION_NAME = 'strip_tags';
 
-    /** @var ContainerInterface */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_ui.html_tag_helper' => HtmlTagHelper::class
+            HtmlTagHelper::class
         ];
     }
 
@@ -62,7 +59,7 @@ class StripTagsExtension extends AbstractTypeExtension implements ServiceSubscri
             $data = $event->getData();
             if (is_string($data)) {
                 /** @var HtmlTagHelper $htmlTagHelper */
-                $htmlTagHelper = $this->container->get('oro_ui.html_tag_helper');
+                $htmlTagHelper = $this->container->get(HtmlTagHelper::class);
                 $event->setData($htmlTagHelper->stripTags($data));
             }
         };

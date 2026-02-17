@@ -118,7 +118,7 @@ services:
             - '%kernel.debug%'
         tags:
             - { name: form.type_extension }
-            - { name: container.service_subscriber, id: oro_entity_extend.form.extension.dynamic_fields_helper }
+            - { name: container.service_subscriber, id: oro_entity_extend.form.extension.dynamic_fields_helper, key: Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper }
 
     oro_entity_extend.entity_generator:
         class: Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator

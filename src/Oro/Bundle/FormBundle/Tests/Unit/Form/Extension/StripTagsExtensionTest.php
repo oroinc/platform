@@ -22,7 +22,7 @@ class StripTagsExtensionTest extends TestCase
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_ui.html_tag_helper', $this->htmlTagHelper)
+            ->add(HtmlTagHelper::class, $this->htmlTagHelper)
             ->getContainer($this);
 
         $this->formExtension = new StripTagsExtension($container);
@@ -31,24 +31,24 @@ class StripTagsExtensionTest extends TestCase
     public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setDefined')
             ->with(StripTagsExtension::OPTION_NAME);
+
         $this->formExtension->configureOptions($resolver);
     }
 
     /**
-     * @param bool $stripTags
-     *
      * @dataProvider buildFormDataProvider
      */
-    public function testBuildForm($stripTags): void
+    public function testBuildForm(?bool $stripTags): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects($this->exactly((int)$stripTags))
+        $builder->expects(self::exactly((int)$stripTags))
             ->method('addEventListener')
             ->with(FormEvents::PRE_SUBMIT, function () {
             });
+
         $this->formExtension->buildForm($builder, [StripTagsExtension::OPTION_NAME => $stripTags]);
     }
 

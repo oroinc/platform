@@ -61,9 +61,9 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_activity.manager' => ActivityManager::class,
-            'oro_entity.entity_alias_resolver' => EntityAliasResolver::class,
-            'oro_entity.routing_helper' => EntityRoutingHelper::class
+            ActivityManager::class,
+            EntityAliasResolver::class,
+            EntityRoutingHelper::class
         ];
     }
 
@@ -225,16 +225,16 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
 
     protected function getActivityManager(): ActivityManager
     {
-        return $this->container->get('oro_activity.manager');
+        return $this->container->get(ActivityManager::class);
     }
 
     protected function getEntityAliasResolver(): EntityAliasResolver
     {
-        return $this->container->get('oro_entity.entity_alias_resolver');
+        return $this->container->get(EntityAliasResolver::class);
     }
 
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->container->get('oro_entity.routing_helper');
+        return $this->container->get(EntityRoutingHelper::class);
     }
 }

@@ -265,7 +265,7 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
-            - { name: container.service_subscriber, id: oro_ui.html_tag_helper }
+            - { name: container.service_subscriber, id: oro_ui.html_tag_helper, key: Oro\Bundle\UIBundle\Tools\HtmlTagHelper }
 
     oro_form.extension.collection:
         class: Oro\Bundle\FormBundle\Form\Extension\CollectionExtension

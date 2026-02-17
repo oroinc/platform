@@ -100,9 +100,9 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     {
         return [
             'security.acl.voter.basic_permissions' => AclVoterInterface::class,
-            'oro_security.owner.entity_owner_accessor' => EntityOwnerAccessor::class,
-            'oro_security.ownership_tree_provider' => OwnerTreeProvider::class,
-            'oro_organization.business_unit_manager' => BusinessUnitManager::class
+            EntityOwnerAccessor::class,
+            OwnerTreeProvider::class,
+            BusinessUnitManager::class
         ];
     }
 
@@ -583,16 +583,16 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
 
     protected function getEntityOwnerAccessor(): EntityOwnerAccessor
     {
-        return $this->container->get('oro_security.owner.entity_owner_accessor');
+        return $this->container->get(EntityOwnerAccessor::class);
     }
 
     protected function getOwnerTreeProvider(): OwnerTreeProvider
     {
-        return $this->container->get('oro_security.ownership_tree_provider');
+        return $this->container->get(OwnerTreeProvider::class);
     }
 
     protected function getBusinessUnitManager(): BusinessUnitManager
     {
-        return $this->container->get('oro_organization.business_unit_manager');
+        return $this->container->get(BusinessUnitManager::class);
     }
 }

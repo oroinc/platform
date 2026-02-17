@@ -115,9 +115,9 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
             - { name: container.service_subscriber, id: security.acl.voter.basic_permissions }
-            - { name: container.service_subscriber, id: oro_security.owner.entity_owner_accessor }
-            - { name: container.service_subscriber, id: oro_security.ownership_tree_provider }
-            - { name: container.service_subscriber, id: oro_organization.business_unit_manager }
+            - { name: container.service_subscriber, id: oro_security.owner.entity_owner_accessor, key: Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor }
+            - { name: container.service_subscriber, id: oro_security.ownership_tree_provider, key: Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider }
+            - { name: container.service_subscriber, id: oro_organization.business_unit_manager, key: Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager }
 
     oro_organization.form.extension.organization:
         class: Oro\Bundle\OrganizationBundle\Form\Extension\OrganizationFormExtension
