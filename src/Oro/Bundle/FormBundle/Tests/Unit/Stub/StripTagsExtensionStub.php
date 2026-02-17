@@ -24,9 +24,7 @@ class StripTagsExtensionStub extends StripTagsExtension
             });
 
         parent::__construct(
-            TestContainerBuilder::create()
-                ->add('oro_ui.html_tag_helper', $htmlTagHelper)
-                ->getContainer($testCase)
+            TestContainerBuilder::create()->add(HtmlTagHelper::class, $htmlTagHelper)->getContainer($testCase)
         );
     }
 }

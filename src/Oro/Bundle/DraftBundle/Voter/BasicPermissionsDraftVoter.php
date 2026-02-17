@@ -40,25 +40,21 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter implements ServiceS
         self::PERMISSION_PUBLISH
     ];
 
-    private AuthorizationCheckerInterface $authorizationChecker;
-    private ContainerInterface $container;
     private ?DraftPermissionHelper $draftPermissionHelper = null;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        AuthorizationCheckerInterface $authorizationChecker,
-        ContainerInterface $container
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly ContainerInterface $container
     ) {
         parent::__construct($doctrineHelper);
-        $this->authorizationChecker = $authorizationChecker;
-        $this->container = $container;
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_draft.helper.draft_permission_helper' => DraftPermissionHelper::class
+            DraftPermissionHelper::class
         ];
     }
 
@@ -136,7 +132,7 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter implements ServiceS
     private function getDraftPermissionHelper(): DraftPermissionHelper
     {
         if (null === $this->draftPermissionHelper) {
-            $this->draftPermissionHelper = $this->container->get('oro_draft.helper.draft_permission_helper');
+            $this->draftPermissionHelper = $this->container->get(DraftPermissionHelper::class);
         }
 
         return $this->draftPermissionHelper;

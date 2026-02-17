@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Exception\ImportExportExpiredException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -21,7 +22,6 @@ use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
@@ -193,7 +193,7 @@ class ImportExportController extends AbstractController
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->container->get(MessageProducerInterface::class)->send(
+        $this->getMessageProducer()->send(
             PreImportTopic::getName(),
             [
                 'fileName' => $fileName,
@@ -222,7 +222,7 @@ class ImportExportController extends AbstractController
         $originFileName = $request->get('originFileName', null);
         $importProcessorTopicName  = $request->get('importProcessorTopicName') ?: PreImportTopic::getName();
 
-        $this->container->get(MessageProducerInterface::class)->send(
+        $this->getMessageProducer()->send(
             $importProcessorTopicName,
             [
                 'fileName' => $fileName,
@@ -251,7 +251,7 @@ class ImportExportController extends AbstractController
         $options = $this->getOptionsFromRequest($request);
         $token = $this->getTokenStorage()->getToken();
 
-        $this->container->get(MessageProducerInterface::class)->send(PreExportTopic::getName(), [
+        $this->getMessageProducer()->send(PreExportTopic::getName(), [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
             'outputFilePrefix' => $filePrefix,
@@ -399,7 +399,7 @@ class ImportExportController extends AbstractController
                 MessageProducerInterface::class,
                 CsvFileHandler::class,
                 FileManager::class,
-                GetImportExportConfigurationExtension::class,
+                ImportExportConfigurationRegistryInterface::class,
                 ExportHandler::class,
                 ImportExportResultSummarizer::class,
                 ManagerRegistry::class,
@@ -469,9 +469,8 @@ class ImportExportController extends AbstractController
      */
     private function getImportConfigurations(string $configAlias): array
     {
-        $configurationsByAlias = $this->container
-            ->get(GetImportExportConfigurationExtension::class)
-            ->getConfiguration($configAlias);
+        $configurationsByAlias = $this->container->get(ImportExportConfigurationRegistryInterface::class)
+            ->getConfigurations($configAlias);
 
         $featureChecker = $this->container->get(FeatureChecker::class);
 
@@ -503,6 +502,11 @@ class ImportExportController extends AbstractController
     private function getCsvFileHandler(): CsvFileHandler
     {
         return $this->container->get(CsvFileHandler::class);
+    }
+
+    private function getMessageProducer(): MessageProducerInterface
+    {
+        return $this->container->get(MessageProducerInterface::class);
     }
 
     private function getTokenStorage(): TokenStorageInterface

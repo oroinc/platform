@@ -6,7 +6,7 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
-            - { name: container.service_subscriber, id: oro_reminder.entity.manager }
+            - { name: container.service_subscriber, id: oro_reminder.entity.manager, key: Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager }
 
     # Form types
     oro_reminder.form.type.reminder:

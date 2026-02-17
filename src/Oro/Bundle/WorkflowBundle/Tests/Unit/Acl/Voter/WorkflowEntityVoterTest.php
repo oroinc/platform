@@ -38,7 +38,7 @@ class WorkflowEntityVoterTest extends TestCase
 
         $container = TestContainerBuilder::create()
             ->add(
-                'oro_workflow.permission_registry',
+                WorkflowPermissionRegistry::class,
                 new WorkflowPermissionRegistry($this->doctrineHelper, $this->workflowRegistry)
             )
             ->getContainer($this);

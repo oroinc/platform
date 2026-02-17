@@ -44,9 +44,9 @@ class FileVoterTest extends TestCase
         $this->currentApplicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_attachment.acl.file_access_control_checker', $this->fileAccessControlChecker)
-            ->add('oro_attachment.provider.file_applications', $this->fileApplicationsProvider)
-            ->add('oro_action.provider.current_application', $this->currentApplicationProvider)
+            ->add(FileAccessControlChecker::class, $this->fileAccessControlChecker)
+            ->add(FileApplicationsProvider::class, $this->fileApplicationsProvider)
+            ->add(CurrentApplicationProviderInterface::class, $this->currentApplicationProvider)
             ->getContainer($this);
 
         $this->voter = new FileVoter($this->doctrineHelper, $this->authorizationChecker, $container);

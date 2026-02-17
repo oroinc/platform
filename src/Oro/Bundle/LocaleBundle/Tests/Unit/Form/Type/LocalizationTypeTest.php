@@ -13,7 +13,7 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
@@ -22,8 +22,6 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class LocalizationTypeTest extends FormIntegrationTestCase
 {
-    use EntityTrait;
-
     private const DATA_CLASS = Localization::class;
 
     private LocalizationType $formType;
@@ -42,34 +40,35 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
-        $this->assertEquals(LocalizationType::NAME, $this->formType->getName());
+        self::assertEquals(LocalizationType::NAME, $this->formType->getName());
     }
 
     /**
      * @dataProvider submitDataProvider
      */
-    public function testSubmit(?Localization $defaultData, array $submittedData, Localization $expectedData)
+    public function testSubmit(?Localization $defaultData, array $submittedData, Localization $expectedData): void
     {
         $form = $this->factory->create(LocalizationType::class, $defaultData);
 
         $formConfig = $form->getConfig();
-        $this->assertEquals(self::DATA_CLASS, $formConfig->getOption('data_class'));
+        self::assertEquals(self::DATA_CLASS, $formConfig->getOption('data_class'));
 
-        $this->assertEquals($defaultData, $form->getData());
+        self::assertEquals($defaultData, $form->getData());
 
         $form->submit($submittedData);
 
-        $this->assertTrue($form->isValid());
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($expectedData, $form->getData());
+        self::assertTrue($form->isValid());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($expectedData, $form->getData());
     }
 
     public function submitDataProvider(): array
     {
         $localizationItem = $this->createLocalization('name', 'title', 0, 'en');
-        $parent = $this->getEntity(Localization::class, ['id' => 1]);
+        $parent = new Localization();
+        $parent->setId(1);
 
         return [
             'without entity' => [
@@ -113,20 +112,16 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         bool $rtlMode = false,
         ?Localization $parentLocalization = null
     ): Localization {
-        $localization = $this->getEntity(
-            Localization::class,
-            [
-                'name' => $name,
-                'language' => $this->getEntity(
-                    Language::class,
-                    ['id' => (int)$languageId, 'code' => (string)self::$languages[$languageId]]
-                ),
-                'formattingCode' => $formattingCode,
-                'rtlMode' => $rtlMode,
-                'parentLocalization' => $parentLocalization,
-            ]
-        );
+        $language = new Language();
+        ReflectionUtil::setId($language, (int)$languageId);
+        $language->setCode((string)self::$languages[$languageId]);
 
+        $localization = new Localization();
+        $localization->setName($name);
+        $localization->setLanguage($language);
+        $localization->setFormattingCode($formattingCode);
+        $localization->setRtlMode($rtlMode);
+        $localization->setParentLocalization($parentLocalization);
         $localization->setDefaultTitle($title);
 
         return $localization;
@@ -135,13 +130,19 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     #[\Override]
     protected function getExtensions(): array
     {
+        $localization = new Localization();
+        $localization->setId(1);
+
         $languages = [];
         foreach (self::$languages as $id => $code) {
-            $languages[$id] = $this->getEntity(Language::class, ['id' => (int)$id, 'code' => (string)$code]);
+            $language = new Language();
+            ReflectionUtil::setId($language, (int)$id);
+            $language->setCode((string)$code);
+            $languages[$id] = $language;
         }
 
         $helper = $this->createMock(HtmlTagHelper::class);
-        $helper->expects($this->any())
+        $helper->expects(self::any())
             ->method('stripTags')
             ->willReturnArgument(0);
 
@@ -152,16 +153,12 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
                     LanguageSelectType::class => new EntityTypeStub($languages),
                     FormattingSelectType::class => new FormattingSelectTypeStub(),
-                    LocalizationParentSelectType::class => new EntityTypeStub([
-                        '1' => $this->getEntity(Localization::class, ['id' => 1])
-                    ]),
+                    LocalizationParentSelectType::class => new EntityTypeStub(['1' => $localization])
                 ],
                 [
                     FormType::class => [
                         new StripTagsExtension(
-                            TestContainerBuilder::create()
-                                ->add('oro_ui.html_tag_helper', $helper)
-                                ->getContainer($this)
+                            TestContainerBuilder::create()->add(HtmlTagHelper::class, $helper)->getContainer($this)
                         )
                     ]
                 ]

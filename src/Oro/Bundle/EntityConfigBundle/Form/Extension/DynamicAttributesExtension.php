@@ -30,35 +30,22 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
 {
     use FormExtendedTypeTrait;
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var array */
-    private $fields = [];
+    private array $fields = [];
 
     public function __construct(
-        ConfigManager $configManager,
-        DoctrineHelper $doctrineHelper,
-        ContainerInterface $container
+        private readonly ContainerInterface $container
     ) {
-        $this->configManager = $configManager;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->container = $container;
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_entity_config.manager.attribute_manager' => AttributeManager::class,
-            'oro_entity_config.config.attributes_config_helper' => AttributeConfigHelper::class,
-            'oro_entity_extend.form.extension.dynamic_fields_helper' => DynamicFieldsHelper::class
+            ConfigManager::class,
+            DoctrineHelper::class,
+            AttributeManager::class,
+            AttributeConfigHelper::class,
+            DynamicFieldsHelper::class
         ];
     }
 
@@ -70,7 +57,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         }
 
         $dataClass = $options['data_class'];
-        $viewConfigProvider = $this->configManager->getProvider('view');
+        $viewConfigProvider = $this->getConfigManager()->getProvider('view');
 
         foreach ($this->getFieldsByClass($dataClass) as $fieldName) {
             $this->fields[$dataClass][$fieldName] = [
@@ -94,10 +81,11 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
 
         $className = $options['data_class'];
 
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $attributeConfigProvider  = $this->configManager->getProvider('attribute');
+        $configManager = $this->getConfigManager();
+        $extendConfigProvider = $configManager->getProvider('extend');
+        $attributeConfigProvider = $configManager->getProvider('attribute');
 
-        $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
+        $formConfigs = $configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
@@ -145,7 +133,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
             return;
         }
 
-        $attributeFamily = $this->doctrineHelper
+        $attributeFamily = $this->getDoctrineHelper()
             ->getEntityRepositoryForClass(AttributeFamily::class)
             ->find((int)$data['attributeFamily']);
 
@@ -158,7 +146,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
      */
     private function getFieldsByClass($class)
     {
-        $formConfigs = $this->configManager->getProvider('form')->getConfigs($class);
+        $formConfigs = $this->getConfigManager()->getProvider('form')->getConfigs($class);
         $fieldNames = [];
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
@@ -177,12 +165,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         return $fieldNames;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return bool
-     */
-    private function isApplicable(array $options)
+    private function isApplicable(array $options): bool
     {
         if (empty($options['data_class'])) {
             return false;
@@ -228,18 +211,28 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         }
     }
 
+    private function getConfigManager(): ConfigManager
+    {
+        return $this->container->get(ConfigManager::class);
+    }
+
+    private function getDoctrineHelper(): DoctrineHelper
+    {
+        return $this->container->get(DoctrineHelper::class);
+    }
+
     private function getAttributeManager(): AttributeManager
     {
-        return $this->container->get('oro_entity_config.manager.attribute_manager');
+        return $this->container->get(AttributeManager::class);
     }
 
     private function getAttributeConfigHelper(): AttributeConfigHelper
     {
-        return $this->container->get('oro_entity_config.config.attributes_config_helper');
+        return $this->container->get(AttributeConfigHelper::class);
     }
 
     private function getDynamicFieldsHelper(): DynamicFieldsHelper
     {
-        return $this->container->get('oro_entity_extend.form.extension.dynamic_fields_helper');
+        return $this->container->get(DynamicFieldsHelper::class);
     }
 }

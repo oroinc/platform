@@ -121,7 +121,7 @@ services:
     oro_importexport.configuration.registry:
         class: Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry
 
-    Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry:
+    Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface:
         alias: oro_importexport.configuration.registry
 
     oro_importexport.twig_extension.get_import_export_configuration:

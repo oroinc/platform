@@ -65,7 +65,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_entity_extend.form.extension.dynamic_fields_helper' => DynamicFieldsHelper::class
+            DynamicFieldsHelper::class
         ];
     }
 
@@ -176,12 +176,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         );
     }
 
-    /**
-     * @param array $options
-     *
-     * @return bool
-     */
-    protected function isApplicable(array $options)
+    protected function isApplicable(array $options): bool
     {
         if ($options['dynamic_fields_disabled'] || empty($options['data_class']) || empty($options['compound'])) {
             return false;
@@ -198,20 +193,14 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         return true;
     }
 
-    /**
-     * @param ConfigInterface $extendConfig
-     * @param ConfigProvider  $extendConfigProvider
-     *
-     * @return bool
-     */
-    protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
+    protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider): bool
     {
         return $this->getDynamicFieldsHelper()->isApplicableField($extendConfig, $extendConfigProvider);
     }
 
     protected function getDynamicFieldsHelper(): DynamicFieldsHelper
     {
-        return $this->container->get('oro_entity_extend.form.extension.dynamic_fields_helper');
+        return $this->container->get(DynamicFieldsHelper::class);
     }
 
     private function fieldExists(FormInterface $form, string $fieldName): bool
@@ -263,7 +252,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
     }
 
     /**
-     * Does not return any values ​​since the extension has a specific using.
+     * Does not return any values since the extension has a specific using.
      */
     #[\Override]
     public static function getExtendedTypes(): array

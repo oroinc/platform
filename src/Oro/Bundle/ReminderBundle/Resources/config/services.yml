@@ -11,7 +11,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: postLoad }
             - { name: doctrine.event_listener, event: postPersist }
-            - { name: container.service_subscriber, id: oro_reminder.entity.manager }
+            - { name: container.service_subscriber, id: oro_reminder.entity.manager, key: Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager }
 
     oro_reminder.sender:
         class: Oro\Bundle\ReminderBundle\Model\ReminderSender

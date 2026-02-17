@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * All success cases are tested by functional tests.
@@ -71,7 +72,7 @@ class MergeServiceLocatorsCompilerPassTest extends TestCase
         );
     }
 
-    public function testAmbiguousServiceDetected(): void
+    public function testAmbiguousServiceIdDetected(): void
     {
         $this->container->register('container_service_1')
             ->addArgument(ServiceLocatorTagPass::register($this->container, [
@@ -91,6 +92,81 @@ class MergeServiceLocatorsCompilerPassTest extends TestCase
             . ' The alias "service_1" has two services with different IDs,'
             . ' "service_1_1" (defined in "container_service_1" service)'
             . ' and "service_1_2" (defined in "container_service_2" service).'
+        );
+
+        $this->compiler->process($this->container);
+    }
+
+    public function testAmbiguousServiceTypeDetected(): void
+    {
+        $this->container->register('container_service_1')
+            ->addArgument(ServiceLocatorTagPass::register($this->container, [
+                'service_1' => new TypedReference('service_1', 'Class1')
+            ]))
+            ->addTag('test_service');
+        $this->container->register('container_service_2')
+            ->addArgument(ServiceLocatorTagPass::register($this->container, [
+                'service_1' => new TypedReference('service_1', 'Class2'),
+                'service_2' => new Reference('service_2')
+            ]))
+            ->addTag('test_service');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Detected ambiguous service alias in the "test_service_locator" service locator.'
+            . ' The alias "service_1" has two services with different types,'
+            . ' "Class1" (defined in "container_service_1" service)'
+            . ' and "Class2" (defined in "container_service_2" service).'
+        );
+
+        $this->compiler->process($this->container);
+    }
+
+    public function testAmbiguousServiceTypeDetectedWhenFirstServiceUntyped(): void
+    {
+        $this->container->register('container_service_1')
+            ->addArgument(ServiceLocatorTagPass::register($this->container, [
+                'service_1' => new Reference('service_1')
+            ]))
+            ->addTag('test_service');
+        $this->container->register('container_service_2')
+            ->addArgument(ServiceLocatorTagPass::register($this->container, [
+                'service_1' => new TypedReference('service_1', 'Class2'),
+                'service_2' => new Reference('service_2')
+            ]))
+            ->addTag('test_service');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Detected ambiguous service alias in the "test_service_locator" service locator.'
+            . ' The alias "service_1" has two services with different types,'
+            . ' "null" (defined in "container_service_1" service)'
+            . ' and "Class2" (defined in "container_service_2" service).'
+        );
+
+        $this->compiler->process($this->container);
+    }
+
+    public function testAmbiguousServiceTypeDetectedWhenSecondServiceUntyped(): void
+    {
+        $this->container->register('container_service_1')
+            ->addArgument(ServiceLocatorTagPass::register($this->container, [
+                'service_1' => new TypedReference('service_1', 'Class1')
+            ]))
+            ->addTag('test_service');
+        $this->container->register('container_service_2')
+            ->addArgument(ServiceLocatorTagPass::register($this->container, [
+                'service_1' => new Reference('service_1'),
+                'service_2' => new Reference('service_2')
+            ]))
+            ->addTag('test_service');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Detected ambiguous service alias in the "test_service_locator" service locator.'
+            . ' The alias "service_1" has two services with different types,'
+            . ' "Class1" (defined in "container_service_1" service)'
+            . ' and "null" (defined in "container_service_2" service).'
         );
 
         $this->compiler->process($this->container);

@@ -18,27 +18,20 @@ class TemplateListener implements ServiceSubscriberInterface
 {
     private const DEFAULT_CONTAINER = 'widget';
 
-    private ContainerInterface $container;
-
-    private ?Environment $twig = null;
-
-    private ?Inflector $inflector = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     public function onKernelView(ViewEvent $event): void
     {
         $templateReference = $this->getTemplateReference($event);
-        $request = $event->getRequest();
-
         if ($templateReference) {
+            $request = $event->getRequest();
+            $twig = $this->getTwig();
             $this->resolveControllerDir($templateReference);
-            $this->injectWidgetContainer($templateReference, $request);
-
-            if (!$this->getTwig()->getLoader()->exists($templateReference->template)) {
+            $this->injectWidgetContainer($twig, $templateReference, $request);
+            if (!$twig->getLoader()->exists($templateReference->template)) {
                 $template = $request->attributes->get('_template');
                 if ($template instanceof Template) {
                     $template->template = $templateReference->template;
@@ -68,7 +61,7 @@ class TemplateListener implements ServiceSubscriberInterface
             return $template;
         }
 
-        if (is_string($template)) {
+        if (\is_string($template)) {
             $parsedTemplate = new Template($template);
             $event->getRequest()->attributes->set('_template', $parsedTemplate);
 
@@ -100,17 +93,16 @@ class TemplateListener implements ServiceSubscriberInterface
             return;
         }
 
-        $loader = $this->container->get('twig.loader.native_filesystem');
-        foreach ($loader->getPaths($bundle) as $path) {
+        foreach ($this->getFilesystemLoader()->getPaths($bundle) as $path) {
             if (
-                file_exists(rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $controller) &&
-                in_array($controller, scandir($path), true)
+                file_exists(rtrim($path, '/\\') . DIRECTORY_SEPARATOR . $controller)
+                && \in_array($controller, scandir($path), true)
             ) {
                 return;
             }
 
             if (file_exists($path . DIRECTORY_SEPARATOR . $legacyController)) {
-                $templateReference->template = sprintf(
+                $templateReference->template = \sprintf(
                     '@%s/%s/%s',
                     $parts['bundle'],
                     $legacyController,
@@ -129,7 +121,7 @@ class TemplateListener implements ServiceSubscriberInterface
             : $name;
     }
 
-    private function injectWidgetContainer(Template $templateReference, Request $request): void
+    private function injectWidgetContainer(Environment $twig, Template $templateReference, Request $request): void
     {
         $widgetContainer = $request->query->get('_widgetContainerTemplate')
             ?: $request->request->get('_widgetContainerTemplate')
@@ -137,8 +129,8 @@ class TemplateListener implements ServiceSubscriberInterface
             ?: $request->request->get('_widgetContainer');
 
         if ($widgetContainer) {
-            if (!$this->processContainer($templateReference, $widgetContainer)) {
-                $this->processContainer($templateReference, self::DEFAULT_CONTAINER);
+            if (!$this->processContainer($twig, $templateReference, $widgetContainer)) {
+                $this->processContainer($twig, $templateReference, self::DEFAULT_CONTAINER);
             }
         }
     }
@@ -146,12 +138,12 @@ class TemplateListener implements ServiceSubscriberInterface
     /**
      * Check new template name based on container
      */
-    private function processContainer(Template $templateReference, string $container): bool
+    private function processContainer(Environment $twig, Template $templateReference, string $container): bool
     {
         $parts = $this->parseTemplateReference($templateReference);
         if ($parts) {
             $templateName = $parts['path'] . $container . '/' . $parts['name'];
-            if ($this->getTwig()->getLoader()->exists($templateName)) {
+            if ($twig->getLoader()->exists($templateName)) {
                 $templateReference->template = $templateName;
                 return true;
             }
@@ -161,7 +153,7 @@ class TemplateListener implements ServiceSubscriberInterface
                  * Checks if legacy template file is exists
                  */
                 $templateName = $parts['path'] . $parts['widget'] . '/' . $container . '/' . $parts['template'];
-                if ($this->getTwig()->getLoader()->exists($templateName)) {
+                if ($twig->getLoader()->exists($templateName)) {
                     $templateReference->template = $templateName;
 
                     return true;
@@ -188,31 +180,28 @@ class TemplateListener implements ServiceSubscriberInterface
         return $parts;
     }
 
-    private function getTwig(): Environment
-    {
-        if (!$this->twig) {
-            $this->twig = $this->container->get(Environment::class);
-        }
-
-        return $this->twig;
-    }
-
-    private function getInflector(): Inflector
-    {
-        if (!$this->inflector) {
-            $this->inflector = $this->container->get(Inflector::class);
-        }
-
-        return $this->inflector;
-    }
-
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
             Inflector::class,
             Environment::class,
-            'twig.loader.native_filesystem' => FilesystemLoader::class,
+            FilesystemLoader::class
         ];
+    }
+
+    private function getTwig(): Environment
+    {
+        return $this->container->get(Environment::class);
+    }
+
+    private function getInflector(): Inflector
+    {
+        return $this->container->get(Inflector::class);
+    }
+
+    private function getFilesystemLoader(): FilesystemLoader
+    {
+        return $this->container->get(FilesystemLoader::class);
     }
 }

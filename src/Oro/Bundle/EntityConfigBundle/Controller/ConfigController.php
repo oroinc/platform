@@ -51,7 +51,7 @@ class ConfigController extends AbstractController
         $jsModules = [];
         $providers = $this->getConfigManager()->getProviders();
         /** @var FeatureChecker $featureChecker */
-        $featureChecker = $this->container->get('oro_featuretoggle.checker.feature_checker');
+        $featureChecker = $this->container->get(FeatureChecker::class);
         $isCustomEntityCreationFeatureEnabled = $featureChecker->isFeatureEnabled('custom_entity_creation');
         foreach ($providers as $provider) {
             $propertyConfig = $provider->getPropertyConfig();
@@ -333,7 +333,7 @@ class ConfigController extends AbstractController
     {
         if (class_exists($entity->getClassName())) {
             /** @var QueryBuilder $qb */
-            $qb = $this->container->get('doctrine')
+            $qb = $this->container->get(ManagerRegistry::class)
                 ->getManagerForClass($entity->getClassName())
                 ->createQueryBuilder();
             $qb->select('entity');
@@ -418,7 +418,7 @@ class ConfigController extends AbstractController
      */
     private function getEntityFieldProvider()
     {
-        return $this->container->get('oro_entity.entity_field_provider');
+        return $this->container->get(EntityFieldProvider::class);
     }
 
     /**
@@ -432,20 +432,17 @@ class ConfigController extends AbstractController
     #[\Override]
     public static function getSubscribedServices(): array
     {
-        return array_merge(
-            parent::getSubscribedServices(),
-            [
-                'oro_featuretoggle.checker.feature_checker' => FeatureChecker::class,
-                'oro_entity.entity_field_provider' => EntityFieldProvider::class,
-                ConfigManager::class,
-                EntityRoutingHelper::class,
-                EntityConfigProviderHelper::class,
-                TranslatorInterface::class,
-                Router::class,
-                ConfigFieldHandler::class,
-                OwnershipType::class,
-                'doctrine' => ManagerRegistry::class,
-            ]
-        );
+        return array_merge(parent::getSubscribedServices(), [
+            FeatureChecker::class,
+            EntityFieldProvider::class,
+            ConfigManager::class,
+            EntityRoutingHelper::class,
+            EntityConfigProviderHelper::class,
+            TranslatorInterface::class,
+            Router::class,
+            ConfigFieldHandler::class,
+            OwnershipType::class,
+            ManagerRegistry::class
+        ]);
     }
 }

@@ -37,7 +37,7 @@ class LocalizationVoterTest extends TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_config.manager', $this->configManager)
+            ->add(ConfigManager::class, $this->configManager)
             ->getContainer($this);
 
         $this->voter = new LocalizationVoter($this->doctrineHelper, $container);

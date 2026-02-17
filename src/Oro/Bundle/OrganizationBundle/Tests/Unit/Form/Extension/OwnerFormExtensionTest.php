@@ -118,9 +118,9 @@ class OwnerFormExtensionTest extends TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
-            ->add('oro_security.ownership_tree_provider', $treeProvider)
-            ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
+            ->add(EntityOwnerAccessor::class, $this->entityOwnerAccessor)
+            ->add(OwnerTreeProvider::class, $treeProvider)
+            ->add(BusinessUnitManager::class, $this->businessUnitManager)
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtension(
@@ -276,9 +276,9 @@ class OwnerFormExtensionTest extends TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
-            ->add('oro_security.ownership_tree_provider', $treeProvider)
-            ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
+            ->add(EntityOwnerAccessor::class, $this->entityOwnerAccessor)
+            ->add(OwnerTreeProvider::class, $treeProvider)
+            ->add(BusinessUnitManager::class, $this->businessUnitManager)
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtension(
@@ -422,9 +422,9 @@ class OwnerFormExtensionTest extends TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
-            ->add('oro_security.ownership_tree_provider', $treeProvider)
-            ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
+            ->add(EntityOwnerAccessor::class, $this->entityOwnerAccessor)
+            ->add(OwnerTreeProvider::class, $treeProvider)
+            ->add(BusinessUnitManager::class, $this->businessUnitManager)
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtension(
@@ -567,9 +567,9 @@ class OwnerFormExtensionTest extends TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
-            ->add('oro_security.ownership_tree_provider', $treeProvider)
-            ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
+            ->add(EntityOwnerAccessor::class, $this->entityOwnerAccessor)
+            ->add(OwnerTreeProvider::class, $treeProvider)
+            ->add(BusinessUnitManager::class, $this->businessUnitManager)
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtensionStub(

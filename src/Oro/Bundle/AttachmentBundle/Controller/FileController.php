@@ -165,7 +165,7 @@ class FileController extends AbstractController
     private function getFileById(int $id): File
     {
         /** @var File|null $file */
-        $file = $this->container->get('doctrine')->getManagerForClass(File::class)->find(File::class, $id);
+        $file = $this->container->get(ManagerRegistry::class)->getManagerForClass(File::class)->find(File::class, $id);
         if (!$file) {
             throw $this->createNotFoundException('File not found');
         }
@@ -259,7 +259,7 @@ class FileController extends AbstractController
             ImageResizeManagerInterface::class,
             FileNameProviderInterface::class,
             WebpConfiguration::class,
-            'doctrine' => ManagerRegistry::class,
+            ManagerRegistry::class
         ]);
     }
 }

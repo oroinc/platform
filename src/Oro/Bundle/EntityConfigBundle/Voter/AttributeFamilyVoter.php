@@ -17,19 +17,18 @@ class AttributeFamilyVoter extends AbstractEntityVoter implements ServiceSubscri
 
     protected $supportedAttributes = [self::ATTRIBUTE_DELETE];
 
-    private ContainerInterface $container;
-
-    public function __construct(DoctrineHelper $doctrineHelper, ContainerInterface $container)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        private readonly ContainerInterface $container
+    ) {
         parent::__construct($doctrineHelper);
-        $this->container = $container;
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_entity_config.manager.attribute_family_manager' => AttributeFamilyManager::class
+            AttributeFamilyManager::class
         ];
     }
 
@@ -43,6 +42,6 @@ class AttributeFamilyVoter extends AbstractEntityVoter implements ServiceSubscri
 
     private function getAttributeFamilyManager(): AttributeFamilyManager
     {
-        return $this->container->get('oro_entity_config.manager.attribute_family_manager');
+        return $this->container->get(AttributeFamilyManager::class);
     }
 }

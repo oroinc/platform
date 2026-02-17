@@ -46,7 +46,7 @@ class BasicPermissionsDraftVoterTest extends TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_draft.helper.draft_permission_helper', new DraftPermissionHelper($tokenAccessor))
+            ->add(DraftPermissionHelper::class, new DraftPermissionHelper($tokenAccessor))
             ->getContainer($this);
 
         $this->voter = new BasicPermissionsDraftVoter($this->doctrineHelper, $this->authorizationChecker, $container);

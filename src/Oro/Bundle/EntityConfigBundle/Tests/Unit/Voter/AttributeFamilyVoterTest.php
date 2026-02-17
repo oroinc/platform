@@ -33,7 +33,7 @@ class AttributeFamilyVoterTest extends TestCase
         $this->attributeFamilyManager = $this->createMock(AttributeFamilyManager::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_entity_config.manager.attribute_family_manager', $this->attributeFamilyManager)
+            ->add(AttributeFamilyManager::class, $this->attributeFamilyManager)
             ->getContainer($this);
 
         $this->voter = new AttributeFamilyVoter($this->doctrineHelper, $container);

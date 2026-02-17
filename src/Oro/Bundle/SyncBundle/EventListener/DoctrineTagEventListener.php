@@ -111,18 +111,18 @@ class DoctrineTagEventListener implements OptionalListenerInterface, ServiceSubs
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_sync.content.tag_generator' => TagGeneratorInterface::class,
-            'oro_sync.content.data_update_topic_sender' => DataUpdateTopicSender::class
+            TagGeneratorInterface::class,
+            DataUpdateTopicSender::class
         ];
     }
 
     private function getTagGenerator(): TagGeneratorInterface
     {
-        return $this->container->get('oro_sync.content.tag_generator');
+        return $this->container->get(TagGeneratorInterface::class);
     }
 
     private function getDataUpdateTopicSender(): DataUpdateTopicSender
     {
-        return $this->container->get('oro_sync.content.data_update_topic_sender');
+        return $this->container->get(DataUpdateTopicSender::class);
     }
 }

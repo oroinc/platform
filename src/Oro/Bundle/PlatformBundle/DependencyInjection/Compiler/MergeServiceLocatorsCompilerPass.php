@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * Finds all service locators used by all services that are tagged with a specific tag,
@@ -165,6 +166,25 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
                 $sourceServiceId
             ));
         }
+        $serviceType = $this->getTargetServiceType($serviceRef, $serviceAlias, $sourceServiceId);
+        $existingServiceType = $this->getTargetServiceType(
+            $existingServiceRef,
+            $serviceAlias,
+            $existingSourceServiceId
+        );
+        if ($serviceType !== $existingServiceType) {
+            throw new InvalidArgumentException(\sprintf(
+                'Detected ambiguous service alias in the "%s" service locator.'
+                . ' The alias "%s" has two services with different types,'
+                . ' "%s" (defined in "%s" service) and "%s" (defined in "%s" service).',
+                $this->serviceLocatorServiceId,
+                $serviceAlias,
+                $existingServiceType ?? 'null',
+                $existingSourceServiceId,
+                $serviceType ?? 'null',
+                $sourceServiceId
+            ));
+        }
     }
 
     private function getTargetServiceId(mixed $serviceRef, string $serviceAlias, string $sourceServiceId): string
@@ -177,6 +197,23 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
         }
         throw new \LogicException(\sprintf(
             'Cannot retrieve the target service ID for the service alias "%s" (defined in "%s" service).',
+            $serviceAlias,
+            $sourceServiceId
+        ));
+    }
+
+    private function getTargetServiceType(mixed $serviceRef, string $serviceAlias, string $sourceServiceId): ?string
+    {
+        if ($serviceRef instanceof ServiceClosureArgument) {
+            $serviceRefValue = $serviceRef->getValues()[0];
+            if ($serviceRefValue instanceof Reference) {
+                return $serviceRefValue instanceof TypedReference
+                    ? $serviceRefValue->getType()
+                    : null;
+            }
+        }
+        throw new \LogicException(\sprintf(
+            'Cannot retrieve the target service type for the service alias "%s" (defined in "%s" service).',
             $serviceAlias,
             $sourceServiceId
         ));

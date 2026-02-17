@@ -13,11 +13,9 @@ services:
         tags:
             - { name: oro_integration.connector, type: connector1, channel_type: foo }
 
-    oro_integration.sync_scheduler:
-        class: Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
+    oro_integration.tests.sync_scheduler:
+        alias: oro_integration.sync_scheduler
         public: true
-        arguments:
-            - '@oro_message_queue.message_producer'
 
     oro_integration.tests.entity_name_resolver.data_loader:
         class: Oro\Bundle\IntegrationBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoader

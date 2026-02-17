@@ -24,8 +24,8 @@ class TagListenerTest extends TestCase
         $this->tagManager = $this->createMock(TagManager::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_tag.helper.taggable_helper', $this->taggableHelper)
-            ->add('oro_tag.tag.manager', $this->tagManager)
+            ->add(TaggableHelper::class, $this->taggableHelper)
+            ->add(TagManager::class, $this->tagManager)
             ->getContainer($this);
 
         $this->listener = new TagListener($container);

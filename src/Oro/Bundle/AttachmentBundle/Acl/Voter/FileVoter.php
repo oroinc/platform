@@ -22,28 +22,23 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
 {
     protected $supportedAttributes = [BasicPermission::VIEW, BasicPermission::EDIT, BasicPermission::DELETE];
 
-    private AuthorizationCheckerInterface $authorizationChecker;
-    private ContainerInterface $container;
-
     private ?TokenInterface $token;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        AuthorizationCheckerInterface $authorizationChecker,
-        ContainerInterface $container
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly ContainerInterface $container
     ) {
         parent::__construct($doctrineHelper);
-        $this->authorizationChecker = $authorizationChecker;
-        $this->container = $container;
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_attachment.acl.file_access_control_checker' => FileAccessControlChecker::class,
-            'oro_attachment.provider.file_applications' => FileApplicationsProvider::class,
-            'oro_action.provider.current_application' => CurrentApplicationProviderInterface::class
+            FileAccessControlChecker::class,
+            FileApplicationsProvider::class,
+            CurrentApplicationProviderInterface::class
         ];
     }
 
@@ -108,16 +103,16 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
 
     private function getFileAccessControlChecker(): FileAccessControlChecker
     {
-        return $this->container->get('oro_attachment.acl.file_access_control_checker');
+        return $this->container->get(FileAccessControlChecker::class);
     }
 
     private function getFileApplicationsProvider(): FileApplicationsProvider
     {
-        return $this->container->get('oro_attachment.provider.file_applications');
+        return $this->container->get(FileApplicationsProvider::class);
     }
 
     private function getCurrentApplicationProvider(): CurrentApplicationProviderInterface
     {
-        return $this->container->get('oro_action.provider.current_application');
+        return $this->container->get(CurrentApplicationProviderInterface::class);
     }
 }

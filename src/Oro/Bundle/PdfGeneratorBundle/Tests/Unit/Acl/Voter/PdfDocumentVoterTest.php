@@ -9,33 +9,25 @@ use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 final class PdfDocumentVoterTest extends TestCase
 {
-    private PdfDocumentVoter $voter;
-
     private MockObject&DoctrineHelper $doctrineHelper;
-
-    private MockObject&ContainerInterface $container;
-
     private MockObject&AuthorizationCheckerInterface $authorizationChecker;
-
     private MockObject&TokenInterface $token;
+    private PdfDocumentVoter $voter;
 
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->container = $this->createMock(ContainerInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->token = $this->createMock(TokenInterface::class);
 
-        $this->voter = new PdfDocumentVoter($this->doctrineHelper);
+        $this->voter = new PdfDocumentVoter($this->doctrineHelper, $this->authorizationChecker);
         $this->voter->setClassName(PdfDocument::class);
-        $this->voter->setContainer($this->container);
     }
 
     public function testVoteOnValidPdfDocumentWithViewPermissionAccessGranted(): void
@@ -64,12 +56,6 @@ final class PdfDocumentVoterTest extends TestCase
             ->with(BasicPermission::VIEW, $sourceEntity)
             ->willReturn(true);
 
-        $this->container
-            ->expects(self::once())
-            ->method('get')
-            ->with('oro_security.authorization_checker')
-            ->willReturn($this->authorizationChecker);
-
         // Perform the vote
         $result = $this->voter->vote($this->token, $pdfDocument, [BasicPermission::VIEW]);
 
@@ -92,10 +78,6 @@ final class PdfDocumentVoterTest extends TestCase
             ->method('getEntity')
             ->with(PdfDocument::class, $pdfDocument->getId())
             ->willReturn($pdfDocument);
-
-        $this->container
-            ->expects(self::never())
-            ->method('get');
 
         // Perform the vote
         $result = $this->voter->vote($this->token, $pdfDocument, [BasicPermission::VIEW]);
@@ -121,10 +103,6 @@ final class PdfDocumentVoterTest extends TestCase
             ->with(PdfDocument::class, $pdfDocument->getId())
             ->willReturn($pdfDocument);
 
-        $this->container
-            ->expects(self::never())
-            ->method('get');
-
         // Perform the vote
         $result = $this->voter->vote($this->token, $pdfDocument, [BasicPermission::VIEW]);
 
@@ -148,10 +126,6 @@ final class PdfDocumentVoterTest extends TestCase
             ->method('getEntity')
             ->with(PdfDocument::class, $pdfDocument->getId())
             ->willReturn($pdfDocument);
-
-        $this->container
-            ->expects(self::never())
-            ->method('get');
 
         // Perform the vote
         $result = $this->voter->vote($this->token, $pdfDocument, [BasicPermission::VIEW]);
@@ -178,10 +152,6 @@ final class PdfDocumentVoterTest extends TestCase
             ->withConsecutive([PdfDocument::class, $pdfDocument->getId()], ['Acme\Entity\Sample', 42])
             ->willReturnOnConsecutiveCalls($pdfDocument, null);
 
-        $this->container
-            ->expects(self::never())
-            ->method('get');
-
         // Perform the vote
         $result = $this->voter->vote($this->token, $pdfDocument, [BasicPermission::VIEW]);
 
@@ -203,10 +173,6 @@ final class PdfDocumentVoterTest extends TestCase
             ->expects(self::never())
             ->method('getEntity');
 
-        $this->container
-            ->expects(self::never())
-            ->method('get');
-
         // Perform the vote with an unsupported attribute
         $result = $this->voter->vote($this->token, $pdfDocument, [BasicPermission::EDIT]);
 
@@ -227,10 +193,6 @@ final class PdfDocumentVoterTest extends TestCase
             ->expects(self::never())
             ->method('getEntity');
 
-        $this->container
-            ->expects(self::never())
-            ->method('get');
-
         // Perform the vote with new PDF document
         $result = $this->voter->vote($this->token, $pdfDocument, [BasicPermission::VIEW]);
 
@@ -246,10 +208,6 @@ final class PdfDocumentVoterTest extends TestCase
         $this->doctrineHelper
             ->expects(self::never())
             ->method('getEntity');
-
-        $this->container
-            ->expects(self::never())
-            ->method('get');
 
         // Perform the vote with null object
         $result = $this->voter->vote($this->token, null, [BasicPermission::VIEW]);

@@ -34,15 +34,15 @@ class TagListener implements ServiceSubscriberInterface
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_tag.helper.taggable_helper' => TaggableHelper::class,
-            'oro_tag.tag.manager' => TagManager::class
+            TaggableHelper::class,
+            TagManager::class
         ];
     }
 
     private function getTaggableHelper(): TaggableHelper
     {
         if (null === $this->taggableHelper) {
-            $this->taggableHelper = $this->container->get('oro_tag.helper.taggable_helper');
+            $this->taggableHelper = $this->container->get(TaggableHelper::class);
         }
 
         return $this->taggableHelper;
@@ -51,7 +51,7 @@ class TagListener implements ServiceSubscriberInterface
     private function getTagManager(): TagManager
     {
         if (null === $this->tagManager) {
-            $this->tagManager = $this->container->get('oro_tag.tag.manager');
+            $this->tagManager = $this->container->get(TagManager::class);
         }
 
         return $this->tagManager;
