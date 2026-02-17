@@ -14,8 +14,8 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: container.service_subscriber, id: oro_sync.content.tag_generator }
-            - { name: container.service_subscriber, id: oro_sync.content.data_update_topic_sender }
+            - { name: container.service_subscriber, id: oro_sync.content.tag_generator, key: Oro\Bundle\SyncBundle\Content\TagGeneratorInterface }
+            - { name: container.service_subscriber, id: oro_sync.content.data_update_topic_sender, key: Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender }
 
     oro_sync.content.tag_generator:
         class: Oro\Bundle\SyncBundle\Content\ChainTagGenerator

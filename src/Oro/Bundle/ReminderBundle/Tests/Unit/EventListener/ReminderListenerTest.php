@@ -26,7 +26,7 @@ class ReminderListenerTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_reminder.entity.manager', $this->reminderManager)
+            ->add(ReminderManager::class, $this->reminderManager)
             ->getContainer($this);
 
         $this->listener = new ReminderListener($container);

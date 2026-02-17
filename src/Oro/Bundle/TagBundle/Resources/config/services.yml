@@ -14,8 +14,8 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: doctrine.event_listener, event: preRemove }
-            - { name: container.service_subscriber, id: oro_tag.helper.taggable_helper }
-            - { name: container.service_subscriber, id: oro_tag.tag.manager }
+            - { name: container.service_subscriber, id: oro_tag.helper.taggable_helper, key: Oro\Bundle\TagBundle\Helper\TaggableHelper }
+            - { name: container.service_subscriber, id: oro_tag.tag.manager, key: Oro\Bundle\TagBundle\Entity\TagManager }
 
     # Tag API
     oro_tag.tag.manager.api:

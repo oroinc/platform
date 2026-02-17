@@ -26,20 +26,17 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
 {
     use FeatureCheckerHolderTrait;
 
-    /** @var ContainerInterface */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_email.mailbox.process_storage' => MailboxProcessStorage::class,
-            'oro_workflow.process.process_handler' => ProcessHandler::class,
+            MailboxProcessStorage::class,
+            ProcessHandler::class,
             LoggerInterface::class
         ];
     }
@@ -72,8 +69,8 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
 
         $em = $args->getObjectManager();
         $processRepository = $em->getRepository(ProcessDefinition::class);
-        $processStorage = $this->container->get('oro_email.mailbox.process_storage');
-        $handler = $this->container->get('oro_workflow.process.process_handler');
+        $processStorage = $this->container->get(MailboxProcessStorage::class);
+        $handler = $this->container->get(ProcessHandler::class);
 
         foreach ($emailBodies as $emailBody) {
             $this->scheduleProcess($emailBody, $processRepository, $processStorage, $handler);

@@ -5,9 +5,9 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\UIBundle\EventListener\TemplateListener;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,45 +22,39 @@ use Twig\Loader\LoaderInterface;
 class TemplateListenerTest extends TestCase
 {
     private Request $request;
-    private ControllerEvent $controlerEvent;
-    private ControllerArgumentsEvent $controllerArgumentsEvent;
-    private ViewEvent $event;
-    private Environment|MockObject $twig;
-    private TemplateListener $listener;
+    private Environment&MockObject $twig;
     private \Closure $callable;
+    private ControllerEvent $controllerEvent;
+    private ViewEvent $event;
+    private TemplateListener $listener;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->request = Request::create('/test/url');
-
+        $this->twig = $this->createMock(Environment::class);
         $this->callable = function () {
         };
 
-        $this->controlerEvent = new ControllerEvent(
-            kernel: $this->createMock(HttpKernelInterface::class),
-            controller: $this->callable,
-            request: $this->request,
-            requestType: HttpKernelInterface::MAIN_REQUEST,
+        $this->controllerEvent = new ControllerEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $this->callable,
+            $this->request,
+            HttpKernelInterface::MAIN_REQUEST
         );
-
-        $this->controllerArgumentsEvent = new ControllerArgumentsEvent(
-            kernel: $this->createMock(HttpKernelInterface::class),
-            controller: $this->controlerEvent,
-            arguments: [],
-            request: $this->request,
-            requestType: HttpKernelInterface::MAIN_REQUEST,
-        );
-
         $this->event = new ViewEvent(
-            kernel: $this->createMock(HttpKernelInterface::class),
-            request: $this->request,
-            requestType: HttpKernelInterface::MAIN_REQUEST,
-            controllerResult: new Response(),
-            controllerArgumentsEvent: $this->controllerArgumentsEvent
+            $this->createMock(HttpKernelInterface::class),
+            $this->request,
+            HttpKernelInterface::MAIN_REQUEST,
+            new Response(),
+            new ControllerArgumentsEvent(
+                $this->createMock(HttpKernelInterface::class),
+                $this->controllerEvent,
+                [],
+                $this->request,
+                HttpKernelInterface::MAIN_REQUEST
+            )
         );
-
-        $this->twig = $this->createMock(Environment::class);
 
         $loader = $this->createMock(FilesystemLoader::class);
         $loader->expects(self::any())
@@ -68,14 +62,11 @@ class TemplateListenerTest extends TestCase
             ->with('TestBundle')
             ->willReturn([realpath(__DIR__  . '/fixtures')]);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects(self::any())
-            ->method('get')
-            ->willReturnMap([
-                [Inflector::class, (new InflectorFactory())->build()],
-                [Environment::class, $this->twig],
-                ['twig.loader.native_filesystem', $loader]
-            ]);
+        $container = TestContainerBuilder::create()
+            ->add(Inflector::class, (new InflectorFactory())->build())
+            ->add(Environment::class, $this->twig)
+            ->add(FilesystemLoader::class, $loader)
+            ->getContainer($this);
 
         $this->listener = new TemplateListener($container);
     }
@@ -148,7 +139,7 @@ class TemplateListenerTest extends TestCase
         string $inputTemplate,
         Template $expectedTemplate
     ): void {
-        $this->controlerEvent->setController($this->callable, [Template::class => [$inputTemplate]]);
+        $this->controllerEvent->setController($this->callable, [Template::class => [$inputTemplate]]);
 
         $this->listener->onKernelView($this->event);
         $this->assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
@@ -283,7 +274,7 @@ class TemplateListenerTest extends TestCase
         $this->request->{$requestAttribute}->set('_widgetContainer', 'container');
         $this->request->attributes->set('_template', $inputTemplate);
 
-        $this->controlerEvent->setController($this->callable, [Template::class => [$inputTemplate]]);
+        $this->controllerEvent->setController($this->callable, [Template::class => [$inputTemplate]]);
 
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects(self::atLeastOnce())
@@ -357,10 +348,8 @@ class TemplateListenerTest extends TestCase
 
     private function templateWithContainer(?string $container = null): Template
     {
-        $template = new Template(
+        return new Template(
             '@TestBundle/Default/' . ($container ? $container . '/' : '') . 'test.html.twig'
         );
-
-        return $template;
     }
 }

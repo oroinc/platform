@@ -33,7 +33,7 @@ class EmailUserListenerTest extends TestCase
             ->willReturn($this->uow);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_email.email_websocket.processor', $this->webSocketSendProcessor)
+            ->add(WebSocketSendProcessor::class, $this->webSocketSendProcessor)
             ->getContainer($this);
 
         $this->listener = new EmailUserListener($container);

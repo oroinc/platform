@@ -13,26 +13,23 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class ReminderListener implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_reminder.entity.manager' => ReminderManager::class
+            ReminderManager::class
         ];
     }
 
     /**
      * After entity with reminders was loaded, load reminders
      */
-    public function postLoad(LifecycleEventArgs $args)
+    public function postLoad(LifecycleEventArgs $args): void
     {
         $entity = $args->getObject();
         if ($entity instanceof RemindableInterface) {
@@ -43,7 +40,7 @@ class ReminderListener implements ServiceSubscriberInterface
     /**
      * Save reminders for new entities
      */
-    public function postPersist(LifecycleEventArgs $event)
+    public function postPersist(LifecycleEventArgs $event): void
     {
         $entity = $event->getObject();
         if ($entity instanceof RemindableInterface) {
@@ -53,6 +50,6 @@ class ReminderListener implements ServiceSubscriberInterface
 
     private function getReminderManager(): ReminderManager
     {
-        return $this->container->get('oro_reminder.entity.manager');
+        return $this->container->get(ReminderManager::class);
     }
 }

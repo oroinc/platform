@@ -44,8 +44,8 @@ class DoctrineTagEventListenerTest extends TestCase
             ->willReturn($this->uow);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_sync.content.tag_generator', $this->tagGenerator)
-            ->add('oro_sync.content.data_update_topic_sender', $this->dataUpdateTopicSender)
+            ->add(TagGeneratorInterface::class, $this->tagGenerator)
+            ->add(DataUpdateTopicSender::class, $this->dataUpdateTopicSender)
             ->getContainer($this);
 
         $this->eventListener = new DoctrineTagEventListener($container, $applicationState);

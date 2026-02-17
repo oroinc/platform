@@ -52,9 +52,9 @@ services:
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: twig.loader.native_filesystem }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: twig.loader.native_filesystem, key: Twig\Loader\FilesystemLoader }
 
     oro_ui.view.content_provider.listener:
         class: Oro\Bundle\UIBundle\EventListener\ContentProviderListener

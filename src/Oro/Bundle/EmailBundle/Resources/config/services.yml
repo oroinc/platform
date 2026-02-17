@@ -123,7 +123,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 1 }
             - { name: doctrine.event_listener, event: postFlush, priority: 1 }
-            - { name: container.service_subscriber, id: oro_email.email_websocket.processor }
+            - { name: container.service_subscriber, id: oro_email.email_websocket.processor, key: Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor }
 
     oro_email.delete_handler.email_user:
         class: Oro\Bundle\EmailBundle\Handler\EmailUserDeleteHandler
@@ -1260,8 +1260,8 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
             - { name: oro_featuretogle.feature, feature: email }
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: oro_email.mailbox.process_storage }
-            - { name: container.service_subscriber, id: oro_workflow.process.process_handler }
+            - { name: container.service_subscriber, id: oro_email.mailbox.process_storage, key: Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage }
+            - { name: container.service_subscriber, id: oro_workflow.process.process_handler, key: Oro\Bundle\WorkflowBundle\Model\ProcessHandler }
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler

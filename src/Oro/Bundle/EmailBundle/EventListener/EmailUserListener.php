@@ -20,12 +20,11 @@ class EmailUserListener implements ServiceSubscriberInterface
     private const ENTITY_STATUS_NEW = 'new';
     private const ENTITY_STATUS_UPDATE = 'update';
 
-    private ContainerInterface $container;
     private array $processEmailUsersEntities = [];
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     public function onFlush(OnFlushEventArgs $args): void
@@ -144,12 +143,12 @@ class EmailUserListener implements ServiceSubscriberInterface
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_email.email_websocket.processor' => WebSocketSendProcessor::class
+            WebSocketSendProcessor::class
         ];
     }
 
     private function getWebSocketSendProcessor(): WebSocketSendProcessor
     {
-        return $this->container->get('oro_email.email_websocket.processor');
+        return $this->container->get(WebSocketSendProcessor::class);
     }
 }
