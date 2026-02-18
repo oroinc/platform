@@ -92,8 +92,6 @@ deptrac:
       - Oro\Bundle\CustomerBundle\Entity\AbstractDefaultTypedAddress
     Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension:
       - Oro\Bundle\CustomerBundle\Entity\CustomerVisitor
-    Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType:
-      - Oro\Bundle\FrontendBundle\Form\Type\ThemeSelectType
     Oro\Bundle\ThemeBundle\Migrations\Data\AbstractLoadThemeConfiguration:
       - Oro\Bundle\WebsiteBundle\Entity\Website
     Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\UpdateAccessLevelsOfTransitionsPermissions:
