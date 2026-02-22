@@ -24,8 +24,8 @@ services:
 
     oro_help.twig.extension:
         class: Oro\Bundle\HelpBundle\Twig\HelpExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_help.help_link_provider, key: Oro\Bundle\HelpBundle\Provider\HelpLinkProvider }

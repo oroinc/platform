@@ -5,3 +5,4 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_ui.user_agent_provider, key: Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface }

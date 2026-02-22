@@ -14,22 +14,22 @@ class FormatExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private TranslatorInterface&MockObject $translator;
-    private FormatterManager&MockObject $formatterManager;
     private UrlWithoutFrontControllerProvider&MockObject $urlProvider;
+    private FormatterManager&MockObject $formatterManager;
+    private TranslatorInterface&MockObject $translator;
     private FormatExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->formatterManager = $this->createMock(FormatterManager::class);
         $this->urlProvider = $this->createMock(UrlWithoutFrontControllerProvider::class);
+        $this->formatterManager = $this->createMock(FormatterManager::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add(TranslatorInterface::class, $this->translator)
-            ->add('oro_ui.formatter', $this->formatterManager)
             ->add('oro_ui.provider.url_without_front_controller', $this->urlProvider)
+            ->add(FormatterManager::class, $this->formatterManager)
+            ->add(TranslatorInterface::class, $this->translator)
             ->getContainer($this);
 
         $this->extension = new FormatExtension($container);

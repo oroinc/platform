@@ -14,34 +14,34 @@ use Twig\TwigFunction;
  */
 class WebpStrategyExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction(
-                'is_webp_enabled_if_supported',
-                [$this, 'isEnabledIfSupported']
-            ),
+            new TwigFunction('is_webp_enabled_if_supported', [$this, 'isEnabledIfSupported'])
         ];
     }
 
     public function isEnabledIfSupported(): bool
     {
-        return $this->container->get(WebpConfiguration::class)->isEnabledIfSupported();
+        return $this->getWebpConfiguration()->isEnabledIfSupported();
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            WebpConfiguration::class,
+            WebpConfiguration::class
         ];
+    }
+
+    private function getWebpConfiguration(): WebpConfiguration
+    {
+        return $this->container->get(WebpConfiguration::class);
     }
 }

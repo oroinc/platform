@@ -14,42 +14,15 @@ use Twig\TwigFunction;
 
 /**
  * Provides a Twig function to retrieve sidebar widgets information:
- *   - oro_sidebar_get_available_widgets
+ *   - oro_sidebar_get_available_widgets - Gets available widgets for the given placement.
  */
 class SidebarExtension extends AbstractExtension implements FeatureToggleableInterface, ServiceSubscriberInterface
 {
     use FeatureCheckerHolderTrait;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return WidgetDefinitionProvider
-     */
-    protected function getWidgetDefinitionProvider()
-    {
-        return $this->container->get('oro_sidebar.widget_definition_provider');
-    }
-
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
-    {
-        return $this->container->get(TranslatorInterface::class);
-    }
-
-    /**
-     * @return AssetHelper
-     */
-    protected function getAssetHelper()
-    {
-        return $this->container->get(AssetHelper::class);
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -60,13 +33,7 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
         ];
     }
 
-    /**
-     * Gets available widgets for the given placement.
-     *
-     * @param string $placement
-     * @return array
-     */
-    public function getWidgetDefinitions($placement)
+    public function getWidgetDefinitions(string $placement): array
     {
         $definitions = $this->getWidgetDefinitionProvider()
             ->getWidgetDefinitionsByPlacement($placement);
@@ -95,9 +62,24 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_sidebar.widget_definition_provider' => WidgetDefinitionProvider::class,
+            WidgetDefinitionProvider::class,
             TranslatorInterface::class,
-            AssetHelper::class,
+            AssetHelper::class
         ];
+    }
+
+    private function getWidgetDefinitionProvider(): WidgetDefinitionProvider
+    {
+        return $this->container->get(WidgetDefinitionProvider::class);
+    }
+
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->container->get(TranslatorInterface::class);
+    }
+
+    private function getAssetHelper(): AssetHelper
+    {
+        return $this->container->get(AssetHelper::class);
     }
 }

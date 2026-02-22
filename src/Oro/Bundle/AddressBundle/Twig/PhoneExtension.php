@@ -15,20 +15,9 @@ use Twig\TwigFunction;
  */
 class PhoneExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return PhoneProviderInterface
-     */
-    protected function getPhoneProvider()
-    {
-        return $this->container->get('oro_address.provider.phone');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -76,7 +65,12 @@ class PhoneExtension extends AbstractExtension implements ServiceSubscriberInter
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_address.provider.phone' => PhoneProviderInterface::class,
+            'oro_address.provider.phone' => PhoneProviderInterface::class
         ];
+    }
+
+    private function getPhoneProvider(): PhoneProviderInterface
+    {
+        return $this->container->get('oro_address.provider.phone');
     }
 }

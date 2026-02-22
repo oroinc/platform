@@ -48,7 +48,7 @@ class UiExtensionTest extends TestCase
 
         $container = self::getContainerBuilder()
             ->add('oro_ui.content_provider.manager', $this->contentProviderManager)
-            ->add('oro_ui.user_agent_provider', $userAgentProvider)
+            ->add(UserAgentProviderInterface::class, $userAgentProvider)
             ->add(EventDispatcherInterface::class, $this->eventDispatcher)
             ->add(RequestStack::class, $this->requestStack)
             ->add(RouterInterface::class, $this->router)

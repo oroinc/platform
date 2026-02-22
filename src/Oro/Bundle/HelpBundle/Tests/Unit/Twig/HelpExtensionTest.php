@@ -21,7 +21,7 @@ class HelpExtensionTest extends TestCase
         $this->linkProvider = $this->createMock(HelpLinkProvider::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_help.help_link_provider', $this->linkProvider)
+            ->add(HelpLinkProvider::class, $this->linkProvider)
             ->getContainer($this);
 
         $this->extension = new HelpExtension($container);
@@ -31,11 +31,11 @@ class HelpExtensionTest extends TestCase
     {
         $expects = 'http://server.com/help/list';
 
-        $this->linkProvider->expects($this->once())
+        $this->linkProvider->expects(self::once())
             ->method('getHelpLinkUrl')
             ->willReturn($expects);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expects,
             self::callTwigFunction($this->extension, 'get_help_link', [])
         );

@@ -32,68 +32,9 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
 {
     private const ROUTE = 'oro_datagrid_index';
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return ManagerInterface
-     */
-    protected function getManager()
-    {
-        return $this->container->get('oro_datagrid.datagrid.manager');
-    }
-
-    /**
-     * @return NameStrategyInterface
-     */
-    protected function getNameStrategy()
-    {
-        return $this->container->get('oro_datagrid.datagrid.name_strategy');
-    }
-
-    /**
-     * @return RouterInterface
-     */
-    protected function getRouter()
-    {
-        return $this->container->get(RouterInterface::class);
-    }
-
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
-    {
-        return $this->container->get(AuthorizationCheckerInterface::class);
-    }
-
-    /**
-     * @return DatagridRouteHelper
-     */
-    protected function getRouteHelper()
-    {
-        return $this->container->get('oro_datagrid.helper.route');
-    }
-
-    /**
-     * @return RequestStack
-     */
-    protected function getRequestStack()
-    {
-        return $this->container->get(RequestStack::class);
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->container->get(LoggerInterface::class);
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -285,7 +226,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         return $this->getRouteHelper()->generate($routeName, $gridName, $params, $referenceType);
     }
 
-    protected function generateUrl(DatagridInterface $grid, string $route, array $params): string
+    private function generateUrl(DatagridInterface $grid, string $route, array $params): string
     {
         $nameStrategy = $this->getNameStrategy();
         $gridFullName = $nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
@@ -297,25 +238,16 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         );
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return bool
-     */
-    protected function isAclGrantedForGridName($gridName)
+    private function isAclGrantedForGridName(string $gridName): bool
     {
         $gridConfig = $this->getManager()->getConfigurationForGrid($gridName);
-
-        if ($gridConfig) {
-            $aclResource = $gridConfig->getAclResource();
-            if ($aclResource && !$this->getAuthorizationChecker()->isGranted($aclResource)) {
-                return false;
-            } else {
-                return true;
-            }
+        if (!$gridConfig) {
+            return false;
         }
 
-        return false;
+        $aclResource = $gridConfig->getAclResource();
+
+        return !$aclResource || $this->getAuthorizationChecker()->isGranted($aclResource);
     }
 
     #[\Override]
@@ -324,11 +256,46 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         return [
             'oro_datagrid.datagrid.manager' => ManagerInterface::class,
             'oro_datagrid.datagrid.name_strategy' => NameStrategyInterface::class,
-            'oro_datagrid.helper.route' => DatagridRouteHelper::class,
+            DatagridRouteHelper::class,
             RouterInterface::class,
             AuthorizationCheckerInterface::class,
             RequestStack::class,
-            LoggerInterface::class,
+            LoggerInterface::class
         ];
+    }
+
+    private function getManager(): ManagerInterface
+    {
+        return $this->container->get('oro_datagrid.datagrid.manager');
+    }
+
+    private function getNameStrategy(): NameStrategyInterface
+    {
+        return $this->container->get('oro_datagrid.datagrid.name_strategy');
+    }
+
+    private function getRouteHelper(): DatagridRouteHelper
+    {
+        return $this->container->get(DatagridRouteHelper::class);
+    }
+
+    private function getRouter(): RouterInterface
+    {
+        return $this->container->get(RouterInterface::class);
+    }
+
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
+    {
+        return $this->container->get(AuthorizationCheckerInterface::class);
+    }
+
+    private function getRequestStack(): RequestStack
+    {
+        return $this->container->get(RequestStack::class);
+    }
+
+    private function getLogger(): LoggerInterface
+    {
+        return $this->container->get(LoggerInterface::class);
     }
 }

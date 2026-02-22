@@ -16,102 +16,32 @@ use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class CurrencyNameHelperTest extends TestCase implements ViewTypeProviderInterface
+class CurrencyNameHelperTest extends TestCase
 {
-    private string $viewType;
     private NumberFormatter&MockObject $formatter;
+    private ViewTypeProviderInterface&MockObject $viewTypeProvider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(NumberFormatter::class);
+        $this->viewTypeProvider = $this->createMock(ViewTypeProviderInterface::class);
     }
 
-    public function testGetCurrencyName(): void
+    private function getCurrencyNameHelper(string $localeCode): CurrencyNameHelper
     {
-        $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleSettings('en'),
+        return new CurrencyNameHelper(
+            $this->getLocaleSettings($localeCode),
             $this->formatter,
-            $this,
+            $this->viewTypeProvider,
             new CurrencyListProviderStub()
         );
-
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
-        $this->assertEquals('USD', $currencyNameHelper->getCurrencyName('USD'));
-
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-        $this->assertEquals('$', $currencyNameHelper->getCurrencyName('USD'));
-    }
-
-    public function testGetCurrencyNameWithFullName(): void
-    {
-        $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleSettings('en'),
-            $this->formatter,
-            $this,
-            new CurrencyListProviderStub()
-        );
-
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
-        $this->assertEquals(
-            'US Dollar (USD)',
-            $currencyNameHelper->getCurrencyName('USD', ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME)
-        );
-    }
-
-    public function testGetCurrencyNameForFrenchLocale(): void
-    {
-        $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleSettings('fr'),
-            $this->formatter,
-            $this,
-            new CurrencyListProviderStub()
-        );
-
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
-        $this->assertEquals('USD', $currencyNameHelper->getCurrencyName('USD'));
-
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-        $this->assertEquals('$US', $currencyNameHelper->getCurrencyName('USD'));
-    }
-
-    public function testGetCurrencyNameForLocalCurrencies(): void
-    {
-        $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleSettings('en'),
-            $this->formatter,
-            $this,
-            new CurrencyListProviderStub()
-        );
-
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-        $this->assertEquals('UAH', $currencyNameHelper->getCurrencyName('UAH'));
-    }
-
-    public function testGetCurrencyChoices(): void
-    {
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-
-        $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleSettings('en'),
-            $this->formatter,
-            $this,
-            new CurrencyListProviderStub()
-        );
-
-        $this->assertEquals(['$' => 'USD', '€' => 'EUR'], $currencyNameHelper->getCurrencyChoices());
-    }
-
-    #[\Override]
-    public function getViewType(): string
-    {
-        return $this->viewType;
     }
 
     private function getLocaleSettings(string $localeCode): LocaleSettings
     {
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager->expects(self::any())
             ->method('get')
             ->with('oro_locale.default_localization')
             ->willReturn(42);
@@ -119,7 +49,7 @@ class CurrencyNameHelperTest extends TestCase implements ViewTypeProviderInterfa
         $calendarFactory = $this->createMock(CalendarFactory::class);
 
         $localizationManager = $this->createMock(LocalizationManager::class);
-        $localizationManager->expects($this->any())
+        $localizationManager->expects(self::any())
             ->method('getLocalizationData')
             ->with(42)
             ->willReturn(['id' => 42, 'formattingCode' => $localeCode]);
@@ -137,19 +67,85 @@ class CurrencyNameHelperTest extends TestCase implements ViewTypeProviderInterfa
         );
     }
 
+    public function testGetCurrencyNameWhenViewTypeIsIsoCode(): void
+    {
+        $this->viewTypeProvider->expects(self::once())
+            ->method('getViewType')
+            ->willReturn(ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE);
+
+        $currencyNameHelper = $this->getCurrencyNameHelper('en');
+        self::assertEquals('USD', $currencyNameHelper->getCurrencyName('USD'));
+    }
+
+    public function testGetCurrencyNameWhenViewTypeIsSymbol(): void
+    {
+        $this->viewTypeProvider->expects(self::once())
+            ->method('getViewType')
+            ->willReturn(ViewTypeProviderInterface::VIEW_TYPE_SYMBOL);
+
+        $currencyNameHelper = $this->getCurrencyNameHelper('en');
+        self::assertEquals('$', $currencyNameHelper->getCurrencyName('USD'));
+    }
+
+    public function testGetCurrencyNameWithFullName(): void
+    {
+        $this->viewTypeProvider->expects(self::once())
+            ->method('getViewType')
+            ->willReturn(ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE);
+
+        $currencyNameHelper = $this->getCurrencyNameHelper('en');
+        self::assertEquals(
+            'US Dollar (USD)',
+            $currencyNameHelper->getCurrencyName('USD', ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME)
+        );
+    }
+
+    public function testGetCurrencyNameForFrenchLocaleWhenViewTypeIsIsoCode(): void
+    {
+        $this->viewTypeProvider->expects(self::once())
+            ->method('getViewType')
+            ->willReturn(ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE);
+
+        $currencyNameHelper = $this->getCurrencyNameHelper('fr');
+        self::assertEquals('USD', $currencyNameHelper->getCurrencyName('USD'));
+    }
+
+    public function testGetCurrencyNameForFrenchLocaleWhenViewTypeIsSymbol(): void
+    {
+        $this->viewTypeProvider->expects(self::once())
+            ->method('getViewType')
+            ->willReturn(ViewTypeProviderInterface::VIEW_TYPE_SYMBOL);
+
+        $currencyNameHelper = $this->getCurrencyNameHelper('fr');
+        self::assertEquals('$US', $currencyNameHelper->getCurrencyName('USD'));
+    }
+
+    public function testGetCurrencyNameForLocalCurrencies(): void
+    {
+        $this->viewTypeProvider->expects(self::once())
+            ->method('getViewType')
+            ->willReturn(ViewTypeProviderInterface::VIEW_TYPE_SYMBOL);
+
+        $currencyNameHelper = $this->getCurrencyNameHelper('en');
+        self::assertEquals('UAH', $currencyNameHelper->getCurrencyName('UAH'));
+    }
+
+    public function testGetCurrencyChoices(): void
+    {
+        $this->viewTypeProvider->expects(self::atLeastOnce())
+            ->method('getViewType')
+            ->willReturn(ViewTypeProviderInterface::VIEW_TYPE_SYMBOL);
+
+        $currencyNameHelper = $this->getCurrencyNameHelper('en');
+        self::assertEquals(['$' => 'USD', '€' => 'EUR'], $currencyNameHelper->getCurrencyChoices());
+    }
+
     /**
      * @dataProvider formatCurrencyDataProvider
      */
     public function testFormatCurrency(Price $price, array $options, string $expected): void
     {
-        $currencyNameHelper = new CurrencyNameHelper(
-            $this->getLocaleSettings('en'),
-            $this->formatter,
-            $this,
-            new CurrencyListProviderStub()
-        );
-
-        $this->formatter->expects($this->once())
+        $this->formatter->expects(self::once())
             ->method('formatCurrency')
             ->with(
                 $price->getValue(),
@@ -161,7 +157,8 @@ class CurrencyNameHelperTest extends TestCase implements ViewTypeProviderInterfa
             )
             ->willReturn($expected);
 
-        $this->assertEquals($expected, $currencyNameHelper->formatPrice($price, $options));
+        $currencyNameHelper = $this->getCurrencyNameHelper('en');
+        self::assertEquals($expected, $currencyNameHelper->formatPrice($price, $options));
     }
 
     public function formatCurrencyDataProvider(): array

@@ -3,9 +3,11 @@ services:
         class: Oro\Bundle\LayoutBundle\Twig\LayoutExtension
         arguments:
             - '@oro_platform.twig.service_locator'
-            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_layout.text.helper, key: Oro\Component\Layout\Templating\TextHelper }
+            - { name: container.service_subscriber, id: oro_layout.layout_context_stack, key: Oro\Bundle\LayoutBundle\Layout\Context\LayoutContextStack }
+            - { name: container.service_subscriber, id: oro_theme.provider.theme_configuration, key: Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider }
 
     oro_layout.twig.renderer:
         class: Oro\Bundle\LayoutBundle\Twig\TwigRenderer
@@ -48,10 +50,3 @@ services:
             - '@oro_layout.twig.layout_renderer'
         tags:
             - { name: kernel.event_listener, event: Oro\Bundle\LayoutBundle\Event\LayoutContextChangedEvent, method: onContextChanged }
-
-    oro_layout.twig.theme_configuration_extension:
-        class: Oro\Bundle\LayoutBundle\Twig\ThemeConfigurationTwigExtension
-        arguments:
-            - '@oro_theme.provider.theme_configuration'
-        tags:
-            - { name: twig.extension }

@@ -21,7 +21,7 @@ class PlatformExtensionTest extends TestCase
         $this->versionHelper = $this->createMock(VersionHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_platform.composer.version_helper', $this->versionHelper)
+            ->add(VersionHelper::class, $this->versionHelper)
             ->getContainer($this);
 
         $this->extension = new PlatformExtension($container);
@@ -29,14 +29,14 @@ class PlatformExtensionTest extends TestCase
 
     public function testGetVersion(): void
     {
-        $undefinedVersion = 'N/A';
+        $version = '1.2';
 
-        $this->versionHelper->expects($this->once())
+        $this->versionHelper->expects(self::once())
             ->method('getVersion')
-            ->willReturn($undefinedVersion);
+            ->willReturn($version);
 
-        $this->assertEquals(
-            $undefinedVersion,
+        self::assertEquals(
+            $version,
             self::callTwigFunction($this->extension, 'oro_version', [])
         );
     }

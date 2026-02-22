@@ -237,12 +237,12 @@ services:
             - { name: oro.action.extension.button_provider, priority: -100 }
 
     oro_action.twig.extension.operation:
-        class: 'Oro\Bundle\ActionBundle\Twig\OperationExtension'
-        public: false
+        class: Oro\Bundle\ActionBundle\Twig\OperationExtension
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_action.helper.options, key: Oro\Bundle\ActionBundle\Helper\OptionsHelper }
 
     oro_action.handler.execute_operation:
         class: 'Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler'

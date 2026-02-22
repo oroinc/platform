@@ -59,11 +59,11 @@ services:
 
     oro_reminder.twig.extension:
         class: Oro\Bundle\ReminderBundle\Twig\ReminderExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_reminder.web_socket.message_params_provider, key: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider }
 
     oro_reminder.topic.remind:
         class: Oro\Bundle\SyncBundle\Topic\SecuredTopic

@@ -21,7 +21,7 @@ class EnumExtensionTest extends TestCase
         $this->enumOptionsProvider = $this->createMock(EnumOptionsProvider::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_entity_extend.enum_options_provider', $this->enumOptionsProvider)
+            ->add(EnumOptionsProvider::class, $this->enumOptionsProvider)
             ->getContainer($this);
 
         $this->extension = new EnumExtension($container);

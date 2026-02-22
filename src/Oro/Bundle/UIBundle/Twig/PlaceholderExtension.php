@@ -5,7 +5,6 @@ namespace Oro\Bundle\UIBundle\Twig;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -19,11 +18,9 @@ use Twig\TwigFunction;
  */
 class PlaceholderExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    protected ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -58,7 +55,7 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
         array $attributes = []
     ) {
         return implode(
-            isset($attributes['delimiter']) ? $attributes['delimiter'] : '',
+            $attributes['delimiter'] ?? '',
             $this->getPlaceholderData($environment, $name, array_merge($context, $variables))
         );
     }
@@ -74,7 +71,7 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
      *
      * @throws \RuntimeException If placeholder cannot be rendered.
      */
-    protected function renderItemContent(Environment $environment, array $item, array $variables)
+    private function renderItemContent(Environment $environment, array $item, array $variables)
     {
         if (isset($item['data']) || array_key_exists('data', $item)) {
             $variables['data'] = $item['data'];
@@ -86,7 +83,7 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
 
         if (isset($item['action'])) {
             $query = [];
-            $request = $this->getRequest();
+            $request = $this->getRequestStack()->getCurrentRequest();
             if (null !== $request) {
                 $query = $request->query->all();
             }
@@ -96,12 +93,10 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
             );
         }
 
-        throw new \RuntimeException(
-            sprintf(
-                'Cannot render placeholder item with keys "%s". Expects "template" or "action" key.',
-                implode('", "', $item)
-            )
-        );
+        throw new \RuntimeException(\sprintf(
+            'Cannot render placeholder item with keys "%s". Expects "template" or "action" key.',
+            implode('", "', $item)
+        ));
     }
 
     /**
@@ -111,10 +106,9 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
      *
      * @return array
      */
-    protected function getPlaceholderData(Environment $environment, $name, $variables)
+    private function getPlaceholderData(Environment $environment, $name, $variables)
     {
         $result = [];
-
         $items = $this->getPlaceholderProvider()->getPlaceholderItems($name, $variables);
         foreach ($items as $item) {
             $result[] = $this->renderItemContent($environment, $item, $variables);
@@ -127,24 +121,24 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_ui.placeholder.provider' => PlaceholderProvider::class,
-            'fragment.handler' => FragmentHandler::class,
-            RequestStack::class,
+            PlaceholderProvider::class,
+            FragmentHandler::class,
+            RequestStack::class
         ];
     }
 
-    protected function getPlaceholderProvider(): PlaceholderProvider
+    private function getPlaceholderProvider(): PlaceholderProvider
     {
-        return $this->container->get('oro_ui.placeholder.provider');
+        return $this->container->get(PlaceholderProvider::class);
     }
 
-    protected function getFragmentHandler(): FragmentHandler
+    private function getFragmentHandler(): FragmentHandler
     {
-        return $this->container->get('fragment.handler');
+        return $this->container->get(FragmentHandler::class);
     }
 
-    protected function getRequest(): ?Request
+    private function getRequestStack(): RequestStack
     {
-        return $this->container->get(RequestStack::class)->getCurrentRequest();
+        return $this->container->get(RequestStack::class);
     }
 }

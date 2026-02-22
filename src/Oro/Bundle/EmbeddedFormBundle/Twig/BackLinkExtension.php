@@ -15,33 +15,11 @@ use Twig\TwigFilter;
  */
 class BackLinkExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
-    /**
-     * @return RouterInterface
-     */
-    protected function getRouter()
-    {
-        return $this->container->get(RouterInterface::class);
-    }
-
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
-    {
-        return $this->container->get(TranslatorInterface::class);
-    }
-
-    /**
-     * @return TwigFilter[]
-     */
     #[\Override]
     public function getFilters()
     {
@@ -93,7 +71,17 @@ class BackLinkExtension extends AbstractExtension implements ServiceSubscriberIn
     {
         return [
             RouterInterface::class,
-            TranslatorInterface::class,
+            TranslatorInterface::class
         ];
+    }
+
+    private function getRouter(): RouterInterface
+    {
+        return $this->container->get(RouterInterface::class);
+    }
+
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->container->get(TranslatorInterface::class);
     }
 }

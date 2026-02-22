@@ -18,6 +18,7 @@ use Twig\Extension\ExtensionInterface;
 class TwigServiceLocatorPass implements CompilerPassInterface
 {
     private const string TWIG_SERVICE_LOCATOR_SERVICE_ID = 'oro_platform.twig.service_locator';
+    private const string SOURCE_SERVICE_ID = '__source_service_id';
 
     #[\Override]
     public function process(ContainerBuilder $container): void
@@ -91,7 +92,7 @@ class TwigServiceLocatorPass implements CompilerPassInterface
         if (is_a($class, ServiceSubscriberInterface::class, true) && !isset($ids[$serviceId])) {
             $ids[$serviceId] = $this->getServiceIds(
                 $class::getSubscribedServices(),
-                $this->getServiceSubscriberTags($definition, $container),
+                $this->getServiceSubscriberTags($serviceId, $definition, $container),
                 $serviceId
             );
         }
@@ -134,7 +135,7 @@ class TwigServiceLocatorPass implements CompilerPassInterface
             } elseif ($alias !== $id && isset($normalizedSubscribedServices[$id])) {
                 unset($normalizedSubscribedServices[$id]);
                 $result[$alias] = $id;
-            } else {
+            } elseif ($serviceSubscriberTag[self::SOURCE_SERVICE_ID] === $serviceId) {
                 $exceptionMessage = \sprintf(
                     'Invalid "container.service_subscriber" tag declaration for "%s" service.',
                     $serviceId
@@ -180,13 +181,21 @@ class TwigServiceLocatorPass implements CompilerPassInterface
         return $result;
     }
 
-    private function getServiceSubscriberTags(Definition $definition, ContainerBuilder $container): array
-    {
+    private function getServiceSubscriberTags(
+        string $serviceId,
+        Definition $definition,
+        ContainerBuilder $container
+    ): array {
         $tags = $definition->getTag('container.service_subscriber');
+        foreach ($tags as $key => $tag) {
+            $tags[$key][self::SOURCE_SERVICE_ID] = $serviceId;
+        }
         $decorated = $definition->getDecoratedService();
         if ($decorated) {
+            $decoratedServiceId = $decorated[0];
             $decoratedServiceTags = $this->getServiceSubscriberTags(
-                $container->getDefinition($decorated[0]),
+                $decoratedServiceId,
+                $container->getDefinition($decoratedServiceId),
                 $container
             );
             if ($decoratedServiceTags) {

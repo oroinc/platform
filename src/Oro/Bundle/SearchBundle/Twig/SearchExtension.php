@@ -11,7 +11,7 @@ use Twig\TwigFilter;
  *   - trim_string
  *   - highlight_trim
  */
-class OroSearchExtension extends AbstractExtension
+class SearchExtension extends AbstractExtension
 {
     #[\Override]
     public function getFilters()

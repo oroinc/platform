@@ -10,8 +10,9 @@ use Twig\TwigFunction;
  */
 class ExternalResourceExtension extends AbstractExtension
 {
-    public function __construct(private readonly array $externalResources)
-    {
+    public function __construct(
+        private readonly array $externalResources
+    ) {
     }
 
     public function getFunctions(): array

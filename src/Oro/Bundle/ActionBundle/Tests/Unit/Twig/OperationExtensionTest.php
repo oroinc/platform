@@ -38,10 +38,10 @@ class OperationExtensionTest extends TestCase
 
         $container = self::getContainerBuilder()
             ->add('oro_action.provider.route', $this->routeProvider)
-            ->add('oro_action.helper.context', $this->contextHelper)
-            ->add('oro_action.helper.options', $this->optionsHelper)
-            ->add('oro_action.provider.button', $this->buttonProvider)
-            ->add('oro_action.provider.button_search_context', $this->buttonSearchContextProvider)
+            ->add(ContextHelper::class, $this->contextHelper)
+            ->add(OptionsHelper::class, $this->optionsHelper)
+            ->add(ButtonProvider::class, $this->buttonProvider)
+            ->add(ButtonSearchContextProvider::class, $this->buttonSearchContextProvider)
             ->getContainer($this);
 
         $this->extension = new OperationExtension($container);
@@ -52,19 +52,19 @@ class OperationExtensionTest extends TestCase
      */
     public function testHasButtons(bool $value): void
     {
-        $this->contextHelper->expects($this->once())
+        $this->contextHelper->expects(self::once())
             ->method('getContext')
             ->willReturn([]);
 
-        $this->buttonSearchContextProvider->expects($this->once())
+        $this->buttonSearchContextProvider->expects(self::once())
             ->method('getButtonSearchContext')
             ->willReturn(new ButtonSearchContext());
 
-        $this->buttonProvider->expects($this->once())
+        $this->buttonProvider->expects(self::once())
             ->method('hasButtons')
             ->willReturn($value);
 
-        $this->assertEquals(
+        self::assertSame(
             $value,
             self::callTwigFunction($this->extension, 'oro_action_has_buttons', [[]])
         );
@@ -74,7 +74,7 @@ class OperationExtensionTest extends TestCase
     {
         return [
             'has_buttons' => [true],
-            'has_no_buttons' => [false],
+            'has_no_buttons' => [false]
         ];
     }
 }

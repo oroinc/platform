@@ -11,44 +11,25 @@ use Twig\TwigFilter;
 
 /**
  * Provides the TWIG filters to format the address according to locale settings:
- *   - oro_format_address
- *   - oro_format_address_html
+ *   - oro_format_address - Formats address according to locale settings.
+ *   - oro_format_address_html - Formats address using twig template. Wraps each address part into a tag.
  */
 class AddressExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    public function __construct(private ContainerInterface $container)
-    {
-    }
-
-    private function getAddressFormatter(): AddressFormatter
-    {
-        return $this->container->get('oro_locale.formatter.address');
-    }
-
-    private function getFormattedAddressRenderer(): FormattedAddressRenderer
-    {
-        return $this->container->get('oro_locale.twig.formatted_address_renderer');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public function getFilters(): array
     {
         return [
-            new TwigFilter(
-                'oro_format_address',
-                $this->formatAddress(...)
-            ),
-            new TwigFilter(
-                'oro_format_address_html',
-                $this->formatAddressHtml(...),
-                ['is_safe' => ['html']]
-            ),
+            new TwigFilter('oro_format_address', $this->formatAddress(...)),
+            new TwigFilter('oro_format_address_html', $this->formatAddressHtml(...), ['is_safe' => ['html']])
         ];
     }
 
-    /**
-     * Formats address according to locale settings.
-     */
     public function formatAddress(
         AddressInterface $address,
         ?string $country = null,
@@ -57,11 +38,6 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
         return $this->getAddressFormatter()->format($address, $country, $newLineSeparator);
     }
 
-    /**
-     * Formats address using twig template.
-     * Wraps each address part into a tag.
-     * @throws \Throwable
-     */
     public function formatAddressHtml(
         AddressInterface $address,
         ?string $country = null,
@@ -79,8 +55,18 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_locale.formatter.address' => AddressFormatter::class,
-            'oro_locale.twig.formatted_address_renderer' => FormattedAddressRenderer::class,
+            AddressFormatter::class,
+            FormattedAddressRenderer::class
         ];
+    }
+
+    private function getAddressFormatter(): AddressFormatter
+    {
+        return $this->container->get(AddressFormatter::class);
+    }
+
+    private function getFormattedAddressRenderer(): FormattedAddressRenderer
+    {
+        return $this->container->get(FormattedAddressRenderer::class);
     }
 }

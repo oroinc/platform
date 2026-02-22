@@ -23,36 +23,9 @@ use Twig\TwigFunction;
  */
 class FormatExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
-    {
-        return $this->container->get(TranslatorInterface::class);
-    }
-
-    /**
-     * @return FormatterManager
-     */
-    protected function getFormatterManager()
-    {
-        return $this->container->get('oro_ui.formatter');
-    }
-
-    /**
-     * @return UrlWithoutFrontControllerProvider
-     */
-    protected function getUrlWithoutFrontControllerProvider()
-    {
-        return $this->container->get('oro_ui.provider.url_without_front_controller');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -168,7 +141,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
      *
      * @return \DateInterval|null
      */
-    protected function getDateDiff($date, $options)
+    private function getDateDiff($date, $options)
     {
         if (!$date) {
             return null;
@@ -188,9 +161,24 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
     public static function getSubscribedServices(): array
     {
         return [
-            TranslatorInterface::class,
-            'oro_ui.formatter' => FormatterManager::class,
             'oro_ui.provider.url_without_front_controller' => UrlWithoutFrontControllerProvider::class,
+            FormatterManager::class,
+            TranslatorInterface::class
         ];
+    }
+
+    private function getUrlWithoutFrontControllerProvider(): UrlWithoutFrontControllerProvider
+    {
+        return $this->container->get('oro_ui.provider.url_without_front_controller');
+    }
+
+    private function getFormatterManager(): FormatterManager
+    {
+        return $this->container->get(FormatterManager::class);
+    }
+
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->container->get(TranslatorInterface::class);
     }
 }

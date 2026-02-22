@@ -278,7 +278,6 @@ services:
 
     oro_navigation.title_service.twig.extension:
         class: Oro\Bundle\NavigationBundle\Twig\TitleExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

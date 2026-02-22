@@ -6,7 +6,6 @@ services:
         class: Oro\Bundle\FormBundle\Twig\FormExtension
         arguments:
             - '@oro_platform.twig.service_locator'
-        public: false
         tags:
             - { name: twig.extension }
 

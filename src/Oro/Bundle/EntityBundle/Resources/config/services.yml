@@ -273,7 +273,6 @@ services:
 
     oro_entity.twig.extension.entity:
         class: Oro\Bundle\EntityBundle\Twig\EntityExtension
-        public: false
         arguments:
             -  '@oro_platform.twig.service_locator'
         tags:

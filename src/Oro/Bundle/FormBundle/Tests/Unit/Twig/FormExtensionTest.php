@@ -5,9 +5,9 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Twig;
 use Oro\Bundle\FormBundle\Captcha\CaptchaSettingsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Type\CaptchaType;
 use Oro\Bundle\FormBundle\Twig\FormExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRendererInterface;
@@ -15,29 +15,27 @@ use Symfony\Component\Form\FormView;
 
 class FormExtensionTest extends TestCase
 {
-    private ContainerInterface&MockObject $container;
-    private CaptchaSettingsProviderInterface&MockObject $captchaSettingsProvider;
+    use TwigExtensionTestCaseTrait;
+
     private FormFactoryInterface&MockObject $formFactory;
+    private CaptchaSettingsProviderInterface&MockObject $captchaSettingsProvider;
     private FormRendererInterface&MockObject $formRenderer;
     private FormExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->captchaSettingsProvider = $this->createMock(CaptchaSettingsProviderInterface::class);
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->formRenderer = $this->createMock(FormRendererInterface::class);
+        $this->captchaSettingsProvider = $this->createMock(CaptchaSettingsProviderInterface::class);
 
-        $this->container->expects(self::any())
-            ->method('get')
-            ->willReturnMap([
-                ['oro_form.captcha.settings_provider', $this->captchaSettingsProvider],
-                ['form.factory', $this->formFactory],
-                ['twig.form.renderer', $this->formRenderer],
-            ]);
+        $container = self::getContainerBuilder()
+            ->add(FormFactoryInterface::class, $this->formFactory)
+            ->add('twig.form.renderer', $this->formRenderer)
+            ->add('oro_form.captcha.settings_provider', $this->captchaSettingsProvider)
+            ->getContainer($this);
 
-        $this->extension = new FormExtension($this->container);
+        $this->extension = new FormExtension($container);
     }
 
     public function testIsFormProtectedWithCaptcha(): void

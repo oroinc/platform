@@ -22,11 +22,9 @@ use Twig\TwigFunction;
  */
 class WorkflowExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -50,32 +48,17 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
         ];
     }
 
-    /**
-     * @param object|string $entity
-     *
-     * @return bool
-     */
-    public function hasApplicableWorkflows($entity)
+    public function hasApplicableWorkflows(object|string $entity): bool
     {
         return $this->getWorkflowManager()->hasApplicableWorkflows($entity);
     }
 
-    /**
-     * @param object|string $entity
-     *
-     * @return bool
-     */
-    public function hasWorkflowItemsByEntity($entity)
+    public function hasWorkflowItemsByEntity(object|string $entity): bool
     {
         return $this->getWorkflowManager()->hasWorkflowItemsByEntity($entity);
     }
 
-    /**
-     * @param Variable $variable
-     *
-     * @return string
-     */
-    public function formatWorkflowVariableValue(Variable $variable)
+    public function formatWorkflowVariableValue(Variable $variable): string
     {
         return $this->getWorkflowVariableFormatter()->formatWorkflowVariableValue($variable);
     }
@@ -85,7 +68,7 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
     {
         return [
             WorkflowVariableFormatter::class,
-            WorkflowManagerRegistry::class,
+            WorkflowManagerRegistry::class
         ];
     }
 

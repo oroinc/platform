@@ -35,7 +35,7 @@ class TabExtensionTest extends TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_menu.twig.extension', $this->menuExtension)
+            ->add(MenuExtension::class, $this->menuExtension)
             ->add(RouterInterface::class, $this->router)
             ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
             ->add(TranslatorInterface::class, $this->translator)
@@ -48,7 +48,7 @@ class TabExtensionTest extends TestCase
     {
         $expected = 'test';
 
-        $this->environment->expects($this->exactly(2))
+        $this->environment->expects(self::exactly(2))
             ->method('render')
             ->willReturn($expected);
 
@@ -68,48 +68,48 @@ class TabExtensionTest extends TestCase
         $this->expectExceptionMessage('Extra parameter "widgetRoute" should be defined for');
 
         $child = $this->createMenuItem();
-        $child->expects($this->once())
+        $child->expects(self::once())
             ->method('isDisplayed')
             ->willReturn(true);
 
         $parent = $this->createMenuItem($child);
 
-        $this->menuExtension->expects($this->once())
+        $this->menuExtension->expects(self::once())
             ->method('getMenu')
             ->willReturn($parent);
 
-        $this->environment->expects($this->never())
+        $this->environment->expects(self::never())
             ->method('render');
 
-        self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, []]);
+        self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, 'menu', []]);
     }
 
     public function testMenuTabPanel(): void
     {
         $expected = 'test';
         $child = $this->createMenuItem(null, ['uri' => 'test', 'widgetAcl' => 'testAcl']);
-        $child->expects($this->once())
+        $child->expects(self::once())
             ->method('isDisplayed')
             ->willReturn(true);
 
         $acl = [['testAcl', null, true]];
         $parent = $this->createMenuItem($child);
 
-        $this->menuExtension->expects($this->once())
+        $this->menuExtension->expects(self::once())
             ->method('getMenu')
             ->willReturn($parent);
 
-        $this->environment->expects($this->once())
+        $this->environment->expects(self::once())
             ->method('render')
             ->willReturn($expected);
 
-        $this->authorizationChecker->expects($this->any())
+        $this->authorizationChecker->expects(self::any())
             ->method('isGranted')
             ->willReturnMap($acl);
 
         self::assertEquals(
             $expected,
-            self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, []])
+            self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, 'menu', []])
         );
     }
 
@@ -125,34 +125,34 @@ class TabExtensionTest extends TestCase
 
         $parent = $this->createMenuItem($child);
 
-        $this->menuExtension->expects($this->once())
+        $this->menuExtension->expects(self::once())
             ->method('getMenu')
             ->willReturn($parent);
 
-        $this->router->expects($this->any())
+        $this->router->expects(self::any())
             ->method('generate')
             ->willReturnCallback(function ($route, $options) {
                 return $route . '?' . http_build_query($options);
             });
 
-        $this->authorizationChecker->expects($this->any())
+        $this->authorizationChecker->expects(self::any())
             ->method('isGranted')
             ->willReturnCallback(function ($aclResource) use ($acl) {
                 return $acl[$aclResource];
             });
 
         if (empty($options['label'])) {
-            $this->translator->expects($this->never())
+            $this->translator->expects(self::never())
                 ->method('trans');
         } else {
-            $this->translator->expects($this->once())
+            $this->translator->expects(self::once())
                 ->method('trans')
                 ->willReturnArgument(0);
         }
 
         $result = $this->extension->getTabs('menu', $tabOptions);
 
-        $this->assertEquals($tab ? [$tab] : [], $result);
+        self::assertEquals($tab ? [$tab] : [], $result);
     }
 
     public function menuProvider(): array
@@ -247,26 +247,26 @@ class TabExtensionTest extends TestCase
     {
         $menuItem = $this->createMock(MenuItem::class);
         if ($child) {
-            $menuItem->expects($this->once())
+            $menuItem->expects(self::once())
                 ->method('getChildren')
                 ->willReturn([$child]);
         }
         if (isset($options['uri'])) {
-            $menuItem->expects($this->atLeastOnce())
+            $menuItem->expects(self::atLeastOnce())
                 ->method('getUri')
                 ->willReturn($options['uri']);
         }
         if (isset($options['name'])) {
-            $menuItem->expects($this->any())
+            $menuItem->expects(self::any())
                 ->method('getName')
                 ->willReturn($options['name']);
         }
         if (isset($options['label'])) {
-            $menuItem->expects($this->any())
+            $menuItem->expects(self::any())
                 ->method('getLabel')
                 ->willReturn($options['label']);
         }
-        $menuItem->expects($this->any())
+        $menuItem->expects(self::any())
             ->method('getExtra')
             ->willReturnCallback(function ($key, $default) use ($options) {
                 return $options[$key] ?? $default;

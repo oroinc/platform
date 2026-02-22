@@ -15,38 +15,11 @@ use Twig\TwigFunction;
  *   - check_ws
  *   - oro_sync_get_content_tags
  */
-class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInterface
+class SyncExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return TagGeneratorInterface
-     */
-    protected function getTagGenerator()
-    {
-        return $this->container->get('oro_sync.content.tag_generator');
-    }
-
-    /**
-     * @return ConnectionChecker
-     */
-    protected function getConnectionChecker()
-    {
-        return $this->container->get('oro_sync.client.connection_checker');
-    }
-
-    /**
-     * @return WebsocketClientParametersProvider
-     */
-    protected function getWsConfigurationProvider()
-    {
-        return $this->container->get('oro_sync.client.frontend_websocket_parameters.provider');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -59,33 +32,18 @@ class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInt
         ];
     }
 
-    /**
-     * Check WebSocket server connection
-     *
-     * @return bool True on success, false otherwise
-     */
-    public function checkWsConnected()
+    public function checkWsConnected(): bool
     {
         return $this->getConnectionChecker()->checkConnection();
     }
 
-    /**
-     * @param mixed $data
-     * @param bool  $includeCollectionTag
-     * @param bool  $processNestedData
-     *
-     * @return array
-     */
-    public function generate($data, $includeCollectionTag = false, $processNestedData = true)
+    public function generate(mixed $data, bool $includeCollectionTag = false, bool $processNestedData = true): array
     {
         // enforce plain array should returns
         return array_values($this->getTagGenerator()->generate($data, $includeCollectionTag, $processNestedData));
     }
 
-    /**
-     * @return array
-     */
-    public function getWsConfig()
+    public function getWsConfig(): array
     {
         $configProvider = $this->getWsConfigurationProvider();
 
@@ -100,9 +58,24 @@ class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_sync.content.tag_generator' => TagGeneratorInterface::class,
-            'oro_sync.client.connection_checker' => ConnectionChecker::class,
+            TagGeneratorInterface::class,
+            ConnectionChecker::class,
             'oro_sync.client.frontend_websocket_parameters.provider' => WebsocketClientParametersProvider::class
         ];
+    }
+
+    private function getTagGenerator(): TagGeneratorInterface
+    {
+        return $this->container->get(TagGeneratorInterface::class);
+    }
+
+    private function getConnectionChecker(): ConnectionChecker
+    {
+        return $this->container->get(ConnectionChecker::class);
+    }
+
+    private function getWsConfigurationProvider(): WebsocketClientParametersProvider
+    {
+        return $this->container->get('oro_sync.client.frontend_websocket_parameters.provider');
     }
 }

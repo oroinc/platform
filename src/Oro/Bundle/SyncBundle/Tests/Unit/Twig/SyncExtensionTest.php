@@ -4,18 +4,18 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
-use Oro\Bundle\SyncBundle\Twig\OroSyncExtension;
+use Oro\Bundle\SyncBundle\Twig\SyncExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class OroSyncExtensionTest extends TestCase
+class SyncExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     private ConnectionChecker&MockObject $connectionChecker;
     private TagGeneratorInterface&MockObject $tagGenerator;
-    private OroSyncExtension $extension;
+    private SyncExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -24,11 +24,11 @@ class OroSyncExtensionTest extends TestCase
         $this->tagGenerator = $this->createMock(TagGeneratorInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_sync.client.connection_checker', $this->connectionChecker)
-            ->add('oro_sync.content.tag_generator', $this->tagGenerator)
+            ->add(ConnectionChecker::class, $this->connectionChecker)
+            ->add(TagGeneratorInterface::class, $this->tagGenerator)
             ->getContainer($this);
 
-        $this->extension = new OroSyncExtension($container);
+        $this->extension = new SyncExtension($container);
     }
 
     public function testGenerate(): void

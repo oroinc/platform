@@ -29,9 +29,9 @@ class DataGridExtensionTest extends TestCase
 
     private ManagerInterface&MockObject $manager;
     private NameStrategyInterface&MockObject $nameStrategy;
+    private DatagridRouteHelper&MockObject $datagridRouteHelper;
     private RouterInterface&MockObject $router;
     private AuthorizationCheckerInterface&MockObject $authorizationChecker;
-    private DatagridRouteHelper&MockObject $datagridRouteHelper;
     private RequestStack&MockObject $requestStack;
     private LoggerInterface&MockObject $logger;
     private DataGridExtension $extension;
@@ -41,18 +41,18 @@ class DataGridExtensionTest extends TestCase
     {
         $this->manager = $this->createMock(ManagerInterface::class);
         $this->nameStrategy = $this->createMock(NameStrategyInterface::class);
+        $this->datagridRouteHelper = $this->createMock(DatagridRouteHelper::class);
         $this->router = $this->createMock(RouterInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->datagridRouteHelper = $this->createMock(DatagridRouteHelper::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_datagrid.datagrid.manager', $this->manager)
             ->add('oro_datagrid.datagrid.name_strategy', $this->nameStrategy)
+            ->add(DatagridRouteHelper::class, $this->datagridRouteHelper)
             ->add(RouterInterface::class, $this->router)
             ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
-            ->add('oro_datagrid.helper.route', $this->datagridRouteHelper)
             ->add(RequestStack::class, $this->requestStack)
             ->add(LoggerInterface::class, $this->logger)
             ->getContainer($this);

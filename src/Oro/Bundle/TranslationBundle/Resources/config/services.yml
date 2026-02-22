@@ -108,13 +108,13 @@ services:
 
     oro_translation.twig.translation.extension:
         class: Oro\Bundle\TranslationBundle\Twig\TranslationExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
             - '%oro_translation.debug_translator%'
             - !abstract '$isDebugJsTranslations defined in Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_translation.helper.translation_route, key: Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper }
 
     oro_translation.query_hint.translatable:
         public: false

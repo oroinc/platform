@@ -21,7 +21,7 @@ class WebpackExtensionTest extends TestCase
         $this->webpackServer = $this->createMock(WebpackServer::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_asset.webpack_server', $this->webpackServer)
+            ->add(WebpackServer::class, $this->webpackServer)
             ->getContainer($this);
 
         $this->extension = new WebpackExtension($container);

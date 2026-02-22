@@ -501,9 +501,6 @@ services:
     oro_email.email_template_rendering_context:
         class: Oro\Bundle\EmailBundle\Model\EmailTemplateRenderingContext
 
-    Oro\Bundle\EmailBundle\Model\EmailTemplateRenderingContext:
-        alias: oro_email.email_template_rendering_context
-
     oro_email.email_renderer_configuration:
         class: Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider
         arguments:
@@ -562,9 +559,6 @@ services:
         class: Oro\Bundle\EmailBundle\EmailTemplateCandidates\EmailTemplateCandidatesProvider
         arguments:
             - !tagged_iterator { tag: oro_email.email_template_candidates_provider }
-
-    Oro\Bundle\EmailBundle\EmailTemplateCandidates\EmailTemplateCandidatesProviderInterface:
-        alias: oro_email.email_template_candidates.provider
 
     oro_email.email_template_candidates.database:
         class: Oro\Bundle\EmailBundle\EmailTemplateCandidates\DatabaseEmailTemplateCandidatesProvider
@@ -926,6 +920,13 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_email.email_holder_helper, key: Oro\Bundle\EmailBundle\Tools\EmailHolderHelper }
+            - { name: container.service_subscriber, id: oro_email.email.address.helper, key: Oro\Bundle\EmailBundle\Tools\EmailAddressHelper }
+            - { name: container.service_subscriber, id: oro_email.mailbox.process_storage, key: Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage }
+            - { name: container.service_subscriber, id: oro_email.related_emails.provider, key: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider }
+            - { name: container.service_subscriber, id: oro_email.provider.url_provider, key: Oro\Bundle\EmailBundle\Provider\UrlProvider }
+            - { name: container.service_subscriber, id: oro_email.email_template_candidates.provider, key: Oro\Bundle\EmailBundle\EmailTemplateCandidates\EmailTemplateCandidatesProviderInterface }
+            - { name: container.service_subscriber, id: oro_email.email_template_rendering_context, key: Oro\Bundle\EmailBundle\Model\EmailTemplateRenderingContext }
 
     oro_email.listener.search_listener:
           class: Oro\Bundle\EmailBundle\EventListener\SearchListener

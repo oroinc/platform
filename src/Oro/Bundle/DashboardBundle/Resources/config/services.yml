@@ -329,10 +329,8 @@ services:
             - '@oro_filter.utils.date_filter_modifier'
             - '@oro_locale.settings'
 
-    # Twig extension
     oro_dashboard.twig.extension:
         class: Oro\Bundle\DashboardBundle\Twig\DashboardExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

@@ -60,11 +60,12 @@ services:
 
     oro_organization.twig.organization_extension:
         class: Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_security.owner.entity_owner_accessor, key: Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor }
+            - { name: container.service_subscriber, id: oro_organization.business_unit_manager, key: Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager }
 
     oro_organization.entity_ownership.listener:
         class: Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener

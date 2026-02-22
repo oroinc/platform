@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
+use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
-use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
+use Oro\Bundle\LayoutBundle\Layout\Context\LayoutContextStack;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
+use Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider as GeneralThemeConfigurationProvider;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -17,22 +19,26 @@ class LayoutExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private TwigRendererInterface&MockObject $renderer;
     private TextHelper&MockObject $textHelper;
+    private LayoutContextStack&MockObject $layoutContextStack;
+    private GeneralThemeConfigurationProvider&MockObject $generalThemeConfigurationProvider;
     private LayoutExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->renderer = $this->createMock(TwigRendererInterface::class);
         $this->textHelper = $this->createMock(TextHelper::class);
+        $this->layoutContextStack = $this->createMock(LayoutContextStack::class);
+        $this->generalThemeConfigurationProvider = $this->createMock(GeneralThemeConfigurationProvider::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_layout.twig.renderer', $this->renderer)
-            ->add('oro_layout.text.helper', $this->textHelper)
+            ->add(TextHelper::class, $this->textHelper)
+            ->add(LayoutContextStack::class, $this->layoutContextStack)
+            ->add(Inflector::class, (new InflectorFactory())->build())
+            ->add(GeneralThemeConfigurationProvider::class, $this->generalThemeConfigurationProvider)
             ->getContainer($this);
 
-        $this->extension = new LayoutExtension($container, (new InflectorFactory())->build());
+        $this->extension = new LayoutExtension($container);
     }
 
     public function testGetTokenParsers(): void
@@ -178,7 +184,7 @@ class LayoutExtensionTest extends TestCase
         $formView = $this->createMock(FormView::class);
         $formView->children = [$childView];
 
-        $this->extension->setClassPrefixToForm($formView, 'foo');
+        self::callTwigFunction($this->extension, 'set_class_prefix_to_form', [$formView, 'foo']);
 
         $this->assertEquals('foo', $formView->vars['class_prefix']);
         $this->assertEquals('foo', $childView->vars['class_prefix']);
@@ -190,7 +196,10 @@ class LayoutExtensionTest extends TestCase
      */
     public function testConvertValueToString(mixed $value, string $expectedConvertedValue): void
     {
-        $this->assertSame($expectedConvertedValue, $this->extension->convertValueToString($value));
+        $this->assertSame(
+            $expectedConvertedValue,
+            self::callTwigFunction($this->extension, 'convert_value_to_string', [$value])
+        );
     }
 
     public function convertValueToStringDataProvider(): array
@@ -225,7 +234,7 @@ class LayoutExtensionTest extends TestCase
         $childFormView->vars['extraField'] = 'value2';
         $formView->children['child'] = $childFormView;
 
-        $newFormView = $this->extension->cloneFormViewWithUniqueId($formView, 'foo');
+        $newFormView = self::callTwigFunction($this->extension, 'clone_form_view_with_unique_id', [$formView, 'foo']);
 
         $formView->setRendered();
         $formView->offsetGet('child')->setRendered();
@@ -237,5 +246,54 @@ class LayoutExtensionTest extends TestCase
         $this->assertEquals('value2', $newFormView->offsetGet('child')->vars['extraField']);
         $this->assertEquals($newFormView, $newFormView->offsetGet('child')->parent);
         $this->assertFalse($newFormView->offsetGet('child')->isRendered());
+    }
+
+    /**
+     * @dataProvider getThemeConfigurationOptionDataProvider
+     */
+    public function testGetThemeConfigurationOption(mixed $expectedOptionValue): void
+    {
+        $option = 'some_option';
+
+        $this->generalThemeConfigurationProvider->expects(self::once())
+            ->method('getThemeConfigurationOption')
+            ->with($option)
+            ->willReturn($expectedOptionValue);
+
+        self::assertEquals(
+            $expectedOptionValue,
+            self::callTwigFunction($this->extension, 'oro_theme_configuration_value', [$option])
+        );
+    }
+
+    /**
+     * @dataProvider getThemeConfigurationOptionDataProvider
+     */
+    public function testGetThemeDefinitionValue(mixed $expectedValue): void
+    {
+        $key = 'some_value';
+
+        $this->generalThemeConfigurationProvider->expects(self::once())
+            ->method('getThemeProperty')
+            ->with($key)
+            ->willReturn($expectedValue);
+
+        self::assertEquals(
+            $expectedValue,
+            self::callTwigFunction($this->extension, 'oro_theme_definition_value', [$key])
+        );
+    }
+
+    public function getThemeConfigurationOptionDataProvider(): array
+    {
+        return [
+            [null],
+            ['some_option_value'],
+            [123],
+            [123.321],
+            [false],
+            [['foo' => 'bar']],
+            [new \stdClass()],
+        ];
     }
 }

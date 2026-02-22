@@ -16,30 +16,18 @@ use Twig\TwigFunction;
  */
 class CalendarExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?LocaleSettings $localeSettings = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public function getFunctions()
     {
         return [
-            new TwigFunction(
-                'oro_calendar_month_names',
-                [$this, 'getMonthNames']
-            ),
-            new TwigFunction(
-                'oro_calendar_day_of_week_names',
-                [$this, 'getDayOfWeekNames']
-            ),
-            new TwigFunction(
-                'oro_calendar_first_day_of_week',
-                [$this, 'getFirstDayOfWeek']
-            ),
+            new TwigFunction('oro_calendar_month_names', [$this, 'getMonthNames']),
+            new TwigFunction('oro_calendar_day_of_week_names', [$this, 'getDayOfWeekNames']),
+            new TwigFunction('oro_calendar_first_day_of_week', [$this, 'getFirstDayOfWeek']),
         ];
     }
 
@@ -85,16 +73,12 @@ class CalendarExtension extends AbstractExtension implements ServiceSubscriberIn
     public static function getSubscribedServices(): array
     {
         return [
-            LocaleSettings::class,
+            LocaleSettings::class
         ];
     }
 
     private function getLocaleSettings(): LocaleSettings
     {
-        if (null === $this->localeSettings) {
-            $this->localeSettings = $this->container->get(LocaleSettings::class);
-        }
-
-        return $this->localeSettings;
+        return $this->container->get(LocaleSettings::class);
     }
 }

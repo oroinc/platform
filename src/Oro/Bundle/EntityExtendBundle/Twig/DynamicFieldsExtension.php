@@ -29,77 +29,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 {
-    private ?ConfigProvider $extendConfigProvider = null;
-    private ?ConfigProvider $entityConfigProvider = null;
-    private ?ConfigProvider $viewConfigProvider = null;
-
-    #[\Override]
-    public static function getSubscribedServices(): array
-    {
-        return [
-            'oro_entity_extend.extend.field_type_helper' => FieldTypeHelper::class,
-            'oro_entity_config.provider.extend' => ConfigProvider::class,
-            'oro_entity_config.provider.entity' => ConfigProvider::class,
-            'oro_entity_config.provider.view' => ConfigProvider::class,
-            'oro_featuretoggle.checker.feature_checker' => FeatureChecker::class,
-            PropertyAccessorInterface::class,
-            EventDispatcherInterface::class,
-            AuthorizationCheckerInterface::class,
-        ];
-    }
-
-    private function getFieldTypeHelper(): FieldTypeHelper
-    {
-        return $this->container->get('oro_entity_extend.extend.field_type_helper');
-    }
-
-    private function getExtendConfigProvider(): ConfigProvider
-    {
-        if (null === $this->extendConfigProvider) {
-            $this->extendConfigProvider = $this->container->get('oro_entity_config.provider.extend');
-        }
-
-        return $this->extendConfigProvider;
-    }
-
-    private function getEntityConfigProvider(): ConfigProvider
-    {
-        if (null === $this->entityConfigProvider) {
-            $this->entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
-        }
-
-        return $this->entityConfigProvider;
-    }
-
-    private function getViewConfigProvider(): ConfigProvider
-    {
-        if (null === $this->viewConfigProvider) {
-            $this->viewConfigProvider = $this->container->get('oro_entity_config.provider.view');
-        }
-
-        return $this->viewConfigProvider;
-    }
-
-    private function getPropertyAccessor(): PropertyAccessorInterface
-    {
-        return $this->container->get(PropertyAccessorInterface::class);
-    }
-
-    private function getEventDispatcher(): EventDispatcherInterface
-    {
-        return $this->container->get(EventDispatcherInterface::class);
-    }
-
-    private function getAuthorizationChecker(): AuthorizationCheckerInterface
-    {
-        return $this->container->get(AuthorizationCheckerInterface::class);
-    }
-
-    private function getFeatureChecker(): FeatureChecker
-    {
-        return $this->container->get('oro_featuretoggle.checker.feature_checker');
-    }
-
     #[\Override]
     public function getFields($entity, $entityClass = null)
     {
@@ -232,5 +161,60 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
             'value'    => $event->getFieldViewValue(),
             'priority' => $viewFieldConfig->get('priority') ?: 0
         ];
+    }
+
+    #[\Override]
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'oro_entity_config.provider.extend' => ConfigProvider::class,
+            'oro_entity_config.provider.entity' => ConfigProvider::class,
+            'oro_entity_config.provider.view' => ConfigProvider::class,
+            FieldTypeHelper::class,
+            FeatureChecker::class,
+            PropertyAccessorInterface::class,
+            EventDispatcherInterface::class,
+            AuthorizationCheckerInterface::class
+        ];
+    }
+
+    private function getExtendConfigProvider(): ConfigProvider
+    {
+        return $this->container->get('oro_entity_config.provider.extend');
+    }
+
+    private function getEntityConfigProvider(): ConfigProvider
+    {
+        return $this->container->get('oro_entity_config.provider.entity');
+    }
+
+    private function getViewConfigProvider(): ConfigProvider
+    {
+        return $this->container->get('oro_entity_config.provider.view');
+    }
+
+    private function getFieldTypeHelper(): FieldTypeHelper
+    {
+        return $this->container->get(FieldTypeHelper::class);
+    }
+
+    private function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        return $this->container->get(PropertyAccessorInterface::class);
+    }
+
+    private function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->container->get(EventDispatcherInterface::class);
+    }
+
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
+    {
+        return $this->container->get(AuthorizationCheckerInterface::class);
+    }
+
+    private function getFeatureChecker(): FeatureChecker
+    {
+        return $this->container->get(FeatureChecker::class);
     }
 }

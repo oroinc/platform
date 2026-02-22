@@ -217,6 +217,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_locale.format_converter.date_time.registry, key: Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry }
 
     oro_locale.twig.locale:
         class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
@@ -247,6 +248,8 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_locale.formatter.address, key: Oro\Bundle\LocaleBundle\Formatter\AddressFormatter }
+            - { name: container.service_subscriber, id: oro_locale.twig.formatted_address_renderer, key: Oro\Bundle\LocaleBundle\Twig\FormattedAddressRenderer }
 
     oro_locale.twig.number:
         class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
@@ -261,6 +264,8 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_locale.formatter.language_code, key: Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter }
+            - { name: container.service_subscriber, id: oro_locale.formatter.formatting_code, key: Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter }
 
     oro_locale.format.datetime:
         class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter

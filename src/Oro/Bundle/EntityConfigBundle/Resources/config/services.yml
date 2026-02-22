@@ -190,7 +190,6 @@ services:
 
     oro_entity_config.twig.extension.config:
         class: Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -381,11 +380,12 @@ services:
 
     oro_entity_config.twig.extension.dynamic_fields_attribute_decorator:
         class: Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator
-        public: false
         decorates: oro_entity_extend.twig.extension.dynamic_fields
         arguments:
             - '@.inner'
             - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: container.service_subscriber, id: oro_entity_config.config.attributes_config_helper, key: Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper }
 
     oro_entity_config.datagrid.attribute_family_actions_configuration:
         class: Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration

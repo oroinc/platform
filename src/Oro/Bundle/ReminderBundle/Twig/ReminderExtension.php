@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ReminderBundle\Twig;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
@@ -19,75 +19,53 @@ use Twig\TwigFunction;
  */
 class ReminderExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return TokenStorageInterface
-     */
-    protected function getTokenStorage()
-    {
-        return $this->container->get(TokenStorageInterface::class);
-    }
-
-    /**
-     * @return MessageParamsProvider
-     */
-    protected function getMessageParamsProvider()
-    {
-        return $this->container->get('oro_reminder.web_socket.message_params_provider');
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        return $this->container->get(ManagerRegistry::class)->getManagerForClass(Reminder::class);
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public function getFunctions()
     {
         return [
-            new TwigFunction(
-                'oro_reminder_get_requested_reminders_data',
-                [$this, 'getRequestedRemindersData']
-            )
+            new TwigFunction('oro_reminder_get_requested_reminders_data', [$this, 'getRequestedRemindersData'])
         ];
     }
 
-    /**
-     * Get requested reminders
-     *
-     * @return array
-     */
-    public function getRequestedRemindersData()
+    public function getRequestedRemindersData(): array
     {
         $user = $this->getTokenStorage()->getToken()?->getUser();
-        if ($user instanceof User) {
-            $reminders = $this->getEntityManager()
-                ->getRepository(Reminder::class)
-                ->findRequestedReminders($user);
-
-            return $this->getMessageParamsProvider()->getMessageParamsForReminders($reminders);
+        if (!$user instanceof User) {
+            return [];
         }
 
-        return [];
+        return $this->getMessageParamsProvider()->getMessageParamsForReminders(
+            $this->getReminderRepository()->findRequestedReminders($user)
+        );
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_reminder.web_socket.message_params_provider' => MessageParamsProvider::class,
+            MessageParamsProvider::class,
             TokenStorageInterface::class,
-            ManagerRegistry::class,
+            ManagerRegistry::class
         ];
+    }
+
+    private function getMessageParamsProvider(): MessageParamsProvider
+    {
+        return $this->container->get(MessageParamsProvider::class);
+    }
+
+    private function getTokenStorage(): TokenStorageInterface
+    {
+        return $this->container->get(TokenStorageInterface::class);
+    }
+
+    private function getReminderRepository(): ReminderRepository
+    {
+        return $this->container->get(ManagerRegistry::class)->getRepository(Reminder::class);
     }
 }

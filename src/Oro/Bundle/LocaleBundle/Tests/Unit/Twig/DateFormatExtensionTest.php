@@ -25,7 +25,7 @@ class DateFormatExtensionTest extends TestCase
         $this->converterRegistry = $this->createMock(DateTimeFormatConverterRegistry::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_locale.format_converter.date_time.registry', $this->converterRegistry)
+            ->add(DateTimeFormatConverterRegistry::class, $this->converterRegistry)
             ->getContainer($this);
 
         $this->extension = new DateFormatExtension($container);

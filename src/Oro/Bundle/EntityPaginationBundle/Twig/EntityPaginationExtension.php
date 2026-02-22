@@ -19,44 +19,9 @@ use Twig\TwigFunction;
  */
 class EntityPaginationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return EntityPaginationNavigation
-     */
-    protected function getPaginationNavigation()
-    {
-        return $this->container->get('oro_entity_pagination.navigation');
-    }
-
-    /**
-     * @return StorageDataCollector
-     */
-    protected function getStorageDataCollector()
-    {
-        return $this->container->get('oro_entity_pagination.storage.data_collector');
-    }
-
-    /**
-     * @return MessageManager
-     */
-    protected function getMessageManager()
-    {
-        return $this->container->get('oro_entity_pagination.message_manager');
-    }
-
-    /**
-     * @return RequestStack
-     */
-    protected function getRequestStack()
-    {
-        return $this->container->get(RequestStack::class);
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -122,10 +87,30 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_entity_pagination.navigation' => EntityPaginationNavigation::class,
-            'oro_entity_pagination.storage.data_collector' => StorageDataCollector::class,
-            'oro_entity_pagination.message_manager' => MessageManager::class,
-            RequestStack::class,
+            EntityPaginationNavigation::class,
+            StorageDataCollector::class,
+            MessageManager::class,
+            RequestStack::class
         ];
+    }
+
+    private function getPaginationNavigation(): EntityPaginationNavigation
+    {
+        return $this->container->get(EntityPaginationNavigation::class);
+    }
+
+    private function getStorageDataCollector(): StorageDataCollector
+    {
+        return $this->container->get(StorageDataCollector::class);
+    }
+
+    private function getMessageManager(): MessageManager
+    {
+        return $this->container->get(MessageManager::class);
+    }
+
+    private function getRequestStack(): RequestStack
+    {
+        return $this->container->get(RequestStack::class);
     }
 }

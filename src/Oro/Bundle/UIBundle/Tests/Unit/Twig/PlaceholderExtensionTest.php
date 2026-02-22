@@ -22,38 +22,38 @@ class PlaceholderExtensionTest extends TestCase
     private const ACTION_NAME = 'Foo\Bundle\BarBundle\Controller\TestController::testAction';
     private const DELIMITER = '<br/>';
 
-    private Environment&MockObject $environment;
-    private PlaceholderProvider&MockObject $placeholderProvider;
-    private RequestStack&MockObject $requestStack;
-    private FragmentHandler&MockObject $fragmentHandler;
-    private PlaceholderExtension $extension;
-
-    private array $placeholders = [
+    private const array PLACEHOLDERS = [
         self::PLACEHOLDER_NAME => [
             'items' => [
                 ['template' => self::TEMPLATE_NAME],
-                ['action' => self::ACTION_NAME],
+                ['action' => self::ACTION_NAME]
             ]
         ],
         self::INVALID_PLACEHOLDER_NAME => [
             'items' => [
                 ['foo' => 'bar', 'baz' => 'bar'],
             ]
-        ],
+        ]
     ];
+
+    private Environment&MockObject $environment;
+    private PlaceholderProvider&MockObject $placeholderProvider;
+    private FragmentHandler&MockObject $fragmentHandler;
+    private RequestStack&MockObject $requestStack;
+    private PlaceholderExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->placeholderProvider = $this->createMock(PlaceholderProvider::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
         $this->fragmentHandler = $this->createMock(FragmentHandler::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_ui.placeholder.provider', $this->placeholderProvider)
+            ->add(PlaceholderProvider::class, $this->placeholderProvider)
+            ->add(FragmentHandler::class, $this->fragmentHandler)
             ->add(RequestStack::class, $this->requestStack)
-            ->add('fragment.handler', $this->fragmentHandler)
             ->getContainer($this);
 
         $this->extension = new PlaceholderExtension($container);
@@ -73,33 +73,30 @@ class PlaceholderExtensionTest extends TestCase
             ->method('getCurrentRequest')
             ->willReturn($request);
 
-        $this->placeholderProvider->expects($this->once())
+        $this->placeholderProvider->expects(self::once())
             ->method('getPlaceholderItems')
             ->with(self::PLACEHOLDER_NAME, $variables)
-            ->willReturn($this->placeholders[self::PLACEHOLDER_NAME]['items']);
+            ->willReturn(self::PLACEHOLDERS[self::PLACEHOLDER_NAME]['items']);
 
-        $this->environment->expects($this->once())
+        $this->environment->expects(self::once())
             ->method('render')
             ->with(self::TEMPLATE_NAME, $variables)
             ->willReturn($expectedTemplateRender);
 
-        $this->fragmentHandler->expects($this->once())
+        $this->fragmentHandler->expects(self::once())
             ->method('render')
             ->willReturn($expectedActionRender);
 
-        $result = self::callTwigFunction(
-            $this->extension,
-            'placeholder',
-            [
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'placeholder', [
                 $this->environment,
                 [],
                 self::PLACEHOLDER_NAME,
                 $variables,
                 ['delimiter' => self::DELIMITER]
-            ]
+            ])
         );
-
-        $this->assertEquals($expectedResult, $result);
     }
 
     public function testRenderPlaceholderFails(): void
@@ -109,21 +106,17 @@ class PlaceholderExtensionTest extends TestCase
             'Cannot render placeholder item with keys "bar", "bar". Expects "template" or "action" key.'
         );
 
-        $this->placeholderProvider->expects($this->once())
+        $this->placeholderProvider->expects(self::once())
             ->method('getPlaceholderItems')
             ->with(self::INVALID_PLACEHOLDER_NAME, [])
-            ->willReturn($this->placeholders[self::INVALID_PLACEHOLDER_NAME]['items']);
+            ->willReturn(self::PLACEHOLDERS[self::INVALID_PLACEHOLDER_NAME]['items']);
 
-        self::callTwigFunction(
-            $this->extension,
-            'placeholder',
-            [
-                $this->environment,
-                [],
-                self::INVALID_PLACEHOLDER_NAME,
-                [],
-                ['delimiter' => self::DELIMITER]
-            ]
-        );
+        self::callTwigFunction($this->extension, 'placeholder', [
+            $this->environment,
+            [],
+            self::INVALID_PLACEHOLDER_NAME,
+            [],
+            ['delimiter' => self::DELIMITER]
+        ]);
     }
 }

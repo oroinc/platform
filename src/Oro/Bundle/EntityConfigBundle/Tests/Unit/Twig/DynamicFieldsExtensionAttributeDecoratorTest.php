@@ -30,7 +30,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends TestCase
         $this->attributeConfigHelper = $this->createMock(AttributeConfigHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_entity_config.config.attributes_config_helper', $this->attributeConfigHelper)
+            ->add(AttributeConfigHelper::class, $this->attributeConfigHelper)
             ->getContainer($this);
 
         $this->extension = new DynamicFieldsExtensionAttributeDecorator(

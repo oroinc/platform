@@ -7,19 +7,15 @@ use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
-use Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider;
 use Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProviderInterface;
-use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
@@ -33,16 +29,9 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
 {
     public const DEFAULT_THUMB_SIZE = 16;
 
-    private ContainerInterface $container;
-    private ?AttachmentManager $attachmentManager = null;
-    private ?PictureSourcesProviderInterface $pictureSourcesProvider = null;
-    private ?ConfigManager $configManager = null;
-    private ?FilesTemplateProviderInterface $filesTemplateProvider = null;
-    private ?ImagesTemplateProviderInterface $imagesTemplateProvider = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -309,7 +298,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             return '';
         }
 
-        return $this->container->get(FileTitleProviderInterface::class)->getTitle($file, $localization);
+        return $this->getFileTitleProvider()->getTitle($file, $localization);
     }
 
     private function getFile(File|int|null $file): ?File
@@ -325,65 +314,49 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     public static function getSubscribedServices(): array
     {
         return [
+            'oro_attachment.provider.picture_sources' => PictureSourcesProviderInterface::class,
+            'oro_attachment.provider.file_title' => FileTitleProviderInterface::class,
+            'oro_attachment.provider.files_template_provider' => FilesTemplateProviderInterface::class,
+            'oro_attachment.provider.images_template_provider' => ImagesTemplateProviderInterface::class,
             AttachmentManager::class,
-            PictureSourcesProvider::class,
             ConfigManager::class,
             ManagerRegistry::class,
-            PropertyAccessorInterface::class,
-            FileTitleProviderInterface::class,
-            CacheManager::class,
-            FilesTemplateProvider::class,
-            ImagesTemplateProvider::class,
+            CacheManager::class
         ];
-    }
-
-    private function getAttachmentManager(): AttachmentManager
-    {
-        if (null === $this->attachmentManager) {
-            $this->attachmentManager = $this->container->get(AttachmentManager::class);
-        }
-
-        return $this->attachmentManager;
     }
 
     private function getPictureSourcesProvider(): PictureSourcesProviderInterface
     {
-        if (null === $this->pictureSourcesProvider) {
-            $this->pictureSourcesProvider = $this->container->get(PictureSourcesProvider::class);
-        }
+        return $this->container->get('oro_attachment.provider.picture_sources');
+    }
 
-        return $this->pictureSourcesProvider;
+    private function getFileTitleProvider(): FileTitleProviderInterface
+    {
+        return $this->container->get('oro_attachment.provider.file_title');
+    }
+
+    private function getFilesTemplateProvider(): FilesTemplateProviderInterface
+    {
+        return $this->container->get('oro_attachment.provider.files_template_provider');
+    }
+
+    private function getImagesTemplateProvider(): ImagesTemplateProviderInterface
+    {
+        return $this->container->get('oro_attachment.provider.images_template_provider');
+    }
+
+    private function getAttachmentManager(): AttachmentManager
+    {
+        return $this->container->get(AttachmentManager::class);
     }
 
     private function getConfigManager(): ConfigManager
     {
-        if (null === $this->configManager) {
-            $this->configManager = $this->container->get(ConfigManager::class);
-        }
-
-        return $this->configManager;
+        return $this->container->get(ConfigManager::class);
     }
 
     private function getDoctrine(): ManagerRegistry
     {
         return $this->container->get(ManagerRegistry::class);
-    }
-
-    private function getFilesTemplateProvider(): FilesTemplateProviderInterface
-    {
-        if (null === $this->filesTemplateProvider) {
-            $this->filesTemplateProvider = $this->container->get(FilesTemplateProvider::class);
-        }
-
-        return $this->filesTemplateProvider;
-    }
-
-    private function getImagesTemplateProvider(): ImagesTemplateProviderInterface
-    {
-        if (null === $this->imagesTemplateProvider) {
-            $this->imagesTemplateProvider = $this->container->get(ImagesTemplateProvider::class);
-        }
-
-        return $this->imagesTemplateProvider;
     }
 }

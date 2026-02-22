@@ -31,9 +31,9 @@ class EntityPaginationExtensionTest extends TestCase
         $this->requestStack = $this->createMock(RequestStack::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_entity_pagination.navigation', $this->navigation)
-            ->add('oro_entity_pagination.storage.data_collector', $this->dataCollector)
-            ->add('oro_entity_pagination.message_manager', $this->messageManager)
+            ->add(EntityPaginationNavigation::class, $this->navigation)
+            ->add(StorageDataCollector::class, $this->dataCollector)
+            ->add(MessageManager::class, $this->messageManager)
             ->add(RequestStack::class, $this->requestStack)
             ->getContainer($this);
 

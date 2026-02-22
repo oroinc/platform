@@ -1,11 +1,13 @@
 services:
     oro_windows.twig.extension:
         class: Oro\Bundle\WindowsBundle\Twig\WindowsExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_windows.manager.windows_state_registry, key: Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry }
+            - { name: container.service_subscriber, id: oro_windows.manager.windows_state_request, key: Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager }
+            - { name: container.service_subscriber, id: fragment.handler, key: Symfony\Component\HttpKernel\Fragment\FragmentHandler }
 
     oro_windows.manager.windows_state_registry:
         class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry

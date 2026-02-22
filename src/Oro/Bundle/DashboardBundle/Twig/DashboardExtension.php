@@ -18,36 +18,9 @@ use Twig\TwigFunction;
  */
 class DashboardExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return FilterDateRangeConverter
-     */
-    protected function getDateRangeConverter()
-    {
-        return $this->container->get('oro_dashboard.widget_config_value.date_range.converter');
-    }
-
-    /**
-     * @return QueryDesignerManager
-     */
-    protected function getQueryDesignerManager()
-    {
-        return $this->container->get('oro_query_designer.query_designer.manager');
-    }
-
-    /**
-     * @return EntityProvider
-     */
-    protected function getEntityProvider()
-    {
-        return $this->container->get('oro_report.entity_provider');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -70,18 +43,12 @@ class DashboardExtension extends AbstractExtension implements ServiceSubscriberI
         return $this->getDateRangeConverter()->getViewValue($value);
     }
 
-    /**
-     * @return array
-     */
-    public function getQueryFilterMetadata()
+    public function getQueryFilterMetadata(): array
     {
         return $this->getQueryDesignerManager()->getMetadata('segment');
     }
 
-    /**
-     * @return array
-     */
-    public function getQueryFilterEntities()
+    public function getQueryFilterEntities(): array
     {
         return $this->getEntityProvider()->getEntities();
     }
@@ -91,8 +58,23 @@ class DashboardExtension extends AbstractExtension implements ServiceSubscriberI
     {
         return [
             'oro_dashboard.widget_config_value.date_range.converter' => FilterDateRangeConverter::class,
-            'oro_query_designer.query_designer.manager' => QueryDesignerManager::class,
             'oro_report.entity_provider' => EntityProvider::class,
+            QueryDesignerManager::class
         ];
+    }
+
+    private function getDateRangeConverter(): FilterDateRangeConverter
+    {
+        return $this->container->get('oro_dashboard.widget_config_value.date_range.converter');
+    }
+
+    private function getEntityProvider(): EntityProvider
+    {
+        return $this->container->get('oro_report.entity_provider');
+    }
+
+    private function getQueryDesignerManager(): QueryDesignerManager
+    {
+        return $this->container->get(QueryDesignerManager::class);
     }
 }

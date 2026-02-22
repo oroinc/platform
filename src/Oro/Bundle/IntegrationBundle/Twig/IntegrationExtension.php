@@ -21,11 +21,9 @@ class IntegrationExtension extends AbstractExtension implements ServiceSubscribe
 {
     private const DEFAULT_THEME = '@OroIntegration/Form/fields.html.twig';
 
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -82,7 +80,7 @@ class IntegrationExtension extends AbstractExtension implements ServiceSubscribe
     public static function getSubscribedServices(): array
     {
         return [
-            EventDispatcherInterface::class,
+            EventDispatcherInterface::class
         ];
     }
 

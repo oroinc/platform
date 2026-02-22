@@ -6,6 +6,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPas
 use Oro\Bundle\PlatformBundle\Tests\Unit\Stub\TwigExtensionStub1;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Stub\TwigExtensionStub1Decorator;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Stub\TwigExtensionStub2;
+use Oro\Bundle\PlatformBundle\Tests\Unit\Stub\TwigExtensionStub2Decorator;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Stub\TwigExtensionStub3;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -301,6 +302,50 @@ class TwigServiceLocatorPassTest extends TestCase
             [
                 LoggerInterface::class,
                 'translator',
+                TokenStorageInterface::class,
+                'router'
+            ],
+            array_keys($services)
+        );
+        $this->assertServiceSubscriberTagsRemoved();
+    }
+
+    public function testProcessWithDecoratorAndDecoratedWithServiceSubscriberTagsAndDoNotHaveInheritance(): void
+    {
+        $this->container->register('twig.extension_2', TwigExtensionStub2::class)
+            ->addTag('container.service_subscriber', ['id' => 'logger', 'key' => LoggerInterface::class]);
+        $this->container->register('twig.extension_2_decorator', TwigExtensionStub2Decorator::class)
+            ->setDecoratedService('twig.extension_2')
+            ->addTag('container.service_subscriber', ['id' => 'token_storage', 'key' => TokenStorageInterface::class]);
+
+        $this->compiler->process($this->container);
+
+        $services = $this->container->getDefinition('oro_platform.twig.service_locator')->getArgument(0);
+        $this->assertEquals(
+            [
+                LoggerInterface::class => new Reference(
+                    'logger',
+                    ContainerInterface::IGNORE_ON_INVALID_REFERENCE
+                ),
+                'request_stack' => new Reference(
+                    'request_stack',
+                    ContainerInterface::IGNORE_ON_INVALID_REFERENCE
+                ),
+                TokenStorageInterface::class => new Reference(
+                    'token_storage',
+                    ContainerInterface::IGNORE_ON_INVALID_REFERENCE
+                ),
+                'router' => new Reference(
+                    'router',
+                    ContainerInterface::IGNORE_ON_INVALID_REFERENCE
+                )
+            ],
+            $services
+        );
+        self::assertEquals(
+            [
+                LoggerInterface::class,
+                'request_stack',
                 TokenStorageInterface::class,
                 'router'
             ],

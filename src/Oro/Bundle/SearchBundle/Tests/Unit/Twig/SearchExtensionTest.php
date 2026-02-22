@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\SearchBundle\Twig\OroSearchExtension;
+use Oro\Bundle\SearchBundle\Twig\SearchExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\TestCase;
-use Twig\Environment;
 
-class OroSearchExtensionTest extends TestCase
+class SearchExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private OroSearchExtension $extension;
+    private SearchExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $twigService = $this->createMock(Environment::class);
-        $this->extension = new OroSearchExtension($twigService, 'testLayout.html.twig');
+        $this->extension = new SearchExtension();
     }
 
     public function testHighlight(): void

@@ -23,46 +23,16 @@ use Twig\TwigFunction;
  */
 class MergeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return AccessorInterface
-     */
-    protected function getAccessor()
-    {
-        return $this->container->get('oro_entity_merge.accessor');
-    }
-
-    /**
-     * @return MergeRenderer
-     */
-    protected function getFieldValueRenderer()
-    {
-        return $this->container->get('oro_entity_merge.twig.renderer');
-    }
-
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
-    {
-        return $this->container->get(TranslatorInterface::class);
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public function getFilters()
     {
         return [
-            new TwigFilter(
-                'oro_entity_merge_sort_fields',
-                [$this, 'sortMergeFields']
-            )
+            new TwigFilter('oro_entity_merge_sort_fields', [$this, 'sortMergeFields'])
         ];
     }
 
@@ -84,13 +54,11 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
     }
 
     /**
-     * Render value of merge field
-     *
      * @param FormView[] $fields
      *
      * @return FormView[]
      */
-    public function sortMergeFields(array $fields)
+    public function sortMergeFields(array $fields): array
     {
         $translator = $this->getTranslator();
         usort(
@@ -111,15 +79,7 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
         return $fields;
     }
 
-    /**
-     * Render value of merge field
-     *
-     * @param FieldData $fieldData
-     * @param int       $entityOffset
-     *
-     * @return string
-     */
-    public function renderMergeFieldValue(FieldData $fieldData, $entityOffset)
+    public function renderMergeFieldValue(FieldData $fieldData, int $entityOffset): string
     {
         $entity = $fieldData->getEntityData()->getEntityByOffset($entityOffset);
         $metadata = $fieldData->getMetadata();
@@ -128,20 +88,12 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->getFieldValueRenderer()->renderFieldValue($value, $metadata, $entity);
     }
 
-    /**
-     * Render label of merge entity
-     *
-     * @param EntityData $entityData
-     * @param int        $entityOffset
-     *
-     * @return string
-     */
-    public function renderMergeEntityLabel(EntityData $entityData, $entityOffset)
+    public function renderMergeEntityLabel(EntityData $entityData, int $entityOffset): string
     {
-        $entity = $entityData->getEntityByOffset($entityOffset);
-        $metadata = $entityData->getMetadata();
-
-        return $this->getFieldValueRenderer()->renderEntityLabel($entity, $metadata);
+        return $this->getFieldValueRenderer()->renderEntityLabel(
+            $entityData->getEntityByOffset($entityOffset),
+            $entityData->getMetadata()
+        );
     }
 
     #[\Override]
@@ -149,8 +101,23 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
     {
         return [
             'oro_entity_merge.accessor' => AccessorInterface::class,
-            'oro_entity_merge.twig.renderer' => MergeRenderer::class,
-            TranslatorInterface::class,
+            MergeRenderer::class,
+            TranslatorInterface::class
         ];
+    }
+
+    private function getAccessor(): AccessorInterface
+    {
+        return $this->container->get('oro_entity_merge.accessor');
+    }
+
+    private function getFieldValueRenderer(): MergeRenderer
+    {
+        return $this->container->get(MergeRenderer::class);
+    }
+
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->container->get(TranslatorInterface::class);
     }
 }

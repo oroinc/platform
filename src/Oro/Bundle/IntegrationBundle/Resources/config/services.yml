@@ -261,7 +261,6 @@ services:
 
     oro_integration.twig.integration:
         class: Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

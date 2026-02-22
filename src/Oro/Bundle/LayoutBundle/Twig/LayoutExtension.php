@@ -6,7 +6,9 @@ use Doctrine\Inflector\Inflector;
 use Oro\Bundle\LayoutBundle\Layout\Context\LayoutContextStack;
 use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
+use Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider as GeneralThemeConfigurationProvider;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Container\ContainerInterface;
@@ -44,14 +46,9 @@ use Twig\TwigTest;
  */
 class LayoutExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private Inflector $inflector;
-    private ?TextHelper $textHelper = null;
-
-    public function __construct(ContainerInterface $container, Inflector $inflector)
-    {
-        $this->container = $container;
-        $this->inflector = $inflector;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -86,39 +83,15 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
                 null,
                 ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
-            new TwigFunction(
-                'layout_attr_defaults',
-                [$this, 'defaultAttributes']
-            ),
-            new TwigFunction(
-                'set_class_prefix_to_form',
-                [$this, 'setClassPrefixToForm']
-            ),
-            new TwigFunction(
-                'convert_value_to_string',
-                [$this, 'convertValueToString']
-            ),
-            new TwigFunction(
-                'highlight_string',
-                [$this, 'highlightString'],
-                ['is_safe' => ['html']]
-            ),
-            new TwigFunction(
-                'clone_form_view_with_unique_id',
-                [$this, 'cloneFormViewWithUniqueId']
-            ),
-            new TwigFunction(
-                'get_layout_context',
-                [$this, 'getLayoutContext']
-            ),
+            new TwigFunction('layout_attr_defaults', [$this, 'defaultAttributes']),
+            new TwigFunction('set_class_prefix_to_form', [$this, 'setClassPrefixToForm']),
+            new TwigFunction('convert_value_to_string', [$this, 'convertValueToString']),
+            new TwigFunction('highlight_string', [$this, 'highlightString'], ['is_safe' => ['html']]),
+            new TwigFunction('clone_form_view_with_unique_id', [$this, 'cloneFormViewWithUniqueId']),
+            new TwigFunction('get_layout_context', [$this, 'getLayoutContext']),
+            new TwigFunction('oro_theme_configuration_value', [$this, 'getThemeConfigurationValue']),
+            new TwigFunction('oro_theme_definition_value', [$this, 'getThemeDefinitionValue']),
         ];
-    }
-
-    public function getLayoutContext()
-    {
-        /** @var LayoutContextStack $contextStack */
-        $contextStack = $this->container->get('oro_layout.layout_context_stack');
-        return $contextStack->getCurrentContext();
     }
 
     #[\Override]
@@ -129,7 +102,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFilter('block_text', [$this, 'processText']),
             // Merge additional context to BlockView
             new TwigFilter('merge_context', [$this, 'mergeContext']),
-            new TwigFilter('pluralize', [$this->inflector, 'pluralize']),
+            new TwigFilter('pluralize', [$this, 'pluralize']),
         ];
     }
 
@@ -142,6 +115,11 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
+    public function getLayoutContext(): ?ContextInterface
+    {
+        return $this->getLayoutContextStack()->getCurrentContext();
+    }
+
     /**
      * @param mixed       $value
      * @param string|null $domain
@@ -150,19 +128,10 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function processText($value, $domain = null)
     {
-        if (null === $this->textHelper) {
-            $this->textHelper = $this->container->get('oro_layout.text.helper');
-        }
-
-        return $this->textHelper->processText($value, $domain);
+        return $this->getTextHelper()->processText($value, $domain);
     }
 
-    /**
-     * @param BlockView $view
-     * @param array     $context
-     * @return BlockView
-     */
-    public function mergeContext(BlockView $view, array $context)
+    public function mergeContext(BlockView $view, array $context): BlockView
     {
         $view->vars = array_merge($view->vars, $context);
 
@@ -173,12 +142,12 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         return $view;
     }
 
-    /**
-     * @param array $attr
-     * @param array $defaultAttr
-     * @return array
-     */
-    public function defaultAttributes(array $attr, array $defaultAttr)
+    public function pluralize(string $word): string
+    {
+        return $this->getInflector()->pluralize($word);
+    }
+
+    public function defaultAttributes(array $attr, array $defaultAttr): array
     {
         foreach ($defaultAttr as $key => $value) {
             if (str_starts_with($key, '~')) {
@@ -257,20 +226,22 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         return $newForm;
     }
 
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function isExpression($value)
+    public function getThemeConfigurationValue(string $option): mixed
+    {
+        return $this->getGeneralThemeConfigurationProvider()->getThemeConfigurationOption($option);
+    }
+
+    public function getThemeDefinitionValue(string $key): mixed
+    {
+        return $this->getGeneralThemeConfigurationProvider()->getThemeProperty($key);
+    }
+
+    public function isExpression(mixed $value): bool
     {
         return $value instanceof Expression;
     }
 
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function isString($value)
+    public function isString(mixed $value): bool
     {
         return \is_string($value);
     }
@@ -279,8 +250,30 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_layout.text.helper' => TextHelper::class,
-            'oro_layout.layout_context_stack' => LayoutContextStack::class,
+            TextHelper::class,
+            LayoutContextStack::class,
+            Inflector::class,
+            GeneralThemeConfigurationProvider::class
         ];
+    }
+
+    private function getTextHelper(): TextHelper
+    {
+        return $this->container->get(TextHelper::class);
+    }
+
+    private function getLayoutContextStack(): LayoutContextStack
+    {
+        return $this->container->get(LayoutContextStack::class);
+    }
+
+    private function getInflector(): Inflector
+    {
+        return $this->container->get(Inflector::class);
+    }
+
+    private function getGeneralThemeConfigurationProvider(): GeneralThemeConfigurationProvider
+    {
+        return $this->container->get(GeneralThemeConfigurationProvider::class);
     }
 }

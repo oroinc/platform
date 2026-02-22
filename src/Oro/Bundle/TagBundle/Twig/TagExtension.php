@@ -16,28 +16,9 @@ use Twig\TwigFunction;
  */
 class TagExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return TagManager
-     */
-    protected function getTagManager()
-    {
-        return $this->container->get('oro_tag.tag.manager');
-    }
-
-    /**
-     * @return TaggableHelper
-     */
-    protected function getTaggableHelper()
-    {
-        return $this->container->get('oro_tag.helper.taggable_helper');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -75,8 +56,18 @@ class TagExtension extends AbstractExtension implements ServiceSubscriberInterfa
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_tag.tag.manager' => TagManager::class,
-            'oro_tag.helper.taggable_helper' => TaggableHelper::class,
+            TagManager::class,
+            TaggableHelper::class
         ];
+    }
+
+    private function getTagManager(): TagManager
+    {
+        return $this->container->get(TagManager::class);
+    }
+
+    private function getTaggableHelper(): TaggableHelper
+    {
+        return $this->container->get(TaggableHelper::class);
     }
 }

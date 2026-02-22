@@ -19,12 +19,9 @@ use Twig\TwigFilter;
  */
 class DateTimeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    protected ContainerInterface $container;
-    private ?DateTimeFormatterInterface $dateTimeFormatter = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        protected readonly ContainerInterface $container
+    ) {
     }
 
     /**
@@ -183,16 +180,12 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_locale.formatter.date_time' => DateTimeFormatterInterface::class,
+            'oro_locale.formatter.date_time' => DateTimeFormatterInterface::class
         ];
     }
 
     protected function getDateTimeFormatter(): DateTimeFormatterInterface
     {
-        if (null === $this->dateTimeFormatter) {
-            $this->dateTimeFormatter = $this->container->get('oro_locale.formatter.date_time');
-        }
-
-        return $this->dateTimeFormatter;
+        return $this->container->get('oro_locale.formatter.date_time');
     }
 }
