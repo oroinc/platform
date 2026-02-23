@@ -37,10 +37,18 @@ class SearchListener
         $mapConfig = $event->getMappingConfig();
         foreach ($mapConfig as $className => $mapping) {
             $metadata = $this->metadataProvider->getMetadata($className);
+            $organizationField = $this->getOrganizationField($metadata);
             $mapConfig[$className]['fields'][] = [
-                'name'          => 'organization',
-                'target_type'   => 'integer',
-                'target_fields' => ['organization']
+                'name'            => $organizationField ?: 'organization',
+                'target_fields'   => [],
+                'relation_type'   => 'many-to-one',
+                'relation_fields' => [
+                    [
+                        'name'          => 'id',
+                        'target_type'   => 'integer',
+                        'target_fields' => ['organization']
+                    ]
+                ]
             ];
 
             $fieldName = $metadata->getOwnerFieldName();
