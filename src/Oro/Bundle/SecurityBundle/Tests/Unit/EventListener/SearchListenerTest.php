@@ -26,9 +26,20 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new SearchListener($this->metadataProvider);
     }
 
-    public function testCollectEntityMapEvent()
-    {
-        $metadata = new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization', 'organization_id');
+    /**
+     * @dataProvider collectEntityMapEventDataProvider
+     */
+    public function testCollectEntityMapEvent(
+        string $organizationFieldName,
+        string $organizationColumnName
+    ): void {
+        $metadata = new OwnershipMetadata(
+            'USER',
+            'owner',
+            'owner_id',
+            $organizationFieldName,
+            $organizationColumnName
+        );
         $this->metadataProvider->expects($this->once())
             ->method('getMetadata')
             ->willReturn($metadata);
@@ -47,9 +58,16 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
                     'alias' => 'oro_test_item',
                     'fields' => [
                         [
-                            'name' => 'organization',
-                            'target_type' => 'integer',
-                            'target_fields' => ['organization'],
+                            'name' => $organizationFieldName,
+                            'target_fields' => [],
+                            'relation_type' => 'many-to-one',
+                            'relation_fields' => [
+                                [
+                                    'name' => 'id',
+                                    'target_type' => 'integer',
+                                    'target_fields' => ['organization'],
+                                ],
+                            ],
                         ],
                         [
                             'name' => 'owner',
@@ -63,7 +81,21 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareEntityMapEvent()
+    public function collectEntityMapEventDataProvider(): array
+    {
+        return [
+            'default organization field' => [
+                'organizationFieldName' => 'organization',
+                'organizationColumnName' => 'organization_id',
+            ],
+            'custom organization field' => [
+                'organizationFieldName' => 'systemOrganization',
+                'organizationColumnName' => 'system_org_id',
+            ],
+        ];
+    }
+
+    public function testPrepareEntityMapEvent(): void
     {
         $entity = new CmsArticle();
         $organization = new CmsOrganization();
