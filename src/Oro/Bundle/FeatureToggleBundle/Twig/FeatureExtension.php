@@ -15,20 +15,9 @@ use Twig\TwigFunction;
  */
 class FeatureExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return FeatureChecker
-     */
-    protected function getFeatureChecker()
-    {
-        return $this->container->get(FeatureChecker::class);
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -65,7 +54,12 @@ class FeatureExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices(): array
     {
         return [
-            FeatureChecker::class,
+            FeatureChecker::class
         ];
+    }
+
+    private function getFeatureChecker(): FeatureChecker
+    {
+        return $this->container->get(FeatureChecker::class);
     }
 }

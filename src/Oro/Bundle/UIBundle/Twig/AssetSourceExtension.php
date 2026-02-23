@@ -16,16 +16,9 @@ use Twig\TwigFunction;
  */
 class AssetSourceExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    public function __construct(private readonly ContainerInterface $container)
-    {
-    }
-
-    #[\Override]
-    public static function getSubscribedServices(): array
-    {
-        return [
-            'oro_distribution.provider.public_directory_provider' => PublicDirectoryProvider::class,
-        ];
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -38,16 +31,25 @@ class AssetSourceExtension extends AbstractExtension implements ServiceSubscribe
 
     public function getAssetSource(string $path): string
     {
-        /** @var PublicDirectoryProvider $publicDirectoryProvider */
-        $publicDirectoryProvider = $this->container->get('oro_distribution.provider.public_directory_provider');
-
-        $publicDir = $publicDirectoryProvider->getPublicDirectory();
+        $publicDir = $this->getPublicDirectoryProvider()->getPublicDirectory();
         $fullPath = (string)realpath($publicDir . DIRECTORY_SEPARATOR . $path);
-
         if (!file_exists($fullPath) || !is_readable($fullPath) || !str_starts_with($fullPath, $publicDir)) {
             return '';
         }
 
         return file_get_contents($fullPath);
+    }
+
+    #[\Override]
+    public static function getSubscribedServices(): array
+    {
+        return [
+            PublicDirectoryProvider::class
+        ];
+    }
+
+    private function getPublicDirectoryProvider(): PublicDirectoryProvider
+    {
+        return $this->container->get(PublicDirectoryProvider::class);
     }
 }

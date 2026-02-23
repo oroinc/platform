@@ -29,18 +29,11 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
     private const DEFAULT_TEMPLATE = '@OroForm/Form/fields.html.twig';
     private const BLOCK_NAME = 'oro_form_js_validation';
 
-    private ContainerInterface $container;
-    private string $templateName;
-    private array $defaultOptions;
-
     public function __construct(
-        ContainerInterface $container,
-        string $templateName = self::DEFAULT_TEMPLATE,
-        array $defaultOptions = []
+        private readonly ContainerInterface $container,
+        private readonly string $templateName = self::DEFAULT_TEMPLATE,
+        private readonly array $defaultOptions = []
     ) {
-        $this->container = $container;
-        $this->templateName = $templateName;
-        $this->defaultOptions = $defaultOptions;
     }
 
     #[\Override]
@@ -163,36 +156,43 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $options;
     }
 
-    #[\Override]
-    public static function getSubscribedServices(): array
-    {
-        return [
-            'form.factory' => FormFactoryInterface::class,
-            'oro_form.captcha.settings_provider' => CaptchaSettingsProviderInterface::class,
-            'twig.form.renderer' => FormRendererInterface::class,
-        ];
-    }
-
     public function isFormProtectedWithCaptcha(string $formName): bool
     {
-        /** @var CaptchaSettingsProviderInterface $settingsProvider */
-        $settingsProvider = $this->container->get('oro_form.captcha.settings_provider');
+        $settingsProvider = $this->getCaptchaSettingsProvider();
 
-        return $settingsProvider->isProtectionAvailable()
+        return
+            $settingsProvider->isProtectionAvailable()
             && $settingsProvider->isFormProtected($formName);
     }
 
     public function getCaptchaFormElement(string $name = 'captcha'): FormView
     {
-        /** @var FormFactoryInterface $formFactory */
-        $formFactory = $this->container->get('form.factory');
+        return $this->getFormFactory()->createNamed($name, CaptchaType::class)->createView();
+    }
 
-        return $formFactory->createNamed($name, CaptchaType::class)->createView();
+    #[\Override]
+    public static function getSubscribedServices(): array
+    {
+        return [
+            FormFactoryInterface::class,
+            'twig.form.renderer' => FormRendererInterface::class,
+            'oro_form.captcha.settings_provider' => CaptchaSettingsProviderInterface::class
+        ];
+    }
+
+    private function getFormFactory(): FormFactoryInterface
+    {
+        return $this->container->get(FormFactoryInterface::class);
     }
 
     private function getFormRenderer(): FormRendererInterface
     {
         return $this->container->get('twig.form.renderer');
+    }
+
+    private function getCaptchaSettingsProvider(): CaptchaSettingsProviderInterface
+    {
+        return $this->container->get('oro_form.captcha.settings_provider');
     }
 
     private function getDataBlockRenderer(): DataBlockRenderer

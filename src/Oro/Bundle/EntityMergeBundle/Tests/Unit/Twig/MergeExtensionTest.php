@@ -29,7 +29,7 @@ class MergeExtensionTest extends TestCase
 
         $container = self::getContainerBuilder()
             ->add('oro_entity_merge.accessor', $this->accessor)
-            ->add('oro_entity_merge.twig.renderer', $this->renderer)
+            ->add(MergeRenderer::class, $this->renderer)
             ->add(TranslatorInterface::class, $this->translator)
             ->getContainer($this);
 
@@ -44,11 +44,11 @@ class MergeExtensionTest extends TestCase
         $actualFields = [$foo, $baz, $bar];
         $expectedFields = [$bar, $baz, $foo];
 
-        $this->translator->expects($this->atLeastOnce())
+        $this->translator->expects(self::atLeastOnce())
             ->method('trans')
             ->willReturnArgument(0);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedFields,
             self::callTwigFilter($this->extension, 'oro_entity_merge_sort_fields', [$actualFields])
         );

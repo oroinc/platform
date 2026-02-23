@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
@@ -21,12 +20,11 @@ use Twig\TwigFunction;
  */
 class TitleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
     private array $templateFileTitleDataStack = [];
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -156,9 +154,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
 
     private function getCurrenRoute(): ?string
     {
-        $request = $this->getRequest();
-
-        return null !== $request ? $request->get('_route') : null;
+        return $this->getRequestStack()->getCurrentRequest()?->get('_route');
     }
 
     #[\Override]
@@ -166,7 +162,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
     {
         return [
             'oro_navigation.title_service' => TitleServiceInterface::class,
-            RequestStack::class,
+            RequestStack::class
         ];
     }
 
@@ -175,8 +171,8 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->container->get('oro_navigation.title_service');
     }
 
-    protected function getRequest(): ?Request
+    private function getRequestStack(): RequestStack
     {
-        return $this->container->get(RequestStack::class)->getCurrentRequest();
+        return $this->container->get(RequestStack::class);
     }
 }

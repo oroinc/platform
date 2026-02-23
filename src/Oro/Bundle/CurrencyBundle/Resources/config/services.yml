@@ -4,15 +4,14 @@ parameters:
 services:
     oro_currency.twig.currency:
         class: Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_currency.helper.currency_name, key: Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper }
 
     oro_currency.twig.rate:
         class: Oro\Bundle\CurrencyBundle\Twig\RateConverterExtension
-        public: false
         tags:
             - { name: twig.extension }
 
@@ -39,7 +38,6 @@ services:
 
     oro_currency.provider.view_type:
         class: Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider
-        lazy: true
         arguments:
             - '@oro_config.manager'
 

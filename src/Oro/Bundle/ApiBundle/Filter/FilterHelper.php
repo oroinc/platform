@@ -79,8 +79,11 @@ class FilterHelper
         $item = $this->filterMap[$fieldName];
         $filterValue = $item[0];
         if (null === $filterValue && $item[2] instanceof StandaloneFilterWithDefaultValue) {
-            $filterValue = new FilterValue($item[1], $item[2]->getDefaultValue(), FilterOperator::EQ);
-            $this->filterMap[$fieldName][0] = $filterValue;
+            $defaultValue = $item[2]->getDefaultValue();
+            if (null !== $defaultValue) {
+                $filterValue = new FilterValue($item[1], $defaultValue, FilterOperator::EQ);
+                $this->filterMap[$fieldName][0] = $filterValue;
+            }
         }
 
         return $filterValue;

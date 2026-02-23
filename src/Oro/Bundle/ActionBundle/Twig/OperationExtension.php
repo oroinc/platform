@@ -22,52 +22,9 @@ use Twig\TwigFunction;
  */
 class OperationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return RouteProviderInterface
-     */
-    protected function getRouteProvider()
-    {
-        return $this->container->get('oro_action.provider.route');
-    }
-
-    /**
-     * @return ContextHelper
-     */
-    protected function getContextHelper()
-    {
-        return $this->container->get('oro_action.helper.context');
-    }
-
-    /**
-     * @return OptionsHelper
-     */
-    protected function getOptionsHelper()
-    {
-        return $this->container->get('oro_action.helper.options');
-    }
-
-    /**
-     * @return ButtonProvider
-     */
-    protected function getButtonProvider()
-    {
-        return $this->container->get('oro_action.provider.button');
-    }
-
-    /**
-     * @return ButtonSearchContextProvider
-     */
-    protected function getButtonSearchContextProvider()
-    {
-        return $this->container->get('oro_action.provider.button_search_context');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -85,40 +42,22 @@ class OperationExtension extends AbstractExtension implements ServiceSubscriberI
         ];
     }
 
-    /**
-     * @param array $context
-     *
-     * @return array
-     */
-    public function getActionParameters(array $context)
+    public function getActionParameters(array $context): array
     {
         return $this->getContextHelper()->getActionParameters($context);
     }
 
-    /**
-     * @return string
-     */
-    public function getWidgetRoute()
+    public function getWidgetRoute(): string
     {
         return $this->getRouteProvider()->getWidgetRoute();
     }
 
-    /**
-     * @param ButtonInterface $button
-     *
-     * @return array
-     */
-    public function getFrontendOptions(ButtonInterface $button)
+    public function getFrontendOptions(ButtonInterface $button): array
     {
         return $this->getOptionsHelper()->getFrontendOptions($button);
     }
 
-    /**
-     * @param array $context
-     *
-     * @return bool
-     */
-    public function hasButtons(array $context)
+    public function hasButtons(array $context): bool
     {
         return $this->getButtonProvider()->hasButtons(
             $this->getButtonSearchContextProvider()->getButtonSearchContext(
@@ -132,10 +71,35 @@ class OperationExtension extends AbstractExtension implements ServiceSubscriberI
     {
         return [
             'oro_action.provider.route' => RouteProviderInterface::class,
-            'oro_action.helper.context' => ContextHelper::class,
-            'oro_action.helper.options' => OptionsHelper::class,
-            'oro_action.provider.button' => ButtonProvider::class,
-            'oro_action.provider.button_search_context' => ButtonSearchContextProvider::class,
+            ContextHelper::class,
+            OptionsHelper::class,
+            ButtonProvider::class,
+            ButtonSearchContextProvider::class
         ];
+    }
+
+    private function getRouteProvider(): RouteProviderInterface
+    {
+        return $this->container->get('oro_action.provider.route');
+    }
+
+    private function getContextHelper(): ContextHelper
+    {
+        return $this->container->get(ContextHelper::class);
+    }
+
+    private function getOptionsHelper(): OptionsHelper
+    {
+        return $this->container->get(OptionsHelper::class);
+    }
+
+    private function getButtonProvider(): ButtonProvider
+    {
+        return $this->container->get(ButtonProvider::class);
+    }
+
+    private function getButtonSearchContextProvider(): ButtonSearchContextProvider
+    {
+        return $this->container->get(ButtonSearchContextProvider::class);
     }
 }

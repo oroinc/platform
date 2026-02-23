@@ -24,11 +24,9 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
     private const TEMPLATE = '@OroUI/tab_panel.html.twig';
     private const DEFAULT_WIDGET_TYPE = 'block';
 
-    protected ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -58,7 +56,6 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
     public function menuTabPanel(TwigEnvironment $environment, $menuName, $options = [])
     {
         $tabs = $this->getTabs($menuName, $options);
-
         if (empty($tabs)) {
             return '';
         }
@@ -140,42 +137,36 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
      */
     public function tabPanel(TwigEnvironment $environment, $tabs, array $options = [])
     {
-        return $environment->render(
-            self::TEMPLATE,
-            [
-                'tabs' => $tabs,
-                'options' => $options,
-            ]
-        );
+        return $environment->render(self::TEMPLATE, ['tabs' => $tabs, 'options' => $options]);
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_menu.twig.extension' => MenuExtension::class,
+            MenuExtension::class,
             RouterInterface::class,
             AuthorizationCheckerInterface::class,
-            TranslatorInterface::class,
+            TranslatorInterface::class
         ];
     }
 
-    protected function getMenuExtension(): MenuExtension
+    private function getMenuExtension(): MenuExtension
     {
-        return $this->container->get('oro_menu.twig.extension');
+        return $this->container->get(MenuExtension::class);
     }
 
-    protected function getRouter(): RouterInterface
+    private function getRouter(): RouterInterface
     {
         return $this->container->get(RouterInterface::class);
     }
 
-    protected function getAuthorizationChecker(): AuthorizationCheckerInterface
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
         return $this->container->get(AuthorizationCheckerInterface::class);
     }
 
-    protected function getTranslator(): TranslatorInterface
+    private function getTranslator(): TranslatorInterface
     {
         return $this->container->get(TranslatorInterface::class);
     }

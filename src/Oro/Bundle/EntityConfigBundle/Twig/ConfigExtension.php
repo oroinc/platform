@@ -31,13 +31,9 @@ use Twig\TwigFunction;
  */
 class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?ConfigManager $configManager = null;
-    private ?RouterInterface $router = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -58,7 +54,9 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     #[\Override]
     public function getFilters()
     {
-        return [new TwigFilter('render_oro_entity_config_value', [$this, 'renderValue'])];
+        return [
+            new TwigFilter('render_oro_entity_config_value', [$this, 'renderValue'])
+        ];
     }
 
     public function renderValue($value)
@@ -278,17 +276,13 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
             ConfigManager::class,
             EntityClassNameHelper::class,
             RouterInterface::class,
-            DoctrineHelper::class,
+            DoctrineHelper::class
         ];
     }
 
     private function getConfigManager(): ConfigManager
     {
-        if (null === $this->configManager) {
-            $this->configManager = $this->container->get(ConfigManager::class);
-        }
-
-        return $this->configManager;
+        return $this->container->get(ConfigManager::class);
     }
 
     private function getEntityClassNameHelper(): EntityClassNameHelper
@@ -298,11 +292,7 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
 
     private function getRouter(): RouterInterface
     {
-        if (null === $this->router) {
-            $this->router = $this->container->get(RouterInterface::class);
-        }
-
-        return $this->router;
+        return $this->container->get(RouterInterface::class);
     }
 
     private function getDoctrineHelper(): DoctrineHelper

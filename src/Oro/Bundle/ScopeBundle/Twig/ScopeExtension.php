@@ -17,8 +17,9 @@ use Twig\TwigFunction;
  */
 class ScopeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    public function __construct(private readonly ContainerInterface $container)
-    {
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -38,7 +39,7 @@ class ScopeExtension extends AbstractExtension implements ServiceSubscriberInter
 
         $scope = $scopes->first();
         foreach ($scopeEntities as $fieldName => $class) {
-            if (!empty($this->container->get(PropertyAccessorInterface::class)->getValue($scope, $fieldName))) {
+            if (!empty($this->getPropertyAccessor()->getValue($scope, $fieldName))) {
                 return false;
             }
         }
@@ -48,15 +49,25 @@ class ScopeExtension extends AbstractExtension implements ServiceSubscriberInter
 
     public function getScopeEntities(string $scopeType): array
     {
-        return $this->container->get(ScopeManager::class)->getScopeEntities($scopeType);
+        return $this->getScopeManager()->getScopeEntities($scopeType);
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            PropertyAccessorInterface::class,
             ScopeManager::class,
+            PropertyAccessorInterface::class
         ];
+    }
+
+    private function getScopeManager(): ScopeManager
+    {
+        return $this->container->get(ScopeManager::class);
+    }
+
+    private function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        return $this->container->get(PropertyAccessorInterface::class);
     }
 }

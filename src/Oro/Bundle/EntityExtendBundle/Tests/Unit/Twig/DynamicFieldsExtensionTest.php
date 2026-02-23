@@ -61,11 +61,11 @@ class DynamicFieldsExtensionTest extends TestCase
             ->add('oro_entity_config.provider.extend', $this->extendConfigProvider)
             ->add('oro_entity_config.provider.entity', $this->entityConfigProvider)
             ->add('oro_entity_config.provider.view', $this->viewConfigProvider)
-            ->add('oro_entity_extend.extend.field_type_helper', $this->fieldTypeHelper)
+            ->add(FieldTypeHelper::class, $this->fieldTypeHelper)
             ->add(PropertyAccessorInterface::class, $propertyAccessor)
             ->add(EventDispatcherInterface::class, $this->dispatcher)
             ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
-            ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
+            ->add(FeatureChecker::class, $this->featureChecker)
             ->getContainer($this);
 
         $this->extension = new DynamicFieldsExtension($container);

@@ -25,8 +25,8 @@ class AddressExtensionTest extends TestCase
         $this->formattedAddressRenderer = $this->createMock(FormattedAddressRenderer::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_locale.formatter.address', $this->formatter)
-            ->add('oro_locale.twig.formatted_address_renderer', $this->formattedAddressRenderer)
+            ->add(AddressFormatter::class, $this->formatter)
+            ->add(FormattedAddressRenderer::class, $this->formattedAddressRenderer)
             ->getContainer($this);
 
         $this->extension = new AddressExtension($container);

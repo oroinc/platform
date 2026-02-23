@@ -36,24 +36,17 @@ class WebpStrategyExtensionTest extends TestCase
             ->method('isEnabledIfSupported')
             ->willReturn($enabled);
 
-        $result = self::callTwigFunction(
-            $this->extension,
-            'is_webp_enabled_if_supported',
-            []
+        self::assertSame(
+            $enabled,
+            self::callTwigFunction($this->extension, 'is_webp_enabled_if_supported', [])
         );
-
-        self::assertEquals($enabled, $result);
     }
 
-    public function isEnabledIfSupportedDataProvider(): array
+    public static function isEnabledIfSupportedDataProvider(): array
     {
         return [
-            [
-                'enabled' => false,
-            ],
-            [
-                'enabled' => true,
-            ],
+            ['enabled' => false],
+            ['enabled' => true]
         ];
     }
 }

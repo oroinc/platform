@@ -341,12 +341,13 @@ services:
             - { name: monolog.logger, channel: security }
 
     oro_security.twig.security_extension:
-        class: Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
-        public: false
+        class: Oro\Bundle\SecurityBundle\Twig\SecurityExtension
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_security.util.uri_security_helper, key: Oro\Bundle\SecurityBundle\Util\UriSecurityHelper }
+            - { name: container.service_subscriber, id: oro_security.acl.permission_manager, key: Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager }
 
     Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter:
         alias: oro_security.encoder.default

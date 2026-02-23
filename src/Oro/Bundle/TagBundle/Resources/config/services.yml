@@ -36,11 +36,12 @@ services:
 
     oro_tag.twig.tag.extension:
         class: Oro\Bundle\TagBundle\Twig\TagExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_tag.tag.manager, key: Oro\Bundle\TagBundle\Entity\TagManager }
+            - { name: container.service_subscriber, id: oro_tag.helper.taggable_helper, key: Oro\Bundle\TagBundle\Helper\TaggableHelper }
 
     oro_tag.security_provider:
         class: Oro\Bundle\TagBundle\Security\SecurityProvider

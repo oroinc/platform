@@ -16,11 +16,9 @@ use Twig\TwigFilter;
  */
 class EnumExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -105,12 +103,12 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_entity_extend.enum_options_provider' => EnumOptionsProvider::class,
+            EnumOptionsProvider::class
         ];
     }
 
     private function getEnumOptionsProvider(): EnumOptionsProvider
     {
-        return $this->container->get('oro_entity_extend.enum_options_provider');
+        return $this->container->get(EnumOptionsProvider::class);
     }
 }

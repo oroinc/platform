@@ -25,10 +25,10 @@ use Twig\TwigFunction;
  */
 class LocaleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ?LocaleSettings $localeSettings = null;
-
-    public function __construct(private ContainerInterface $container, private ?array $localesNotInLowercase)
-    {
+    public function __construct(
+        private readonly ContainerInterface $container,
+        private readonly ?array $localesNotInLowercase
+    ) {
     }
 
     #[\Override]
@@ -44,40 +44,22 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction('oro_currency', [$this, 'getCurrency']),
             new TwigFunction('oro_timezone', [$this, 'getTimeZone']),
             new TwigFunction('oro_timezone_offset', [$this, 'getTimeZoneOffset']),
-            new TwigFunction(
-                'oro_format_address_by_address_country',
-                [$this, 'isFormatAddressByAddressCountry']
-            ),
-            new TwigFunction(
-                'oro_entity_do_not_lowercase_noun_locales',
-                [$this, 'isNotNeedToLowerCaseNounLocale']
-            ),
+            new TwigFunction('oro_format_address_by_address_country', [$this, 'isFormatAddressByAddressCountry']),
+            new TwigFunction('oro_entity_do_not_lowercase_noun_locales', [$this, 'isNotNeedToLowerCaseNounLocale']),
         ];
     }
 
-    /**
-     * @param string      $currency
-     * @param string|null $displayLocale
-     *
-     * @return string|null
-     */
-    public function getCurrencyName($currency, $displayLocale = null)
+    public function getCurrencyName(string $currency, ?string $displayLocale = null): ?string
     {
         return Currencies::getName($currency, $displayLocale);
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->getLocaleSettings()->getLocale();
     }
 
-    /**
-     * @return string
-     */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->getLocaleSettings()->getLanguage();
     }
@@ -87,63 +69,37 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getLocaleSettings()->isRtlMode();
     }
 
-    /**
-     * @return string
-     */
-    public function getCountry()
+    public function getCountry(): string
     {
         return $this->getLocaleSettings()->getCountry();
     }
 
-    /**
-     * @param string|null $currencyCode
-     *
-     * @return string|null
-     */
-    public function getCurrencySymbolByCurrency($currencyCode = null)
+    public function getCurrencySymbolByCurrency(?string $currencyCode = null): ?string
     {
         return $this->getLocaleSettings()->getCurrencySymbolByCurrency($currencyCode);
     }
 
     public function isNotNeedToLowerCaseNounLocale(): bool
     {
-        if (in_array($this->getLocale(), $this->localesNotInLowercase, true)) {
-            return true;
-        }
-
-        return false;
+        return \in_array($this->getLocale(), $this->localesNotInLowercase, true);
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrency()
+    public function getCurrency(): string
     {
         return $this->getLocaleSettings()->getCurrency();
     }
 
-    /**
-     * @return string
-     */
-    public function getTimeZone()
+    public function getTimeZone(): string
     {
         return $this->getLocaleSettings()->getTimeZone();
     }
 
-    /**
-     * @return string
-     */
-    public function getTimeZoneOffset()
+    public function getTimeZoneOffset(): string
     {
-        $date = new \DateTime('now', new \DateTimeZone($this->getLocaleSettings()->getTimeZone()));
-
-        return $date->format('P');
+        return (new \DateTime('now', new \DateTimeZone($this->getLocaleSettings()->getTimeZone())))->format('P');
     }
 
-    /**
-     * @return bool
-     */
-    public function isFormatAddressByAddressCountry()
+    public function isFormatAddressByAddressCountry(): bool
     {
         return $this->getLocaleSettings()->isFormatAddressByAddressCountry();
     }
@@ -152,16 +108,12 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
     public static function getSubscribedServices(): array
     {
         return [
-            LocaleSettings::class,
+            LocaleSettings::class
         ];
     }
 
     private function getLocaleSettings(): LocaleSettings
     {
-        if (null === $this->localeSettings) {
-            $this->localeSettings = $this->container->get(LocaleSettings::class);
-        }
-
-        return $this->localeSettings;
+        return $this->container->get(LocaleSettings::class);
     }
 }

@@ -454,19 +454,19 @@ services:
 
     oro_entity_extend.twig.extension.dynamic_fields:
         class: Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_entity_extend.extend.field_type_helper, key: Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper }
 
     oro_entity_extend.twig.extension.enum:
         class: Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
-        public: false
         arguments:
-            - "@oro_platform.twig.service_locator"
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_entity_extend.enum_options_provider, key: Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider }
 
     oro_entity_extend.datagrid.column_options_guesser:
         class: Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser

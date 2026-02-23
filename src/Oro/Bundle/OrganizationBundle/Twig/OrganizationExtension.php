@@ -20,36 +20,9 @@ use Twig\TwigFunction;
  */
 class OrganizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        return $this->container->get(ConfigManager::class);
-    }
-
-    /**
-     * @return EntityOwnerAccessor
-     */
-    protected function getOwnerAccessor()
-    {
-        return $this->container->get('oro_security.owner.entity_owner_accessor');
-    }
-
-    /**
-     * @return BusinessUnitManager
-     */
-    protected function getBusinessUnitManager()
-    {
-        return $this->container->get('oro_organization.business_unit_manager');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -119,9 +92,24 @@ class OrganizationExtension extends AbstractExtension implements ServiceSubscrib
     public static function getSubscribedServices(): array
     {
         return [
-            ConfigManager::class,
-            'oro_security.owner.entity_owner_accessor' => EntityOwnerAccessor::class,
-            'oro_organization.business_unit_manager' => BusinessUnitManager::class,
+            EntityOwnerAccessor::class,
+            BusinessUnitManager::class,
+            ConfigManager::class
         ];
+    }
+
+    private function getOwnerAccessor(): EntityOwnerAccessor
+    {
+        return $this->container->get(EntityOwnerAccessor::class);
+    }
+
+    private function getBusinessUnitManager(): BusinessUnitManager
+    {
+        return $this->container->get(BusinessUnitManager::class);
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        return $this->container->get(ConfigManager::class);
     }
 }

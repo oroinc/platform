@@ -17,61 +17,23 @@ use Twig\TwigFunction;
 /**
  * Provides Twig functions to render menus and breadcrumbs:
  *   - oro_menu_render
+ *   - oro_menu_get
  *   - oro_breadcrumbs
  */
 class MenuExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     private const BREADCRUMBS_TEMPLATE = '@OroNavigation/Menu/breadcrumbs.html.twig';
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return Helper
-     */
-    protected function getMenuHelper()
-    {
-        return $this->container->get(Helper::class);
-    }
-
-    /**
-     * @return MenuProviderInterface
-     */
-    protected function getMenuProvider()
-    {
-        return $this->container->get(BuilderChainProvider::class);
-    }
-
-    /**
-     * @return BreadcrumbManagerInterface
-     */
-    protected function getBreadcrumbManager()
-    {
-        return $this->container->get(BreadcrumbManagerInterface::class);
-    }
-
-    /**
-     * @return ConfigurationProvider
-     */
-    protected function getConfigurationProvider()
-    {
-        return $this->container->get(ConfigurationProvider::class);
+    public function __construct(
+        protected readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public function getFunctions()
     {
         return [
-            new TwigFunction(
-                'oro_menu_render',
-                [$this, 'render'],
-                ['is_safe' => ['html']]
-            ),
+            new TwigFunction('oro_menu_render', [$this, 'render'], ['is_safe' => ['html']]),
             new TwigFunction('oro_menu_get', [$this, 'getMenu']),
             new TwigFunction(
                 'oro_breadcrumbs',
@@ -212,5 +174,25 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
             ConfigurationProvider::class,
             Helper::class
         ];
+    }
+
+    protected function getMenuProvider(): MenuProviderInterface
+    {
+        return $this->container->get(BuilderChainProvider::class);
+    }
+
+    protected function getBreadcrumbManager(): BreadcrumbManagerInterface
+    {
+        return $this->container->get(BreadcrumbManagerInterface::class);
+    }
+
+    protected function getConfigurationProvider(): ConfigurationProvider
+    {
+        return $this->container->get(ConfigurationProvider::class);
+    }
+
+    protected function getMenuHelper(): Helper
+    {
+        return $this->container->get(Helper::class);
     }
 }

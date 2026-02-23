@@ -10,7 +10,6 @@ use Oro\Bundle\AttachmentBundle\Provider\FilesTemplateProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ImagesTemplateProvider;
-use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -32,30 +31,30 @@ class FileExtensionTest extends TestCase
 
     private const int FILE_ID = 42;
 
-    private AttachmentManager&MockObject $attachmentManager;
     private PictureSourcesProviderInterface&MockObject $pictureSourcesProvider;
-    private ConfigManager&MockObject $configManager;
     private FileTitleProviderInterface&MockObject $fileTitleProvider;
-    private FileExtension $extension;
+    private AttachmentManager&MockObject $attachmentManager;
+    private ConfigManager&MockObject $configManager;
     private File $file;
+    private FileExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $this->pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
-        $this->configManager = $this->createMock(ConfigManager::class);
         $this->fileTitleProvider = $this->createMock(FileTitleProviderInterface::class);
+        $this->attachmentManager = $this->createMock(AttachmentManager::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
 
         $serviceLocator = self::getContainerBuilder()
+            ->add('oro_attachment.provider.picture_sources', $this->pictureSourcesProvider)
+            ->add('oro_attachment.provider.file_title', $this->fileTitleProvider)
+            ->add('oro_attachment.provider.files_template_provider', new FilesTemplateProvider())
+            ->add('oro_attachment.provider.images_template_provider', new ImagesTemplateProvider())
             ->add(AttachmentManager::class, $this->attachmentManager)
-            ->add(PictureSourcesProvider::class, $this->pictureSourcesProvider)
             ->add(ConfigManager::class, $this->configManager)
             ->add(ManagerRegistry::class, $managerRegistry)
-            ->add(FileTitleProviderInterface::class, $this->fileTitleProvider)
-            ->add(FilesTemplateProvider::class, new FilesTemplateProvider())
-            ->add(ImagesTemplateProvider::class, new ImagesTemplateProvider())
             ->getContainer($this);
 
         $this->extension = new FileExtension($serviceLocator);

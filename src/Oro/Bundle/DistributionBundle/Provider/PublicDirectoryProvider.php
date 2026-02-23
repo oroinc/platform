@@ -7,8 +7,9 @@ namespace Oro\Bundle\DistributionBundle\Provider;
  */
 class PublicDirectoryProvider
 {
-    public function __construct(private readonly string $projectDir)
-    {
+    public function __construct(
+        private readonly string $projectDir
+    ) {
     }
 
     public function getPublicDirectory(): string

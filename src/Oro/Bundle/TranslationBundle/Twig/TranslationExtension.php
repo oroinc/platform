@@ -17,15 +17,11 @@ use Twig\TwigFunction;
  */
 class TranslationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private bool $isDebugTranslator;
-    private bool $isDebugJsTranslations;
-
-    public function __construct(ContainerInterface $container, bool $isDebugTranslator, bool $isDebugJsTranslations)
-    {
-        $this->container = $container;
-        $this->isDebugTranslator = $isDebugTranslator;
-        $this->isDebugJsTranslations = $isDebugJsTranslations;
+    public function __construct(
+        private readonly ContainerInterface $container,
+        private readonly bool $isDebugTranslator,
+        private readonly bool $isDebugJsTranslations
+    ) {
     }
 
     #[\Override]
@@ -48,16 +44,10 @@ class TranslationExtension extends AbstractExtension implements ServiceSubscribe
         return $this->isDebugJsTranslations;
     }
 
-    /**
-     * @param array $filters
-     * @param int   $referenceType
-     *
-     * @return string
-     */
     public function getTranslationGridLink(
         array $filters = [],
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) {
+    ): string {
         return $this->getTranslationsDatagridRouteHelper()->generate($filters, $referenceType);
     }
 
@@ -65,12 +55,12 @@ class TranslationExtension extends AbstractExtension implements ServiceSubscribe
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_translation.helper.translation_route' => TranslationsDatagridRouteHelper::class,
+            TranslationsDatagridRouteHelper::class
         ];
     }
 
     private function getTranslationsDatagridRouteHelper(): TranslationsDatagridRouteHelper
     {
-        return $this->container->get('oro_translation.helper.translation_route');
+        return $this->container->get(TranslationsDatagridRouteHelper::class);
     }
 }

@@ -1,11 +1,11 @@
 services:
     oro_entity_merge.twig.extension:
         class: Oro\Bundle\EntityMergeBundle\Twig\MergeExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_entity_merge.twig.renderer, key: Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer }
 
     oro_entity_merge.twig.renderer:
         class: Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer

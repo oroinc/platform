@@ -50,6 +50,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_asset.webpack_server, key: Oro\Bundle\AssetBundle\Webpack\WebpackServer }
 
     Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy:
         arguments:

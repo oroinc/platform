@@ -25,8 +25,8 @@ class TagExtensionTest extends TestCase
         $this->helper = $this->createMock(TaggableHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_tag.tag.manager', $this->manager)
-            ->add('oro_tag.helper.taggable_helper', $this->helper)
+            ->add(TagManager::class, $this->manager)
+            ->add(TaggableHelper::class, $this->helper)
             ->getContainer($this);
 
         $this->extension = new TagExtension($container);

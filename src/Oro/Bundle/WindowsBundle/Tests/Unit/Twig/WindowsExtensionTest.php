@@ -7,7 +7,7 @@ use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -19,14 +19,12 @@ use Twig\Environment;
 class WindowsExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
-    use EntityTrait;
 
-    private WindowsExtension $extension;
     private Environment&MockObject $environment;
     private WindowsStateManager&MockObject $stateManager;
     private WindowsStateManagerRegistry&MockObject $stateManagerRegistry;
-    private WindowsStateRequestManager $requestStateManager;
     private FragmentHandler&MockObject $fragmentHandler;
+    private WindowsExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -34,21 +32,22 @@ class WindowsExtensionTest extends TestCase
         $this->environment = $this->createMock(Environment::class);
         $this->stateManager = $this->createMock(WindowsStateManager::class);
         $this->stateManagerRegistry = $this->createMock(WindowsStateManagerRegistry::class);
-        $this->requestStateManager = new WindowsStateRequestManager($this->createMock(RequestStack::class));
         $this->fragmentHandler = $this->createMock(FragmentHandler::class);
+        $windowsStateRequestManager = new WindowsStateRequestManager($this->createMock(RequestStack::class));
 
         $container = self::getContainerBuilder()
-            ->add('oro_windows.manager.windows_state_registry', $this->stateManagerRegistry)
-            ->add('oro_windows.manager.windows_state_request', $this->requestStateManager)
-            ->add('fragment.handler', $this->fragmentHandler)
+            ->add(WindowsStateManagerRegistry::class, $this->stateManagerRegistry)
+            ->add(WindowsStateRequestManager::class, $windowsStateRequestManager)
+            ->add(FragmentHandler::class, $this->fragmentHandler)
             ->getContainer($this);
 
         $this->extension = new WindowsExtension($container);
     }
 
-    private function createWindowState(array $data = [], ?int $id = 123): WindowsState
+    private function getWindowState(int $id, array $data = []): WindowsState
     {
-        $state = $this->getEntity(WindowsState::class, ['id' => $id]);
+        $state = new WindowsState();
+        ReflectionUtil::setId($state, $id);
         $state->setData($data);
 
         return $state;
@@ -69,8 +68,8 @@ class WindowsExtensionTest extends TestCase
 
     public function testRender(): void
     {
-        $windowStateFoo = $this->createWindowState(['cleanUrl' => 'foo']);
-        $windowStateBar = $this->createWindowState(['cleanUrl' => 'foo']);
+        $windowStateFoo = $this->getWindowState(1, ['cleanUrl' => 'foo']);
+        $windowStateBar = $this->getWindowState(2, ['cleanUrl' => 'foo']);
 
         $windowStates = [$windowStateFoo, $windowStateBar];
 
@@ -107,7 +106,7 @@ class WindowsExtensionTest extends TestCase
      */
     public function testRenderFragment(string $cleanUrl, string $type, string $expectedUrl): void
     {
-        $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl, 'type' => $type]);
+        $windowState = $this->getWindowState(1, ['cleanUrl' => $cleanUrl, 'type' => $type]);
 
         $expectedOutput = 'RENDERED';
         $this->fragmentHandler->expects($this->once())
@@ -154,7 +153,7 @@ class WindowsExtensionTest extends TestCase
     public function testRenderFragmentWithNotFoundHttpException(): void
     {
         $cleanUrl = '/foo/bar';
-        $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl]);
+        $windowState = $this->getWindowState(1, ['cleanUrl' => $cleanUrl]);
 
         $this->fragmentHandler->expects($this->once())
             ->method('render')
@@ -181,7 +180,7 @@ class WindowsExtensionTest extends TestCase
         $this->expectExceptionMessage('Not caught exception.');
 
         $cleanUrl = '/foo/bar';
-        $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl]);
+        $windowState = $this->getWindowState(1, ['cleanUrl' => $cleanUrl]);
 
         $this->fragmentHandler->expects($this->once())
             ->method('render')
@@ -201,7 +200,7 @@ class WindowsExtensionTest extends TestCase
 
     public function testRenderFragmentWithEmptyCleanUrl(): void
     {
-        $windowState = $this->createWindowState();
+        $windowState = $this->getWindowState(1);
 
         $this->fragmentHandler->expects($this->never())
             ->method('render');
@@ -222,7 +221,7 @@ class WindowsExtensionTest extends TestCase
 
     public function testRenderFragmentWithEmptyCleanUrlAndWithoutUser(): void
     {
-        $windowState = $this->createWindowState();
+        $windowState = $this->getWindowState(1);
 
         $this->fragmentHandler->expects($this->never())
             ->method('render');

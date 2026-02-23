@@ -83,7 +83,6 @@ services:
 
     oro_migration.twig.schema_dumper:
         class: Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

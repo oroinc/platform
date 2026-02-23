@@ -27,9 +27,9 @@ class LocalizationExtensionTest extends TestCase
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_locale.formatter.language_code', $this->languageCodeFormatter)
-            ->add('oro_locale.formatter.formatting_code', $this->formattingCodeFormatter)
-            ->add('oro_locale.helper.localization', $this->localizationHelper)
+            ->add(LanguageCodeFormatter::class, $this->languageCodeFormatter)
+            ->add(FormattingCodeFormatter::class, $this->formattingCodeFormatter)
+            ->add(LocalizationHelper::class, $this->localizationHelper)
             ->getContainer($this);
 
         $this->extension = new LocalizationExtension($container);

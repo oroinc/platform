@@ -22,14 +22,13 @@ class EmailExtensionTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->emailTemplateCandidatesProvider = $this->createMock(EmailTemplateCandidatesProviderInterface::class);
         $this->emailTemplateRenderingContext = new EmailTemplateRenderingContext();
 
         $container = self::getContainerBuilder()
-            ->add(ManagerRegistry::class, $managerRegistry)
             ->add(EmailTemplateCandidatesProviderInterface::class, $this->emailTemplateCandidatesProvider)
             ->add(EmailTemplateRenderingContext::class, $this->emailTemplateRenderingContext)
+            ->add(ManagerRegistry::class, $this->createMock(ManagerRegistry::class))
             ->getContainer($this);
 
         $this->extension = new EmailExtension($container);
@@ -46,11 +45,7 @@ class EmailExtensionTest extends TestCase
 
         self::assertEquals(
             $templateNames,
-            self::callTwigFunction(
-                $this->extension,
-                'oro_get_email_template',
-                [$templateName]
-            )
+            self::callTwigFunction($this->extension, 'oro_get_email_template', [$templateName])
         );
     }
 

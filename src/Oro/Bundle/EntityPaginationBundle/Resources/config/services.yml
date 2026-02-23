@@ -24,9 +24,6 @@ services:
         arguments:
             - '@oro_config.user'
 
-    Oro\Bundle\EntityPaginationBundle\Manager\MessageManager:
-        alias: oro_entity_pagination.message_manager
-
     oro_entity_pagination.message_manager:
         class: Oro\Bundle\EntityPaginationBundle\Manager\MessageManager
         public: true
@@ -35,9 +32,6 @@ services:
             - '@translator'
             - '@oro_entity_pagination.navigation'
             - '@oro_entity_pagination.storage'
-
-    Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation:
-        alias: oro_entity_pagination.navigation
 
     oro_entity_pagination.navigation:
         class: Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation
@@ -58,8 +52,10 @@ services:
 
     oro_entity_pagination.twig_extension.entity_pagination:
         class: Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_entity_pagination.navigation, key: Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation }
+            - { name: container.service_subscriber, id: oro_entity_pagination.storage.data_collector, key: Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector }
+            - { name: container.service_subscriber, id: oro_entity_pagination.message_manager, key: Oro\Bundle\EntityPaginationBundle\Manager\MessageManager }

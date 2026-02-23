@@ -12,38 +12,22 @@ use Twig\TwigFunction;
  * Provides a Twig function to display a translated gender label:
  *   - oro_gender
  */
-class OroUserExtension extends AbstractExtension implements ServiceSubscriberInterface
+class UserExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return GenderProvider
-     */
-    protected function getGenderProvider()
-    {
-        return $this->container->get('oro_user.gender_provider');
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('oro_gender', [$this, 'getGenderLabel'])
         ];
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public function getGenderLabel($name)
+    public function getGenderLabel(?string $name): ?string
     {
         if (!$name) {
             return null;
@@ -56,7 +40,12 @@ class OroUserExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_user.gender_provider' => GenderProvider::class,
+            GenderProvider::class
         ];
+    }
+
+    private function getGenderProvider(): GenderProvider
+    {
+        return $this->container->get(GenderProvider::class);
     }
 }

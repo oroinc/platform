@@ -18,11 +18,9 @@ use Twig\TwigFunction;
  */
 class WebpackExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -55,12 +53,12 @@ class WebpackExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_asset.webpack_server' => WebpackServer::class,
+            WebpackServer::class
         ];
     }
 
     private function getWebpackServer(): WebpackServer
     {
-        return $this->container->get('oro_asset.webpack_server');
+        return $this->container->get(WebpackServer::class);
     }
 }

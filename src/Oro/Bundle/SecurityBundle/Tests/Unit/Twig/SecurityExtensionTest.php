@@ -4,46 +4,45 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
-use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
+use Oro\Bundle\SecurityBundle\Twig\SecurityExtension;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class OroSecurityExtensionTest extends TestCase
+class SecurityExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private TokenAccessorInterface&MockObject $tokenAccessor;
-    private PermissionManager&MockObject $permissionManager;
     private UriSecurityHelper&MockObject $uriSecurityHelper;
+    private PermissionManager&MockObject $permissionManager;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
     private ManagerRegistry&MockObject $doctrine;
-    private OroSecurityExtension $extension;
+    private SecurityExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->permissionManager = $this->createMock(PermissionManager::class);
         $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
+        $this->permissionManager = $this->createMock(PermissionManager::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $container = self::getContainerBuilder()
+            ->add(UriSecurityHelper::class, $this->uriSecurityHelper)
+            ->add(PermissionManager::class, $this->permissionManager)
             ->add(TokenAccessorInterface::class, $this->tokenAccessor)
-            ->add('oro_security.acl.permission_manager', $this->permissionManager)
-            ->add('oro_security.util.uri_security_helper', $this->uriSecurityHelper)
-            ->add('doctrine', $this->doctrine)
+            ->add(ManagerRegistry::class, $this->doctrine)
             ->getContainer($this);
 
-        $this->extension = new OroSecurityExtension($container);
+        $this->extension = new SecurityExtension($container);
     }
 
     public function testGetOrganizations(): void
@@ -94,15 +93,10 @@ class OroSecurityExtensionTest extends TestCase
             ->with($user)
             ->willReturn(23);
 
-        $manager = $this->createMock(ObjectManager::class);
-        $manager->expects(self::once())
-            ->method('getRepository')
-            ->willReturn($repository);
-
         $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
+            ->method('getRepository')
             ->with(Organization::class)
-            ->willReturn($manager);
+            ->willReturn($repository);
 
         self::assertEquals(23, self::callTwigFunction($this->extension, 'get_user_organizations_count', []));
     }

@@ -38,8 +38,7 @@ services:
             - { name: doctrine.event_listener, event: onClear }
 
     oro_search.twig.search_extension:
-        class: Oro\Bundle\SearchBundle\Twig\OroSearchExtension
-        public: false
+        class: Oro\Bundle\SearchBundle\Twig\SearchExtension
         tags:
             - { name: twig.extension }
 

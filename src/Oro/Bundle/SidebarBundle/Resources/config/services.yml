@@ -8,12 +8,12 @@ services:
 
     oro_sidebar.twig.extension:
         class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
             - { name: oro_featuretogle.feature, feature: email }
+            - { name: container.service_subscriber, id: oro_sidebar.widget_definition_provider, key: Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider }
 
     oro_sidebar.config_extension.feature:
         class: Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension

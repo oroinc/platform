@@ -15,29 +15,11 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  */
 class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension
 {
-    /** @var AbstractDynamicFieldsExtension */
-    private $extension;
-
-    public function __construct(AbstractDynamicFieldsExtension $extension, ContainerInterface $container)
-    {
+    public function __construct(
+        private readonly AbstractDynamicFieldsExtension $extension,
+        ContainerInterface $container
+    ) {
         parent::__construct($container);
-        $this->extension = $extension;
-    }
-
-    #[\Override]
-    public static function getSubscribedServices(): array
-    {
-        return [
-            'oro_entity_config.config.attributes_config_helper' => AttributeConfigHelper::class,
-        ];
-    }
-
-    /**
-     * @return AttributeConfigHelper
-     */
-    private function getAttributeHelper()
-    {
-        return $this->container->get('oro_entity_config.config.attributes_config_helper');
     }
 
     #[\Override]
@@ -63,5 +45,18 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
             },
             ARRAY_FILTER_USE_KEY
         );
+    }
+
+    #[\Override]
+    public static function getSubscribedServices(): array
+    {
+        return [
+            AttributeConfigHelper::class
+        ];
+    }
+
+    private function getAttributeHelper(): AttributeConfigHelper
+    {
+        return $this->container->get(AttributeConfigHelper::class);
     }
 }

@@ -26,7 +26,6 @@ services:
 
     oro_address.twig.extension.phone:
         class: Oro\Bundle\AddressBundle\Twig\PhoneExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

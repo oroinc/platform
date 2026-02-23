@@ -28,16 +28,11 @@ use Twig\TwigFunction;
  *   - acl_permission
  *   - strip_dangerous_protocols
  */
-class OroSecurityExtension extends AbstractExtension implements ServiceSubscriberInterface
+class SecurityExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?PermissionManager $permissionManager = null;
-    private ?UriSecurityHelper $uriSecurityHelper = null;
-    private ?TokenAccessorInterface $tokenAccessor = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -83,25 +78,17 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
             return 0;
         }
 
-        return $this->container->get('doctrine')
-            ->getManagerForClass(Organization::class)
-            ->getRepository(Organization::class)
-            ->getUserOrganizationsCount($user);
+        return $this->getDoctrine()->getRepository(Organization::class)->getUserOrganizationsCount($user);
     }
 
     public function getOrganizationSelectorForm(): FormView
     {
-        $form = $this->container->get(FormFactoryInterface::class)
+        return $this->getFormFactory()
             ->createNamedBuilder('', FormType::class, [], ['csrf_protection' => false])
-            ->add(
-                'organization',
-                SwitchOrganizationType::class
-            )
+            ->add('organization', SwitchOrganizationType::class)
             ->setMethod('GET')
             ->getForm()
             ->createView();
-
-        return $form;
     }
 
     public function getCurrentOrganization(): ?Organization
@@ -148,18 +135,6 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         return $result;
     }
 
-    #[\Override]
-    public static function getSubscribedServices(): array
-    {
-        return [
-            'oro_security.util.uri_security_helper' => UriSecurityHelper::class,
-            'oro_security.acl.permission_manager' => PermissionManager::class,
-            TokenAccessorInterface::class,
-            FormFactoryInterface::class,
-            'doctrine' => ManagerRegistry::class,
-        ];
-    }
-
     public function isAuthenticated(): bool
     {
         $user = $this->getTokenAccessor()->getUser();
@@ -167,30 +142,40 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         return null !== $user && !$user instanceof CustomerVisitor;
     }
 
-    private function getPermissionManager(): PermissionManager
+    #[\Override]
+    public static function getSubscribedServices(): array
     {
-        if (null === $this->permissionManager) {
-            $this->permissionManager = $this->container->get('oro_security.acl.permission_manager');
-        }
-
-        return $this->permissionManager;
+        return [
+            UriSecurityHelper::class,
+            PermissionManager::class,
+            TokenAccessorInterface::class,
+            FormFactoryInterface::class,
+            ManagerRegistry::class
+        ];
     }
 
     private function getUriSecurityHelper(): UriSecurityHelper
     {
-        if (null === $this->uriSecurityHelper) {
-            $this->uriSecurityHelper = $this->container->get('oro_security.util.uri_security_helper');
-        }
+        return $this->container->get(UriSecurityHelper::class);
+    }
 
-        return $this->uriSecurityHelper;
+    private function getPermissionManager(): PermissionManager
+    {
+        return $this->container->get(PermissionManager::class);
     }
 
     private function getTokenAccessor(): TokenAccessorInterface
     {
-        if (null === $this->tokenAccessor) {
-            $this->tokenAccessor = $this->container->get(TokenAccessorInterface::class);
-        }
+        return $this->container->get(TokenAccessorInterface::class);
+    }
 
-        return $this->tokenAccessor;
+    private function getFormFactory(): FormFactoryInterface
+    {
+        return $this->container->get(FormFactoryInterface::class);
+    }
+
+    private function getDoctrine(): ManagerRegistry
+    {
+        return $this->container->get(ManagerRegistry::class);
     }
 }

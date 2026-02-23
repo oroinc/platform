@@ -30,7 +30,7 @@ class SidebarExtensionTest extends TestCase
         $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_sidebar.widget_definition_provider', $this->widgetDefinitionProvider)
+            ->add(WidgetDefinitionProvider::class, $this->widgetDefinitionProvider)
             ->add(TranslatorInterface::class, $this->translator)
             ->add(AssetHelper::class, $this->assetHelper)
             ->getContainer($this);

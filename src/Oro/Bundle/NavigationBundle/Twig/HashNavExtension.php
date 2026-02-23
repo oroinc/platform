@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
@@ -17,37 +16,23 @@ use Twig\TwigFunction;
  */
 class HashNavExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    #[\Override]
-    public static function getSubscribedServices(): array
-    {
-        return [RequestStack::class];
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction(
-                'oro_is_hash_navigation',
-                [$this, 'checkIsHashNavigation']
-            ),
-            new TwigFunction(
-                'oro_hash_navigation_header',
-                [$this, 'getHashNavigationHeaderConst']
-            ),
+            new TwigFunction('oro_is_hash_navigation', [$this, 'checkIsHashNavigation']),
+            new TwigFunction('oro_hash_navigation_header', [$this, 'getHashNavigationHeaderConst'])
         ];
     }
 
     public function checkIsHashNavigation(): bool
     {
-        $mainRequest = $this->getMainRequest();
+        $mainRequest = $this->getRequestStack()->getMainRequest();
 
         return
             null !== $mainRequest
@@ -62,8 +47,16 @@ class HashNavExtension extends AbstractExtension implements ServiceSubscriberInt
         return ResponseHashnavListener::HASH_NAVIGATION_HEADER;
     }
 
-    private function getMainRequest(): ?Request
+    #[\Override]
+    public static function getSubscribedServices(): array
     {
-        return $this->container->get(RequestStack::class)->getMainRequest();
+        return [
+            RequestStack::class
+        ];
+    }
+
+    private function getRequestStack(): RequestStack
+    {
+        return $this->container->get(RequestStack::class);
     }
 }

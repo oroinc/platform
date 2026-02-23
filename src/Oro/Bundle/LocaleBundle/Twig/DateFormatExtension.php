@@ -18,12 +18,9 @@ use Twig\TwigFunction;
  */
 class DateFormatExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?DateTimeFormatConverterRegistry $dateTimeFormatConverterRegistry = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -38,10 +35,7 @@ class DateFormatExtension extends AbstractExtension implements ServiceSubscriber
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getDateTimeFormatterList()
+    public function getDateTimeFormatterList(): array
     {
         return array_keys($this->getDateTimeFormatConverterRegistry()->getFormatConverters());
     }
@@ -106,18 +100,12 @@ class DateFormatExtension extends AbstractExtension implements ServiceSubscriber
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_locale.format_converter.date_time.registry' => DateTimeFormatConverterRegistry::class,
+            DateTimeFormatConverterRegistry::class
         ];
     }
 
     private function getDateTimeFormatConverterRegistry(): DateTimeFormatConverterRegistry
     {
-        if (null === $this->dateTimeFormatConverterRegistry) {
-            $this->dateTimeFormatConverterRegistry = $this->container->get(
-                'oro_locale.format_converter.date_time.registry'
-            );
-        }
-
-        return $this->dateTimeFormatConverterRegistry;
+        return $this->container->get(DateTimeFormatConverterRegistry::class);
     }
 }

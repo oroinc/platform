@@ -32,17 +32,8 @@ final class AssetSourceExtensionTest extends TestCase
 
         $this->extension = new AssetSourceExtension(
             self::getContainerBuilder()
-                ->add('oro_distribution.provider.public_directory_provider', $publicDirectoryProvider)
+                ->add(PublicDirectoryProvider::class, $publicDirectoryProvider)
                 ->getContainer($this)
-        );
-    }
-
-    public function testGetFunctions(): void
-    {
-        self::assertCount(1, $this->extension->getFunctions());
-        self::assertSame(
-            'asset_source',
-            $this->extension->getFunctions()[0]->getName()
         );
     }
 

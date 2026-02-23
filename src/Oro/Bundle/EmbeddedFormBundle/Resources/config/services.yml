@@ -23,7 +23,6 @@ services:
 
     oro_embedded_form.back_link.twig.extension:
         class: Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

@@ -104,11 +104,11 @@ services:
 
     oro_platform.twig.platform_extension:
         class: Oro\Bundle\PlatformBundle\Twig\PlatformExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_platform.composer.version_helper, key: Oro\Bundle\PlatformBundle\Composer\VersionHelper }
 
     oro_platform.optional_listeners.manager:
         class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
@@ -161,11 +161,16 @@ services:
 
     oro_platform.twig.service_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator
-        public: false
         arguments:
             - [] # services. Will be set in Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass
         tags:
             - { name: container.service_locator }
+
+    oro_platform.twig.service_locator.decorator:
+        class: Oro\Bundle\PlatformBundle\Twig\TwigServiceLocatorDecorator
+        decorates: oro_platform.twig.service_locator
+        arguments:
+            - '@.inner'
 
     Doctrine\Persistence\ManagerRegistry:
         alias: 'doctrine'

@@ -30,7 +30,7 @@ class DateTimeOrganizationExtensionTest extends TestCase
         $container = self::getContainerBuilder()
             ->add('oro_locale.formatter.date_time', $this->formatter)
             ->add('oro_config.global', $this->configManager)
-            ->add('oro_locale.manager.localization', $this->localizationManager)
+            ->add(LocalizationManager::class, $this->localizationManager)
             ->getContainer($this);
 
         $this->extension = new DateTimeOrganizationExtension($container);

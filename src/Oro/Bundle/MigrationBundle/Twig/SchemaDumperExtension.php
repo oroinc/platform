@@ -18,8 +18,6 @@ use Twig\TwigFunction;
  */
 class SchemaDumperExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?AbstractPlatform $platform = null;
     private ?Column $defaultColumn = null;
     private array $defaultColumnOptions = [];
     private array $optionNames = [
@@ -33,9 +31,9 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
         'autoincrement'
     ];
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -49,7 +47,8 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
     public function getColumnOptions(Column $column): array
     {
         $defaultOptions = $this->getDefaultOptions();
-        $platform = $this->getPlatform();
+        /** @var AbstractPlatform $platform */
+        $platform = $this->getDoctrine()->getConnection()->getDatabasePlatform();
         $options = [];
 
         foreach ($this->optionNames as $optionName) {
@@ -72,20 +71,7 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
 
     private function getColumnOption(Column $column, string $optionName): mixed
     {
-        $method = 'get' . $optionName;
-
-        return $column->$method();
-    }
-
-    private function getPlatform(): AbstractPlatform
-    {
-        if (null === $this->platform) {
-            $this->platform = $this->container->get(ManagerRegistry::class)
-                ->getConnection()
-                ->getDatabasePlatform();
-        }
-
-        return $this->platform;
+        return $column->{'get' . $optionName}();
     }
 
     private function getDefaultOptions(): array
@@ -106,7 +92,12 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
     public static function getSubscribedServices(): array
     {
         return [
-            ManagerRegistry::class,
+            ManagerRegistry::class
         ];
+    }
+
+    private function getDoctrine(): ManagerRegistry
+    {
+        return $this->container->get(ManagerRegistry::class);
     }
 }

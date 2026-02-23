@@ -18,12 +18,9 @@ use Twig\TwigFilter;
  */
 class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?HtmlTagHelper $htmlTagHelper = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -102,16 +99,12 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_ui.html_tag_helper' => HtmlTagHelper::class,
+            HtmlTagHelper::class
         ];
     }
 
     private function getHtmlTagHelper(): HtmlTagHelper
     {
-        if (null === $this->htmlTagHelper) {
-            $this->htmlTagHelper = $this->container->get('oro_ui.html_tag_helper');
-        }
-
-        return $this->htmlTagHelper;
+        return $this->container->get(HtmlTagHelper::class);
     }
 }

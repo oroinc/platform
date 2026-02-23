@@ -307,6 +307,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_ui.formatter, key: Oro\Bundle\UIBundle\Formatter\FormatterManager }
 
     oro_ui.twig.tab_extension:
         class: Oro\Bundle\UIBundle\Twig\TabExtension
@@ -314,6 +315,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_menu.twig.extension, key: Oro\Bundle\NavigationBundle\Twig\MenuExtension }
 
     oro_ui.twig.html_tag:
         class: Oro\Bundle\UIBundle\Twig\HtmlTagExtension
@@ -321,6 +323,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_ui.html_tag_helper, key: Oro\Bundle\UIBundle\Tools\HtmlTagHelper }
 
     oro_ui.twig.placeholder_extension:
         class: Oro\Bundle\UIBundle\Twig\PlaceholderExtension
@@ -328,6 +331,8 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_ui.placeholder.provider, key: Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider }
+            - { name: container.service_subscriber, id: fragment.handler, key: Symfony\Component\HttpKernel\Fragment\FragmentHandler }
 
     oro_ui.twig.ui_extension:
         class: Oro\Bundle\UIBundle\Twig\UiExtension
@@ -335,6 +340,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_ui.user_agent_provider, key: Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface }
 
     oro_ui.twig.asset_source_extension:
         class: Oro\Bundle\UIBundle\Twig\AssetSourceExtension
@@ -342,6 +348,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_distribution.provider.public_directory_provider, key: Oro\Bundle\DistributionBundle\Provider\PublicDirectoryProvider }
 
     oro_ui.validator.move_to_child:
         class: Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator

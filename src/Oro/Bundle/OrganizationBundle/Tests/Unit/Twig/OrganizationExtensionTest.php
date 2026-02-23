@@ -39,8 +39,8 @@ class OrganizationExtensionTest extends TestCase
 
         $container = self::getContainerBuilder()
             ->add(ConfigManager::class, $this->configManager)
-            ->add('oro_security.owner.entity_owner_accessor', $entityOwnerAccessor)
-            ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
+            ->add(EntityOwnerAccessor::class, $entityOwnerAccessor)
+            ->add(BusinessUnitManager::class, $this->businessUnitManager)
             ->getContainer($this);
 
         $this->extension = new OrganizationExtension($container);

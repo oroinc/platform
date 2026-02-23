@@ -22,14 +22,9 @@ use Twig\TwigFilter;
  */
 class LocalizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?LanguageCodeFormatter $languageCodeFormatter = null;
-    private ?FormattingCodeFormatter $formattingCodeFormatter = null;
-    private ?LocalizationHelper $localizationHelper = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -43,32 +38,17 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
         ];
     }
 
-    /**
-     * @param string $code
-     *
-     * @return string
-     */
-    public function getLanguageTitleByCode($code)
+    public function getLanguageTitleByCode(?string $code): ?string
     {
         return $this->getLanguageCodeFormatter()->format($code);
     }
 
-    /**
-     * @param string $code
-     *
-     * @return string
-     */
-    public function formatLocale($code)
+    public function formatLocale(?string $code): ?string
     {
         return $this->getLanguageCodeFormatter()->formatLocale($code);
     }
 
-    /**
-     * @param string $code
-     *
-     * @return string
-     */
-    public function getFormattingTitleByCode($code)
+    public function getFormattingTitleByCode(?string $code): ?string
     {
         return $this->getFormattingCodeFormatter()->format($code);
     }
@@ -82,36 +62,24 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_locale.formatter.language_code' => LanguageCodeFormatter::class,
-            'oro_locale.formatter.formatting_code' => FormattingCodeFormatter::class,
-            'oro_locale.helper.localization' => LocalizationHelper::class,
+            LanguageCodeFormatter::class,
+            FormattingCodeFormatter::class,
+            LocalizationHelper::class
         ];
     }
 
     private function getLanguageCodeFormatter(): LanguageCodeFormatter
     {
-        if (null === $this->languageCodeFormatter) {
-            $this->languageCodeFormatter = $this->container->get('oro_locale.formatter.language_code');
-        }
-
-        return $this->languageCodeFormatter;
+        return $this->container->get(LanguageCodeFormatter::class);
     }
 
     private function getFormattingCodeFormatter(): FormattingCodeFormatter
     {
-        if (null === $this->formattingCodeFormatter) {
-            $this->formattingCodeFormatter = $this->container->get('oro_locale.formatter.formatting_code');
-        }
-
-        return $this->formattingCodeFormatter;
+        return $this->container->get(FormattingCodeFormatter::class);
     }
 
     private function getLocalizationHelper(): LocalizationHelper
     {
-        if (null === $this->localizationHelper) {
-            $this->localizationHelper = $this->container->get('oro_locale.helper.localization');
-        }
-
-        return $this->localizationHelper;
+        return $this->container->get(LocalizationHelper::class);
     }
 }

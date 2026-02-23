@@ -67,15 +67,14 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
 
     private const SKYPE_BUTTON_TEMPLATE = '@OroUI/skype_button.html.twig';
 
-    protected ContainerInterface $container;
     /** Protect extension from infinite loop during a widget rendering */
     private array $renderedWidgets = [];
     private ?bool $isMobile = null;
     private ?bool $isDesktop = null;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        protected readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -413,10 +412,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         return $urlPath . '?' . http_build_query($mergedParams);
     }
 
-    /**
-     * @return string
-     */
-    protected function getUniqueIdentifier()
+    protected function getUniqueIdentifier(): string
     {
         return str_replace('.', '-', uniqid('', true));
     }
@@ -686,10 +682,10 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     {
         return [
             'oro_ui.content_provider.manager' => ContentProviderManager::class,
-            'oro_ui.user_agent_provider' => UserAgentProviderInterface::class,
+            UserAgentProviderInterface::class,
             EventDispatcherInterface::class,
             RouterInterface::class,
-            RequestStack::class,
+            RequestStack::class
         ];
     }
 
@@ -701,7 +697,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     protected function getUserAgent(): UserAgent
     {
         /** @var UserAgentProviderInterface $userAgentProvider */
-        $userAgentProvider = $this->container->get('oro_ui.user_agent_provider');
+        $userAgentProvider = $this->container->get(UserAgentProviderInterface::class);
 
         return $userAgentProvider->getUserAgent();
     }

@@ -26,10 +26,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
     public function getFilters()
     {
         $filters = parent::getFilters();
-        $filters[] = new TwigFilter(
-            'oro_format_datetime_organization',
-            [$this, 'formatDateTimeOrganization']
-        );
+        $filters[] = new TwigFilter('oro_format_datetime_organization', [$this, 'formatDateTimeOrganization']);
 
         return $filters;
     }
@@ -103,13 +100,10 @@ class DateTimeOrganizationExtension extends DateTimeExtension
     #[\Override]
     public static function getSubscribedServices(): array
     {
-        return array_merge(
-            parent::getSubscribedServices(),
-            [
-                'oro_config.global' => ConfigManager::class,
-                'oro_locale.manager.localization' => LocalizationManager::class,
-            ]
-        );
+        return array_merge(parent::getSubscribedServices(), [
+            'oro_config.global' => ConfigManager::class,
+            LocalizationManager::class
+        ]);
     }
     protected function getConfigManager(): ConfigManager
     {
@@ -118,6 +112,6 @@ class DateTimeOrganizationExtension extends DateTimeExtension
 
     protected function getLocalizationManager(): LocalizationManager
     {
-        return $this->container->get('oro_locale.manager.localization');
+        return $this->container->get(LocalizationManager::class);
     }
 }

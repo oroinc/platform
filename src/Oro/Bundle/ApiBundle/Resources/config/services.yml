@@ -1349,6 +1349,10 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_api.open_api_choices_provider, key: Oro\Bundle\ApiBundle\Provider\OpenApiChoicesProvider }
+            - { name: container.service_subscriber, id: oro_api.value_normalizer, key: Oro\Bundle\ApiBundle\Request\ValueNormalizer }
+            - { name: container.service_subscriber, id: oro_api.entity_name_provider, key: Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider }
+            - { name: container.service_subscriber, id: oro_api.rest.doc_view_detector, key: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector }
 
     oro_api.event_listener.open_api_specification_form:
         class: Oro\Bundle\ApiBundle\EventListener\OpenApiSpecificationEventListener

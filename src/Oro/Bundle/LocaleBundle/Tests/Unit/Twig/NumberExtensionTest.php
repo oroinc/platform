@@ -24,7 +24,7 @@ class NumberExtensionTest extends TestCase
         $this->formatter = $this->createMock(NumberFormatter::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_locale.formatter.number', $this->formatter)
+            ->add(NumberFormatter::class, $this->formatter)
             ->getContainer($this);
 
         $this->extension = new NumberExtension($container);

@@ -7,6 +7,7 @@ use Oro\Bundle\TranslationBundle\Twig\TranslationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TranslationExtensionTest extends TestCase
 {
@@ -21,7 +22,7 @@ class TranslationExtensionTest extends TestCase
         $this->translationRouteHelper = $this->createMock(TranslationsDatagridRouteHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_translation.helper.translation_route', $this->translationRouteHelper)
+            ->add(TranslationsDatagridRouteHelper::class, $this->translationRouteHelper)
             ->getContainer($this);
 
         $this->extension = new TranslationExtension($container, true, true);
@@ -38,6 +39,39 @@ class TranslationExtensionTest extends TestCase
     {
         $this->assertTrue(
             self::callTwigFunction($this->extension, 'oro_translation_debug_js_translations', [])
+        );
+    }
+
+    public function testGetTranslationGridLink(): void
+    {
+        $filters = ['key' => 'val'];
+        $referenceType = UrlGeneratorInterface::RELATIVE_PATH;
+        $link = 'test link';
+
+        $this->translationRouteHelper->expects(self::once())
+            ->method('generate')
+            ->with($filters, $referenceType)
+            ->willReturn($link);
+
+        $this->assertEquals(
+            $link,
+            self::callTwigFunction($this->extension, 'translation_grid_link', [$filters, $referenceType])
+        );
+    }
+
+    public function testGetTranslationGridLinkWhenReferenceTypeNotSpecified(): void
+    {
+        $filters = ['key' => 'val'];
+        $link = 'test link';
+
+        $this->translationRouteHelper->expects(self::once())
+            ->method('generate')
+            ->with($filters, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->willReturn($link);
+
+        $this->assertEquals(
+            $link,
+            self::callTwigFunction($this->extension, 'translation_grid_link', [$filters])
         );
     }
 }

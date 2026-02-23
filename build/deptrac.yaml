@@ -86,11 +86,11 @@ deptrac:
       - Oro\Bundle\ContactBundle\Entity\ContactEmail
     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor:
       - Oro\Bundle\ContactBundle\Entity\ContactEmail
-    Oro\Bundle\SecurityProBundle\Twig\OroProSecurityExtension:
+    Oro\Bundle\SecurityProBundle\Twig\SecurityProExtension:
       - Oro\Bundle\CustomerBundle\Entity\CustomerVisitor
     Oro\Bundle\AddressBundle\Validator\Constraints\ValidOrganizationValidator:
       - Oro\Bundle\CustomerBundle\Entity\AbstractDefaultTypedAddress
-    Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension:
+    Oro\Bundle\SecurityBundle\Twig\SecurityExtension:
       - Oro\Bundle\CustomerBundle\Entity\CustomerVisitor
     Oro\Bundle\ThemeBundle\Migrations\Data\AbstractLoadThemeConfiguration:
       - Oro\Bundle\WebsiteBundle\Entity\Website

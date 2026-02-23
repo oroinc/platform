@@ -27,12 +27,9 @@ use Twig\TwigFunction;
  */
 class NumberExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?NumberFormatter $numberFormatter = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -378,16 +375,12 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_locale.formatter.number' => NumberFormatter::class,
+            NumberFormatter::class
         ];
     }
 
     private function getNumberFormatter(): NumberFormatter
     {
-        if (null === $this->numberFormatter) {
-            $this->numberFormatter = $this->container->get('oro_locale.formatter.number');
-        }
-
-        return $this->numberFormatter;
+        return $this->container->get(NumberFormatter::class);
     }
 }

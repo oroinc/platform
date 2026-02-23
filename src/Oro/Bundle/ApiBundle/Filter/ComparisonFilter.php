@@ -43,7 +43,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * * an instance of Range class, in this case BETWEEN expression will be used
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInterface, CollectionAwareFilterInterface
+class ComparisonFilter extends StandaloneFilterWithDefaultValue implements
+    FieldAwareFilterInterface,
+    CollectionAwareFilterInterface
 {
     /** @var string[] The list of operators that support several values, e.g. an array or a range */
     private const SUPPORT_SEVERAL_VALUES_OPERATORS = [
@@ -145,15 +147,21 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      */
     protected function createExpression(?FilterValue $value = null): ?Expression
     {
-        if (null === $value) {
-            return null;
-        }
         $field = $this->getField();
         if (!$field) {
             throw new \InvalidArgumentException('The field must not be empty.');
         }
         if (ConfigUtil::IGNORE_PROPERTY_PATH === $field) {
             return null;
+        }
+
+        if (null === $value) {
+            $defaultValue = $this->getDefaultValue();
+            if (null === $defaultValue) {
+                return null;
+            }
+
+            return $this->buildExpression($field, $field, FilterOperator::EQ, $defaultValue);
         }
 
         return $this->buildExpression($field, $value->getPath(), $value->getOperator(), $value->getValue());

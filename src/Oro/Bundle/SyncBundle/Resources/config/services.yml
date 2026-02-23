@@ -33,11 +33,12 @@ services:
             - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.twig.sync_extension:
-        class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
+        class: Oro\Bundle\SyncBundle\Twig\SyncExtension
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_sync.client.connection_checker, key: Oro\Bundle\SyncBundle\Client\ConnectionChecker }
 
     oro_sync.client.connection_checker:
         class: Oro\Bundle\SyncBundle\Client\ConnectionChecker

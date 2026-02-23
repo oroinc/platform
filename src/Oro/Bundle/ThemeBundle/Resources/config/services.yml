@@ -10,7 +10,6 @@ services:
     # Twig extension
     oro_theme.twig.extension:
         class: Oro\Bundle\ThemeBundle\Twig\ThemeExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:

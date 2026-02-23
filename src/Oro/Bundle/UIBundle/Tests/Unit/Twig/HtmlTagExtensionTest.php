@@ -21,7 +21,7 @@ class HtmlTagExtensionTest extends TestCase
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_ui.html_tag_helper', $this->htmlTagHelper)
+            ->add(HtmlTagHelper::class, $this->htmlTagHelper)
             ->getContainer($this);
 
         $this->extension = new HtmlTagExtension($container);
@@ -31,12 +31,12 @@ class HtmlTagExtensionTest extends TestCase
     {
         $html = '<html>HTML</html>';
 
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('sanitize')
             ->with($html)
             ->willReturn('HTML');
 
-        $this->assertEquals(
+        self::assertEquals(
             'HTML',
             self::callTwigFilter($this->extension, 'oro_html_sanitize', [$html])
         );
@@ -73,12 +73,12 @@ class HtmlTagExtensionTest extends TestCase
     {
         $html = '<html>HTML</html>';
 
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('stripTags')
             ->with($html)
             ->willReturn('HTML');
 
-        $this->assertEquals(
+        self::assertEquals(
             'HTML',
             self::callTwigFilter($this->extension, 'oro_html_strip_tags', [$html])
         );
@@ -88,11 +88,12 @@ class HtmlTagExtensionTest extends TestCase
     {
         $html = '<div>HTML</div><script type="text/javascript"></script>';
 
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('escape')
             ->with($html)
             ->willReturn('<div>HTML</div>');
-        $this->assertEquals(
+
+        self::assertEquals(
             '<div>HTML</div>',
             self::callTwigFilter($this->extension, 'oro_html_escape', [$html])
         );
@@ -103,7 +104,7 @@ class HtmlTagExtensionTest extends TestCase
      */
     public function testAttributeNamePurify(string $string, string $expected): void
     {
-        $this->assertSame(
+        self::assertSame(
             $expected,
             self::callTwigFilter($this->extension, 'oro_attribute_name_purify', [$string])
         );

@@ -20,37 +20,12 @@ use Twig\TwigFunction;
  */
 class WindowsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    protected ContainerInterface $container;
     /** Protect extension from infinite loop */
     private bool $rendered = false;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return WindowsStateManagerRegistry
-     */
-    protected function getWindowsStateManagerRegistry()
-    {
-        return $this->container->get('oro_windows.manager.windows_state_registry');
-    }
-
-    /**
-     * @return WindowsStateRequestManager
-     */
-    protected function getWindowsStateRequestManager()
-    {
-        return $this->container->get('oro_windows.manager.windows_state_request');
-    }
-
-    /**
-     * @return FragmentHandler
-     */
-    protected function getFragmentHandler()
-    {
-        return $this->container->get('fragment.handler');
+    public function __construct(
+        protected readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -72,12 +47,8 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
 
     /**
      * Renders windows restore html block
-     *
-     * @param Environment $environment
-     *
-     * @return string
      */
-    public function render(Environment $environment)
+    public function render(Environment $environment): string
     {
         if ($this->rendered) {
             return '';
@@ -98,12 +69,8 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
 
     /**
      * Renders fragment by window state.
-     *
-     * @param AbstractWindowsState $windowState
-     *
-     * @return string
      */
-    public function renderFragment(AbstractWindowsState $windowState)
+    public function renderFragment(AbstractWindowsState $windowState): string
     {
         $windowState->setRenderedSuccessfully(false);
         try {
@@ -129,9 +96,24 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_windows.manager.windows_state_registry' => WindowsStateManagerRegistry::class,
-            'oro_windows.manager.windows_state_request' => WindowsStateRequestManager::class,
-            'fragment.handler' => FragmentHandler::class,
+            WindowsStateManagerRegistry::class,
+            WindowsStateRequestManager::class,
+            FragmentHandler::class
         ];
+    }
+
+    protected function getWindowsStateManagerRegistry(): WindowsStateManagerRegistry
+    {
+        return $this->container->get(WindowsStateManagerRegistry::class);
+    }
+
+    protected function getWindowsStateRequestManager(): WindowsStateRequestManager
+    {
+        return $this->container->get(WindowsStateRequestManager::class);
+    }
+
+    protected function getFragmentHandler(): FragmentHandler
+    {
+        return $this->container->get(FragmentHandler::class);
     }
 }

@@ -14,12 +14,9 @@ use Twig\TwigFunction;
  */
 class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private ?ConfigManager $configManager = null;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     #[\Override]
@@ -30,12 +27,7 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
         ];
     }
 
-    /**
-     * @param  string $name Setting name in "{bundle}.{setting}" format
-     *
-     * @return mixed
-     */
-    public function getConfigValue($name)
+    public function getConfigValue(string $name): mixed
     {
         return $this->getConfigManager()->get($name);
     }
@@ -44,16 +36,12 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_config.manager' => ConfigManager::class
+            ConfigManager::class
         ];
     }
 
     private function getConfigManager(): ConfigManager
     {
-        if (!$this->configManager) {
-            $this->configManager = $this->container->get('oro_config.manager');
-        }
-
-        return $this->configManager;
+        return $this->container->get(ConfigManager::class);
     }
 }

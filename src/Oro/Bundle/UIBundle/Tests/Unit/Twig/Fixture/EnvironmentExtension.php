@@ -16,47 +16,47 @@ use Twig\TwigTest;
 class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
 {
     #[\Override]
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
-            new EnvironmentTokenParser(),
+            new EnvironmentTokenParser()
         ];
     }
 
     #[\Override]
-    public function getNodeVisitors()
+    public function getNodeVisitors(): array
     {
         return [
-            new EnvironmentNodeVisitor(),
+            new EnvironmentNodeVisitor()
         ];
     }
 
     #[\Override]
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
-            new TwigFilter('foo_filter', 'foo_filter'),
+            new TwigFilter('foo_filter', 'foo_filter')
         ];
     }
 
     #[\Override]
-    public function getTests()
+    public function getTests(): array
     {
         return [
-            new TwigTest('foo_test', 'foo_test'),
+            new TwigTest('foo_test', 'foo_test')
         ];
     }
 
     #[\Override]
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('foo_function', 'foo_function'),
+            new TwigFunction('foo_function', 'foo_function')
         ];
     }
 
     #[\Override]
-    public function getOperators()
+    public function getOperators(): array
     {
         return [
             [
@@ -64,8 +64,8 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
                     'class' => NotUnary::class,
                     'precedence' => 0,
                     'precedence_change' => null,
-                    'aliases' => [],
-                ],
+                    'aliases' => []
+                ]
             ],
             [
                 'foo_binary' => [
@@ -73,9 +73,9 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
                     'precedence' => 0,
                     'associativity' => 1,
                     'precedence_change' => null,
-                    'aliases' => [],
-                ],
-            ],
+                    'aliases' => []
+                ]
+            ]
         ];
     }
 
@@ -83,7 +83,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
     public function getGlobals(): array
     {
         return [
-            'foo_global' => 'foo_global',
+            'foo_global' => 'foo_global'
         ];
     }
 }

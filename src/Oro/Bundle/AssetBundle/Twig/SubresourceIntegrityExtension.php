@@ -33,9 +33,8 @@ class SubresourceIntegrityExtension extends AbstractExtension
         if (!$this->featureChecker->isFeatureEnabled('asset_subresource_integrity_enabled')) {
             return '';
         }
-        $normalizedAssetName = $this->getNormalizeAssetName($asset);
 
-        $integrityHash = $this->integrityProvider->getHash($normalizedAssetName);
+        $integrityHash = $this->integrityProvider->getHash($this->getNormalizeAssetName($asset));
         if (null === $integrityHash) {
             return '';
         }
