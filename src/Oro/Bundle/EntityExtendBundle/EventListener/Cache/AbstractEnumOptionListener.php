@@ -37,7 +37,7 @@ abstract class AbstractEnumOptionListener
 
     public function postUpdate(object $entity): void
     {
-        $this->updateEnumOptionTranslation($entity, true);
+        $this->setEntityToUpdateTranslation($entity);
         $this->invalidateCache($entity);
     }
 
