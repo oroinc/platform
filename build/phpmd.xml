@@ -7,6 +7,11 @@
     <description>
         Custom rule set that is used to check the code of the Oro Projects...
     </description>
+
+    <!-- Exclude test files from all PHPMD checks -->
+    <exclude-pattern>*/Tests/*</exclude-pattern>
+    <exclude-pattern>*Test.php</exclude-pattern>
+
     <rule ref="rulesets/codesize.xml">
     </rule>
 </ruleset>
