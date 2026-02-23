@@ -102,7 +102,7 @@ class EnumOptionListenerTest extends TestCase
         $this->listener->postRemove($this->getEntityInstance());
     }
 
-    public function testPostFlush(): void
+    public function testPostFlushAfterRemove(): void
     {
         $repo = $this->createMock(TranslationRepository::class);
         $this->em->expects(self::once())
@@ -120,6 +120,31 @@ class EnumOptionListenerTest extends TestCase
             ->with(self::ENUM_CODE);
 
         $this->listener->postRemove($this->getEntityInstance());
+        $this->listener->postFlush();
+    }
+
+    public function testPostFlushAfterUpdate(): void
+    {
+        $this->translationManager->expects(self::once())
+            ->method('saveTranslation')
+            ->with(
+                'oro.entity_extend.enum_option.test_enum_code.test',
+                'Test',
+                'fr',
+                'messages',
+                Translation::SCOPE_UI
+            );
+        $this->translationManager->expects(self::once())
+            ->method('invalidateCache')
+            ->with('fr');
+        $this->translationManager->expects(self::once())
+            ->method('flush');
+
+        $this->cache->expects(self::once())
+            ->method('invalidate')
+            ->with(self::ENUM_CODE);
+
+        $this->listener->postUpdate($this->getEntityInstance());
         $this->listener->postFlush();
     }
 

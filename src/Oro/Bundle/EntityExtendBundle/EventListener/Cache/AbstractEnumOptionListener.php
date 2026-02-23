@@ -37,7 +37,7 @@ abstract class AbstractEnumOptionListener
 
     public function postUpdate(object $entity): void
     {
-        $this->updateEnumOptionTranslation($entity, true);
+        $this->setEntityToUpdateTranslation($entity);
         $this->invalidateCache($entity);
     }
 
@@ -75,7 +75,7 @@ abstract class AbstractEnumOptionListener
         $this->translationManager->flush();
     }
 
-    protected function updateEnumOptionTranslation(object $entity, bool $flush = false): void
+    protected function updateEnumOptionTranslation(object $entity): void
     {
         list($id, $name, $locale) = $this->getEntityTranslationInfo($entity);
         if (null === $id) {
@@ -90,9 +90,6 @@ abstract class AbstractEnumOptionListener
             Translation::SCOPE_UI
         );
         $this->translationManager->invalidateCache($locale);
-        if ($flush) {
-            $this->translationManager->flush();
-        }
     }
 
     protected function deleteEnumOptionTranslation(object $entity): void
