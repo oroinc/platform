@@ -795,6 +795,64 @@ class ComparisonFilterTest extends TestCase
         ];
     }
 
+    public function testFilterWithDefaultValue(): void
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::STRING);
+        $comparisonFilter->setField('fieldName');
+        $comparisonFilter->setDefaultValue('default');
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, null);
+
+        self::assertEquals(
+            new Comparison('fieldName', Comparison::EQ, new Value('default')),
+            $criteria->getWhereExpression()
+        );
+    }
+
+    public function testFilterWithCallbackDefaultValue(): void
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::STRING);
+        $comparisonFilter->setField('fieldName');
+        $comparisonFilter->setDefaultValue(function () {
+            return 'default';
+        });
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, null);
+
+        self::assertEquals(
+            new Comparison('fieldName', Comparison::EQ, new Value('default')),
+            $criteria->getWhereExpression()
+        );
+    }
+
+    public function testFilterWithDefaultValueEqualsToNull(): void
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::STRING);
+        $comparisonFilter->setField('fieldName');
+        $comparisonFilter->setDefaultValue(null);
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, null);
+
+        self::assertNull($criteria->getWhereExpression());
+    }
+
+    public function testFilterWithCallbackDefaultValueEqualsToNull(): void
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::STRING);
+        $comparisonFilter->setField('fieldName');
+        $comparisonFilter->setDefaultValue(function () {
+            return null;
+        });
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, null);
+
+        self::assertNull($criteria->getWhereExpression());
+    }
+
     /**
      * @dataProvider caseInsensitiveFilterDataProvider
      */
