@@ -1348,7 +1348,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(10, $container->getParameter('oro_api.default_page_size'));
         self::assertSame(-1, $container->getParameter('oro_api.max_entities'));
-        self::assertSame(100, $container->getParameter('oro_api.max_related_entities'));
+        self::assertSame(1000, $container->getParameter('oro_api.max_related_entities'));
         self::assertSame(100, $container->getParameter('oro_api.max_delete_entities'));
 
         self::assertServiceExists($container, 'oro_api.config_extension_registry');

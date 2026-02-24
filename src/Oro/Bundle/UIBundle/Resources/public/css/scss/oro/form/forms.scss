@@ -225,6 +225,10 @@
         &:not(:last-child) {
             margin-bottom: $content-padding-small * .5;
         }
+
+        .tooltip-icon {
+            margin-left: $content-padding-small;
+        }
     }
 }
 

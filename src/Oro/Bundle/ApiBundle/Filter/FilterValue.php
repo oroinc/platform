@@ -23,12 +23,12 @@ final class FilterValue
     public static function createFromSource(
         string $sourceKey,
         string $path,
-        string $value,
+        mixed $value,
         ?string $operator = null
     ): self {
         $filterValue = new FilterValue($path, $value, $operator);
         $filterValue->sourceKey = $sourceKey;
-        $filterValue->sourceValue = $value;
+        $filterValue->sourceValue = (string)$value;
 
         return $filterValue;
     }

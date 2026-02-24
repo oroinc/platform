@@ -55,6 +55,17 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertSame('operator', $filterValue->getOperator());
     }
 
+    public function testFilterValueCreatedWithSourceKeyAndValueWhenValueIsNotString()
+    {
+        $filterValue = FilterValue::createFromSource('src_key', 'path', 123, 'operator');
+
+        self::assertSame('src_key', $filterValue->getSourceKey());
+        self::assertSame('123', $filterValue->getSourceValue());
+        self::assertSame('path', $filterValue->getPath());
+        self::assertSame(123, $filterValue->getValue());
+        self::assertSame('operator', $filterValue->getOperator());
+    }
+
     public function testFilterValueCreatedWithoutSourceKeyAndValue()
     {
         $filterValue = new FilterValue('path', 'value', 'operator');

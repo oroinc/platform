@@ -100,7 +100,7 @@ class Configuration implements ConfigurationInterface
             ->integerNode('max_related_entities')
                 ->info('The maximum number of related entities that can be retrieved by a request.')
                 ->min(0)
-                ->defaultValue(100)
+                ->defaultValue(1000)
             ->end()
             ->integerNode('max_delete_entities')
                 ->info('The maximum number of entities that can be deleted by one request.')
