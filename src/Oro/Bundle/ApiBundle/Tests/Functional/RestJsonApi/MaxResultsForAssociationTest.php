@@ -23,7 +23,7 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
         );
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(100, $data['data']['relationships']['staff']['data']);
+        self::assertCount(1000, $data['data']['relationships']['staff']['data']);
     }
 
     public function testAssociationDefaultMaxResultsLimitWithIncludeFilter()
@@ -35,8 +35,8 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
         );
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(100, $data['data']['relationships']['staff']['data']);
-        self::assertCount(100, $data['included']);
+        self::assertCount(1000, $data['data']['relationships']['staff']['data']);
+        self::assertCount(1000, $data['included']);
     }
 
     public function testAssociationCustomMaxResultsLimit()
@@ -104,7 +104,7 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
         );
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(105, $data['data']['relationships']['staff']['data']);
+        self::assertCount(1005, $data['data']['relationships']['staff']['data']);
     }
 
     public function testAssociationUnlimitedMaxResultsWithIncludeFilter()
@@ -127,8 +127,8 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
         );
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(105, $data['data']['relationships']['staff']['data']);
-        self::assertCount(105, $data['included']);
+        self::assertCount(1005, $data['data']['relationships']['staff']['data']);
+        self::assertCount(1005, $data['included']);
     }
 
     public function testAssociationCustomMaxResultsLimitAndOrderBy()
@@ -153,7 +153,7 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
                 'id'   => '<toString(@department1->id)>'
             ]
         ];
-        foreach ([99, 98, 97, 96, 95] as $i) {
+        foreach ([999, 998, 997, 996, 995] as $i) {
             $expectedResponse['data']['relationships']['staff']['data'][] = [
                 'type' => $associationEntityType,
                 'id'   => sprintf('<toString(@employee%d->id)>', $i)
@@ -190,7 +190,7 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
                 'id'   => '<toString(@department1->id)>'
             ]
         ];
-        foreach ([99, 98, 97, 96, 95] as $i) {
+        foreach ([999, 998, 997, 996, 995] as $i) {
             $expectedResponse['data']['relationships']['staff']['data'][] = [
                 'type' => $associationEntityType,
                 'id'   => sprintf('<toString(@employee%d->id)>', $i)
