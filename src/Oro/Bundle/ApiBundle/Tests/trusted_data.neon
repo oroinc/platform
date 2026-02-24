@@ -27,6 +27,9 @@ trusted_data:
         Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer:
             tryGetValueByAssociationQuery:
                 fieldName: true
+        Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandAssociatedEntities:
+            loadAssociationData:
+                idPropertyName: true
         Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter:
             createAssociationQuery:
                 targetEntityClass: true
