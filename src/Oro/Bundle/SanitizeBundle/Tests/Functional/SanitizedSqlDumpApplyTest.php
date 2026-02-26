@@ -29,8 +29,8 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
             ->getManager()
             ->getConnection();
         $this->outputFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sanitize_dump.sql';
-        $metatdataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
-        $metatdataProvider->setEntitiesToFilter([TestSanitizable::class]);
+        $metadataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
+        $metadataProvider->setEntitiesToFilter([TestSanitizable::class]);
     }
 
     public function testSanitizeAppliedProperlyWithoutCustomEmailDomain(): void
@@ -48,14 +48,14 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
         // guessed 'md5' rule processor results check
         self::assertMatchesRegularExpression('/[a-z0-9]{32}/', $data['last_name']);
         // guessed 'email' rule processor results check
-        self::assertMatchesRegularExpression('/john\\.redison\\d+@[a-z0-9]{32}\\.test/', $data['email']);
+        self::assertMatchesRegularExpression('/john\\.redison_\\d+@[a-z0-9]{32}\\.test/', $data['email']);
         // 'digits_mask' rule processor with custom options results check
         self::assertMatchesRegularExpression('/1 800 \\d{3}-\\d{3}-\\d{4}/', $data['phone']);
         // guessed 'md5' rule processor results check
         self::assertMatchesRegularExpression('/[a-z0-9]{32}/', $data['secret']);
         // guessed 'email' rule processor results check
         self::assertMatchesRegularExpression(
-            '/john\\.redison\\.third\\d+@[a-z0-9]{32}\\.test/',
+            '/john\\.redison\\.third_\\d+@[a-z0-9]{32}\\.test/',
             $serializedData['email_third']
         );
         // 'date' rule processor results check. Today's date is newer then beging of 1970
@@ -74,10 +74,10 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
 
         [$data, $serializedData] = $this->applyRulesAndReadAffectedData();
 
-        $pregQuotedEailDomain = preg_quote(self::CUSTOM_EMAIL_DOMAIN);
-        self::assertMatchesRegularExpression('/john\\.redison\\d+@' . $pregQuotedEailDomain . '/', $data['email']);
+        $pregQuotedEmailDomain = preg_quote(self::CUSTOM_EMAIL_DOMAIN);
+        self::assertMatchesRegularExpression('/john\\.redison_\\d+@' . $pregQuotedEmailDomain . '/', $data['email']);
         self::assertMatchesRegularExpression(
-            '/john\\.redison\\.third\\d+@' . $pregQuotedEailDomain . '/',
+            '/john\\.redison\\.third_\\d+@' . $pregQuotedEmailDomain . '/',
             $serializedData['email_third']
         );
     }
