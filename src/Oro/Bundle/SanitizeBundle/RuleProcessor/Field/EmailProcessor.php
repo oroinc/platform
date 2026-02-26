@@ -78,18 +78,20 @@ class EmailProcessor implements ProcessorInterface
 
     private function getUpdateSqlValue(string $quotedColumnName, ClassMetadata $metadata): string
     {
-        $emailBoxSuffixExpr = 'FLOOR(RANDOM()*100)';
+        // Use MD5 hash of email (first 8 chars) for composite keys, ID for integer keys
+        $emailBoxSuffixExpr = sprintf('SUBSTRING(MD5(%s), 1, 8)', $quotedColumnName);
         try {
             $idFieldType = $this->helper->getFieldType($metadata->getSingleIdentifierFieldName(), $metadata);
             if (in_array($idFieldType, ['integer', 'bigint', 'smallint'], true)) {
                 $emailBoxSuffixExpr = $metadata->getSingleIdentifierFieldName();
             }
         } catch (\Exception $e) {
+            // Composite or missing key - use MD5
         }
 
         if (!empty($this->customEmailDomain)) {
             $replaced = sprintf(
-                'CONCAT(SUBSTRING(%1$s, 1, POSITION(\'@\' IN %1$s)-1), %2$s, \'@\', %3$s)',
+                'CONCAT(SUBSTRING(%1$s, 1, POSITION(\'@\' IN %1$s)-1), \'_\', %2$s, \'@\', %3$s)',
                 $quotedColumnName,
                 $emailBoxSuffixExpr,
                 $this->helper->quoteString($this->customEmailDomain)
@@ -98,6 +100,7 @@ class EmailProcessor implements ProcessorInterface
             $replaced = sprintf(
                 'CONCAT('
                 . 'SUBSTRING(%1$s, 1, POSITION(\'@\' IN %1$s)-1), '
+                . '\'_\', '
                 . '%2$s, '
                 . '\'@\', '
                 . 'MD5(SUBSTRING(%1$s, POSITION(\'@\' IN %1$s)+1)), '
