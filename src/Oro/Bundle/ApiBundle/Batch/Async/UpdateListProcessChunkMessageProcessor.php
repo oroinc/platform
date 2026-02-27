@@ -10,10 +10,8 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateHandler;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateRequest;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
-use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\RetryHelper;
-use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -113,11 +111,9 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             $body['firstRecordOffset'],
             $body['sectionName']
         );
-        $requestType = new RequestType($body['requestType']);
-        $requestType->add(ApiAction::UPDATE_LIST);
         $request = new BatchUpdateRequest(
             $body['version'],
-            $requestType,
+            new RequestType($body['requestType']),
             $body['operationId'],
             [$body['entityClass']],
             $chunkFile,
@@ -142,7 +138,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             'createCount'   => $response->getSummary()->getCreateCount(),
             'updateCount'   => $response->getSummary()->getUpdateCount()
         ];
-        $affectedEntities = $this->getAffectedEntitiesData($response->getAffectedEntities());
+        $affectedEntities = $response->getAffectedEntities()->toArray();
         if ($affectedEntities) {
             $jobData['affectedEntities'] = $affectedEntities;
         }
@@ -191,21 +187,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             $previousAggregateTime
         );
         $job->setData($jobData);
-
-        return $result;
-    }
-
-    private function getAffectedEntitiesData(BatchAffectedEntities $affectedEntities): array
-    {
-        $result = [];
-        $primaryEntities = $affectedEntities->getPrimaryEntities();
-        if ($primaryEntities) {
-            $result['primary'] = $primaryEntities;
-        }
-        $includedEntities = $affectedEntities->getIncludedEntities();
-        if ($includedEntities) {
-            $result['included'] = $includedEntities;
-        }
 
         return $result;
     }

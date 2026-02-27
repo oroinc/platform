@@ -43,8 +43,8 @@ class UpdateSummaryCounters implements ProcessorInterface
         $processedItemStatuses = $context->getProcessedItemStatuses();
         foreach ($items as $item) {
             if (BatchUpdateItemStatus::NO_ERRORS === $processedItemStatuses[$item->getIndex()]) {
-                $context = $item->getContext();
-                switch ($context->getTargetAction()) {
+                $itemContext = $item->getContext();
+                switch ($itemContext->getTargetAction()) {
                     case ApiAction::CREATE:
                         $summary->incrementWriteCount();
                         $summary->incrementCreateCount();
@@ -54,7 +54,15 @@ class UpdateSummaryCounters implements ProcessorInterface
                         $summary->incrementUpdateCount();
                         break;
                 }
-                $this->addAffectedEntities($affectedEntities, $context);
+                $this->addAffectedEntities($affectedEntities, $itemContext);
+            }
+        }
+
+        /** @var array|null $payload */
+        $payload = $context->getSharedData()->get('payload');
+        if ($payload) {
+            foreach ($payload as $key => $value) {
+                $affectedEntities->addToPayload($key, $value);
             }
         }
     }

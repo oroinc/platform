@@ -24,6 +24,18 @@ class PersistEntityTest extends UpdateProcessorTestCase
         $this->processor = new PersistEntity($this->doctrineHelper);
     }
 
+    public function testProcessWhenEntityAlreadyPersisted(): void
+    {
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManager');
+
+        $this->context->setProcessed(PersistEntity::OPERATION_NAME);
+        $this->context->setResult(new \stdClass());
+        $this->context->setMetadata($this->createMock(EntityMetadata::class));
+        $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(PersistEntity::OPERATION_NAME));
+    }
+
     public function testProcessWhenEntityAlreadySaved(): void
     {
         $this->doctrineHelper->expects(self::never())
@@ -33,6 +45,8 @@ class PersistEntityTest extends UpdateProcessorTestCase
         $this->context->setResult(new \stdClass());
         $this->context->setMetadata($this->createMock(EntityMetadata::class));
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(PersistEntity::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
     public function testProcessForExistingEntity(): void
@@ -43,7 +57,7 @@ class PersistEntityTest extends UpdateProcessorTestCase
         $this->context->setResult(new \stdClass());
         $this->context->setMetadata($this->createMock(EntityMetadata::class));
         $this->processor->process($this->context);
-        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
+        self::assertFalse($this->context->isProcessed(PersistEntity::OPERATION_NAME));
     }
 
     public function testProcessWhenNoEntity(): void
@@ -53,7 +67,7 @@ class PersistEntityTest extends UpdateProcessorTestCase
 
         $this->context->setExisting(false);
         $this->processor->process($this->context);
-        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
+        self::assertFalse($this->context->isProcessed(PersistEntity::OPERATION_NAME));
     }
 
     public function testProcessForNotSupportedNewEntity(): void
@@ -64,6 +78,7 @@ class PersistEntityTest extends UpdateProcessorTestCase
         $this->context->setExisting(false);
         $this->context->setResult([]);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(PersistEntity::OPERATION_NAME));
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
@@ -79,7 +94,7 @@ class PersistEntityTest extends UpdateProcessorTestCase
         $this->context->setExisting(false);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
-        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
+        self::assertFalse($this->context->isProcessed(PersistEntity::OPERATION_NAME));
     }
 
     public function testProcessForManageableNewEntityButNoApiMetadata(): void
@@ -100,7 +115,7 @@ class PersistEntityTest extends UpdateProcessorTestCase
         $this->context->setResult($entity);
         $this->context->setMetadata(null);
         $this->processor->process($this->context);
-        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
+        self::assertFalse($this->context->isProcessed(PersistEntity::OPERATION_NAME));
     }
 
     public function testProcessForManageableNewEntity(): void
@@ -122,6 +137,6 @@ class PersistEntityTest extends UpdateProcessorTestCase
         $this->context->setResult($entity);
         $this->context->setMetadata($this->createMock(EntityMetadata::class));
         $this->processor->process($this->context);
-        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(PersistEntity::OPERATION_NAME));
     }
 }
