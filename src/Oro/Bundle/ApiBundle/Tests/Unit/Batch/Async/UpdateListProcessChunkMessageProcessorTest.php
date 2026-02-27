@@ -343,13 +343,24 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'createCount' => 1,
             'updateCount' => 0
         ];
+        $affectedEntities = new BatchAffectedEntities();
+        $affectedEntities->addPrimaryEntity(1, '1', true);
+        $affectedEntities->addIncludedEntity('Test\Entity1', 2, '2', true);
+        $affectedEntities->addToPayload('key1', 'val1');
 
         $job = new Job();
         $job->setData(['key' => 'value']);
         $job->setId($jobId);
         $expectedJobData = array_merge(
             $job->getData(),
-            ['summary' => array_merge(['aggregateTime' => $processorAggregateTime], $summaryData)]
+            [
+                'summary'          => array_merge(['aggregateTime' => $processorAggregateTime], $summaryData),
+                'affectedEntities' => [
+                    'primary'  => [[1, '1', true]],
+                    'included' => [['Test\Entity1', 2, '2', true]],
+                    'payload'  => ['key1' => 'val1']
+                ]
+            ]
         );
 
         $this->jobRunner->expects(self::once())
@@ -363,7 +374,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 [['key' => 'val1']],
                 [BatchUpdateItemStatus::NO_ERRORS],
                 $this->createBatchSummaryFromArray($summaryData),
-                new BatchAffectedEntities(),
+                $affectedEntities,
                 false
             ));
 

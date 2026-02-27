@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateRequest;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateResponse;
 use Oro\Bundle\ApiBundle\Batch\IncludeAccessor\IncludeAccessorRegistry;
 use Oro\Bundle\ApiBundle\Batch\IncludeMapManager;
-use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
+use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntitiesMerger;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
@@ -44,9 +44,6 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
     private const ERROR_COUNT = 'errorCount';
     private const CREATE_COUNT = 'createCount';
     private const UPDATE_COUNT = 'updateCount';
-    private const AFFECTED_ENTITIES = 'affectedEntities';
-    private const PRIMARY_ENTITIES = 'primary';
-    private const INCLUDED_ENTITIES = 'included';
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -347,13 +344,13 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
             'summary' => $summary,
             'hasErrors' => $hasErrors || $summary[self::ERROR_COUNT] > 0
         ];
-        $affectedEntities = $this->getAffectedEntitiesData($response->getAffectedEntities());
+        $affectedEntities = $response->getAffectedEntities()->toArray();
         if ($affectedEntities) {
             $operationAffectedEntities = $operation->getAffectedEntities();
             if ($operationAffectedEntities) {
                 $affectedEntities = self::mergeAffectedEntities($operationAffectedEntities, $affectedEntities);
             }
-            $data[self::AFFECTED_ENTITIES] = $affectedEntities;
+            $data['affectedEntities'] = $affectedEntities;
         }
 
         return $data;
@@ -400,42 +397,10 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
         return $totalSummary;
     }
 
-    private function getAffectedEntitiesData(BatchAffectedEntities $affectedEntities): array
-    {
-        $result = [];
-        $primaryEntities = $affectedEntities->getPrimaryEntities();
-        if ($primaryEntities) {
-            $result[self::PRIMARY_ENTITIES] = $primaryEntities;
-        }
-        $includedEntities = $affectedEntities->getIncludedEntities();
-        if ($includedEntities) {
-            $result[self::INCLUDED_ENTITIES] = $includedEntities;
-        }
-
-        return $result;
-    }
-
     private static function mergeAffectedEntities(array $affectedEntities, array $toMerge): array
     {
-        self::mergeAffectedEntitiesSection($affectedEntities, $toMerge, self::PRIMARY_ENTITIES);
-        self::mergeAffectedEntitiesSection($affectedEntities, $toMerge, self::INCLUDED_ENTITIES);
+        BatchAffectedEntitiesMerger::mergeAffectedEntities($affectedEntities, $toMerge);
 
         return $affectedEntities;
-    }
-
-    private static function mergeAffectedEntitiesSection(
-        array &$affectedEntities,
-        array $toMerge,
-        string $sectionName
-    ): void {
-        if (isset($toMerge[$sectionName])) {
-            if (isset($affectedEntities[$sectionName])) {
-                foreach ($toMerge[$sectionName] as $item) {
-                    $affectedEntities[$sectionName][] = $item;
-                }
-            } else {
-                $affectedEntities[$sectionName] = $toMerge[$sectionName];
-            }
-        }
     }
 }

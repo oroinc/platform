@@ -11,6 +11,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class PersistEntity implements ProcessorInterface
 {
+    public const OPERATION_NAME = 'persist_new_entity';
+
     private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
@@ -23,8 +25,8 @@ class PersistEntity implements ProcessorInterface
     {
         /** @var CreateContext $context */
 
-        if ($context->isProcessed(SaveEntity::OPERATION_NAME)) {
-            // the entity was already saved
+        if ($context->isProcessed(self::OPERATION_NAME) || $context->isProcessed(SaveEntity::OPERATION_NAME)) {
+            // the entity was already persisted or saved
             return;
         }
 
@@ -46,5 +48,6 @@ class PersistEntity implements ProcessorInterface
         }
 
         $em->persist($entity);
+        $context->setProcessed(self::OPERATION_NAME);
     }
 }

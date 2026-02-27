@@ -613,7 +613,10 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testMergeAffectedEntities()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testMergeAffectedEntities(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -625,14 +628,34 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $childJob2->setData([
             'affectedEntities' => [
                 'primary'  => [[1, 'item1', false]],
-                'included' => [['Test\Entity1', 1, 'include1', false]]
+                'included' => [['Test\Entity1', 1, 'include1', false]],
+                'payload'  => [
+                    'key1' => 'j2_val1',
+                    'key2' => 2,
+                    'key3' => ['k31' => 'j2_v31', 'k32' => 'j2_v32'],
+                    'key4' => ['j2_v41', 'j2_v42'],
+                    'key5' => ['j2_v5'],
+                    'key6' => 'j2_v6',
+                    'key7' => 'j2_v7',
+                    'key9' => ['k91' => ['j2_v91'], 'k92' => ['j2_v92']]
+                ]
             ]
         ]);
         $childJob3 = new Job();
         $childJob3->setData([
             'affectedEntities' => [
                 'primary'  => [[2, 'item2', true]],
-                'included' => [['Test\Entity1', 2, 'include2', true]]
+                'included' => [['Test\Entity1', 2, 'include2', true]],
+                'payload'  => [
+                    'key1' => 'j3_val1',
+                    'key2' => 3,
+                    'key3' => ['k31' => 'j3_v31', 'k33' => 'j2_v33'],
+                    'key4' => ['j3_v41', 'j3_v42'],
+                    'key5' => 'j3_v5',
+                    'key6' => ['j3_v6'],
+                    'key8' => 'j3_v8',
+                    'key9' => ['k91' => ['j3_v91'], 'k93' => ['j2_v93']]
+                ]
             ]
         ]);
         $childJob4 = new Job();
@@ -680,6 +703,17 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
                             'included' => [
                                 ['Test\Entity1', 1, 'include1', false],
                                 ['Test\Entity1', 2, 'include2', true]
+                            ],
+                            'payload'  => [
+                                'key1' => 'j3_val1',
+                                'key2' => 3,
+                                'key3' => ['k31' => 'j3_v31', 'k32' => 'j2_v32', 'k33' => 'j2_v33'],
+                                'key4' => ['j2_v41', 'j2_v42', 'j3_v41', 'j3_v42'],
+                                'key5' => 'j3_v5',
+                                'key6' => ['j3_v6'],
+                                'key7' => 'j2_v7',
+                                'key9' => ['k91' => ['j2_v91', 'j3_v91'], 'k92' => ['j2_v92'], 'k93' => ['j2_v93']],
+                                'key8' => 'j3_v8'
                             ]
                         ]
                     ],

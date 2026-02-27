@@ -254,7 +254,6 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, mainRequest: true, priority: -255 }
             - { name: oro.api.processor, action: create, group: initialize, mainRequest: true, priority: -255 }
             - { name: oro.api.processor, action: update, group: initialize, mainRequest: true, priority: -255 }
-            - { name: oro.api.processor, action: update_list, group: initialize, mainRequest: true, priority: -255 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, mainRequest: true, priority: -255 }
             - { name: oro.api.processor, action: delete_subresource, group: initialize, mainRequest: true, priority: -255 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, mainRequest: true, priority: -255 }

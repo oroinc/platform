@@ -44,6 +44,11 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
                 if (isset($expectedData[0][JsonApiDoc::TYPE])) {
                     $expectedItems = $this->getDataItems($expectedData);
                     $actualItems = $this->getDataItems($other[JsonApiDoc::DATA]);
+                    if (!isset($expectedItems[0][JsonApiDoc::ID]) && \count($expectedItems) === \count($actualItems)) {
+                        foreach ($actualItems as $i => $item) {
+                            $expectedItems[$i][JsonApiDoc::ID] = $item[JsonApiDoc::ID];
+                        }
+                    }
                     if (!$this->strictPrimaryData) {
                         $this->sortDataForNotStrictComparison($expectedItems);
                         $this->sortDataForNotStrictComparison($actualItems);
@@ -52,7 +57,7 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
                         \PHPUnit\Framework\Assert::assertSame(
                             $expectedItems,
                             $actualItems,
-                            sprintf(
+                            \sprintf(
                                 'Failed asserting the primary data collection items count%s.',
                                 $this->strictPrimaryData ? ' and order' : ''
                             )
@@ -128,10 +133,11 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     {
         $result = [];
         foreach ($data as $item) {
-            $result[] = [
-                JsonApiDoc::TYPE => $item[JsonApiDoc::TYPE],
-                JsonApiDoc::ID   => $item[JsonApiDoc::ID]
-            ];
+            $resultItem = [JsonApiDoc::TYPE => $item[JsonApiDoc::TYPE]];
+            if (\array_key_exists(JsonApiDoc::ID, $item)) {
+                $resultItem[JsonApiDoc::ID] = $item[JsonApiDoc::ID];
+            }
+            $result[] = $resultItem;
         }
 
         return $result;

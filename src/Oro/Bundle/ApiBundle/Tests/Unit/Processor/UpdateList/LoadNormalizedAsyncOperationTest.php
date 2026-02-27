@@ -11,28 +11,20 @@ use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\LoadNormalizedAsyncOperation;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\UpdateListContext;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
-    private $processorBag;
-
-    /** @var ParameterBag */
-    private $sharedData;
-
-    /** @var LoadNormalizedAsyncOperation */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private LoadNormalizedAsyncOperation $processor;
 
     #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->sharedData = new ParameterBag();
-        $this->sharedData->set('someKey', 'someSharedValue');
-        $this->context->setSharedData($this->sharedData);
 
         $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
 
@@ -71,16 +63,20 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
             ->method('createContext')
             ->willReturn($getContext);
 
+        $sharedData = new ParameterBag();
+        $sharedData->set('someKey', 'someSharedValue');
+
         $this->context->setClassName('Test\Entity');
         $this->context->setOperationId(123);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->context->setHateoas(true);
+        $this->context->setSharedData($sharedData);
 
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->getRequestType()->add(RequestType::BATCH);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
-        $expectedGetContext->setSharedData($this->sharedData);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setClassName(AsyncOperation::class);
         $expectedGetContext->setId($this->context->getOperationId());
@@ -113,7 +109,7 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
-        $expectedContext->setSharedData($this->sharedData);
+        $expectedContext->setSharedData($sharedData);
         $expectedContext->setHateoas($this->context->isHateoasEnabled());
         $expectedContext->setOperationId($this->context->getOperationId());
         $expectedContext->setClassName($this->context->getClassName());
