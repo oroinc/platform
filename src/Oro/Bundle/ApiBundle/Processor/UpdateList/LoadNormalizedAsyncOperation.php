@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -40,8 +41,8 @@ class LoadNormalizedAsyncOperation implements ProcessorInterface
             $getContext = $getProcessor->createContext();
             $getContext->setVersion($context->getVersion());
             $getContext->getRequestType()->set($context->getRequestType());
+            $getContext->getRequestType()->add(RequestType::BATCH);
             $getContext->setRequestHeaders($context->getRequestHeaders());
-            $getContext->setSharedData($context->getSharedData());
             $getContext->setHateoas($context->isHateoasEnabled());
             $getContext->setClassName(AsyncOperation::class);
             $getContext->setId($operationId);

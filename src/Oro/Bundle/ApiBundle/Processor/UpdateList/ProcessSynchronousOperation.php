@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
@@ -142,12 +143,14 @@ class ProcessSynchronousOperation implements ProcessorInterface
             return [];
         }
 
+        $payload = $affectedEntities['payload'] ?? null;
+
         $primaryEntityIds = [];
         foreach ($primaryEntities as [$entityId]) {
             $primaryEntityIds[] = $entityId;
         }
         $this->processNormalizationResult(
-            $this->normalizeEntities($context, $context->getClassName(), $primaryEntityIds),
+            $this->normalizeEntities($context, $context->getClassName(), $primaryEntityIds, $payload),
             $context
         );
         if ($context->hasErrors()) {
@@ -167,7 +170,7 @@ class ProcessSynchronousOperation implements ProcessorInterface
                 $includedEntityMap[$entityClass][] = $entityId;
             }
             foreach ($includedEntityMap as $entityClass => $entityIds) {
-                $includedTargetContext = $this->normalizeEntities($context, $entityClass, $entityIds);
+                $includedTargetContext = $this->normalizeEntities($context, $entityClass, $entityIds, $payload);
                 if ($includedTargetContext->hasErrors()) {
                     $this->processNormalizationErrors($includedTargetContext, $context);
                 } else {
@@ -201,20 +204,24 @@ class ProcessSynchronousOperation implements ProcessorInterface
     private function normalizeEntities(
         UpdateListContext $context,
         string $entityClass,
-        array $entityIds
+        array $entityIds,
+        ?array $payload
     ): GetListContext {
         $targetProcessor = $this->processorBag->getProcessor(ApiAction::GET_LIST);
         /** @var GetListContext $targetContext */
         $targetContext = $targetProcessor->createContext();
         $targetContext->setVersion($context->getVersion());
         $targetContext->getRequestType()->set($context->getRequestType());
+        $targetContext->getRequestType()->add(RequestType::BATCH);
         $targetContext->setRequestHeaders($context->getRequestHeaders());
-        $targetContext->setSharedData($context->getSharedData());
         $targetContext->setHateoas($context->isHateoasEnabled());
         $targetContext->setClassName($entityClass);
         $targetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
         $targetContext->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
         $targetContext->setSoftErrorsHandling(true);
+        if ($payload) {
+            $targetContext->getSharedData()->set('payload', $payload);
+        }
 
         $targetContext->setInitializeCriteriaCallback(function (Criteria $criteria) use ($entityIds, $context) {
             self::applyEntityIdRestriction($criteria, $entityIds, $context->getMetadata());
