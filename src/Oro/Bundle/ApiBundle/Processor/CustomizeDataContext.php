@@ -133,21 +133,13 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
         $this->config = $config;
     }
 
-    /**
-     * Gets an object that is used to share data between a primary action
-     * and actions that are executed as part of this action.
-     * Also, this object can be used to share data between different kind of child actions.
-     */
+    #[\Override]
     public function getSharedData(): ParameterBagInterface
     {
         return $this->sharedData;
     }
 
-    /**
-     * Sets an object that is used to share data between a primary action
-     * and actions that are executed as part of this action.
-     * Also, this object can be used to share data between different kind of child actions.
-     */
+    #[\Override]
     public function setSharedData(ParameterBagInterface $sharedData): void
     {
         $this->sharedData = $sharedData;

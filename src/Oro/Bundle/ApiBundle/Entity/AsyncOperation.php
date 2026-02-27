@@ -298,7 +298,8 @@ class AsyncOperation
      *
      * @return array|null [
      *                      'primary' => [[id, request id, is existing], ...],
-     *                      'included' => [[class, id, request id, is existing], ...]
+     *                      'included' => [[class, id, request id, is existing], ...],
+     *                      'payload' => [key => value, ...]
      *                    ]
      */
     public function getAffectedEntities(): ?array

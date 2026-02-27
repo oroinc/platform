@@ -4,13 +4,13 @@ namespace Oro\Bundle\ApiBundle\Batch\EventListener;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
+use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntitiesMerger;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 
 /**
  * Synchronizes an asynchronous operation with the related MQ job.
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JobListener
 {
@@ -24,8 +24,6 @@ class JobListener
     private const CREATE_COUNT = 'createCount';
     private const UPDATE_COUNT = 'updateCount';
     private const AFFECTED_ENTITIES = 'affectedEntities';
-    private const PRIMARY_ENTITIES = 'primary';
-    private const INCLUDED_ENTITIES = 'included';
 
     private ManagerRegistry $doctrine;
     private AsyncOperationManager $asyncOperationManager;
@@ -191,36 +189,14 @@ class JobListener
             if (!\is_array($chunkAffectedEntities)) {
                 continue;
             }
-            self::mergeAffectedEntities($totalAffectedEntities, $chunkAffectedEntities);
+            BatchAffectedEntitiesMerger::mergeAffectedEntities($totalAffectedEntities, $chunkAffectedEntities);
         }
 
         $operationAffectedEntities = $operation->getAffectedEntities();
         if ($operationAffectedEntities) {
-            self::mergeAffectedEntities($totalAffectedEntities, $operationAffectedEntities);
+            BatchAffectedEntitiesMerger::mergeAffectedEntities($totalAffectedEntities, $operationAffectedEntities);
         }
 
         return $totalAffectedEntities;
-    }
-
-    private static function mergeAffectedEntities(array &$affectedEntities, array $toMerge): void
-    {
-        self::mergeAffectedEntitiesSection($affectedEntities, $toMerge, self::PRIMARY_ENTITIES);
-        self::mergeAffectedEntitiesSection($affectedEntities, $toMerge, self::INCLUDED_ENTITIES);
-    }
-
-    private static function mergeAffectedEntitiesSection(
-        array &$affectedEntities,
-        array $toMerge,
-        string $sectionName
-    ): void {
-        if (isset($toMerge[$sectionName])) {
-            if (isset($affectedEntities[$sectionName])) {
-                foreach ($toMerge[$sectionName] as $item) {
-                    $affectedEntities[$sectionName][] = $item;
-                }
-            } else {
-                $affectedEntities[$sectionName] = $toMerge[$sectionName];
-            }
-        }
     }
 }
