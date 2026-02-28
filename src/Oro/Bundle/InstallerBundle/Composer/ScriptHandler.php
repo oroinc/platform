@@ -327,7 +327,7 @@ class ScriptHandler
         }
     }
 
-    private static function runProcess(IOInterface $inputOutput, array $cmd, int $timeout, string $cwd = null): int
+    private static function runProcess(IOInterface $inputOutput, array $cmd, int $timeout, ?string $cwd = null): int
     {
         $inputOutput->write(implode(' ', $cmd));
 
