@@ -436,6 +436,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
 
         $nameFilter = new StandaloneFilterWithDefaultValue('string');
+        $nameFilter->setDefaultValue('default');
 
         $request = $this->getRequest('');
 
