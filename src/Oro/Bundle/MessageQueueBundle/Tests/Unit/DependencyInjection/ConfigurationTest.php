@@ -29,6 +29,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'time_before_stale' => [
                 'jobs' => [],
             ],
+            'redelivery_max_runtime' => [
+                'jobs' => [],
+            ],
             'consumer' => [
                 'heartbeat_update_period' => 15,
             ],
@@ -63,6 +66,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'security_agnostic_topics' => [],
                     'security_agnostic_processors' => [],
                     'time_before_stale' => [],
+                    'redelivery_max_runtime' => [],
                     'consumer' => [],
                     'transport' => [
                         'dbal' => [

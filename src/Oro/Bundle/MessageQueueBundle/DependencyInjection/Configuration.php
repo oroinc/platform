@@ -69,6 +69,17 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
+        ;
+
+        $this->appendTimeBeforeStaleConfiguration($rootNode);
+        $this->appendRedeliveryMaxRuntimeConfiguration($rootNode);
+
+        return $builder;
+    }
+
+    private function appendTimeBeforeStaleConfiguration(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode->children()
             ->arrayNode('time_before_stale')
                 ->info(
                     "The maximum time for a unique job execution.\n"
@@ -106,8 +117,40 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+    }
 
-        return $builder;
+    private function appendRedeliveryMaxRuntimeConfiguration(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode->children()
+            ->arrayNode('redelivery_max_runtime')
+                ->info(
+                    "The maximum time a job can run when all remaining active children\n"
+                    . "are stuck in FAILED_REDELIVERED status (redelivery loop).\n"
+                    . 'If the runtime exceeds this value, the job is marked as "stale".'
+                )
+                ->example([
+                    '# default' => 'X',
+                    '# jobs' => ['# some_job_type_name' => 'Y']
+                ])
+                ->children()
+                    ->integerNode('default')
+                        ->min(-1)
+                        ->info(
+                            "The number of seconds since job start to qualify a job stuck\n"
+                            . "in a redelivery loop as stale.\n"
+                            . 'If this attribute is not set or set to -1, this check is disabled.'
+                        )
+                    ->end()
+                    ->arrayNode('jobs')
+                        ->useAttributeAsKey('job_name')
+                        ->info(
+                            "The number of seconds for specific job types.\n"
+                            . 'The key can be a whole job name or a part of it from the beginning of string to any "."'
+                        )
+                        ->prototype('integer')->end()
+                    ->end()
+                ->end()
+            ->end();
     }
 
     private function appendClientConfiguration(ArrayNodeDefinition $builder)

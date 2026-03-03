@@ -6,6 +6,10 @@ services:
         class: 'Oro\Bundle\MessageQueueBundle\Provider\JobConfigurationProvider'
         public: false
 
+    oro_message_queue.job.redelivery_configuration_provider:
+        class: 'Oro\Bundle\MessageQueueBundle\Provider\JobConfigurationProvider'
+        public: false
+
     oro_message_queue.job.manager:
         class: 'Oro\Bundle\MessageQueueBundle\Job\JobManager'
         arguments:
@@ -27,6 +31,7 @@ services:
             - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
         calls:
             - ['setJobConfigurationProvider', ['@oro_message_queue.job.configuration_provider']]
+            - ['setRedeliveryConfigurationProvider', ['@oro_message_queue.job.redelivery_configuration_provider']]
 
     oro_message_queue.job.runner:
         class: 'Oro\Component\MessageQueue\Job\JobRunner'
