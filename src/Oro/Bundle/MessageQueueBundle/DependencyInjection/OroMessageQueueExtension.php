@@ -160,6 +160,11 @@ class OroMessageQueueExtension extends Extension
             $container->getDefinition('oro_message_queue.job.configuration_provider')
                 ->addMethodCall('setConfiguration', [$config['time_before_stale']]);
         }
+
+        if (!empty($config['redelivery_max_runtime'])) {
+            $container->getDefinition('oro_message_queue.job.redelivery_configuration_provider')
+                ->addMethodCall('setConfiguration', [$config['redelivery_max_runtime']]);
+        }
     }
 
     private function configureTestEnvironment(ContainerBuilder $container): void
