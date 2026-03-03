@@ -18,10 +18,11 @@ Feature: User Login Attempts
     Given I login as administrator
     And go to System/User Management/Login Attempts
     Then there are 2 records in grid
-    And I should see following grid:
+    When I sort grid by "Success"
+    Then I should see following grid:
       | Success | Source  | Username   | User     |
-      | Yes     | Default | admin      | John Doe |
       | No      | Default | wrong_user |          |
+      | Yes     | Default | admin      | John Doe |
 
   Scenario: Check users attempts grid "Username" filter
     When I set filter "Username" as is equal to "wrong_user" and press Enter key
@@ -44,13 +45,13 @@ Feature: User Login Attempts
     When I sort grid by "Success"
     Then I should see following grid:
       | Success | Source  | Username   | User     |
-      | No      | Default | wrong_user |          |
       | Yes     | Default | admin      | John Doe |
+      | No      | Default | wrong_user |          |
     When I sort grid by "Success"
     Then I should see following grid:
       | Success | Source  | Username   | User     |
-      | Yes     | Default | admin      | John Doe |
       | No      | Default | wrong_user |          |
+      | Yes     | Default | admin      | John Doe |
 
   Scenario: Sort by Username field
     When I sort grid by "Username"
