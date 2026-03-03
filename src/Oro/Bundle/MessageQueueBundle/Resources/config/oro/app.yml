@@ -37,6 +37,9 @@ oro_message_queue:
     time_before_stale:
         default: 1800
         jobs: ~
+    redelivery_max_runtime:
+        default: -1
+        jobs: ~
     consumer:
         heartbeat_update_period: 15
 

@@ -19,6 +19,9 @@ class JobProcessor
     /** @var JobConfigurationProviderInterface */
     private $jobConfigurationProvider;
 
+    /** @var JobConfigurationProviderInterface */
+    private $redeliveryConfigurationProvider;
+
     /** @var JobManagerInterface */
     private $jobManager;
 
@@ -42,12 +45,28 @@ class JobProcessor
         return $this;
     }
 
+    public function setRedeliveryConfigurationProvider(
+        JobConfigurationProviderInterface $redeliveryConfigurationProvider
+    ): self {
+        $this->redeliveryConfigurationProvider = $redeliveryConfigurationProvider;
+
+        return $this;
+    }
+
     public function getJobConfigurationProvider(): JobConfigurationProviderInterface
     {
         if (!$this->jobConfigurationProvider) {
             return new NullJobConfigurationProvider();
         }
         return $this->jobConfigurationProvider;
+    }
+
+    public function getRedeliveryConfigurationProvider(): JobConfigurationProviderInterface
+    {
+        if (!$this->redeliveryConfigurationProvider) {
+            return new NullJobConfigurationProvider();
+        }
+        return $this->redeliveryConfigurationProvider;
     }
 
     public function findJobById(int $id): ?Job
@@ -253,10 +272,62 @@ class JobProcessor
 
         $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
         if ($timeBeforeStale !== null && $timeBeforeStale !== -1) {
-            return $job->getLastActiveAt() <= new \DateTime('- ' . $timeBeforeStale . ' seconds');
+            if ($job->getLastActiveAt() <= new \DateTime('- ' . $timeBeforeStale . ' seconds')) {
+                return true;
+            }
+        }
+
+        $redeliveryMaxRuntime = $this->getRedeliveryConfigurationProvider()
+            ->getTimeBeforeStaleForJobName($job->getName());
+        if ($redeliveryMaxRuntime !== null && $redeliveryMaxRuntime !== -1) {
+            if ($this->isStuckInRedeliveryLoop($job, $redeliveryMaxRuntime)) {
+                return true;
+            }
         }
 
         return false;
+    }
+
+    private function isStuckInRedeliveryLoop(Job $job, int $maxRuntime): bool
+    {
+        $startedAt = $job->getStartedAt();
+        $lastActiveAt = $job->getLastActiveAt();
+
+        if (!$startedAt || !$lastActiveAt) {
+            return false;
+        }
+
+        if (($lastActiveAt->getTimestamp() - $startedAt->getTimestamp()) < $maxRuntime) {
+            return false;
+        }
+
+        /**
+         * Verifies that all children have reached a terminal state and at least one is stuck in a redelivery loop.
+         *
+         * Expected statuses:
+         *  - SUCCESS - completed normally, skip.
+         *  - FAILED_REDELIVERED - stuck in a redelivery loop, counts as stuck.
+         *  - NEW, RUNNING - still actively processing, not stuck yet.
+         *  - FAILED, CANCELLED, STALE - terminal but not a redelivery loop scenario.
+         *
+         * Any status other than SUCCESS or FAILED_REDELIVERED means the job is not stuck in a redelivery loop and
+         * should not be marked as stale.
+         */
+        $hasFailedRedelivered = false;
+        foreach ($job->getChildJobs() as $child) {
+            $status = $child->getStatus();
+            if ($status === Job::STATUS_SUCCESS) {
+                continue;
+            }
+            if ($status === Job::STATUS_FAILED_REDELIVERED) {
+                $hasFailedRedelivered = true;
+                continue;
+            }
+
+            return false;
+        }
+
+        return $hasFailedRedelivered;
     }
 
     private function hasNotStartedChild(Job $job): bool

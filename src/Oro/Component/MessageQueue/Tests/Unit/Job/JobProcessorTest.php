@@ -563,4 +563,99 @@ class JobProcessorTest extends TestCase
 
         self::assertNull($this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses('job-name', []));
     }
+
+    public function testStaleIfStuckInRedeliveryLoop(): void
+    {
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setStartedAt(new \DateTime('-20 minutes'));
+        $rootJob->setLastActiveAt(new \DateTime());
+
+        $successChild = new Job();
+        $successChild->setStatus(Job::STATUS_SUCCESS);
+        $failedChild = new Job();
+        $failedChild->setStatus(Job::STATUS_FAILED_REDELIVERED);
+        $rootJob->setChildJobs([$successChild, $failedChild]);
+
+        $this->jobRepository->expects($this->once())
+            ->method('findRootJobByJobNameAndStatuses')
+            ->willReturn($rootJob);
+        $this->jobManager->expects($this->once())
+            ->method('saveJobWithLock')
+            ->with($rootJob);
+
+        $jobConfigProvider = $this->createMock(JobConfigurationProviderInterface::class);
+        $jobConfigProvider->expects($this->any())
+            ->method('getTimeBeforeStaleForJobName')
+            ->willReturn(-1);
+        $this->jobProcessor->setJobConfigurationProvider($jobConfigProvider);
+
+        $redeliveryProvider = $this->createMock(JobConfigurationProviderInterface::class);
+        $redeliveryProvider->expects($this->any())
+            ->method('getTimeBeforeStaleForJobName')
+            ->willReturn(600);
+        $this->jobProcessor->setRedeliveryConfigurationProvider($redeliveryProvider);
+
+        self::assertNull($this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses('job-name', []));
+    }
+
+    /**
+     * @dataProvider notStaleRedeliveryDataProvider
+     */
+    public function testNotStaleRedeliveryCheck(
+        string $startedAt,
+        array $childStatuses,
+        int $redeliveryMaxRuntime
+    ): void {
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setStartedAt(new \DateTime($startedAt));
+        $rootJob->setLastActiveAt(new \DateTime());
+
+        $children = [];
+        foreach ($childStatuses as $status) {
+            $child = new Job();
+            $child->setStatus($status);
+            $children[] = $child;
+        }
+        $rootJob->setChildJobs($children);
+
+        $this->jobRepository->expects($this->once())
+            ->method('findRootJobByJobNameAndStatuses')
+            ->willReturn($rootJob);
+
+        $redeliveryProvider = $this->createMock(JobConfigurationProviderInterface::class);
+        $redeliveryProvider->expects($this->any())
+            ->method('getTimeBeforeStaleForJobName')
+            ->willReturn($redeliveryMaxRuntime);
+        $this->jobProcessor->setRedeliveryConfigurationProvider($redeliveryProvider);
+
+        self::assertSame($rootJob, $this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses('job-name', []));
+    }
+
+    public function notStaleRedeliveryDataProvider(): array
+    {
+        return [
+            'redelivery runtime not exceeded' => [
+                '-2 minutes',
+                [Job::STATUS_SUCCESS, Job::STATUS_FAILED_REDELIVERED],
+                600,
+            ],
+            'has running child' => [
+                '-20 minutes',
+                [Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED],
+                600,
+            ],
+            'no failed redelivered children' => [
+                '-20 minutes',
+                [Job::STATUS_SUCCESS, Job::STATUS_SUCCESS],
+                600,
+            ],
+            'redelivery check disabled' => [
+                '-20 minutes',
+                [Job::STATUS_SUCCESS, Job::STATUS_FAILED_REDELIVERED],
+                -1,
+            ],
+        ];
+    }
 }
