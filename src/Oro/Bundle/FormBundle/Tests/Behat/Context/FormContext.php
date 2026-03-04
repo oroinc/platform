@@ -712,7 +712,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues($value);
+            $options = $element->getAllSuggestedValues($this->getSession(), $value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $options);
             }
@@ -769,7 +769,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues($value);
+            $options = $element->getAllSuggestedValues($this->getSession(), $value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertNotContains($optionLabel, $options);
             }

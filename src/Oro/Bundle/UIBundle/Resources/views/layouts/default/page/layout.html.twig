@@ -167,7 +167,14 @@
     }) %}
 
     <div class="skip-to-content">
-        <button {{ block('block_attributes') }}>{{ 'oro.ui.button.skip_to_content'|trans }}</button>
+        <div class="skip-to-content__elements">
+            <button {{ block('block_attributes') }}>{{ 'oro.ui.button.skip_to_content'|trans }}</button>
+            <div>{{ 'oro.ui.button.skip_to_content_arrow_keys'|trans|raw }}</div>
+            {% set help_page_url = oro_accessibility_page_url() %}
+            {% if help_page_url %}
+                <div>{{ 'oro.ui.button.skip_to_content_link'|trans }} <a href="{{ help_page_url }}">{{ oro_accessibility_page_title() ?: 'oro.ui.button.skip_to_content_link_text'|trans }}</a></div>
+            {% endif %}
+        </div>
         <div class="skip-to-content__decorator" aria-hidden="true"></div>
     </div>
 {% endblock %}
