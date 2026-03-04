@@ -265,6 +265,24 @@ JS;
         return $suggestions;
     }
 
+    /**
+     * @param Session $session
+     * @param string $value
+     * @return string[]
+     */
+    public function getAllSuggestedValues(Session $session, $value = '')
+    {
+        $suggestions = array_map(
+            function (NodeElement $element) {
+                return $element->getText();
+            },
+            $this->getAllSuggestions($session, $value)
+        );
+        $this->close();
+
+        return $suggestions;
+    }
+
     public function open()
     {
         $this->openElement();

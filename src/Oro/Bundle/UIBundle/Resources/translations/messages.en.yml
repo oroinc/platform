@@ -154,6 +154,9 @@ oro:
         button:
             copy_to_clipboard.label: 'Copy to Clipboard'
             skip_to_content: 'Skip to Main Content'
+            skip_to_content_arrow_keys: 'Keyboard arrow keys can be used to navigate menus, filters, and datagrids.'
+            skip_to_content_link: 'Learn more in'
+            skip_to_content_link_text: 'Keyboard Navigation'
         collapse:
             more: 'View More'
             less: 'View Less'
