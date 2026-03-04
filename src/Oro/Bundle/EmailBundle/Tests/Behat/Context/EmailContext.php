@@ -181,8 +181,6 @@ class EmailContext extends OroFeatureContext
         $found = $this->spin(function () use ($expectedRows, &$expectedContent, &$sentMessages) {
             $sentMessages = $this->getSentMessages();
 
-            self::assertNotEmpty($sentMessages, 'There are no sent messages');
-
             $found = false;
             foreach ($sentMessages as $message) {
                 foreach ($expectedRows as $expectedContent) {
@@ -203,15 +201,18 @@ class EmailContext extends OroFeatureContext
             return $found;
         });
 
-        self::assertTrue(
-            $found !== null && $found !== false,
-            sprintf(
-                'Sent emails bodies don\'t contain "%s" in "%s". The following messages have been sent: %s',
-                $expectedContent['pattern'],
-                $expectedContent['field'],
-                print_r($this->getSentMessagesData($sentMessages), true)
-            )
-        );
+        if ($found !== true) {
+            self::assertNotEmpty($sentMessages, 'There are no sent messages');
+
+            self::fail(
+                sprintf(
+                    'Sent emails bodies don\'t contain "%s" in "%s". The following messages have been sent: %s',
+                    $expectedContent['pattern'],
+                    $expectedContent['field'],
+                    print_r($this->getSentMessagesData($sentMessages), true)
+                )
+            );
+        }
     }
 
     private function getSentMessagesData(array $messages): array

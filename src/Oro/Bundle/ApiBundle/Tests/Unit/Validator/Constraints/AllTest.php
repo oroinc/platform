@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class AllTest extends TestCase
 {
@@ -18,8 +19,13 @@ class AllTest extends TestCase
 
     public function testRequiredOptions(): void
     {
-        $constraint = new All();
-        self::assertEquals([], $constraint->constraints);
+        $this->expectException(MissingOptionsException::class);
+        new All();
+    }
+
+    public function testGetRequiredOptions(): void
+    {
+        $constraint = new All(new NotNull());
         self::assertEquals(['constraints'], $constraint->getRequiredOptions());
     }
 
