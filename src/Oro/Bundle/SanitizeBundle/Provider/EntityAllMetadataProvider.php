@@ -31,7 +31,15 @@ class EntityAllMetadataProvider
                     continue;
                 }
 
-                array_push($metadataList, ...$em->getMetadataFactory()->getAllMetadata());
+                $existingTables = array_flip(
+                    $em->getConnection()->getSchemaManager()->listTableNames()
+                );
+                foreach ($em->getMetadataFactory()->getAllMetadata() as $metadata) {
+                    $tableName = !empty($metadata->table) ? $metadata->getTableName() : null;
+                    if ($tableName !== null && isset($existingTables[$tableName])) {
+                        $metadataList[] = $metadata;
+                    }
+                }
             }
             $this->metadataList = $metadataList;
         }
