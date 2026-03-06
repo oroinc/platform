@@ -319,6 +319,11 @@ api:
             actions:
                 update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestUniqueKeyIdentifier:
+            fields:
+                name:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
             upsert:
                 add: [['key7'], ['parent', 'key6'], ['children', 'key6']]
             actions:
@@ -444,7 +449,9 @@ api:
                 targetSideOfUnidirectionalManyToMany:
                     data_type: unidirectionalAssociation:uniM2M
                     target_class: Extend\Entity\TestApiE1
-        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner:
+            actions:
+                update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:
             exclude: false # override system wide exclude rule, see Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigExclusionProvider

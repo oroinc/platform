@@ -51,23 +51,23 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getMessage(array $body, string $messageId = ''): MessageInterface
+    private function getMessage(array $body): MessageInterface
     {
         $message = new Message();
         $message->setBody($body);
-        $message->setMessageId($messageId);
+        $message->setMessageId('test_id');
 
         return $message;
     }
 
-    private function getUnlinkedIncludedDataError(string $sectionName, int $itemIndex): BatchError
+    private function getUnlinkedIncludedDataError(int $itemIndex): BatchError
     {
         $error = BatchError::createValidationError(
             Constraint::REQUEST_DATA,
             'The entity should have a relationship with at least one primary entity'
             . ' and this should be explicitly specified in the request'
         );
-        $error->setSource(ErrorSource::createByPointer(sprintf('/%s/%s', $sectionName, $itemIndex)));
+        $error->setSource(ErrorSource::createByPointer(sprintf('/included/%s', $itemIndex)));
 
         return $error;
     }
@@ -89,8 +89,8 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'operationId' => $operationId,
             'entityClass' => 'Test\Entity',
             'requestType' => ['testRequest'],
-            'version'     => '1.1',
-            'fileName'    => $dataFileName
+            'version' => '1.1',
+            'fileName' => $dataFileName
         ]);
 
         $this->includeMapManager->expects(self::once())
@@ -129,8 +129,8 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'operationId' => $operationId,
             'entityClass' => 'Test\Entity',
             'requestType' => ['testRequest'],
-            'version'     => '1.1',
-            'fileName'    => $dataFileName
+            'version' => '1.1',
+            'fileName' => $dataFileName
         ]);
 
         $this->includeMapManager->expects(self::once())
@@ -143,10 +143,49 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 $operationId,
                 $dataFileName,
                 [
-                    $this->getUnlinkedIncludedDataError('included', 3),
-                    $this->getUnlinkedIncludedDataError('included', 4)
+                    $this->getUnlinkedIncludedDataError(3),
+                    $this->getUnlinkedIncludedDataError(4)
                 ]
             );
+        $this->processingHelper->expects(self::exactly(4))
+            ->method('safeDeleteFile')
+            ->withConsecutive(
+                [sprintf('api_%s_info', $operationId)],
+                [sprintf('api_%s_include_index', $operationId)],
+                [sprintf('api_%s_include_index_processed', $operationId)],
+                [sprintf('api_%s_include_index_linked', $operationId)]
+            );
+        $this->processingHelper->expects(self::once())
+            ->method('calculateAggregateTime')
+            ->with(self::isType('float'), 0)
+            ->willReturn($aggregateTime);
+        $this->operationManager->expects(self::once())
+            ->method('incrementAggregateTime')
+            ->with($operationId, $aggregateTime);
+
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+    }
+
+    public function testProcessWhenHasUnlinkedIncludedDataButThisValidationIsDisabled(): void
+    {
+        $operationId = 123;
+        $dataFileName = 'testFile';
+        $aggregateTime = 100;
+        $message = $this->getMessage([
+            'operationId' => $operationId,
+            'entityClass' => 'Test\Entity',
+            'requestType' => ['testRequest'],
+            'version' => '1.1',
+            'fileName' => $dataFileName,
+            'disableNotLinkedIncludedItemsValidation' => true
+        ]);
+
+        $this->includeMapManager->expects(self::never())
+            ->method('getNotLinkedIncludedItemIndexes');
+        $this->operationManager->expects(self::never())
+            ->method('addErrors');
         $this->processingHelper->expects(self::exactly(4))
             ->method('safeDeleteFile')
             ->withConsecutive(

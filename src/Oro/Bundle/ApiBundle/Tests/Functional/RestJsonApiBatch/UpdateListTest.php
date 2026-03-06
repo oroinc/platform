@@ -801,7 +801,14 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             false,
             'save_errors'
         );
-        self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
+        $this->assertResponseValidationError(
+            [
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "save_errors" group.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
 
         $this->getEntityManager()->clear();
         $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
@@ -1508,61 +1515,32 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
     public function testProcessChunkWithValidationErrors(): void
     {
-        $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
-        $departments = $this->createDepartments(['Department 2', 'Department 3']);
-        $data = [
-            'data' => [
-                [
-                    'type'       => $entityType,
-                    'attributes' => ['title' => '']
-                ],
-                [
-                    'meta'       => ['update' => true],
-                    'type'       => $entityType,
-                    'id'         => (string)$departments[0]->getId(),
-                    'attributes' => ['title' => '']
-                ],
-                [
-                    'meta'       => ['update' => true],
-                    'type'       => $entityType,
-                    'id'         => (string)$departments[1]->getId(),
-                    'attributes' => ['title' => 'Updated ' . $departments[1]->getName()]
-                ]
-            ]
-        ];
-        $expectedJobs = [
-            [
-                'summary' => [
-                    'readCount'   => 3,
-                    'writeCount'  => 0,
-                    'errorCount'  => 2,
-                    'createCount' => 0,
-                    'updateCount' => 0
-                ]
-            ],
-            [
-                'extra_chunk' => true,
-                'summary'     => [
-                    'readCount'   => 1,
-                    'writeCount'  => 1,
-                    'errorCount'  => 0,
-                    'createCount' => 0,
-                    'updateCount' => 1
-                ]
-            ]
-        ];
-
         $operationId = $this->processUpdateListAndValidateJobs(
-            $entityClass,
-            $data,
-            $expectedJobs,
-            null
+            TestDepartment::class,
+            $this->getProcessChunkWithValidationErrorsRequestData(),
+            [
+                [
+                    'summary' => [
+                        'readCount' => 3,
+                        'writeCount' => 0,
+                        'errorCount' => 2,
+                        'createCount' => 0,
+                        'updateCount' => 0
+                    ]
+                ],
+                [
+                    'extra_chunk' => true,
+                    'summary' => [
+                        'readCount' => 1,
+                        'writeCount' => 1,
+                        'errorCount' => 0,
+                        'createCount' => 0,
+                        'updateCount' => 1
+                    ]
+                ]
+            ]
         );
 
         $this->assertAsyncOperationRootJobStatus(
@@ -1571,9 +1549,9 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             1.0,
             true,
             [
-                'readCount'   => 3,
-                'writeCount'  => 1,
-                'errorCount'  => 2,
+                'readCount' => 3,
+                'writeCount' => 1,
+                'errorCount' => 2,
                 'createCount' => 0,
                 'updateCount' => 1
             ]
@@ -1607,33 +1585,9 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
 
     public function testTryToProcessChunkWithoutMessageQueueAndWithValidationErrors(): void
     {
-        $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
-        $departments = $this->createDepartments(['Department 2', 'Department 3']);
-        $data = [
-            'data' => [
-                [
-                    'type'       => $entityType,
-                    'attributes' => ['title' => '']
-                ],
-                [
-                    'meta'       => ['update' => true],
-                    'type'       => $entityType,
-                    'id'         => (string)$departments[0]->getId(),
-                    'attributes' => ['title' => '']
-                ],
-                [
-                    'meta'       => ['update' => true],
-                    'type'       => $entityType,
-                    'id'         => (string)$departments[1]->getId(),
-                    'attributes' => ['title' => 'Updated ' . $departments[1]->getName()]
-                ]
-            ]
-        ];
-
         $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
-            $entityClass,
-            $data
+            TestDepartment::class,
+            $this->getProcessChunkWithValidationErrorsRequestData()
         );
 
         $this->getEntityManager()->clear();
@@ -1664,44 +1618,20 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
 
     public function testTryToProcessChunkWithoutMessageQueueAndWithSyncModeAndWithValidationErrors(): void
     {
-        $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
-        $departments = $this->createDepartments(['Department 2', 'Department 3']);
-        $data = [
-            'data' => [
-                [
-                    'type'       => $entityType,
-                    'attributes' => ['title' => '']
-                ],
-                [
-                    'meta'       => ['update' => true],
-                    'type'       => $entityType,
-                    'id'         => (string)$departments[0]->getId(),
-                    'attributes' => ['title' => '']
-                ],
-                [
-                    'meta'       => ['update' => true],
-                    'type'       => $entityType,
-                    'id'         => (string)$departments[1]->getId(),
-                    'attributes' => ['title' => 'Updated ' . $departments[1]->getName()]
-                ]
-            ]
-        ];
-
         $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
-            $entityClass,
-            $data,
+            TestDepartment::class,
+            $this->getProcessChunkWithValidationErrorsRequestData(),
             false
         );
         $this->assertResponseValidationErrors(
             [
                 [
-                    'title'  => 'not blank constraint',
+                    'title' => 'not blank constraint',
                     'detail' => 'This value should not be blank.',
                     'source' => ['pointer' => '/data/0/attributes/title']
                 ],
                 [
-                    'title'  => 'not blank constraint',
+                    'title' => 'not blank constraint',
                     'detail' => 'This value should not be blank.',
                     'source' => ['pointer' => '/data/1/attributes/title']
                 ]
@@ -1735,6 +1665,33 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             )
         ];
         self::assertEquals($expectedErrors, $errors);
+    }
+
+    private function getProcessChunkWithValidationErrorsRequestData(): array
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $departments = $this->createDepartments(['Department 2', 'Department 3']);
+
+        return [
+            'data' => [
+                [
+                    'type' => $entityType,
+                    'attributes' => ['title' => '']
+                ],
+                [
+                    'meta' => ['update' => true],
+                    'type' => $entityType,
+                    'id' => (string)$departments[0]->getId(),
+                    'attributes' => ['title' => '']
+                ],
+                [
+                    'meta' => ['update' => true],
+                    'type' => $entityType,
+                    'id' => (string)$departments[1]->getId(),
+                    'attributes' => ['title' => 'Updated ' . $departments[1]->getName()]
+                ]
+            ]
+        ];
     }
 
     public function testProcessChunkForUpdateEntitiesWithInvalidUpdateFlag(): void

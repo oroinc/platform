@@ -351,6 +351,81 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         );
     }
 
+    public function testProcessWithDuplicateIncludedEntities(): void
+    {
+        $type = 'testType';
+        $id = 'testId';
+        $requestData = [
+            'included' => [
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]],
+                ['type' => $type, 'id' => $id, 'meta' => ['update' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+        $includedEntity = new \stdClass();
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::exactly(2))
+            ->method('findEntity')
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willReturn($includedEntity);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig($config));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::exactly(2))
+            ->method('normalizeValue')
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::exactly(2))
+            ->method('reverseTransform')
+            ->with($id, self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::REQUEST_DATA, 'The item duplicates the item with the index 0')
+                    ->setSource(ErrorSource::createByPointer('/included/1'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessForInvalidUpdateFlag(): void
     {
         $type = 'testType';

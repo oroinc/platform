@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Batch\Handler;
 
 use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
+use Oro\Bundle\ApiBundle\Model\Error;
 
 /**
  * Represents the response of API batch update operation.
@@ -17,6 +18,8 @@ class BatchUpdateResponse
     private BatchAffectedEntities $affectedEntities;
     private bool $hasUnexpectedErrors;
     private ?string $retryReason;
+    /** @var Error[]|null */
+    private ?array $unexpectedErrors;
 
     /**
      * @param array                 $data
@@ -99,5 +102,21 @@ class BatchUpdateResponse
     public function getRetryReason(): ?string
     {
         return $this->retryReason;
+    }
+
+    /**
+     * @return Error[]
+     */
+    public function getUnexpectedErrors(): array
+    {
+        return $this->unexpectedErrors ?? [];
+    }
+
+    /**
+     * @param Error[] $unexpectedErrors
+     */
+    public function setUnexpectedErrors(array $unexpectedErrors): void
+    {
+        $this->unexpectedErrors = $unexpectedErrors;
     }
 }

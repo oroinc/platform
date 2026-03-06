@@ -29,7 +29,8 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
         $fullOptionsSet = array_merge(
             $requiredOptionsSet,
             [
-                'synchronousMode' => true
+                'synchronousMode' => true,
+                'disableNotLinkedIncludedItemsValidation' => true
             ]
         );
 
@@ -88,12 +89,25 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
                     'entityClass' => '',
                     'requestType' => [],
                     'operationId' => 1,
-                    'fileName' => 1,
+                    'fileName' => 'foo.bar',
                     'version' => 'latest',
                     'synchronousMode' => 1
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "synchronousMode" with value 1 is expected to be of type "bool"/'
+            ],
+            'wrong disableNotLinkedIncludedItemsValidation type' => [
+                'body' => [
+                    'entityClass' => '',
+                    'requestType' => [],
+                    'operationId' => 1,
+                    'fileName' => 'foo.bar',
+                    'version' => 'latest',
+                    'disableNotLinkedIncludedItemsValidation' => 1
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' => '/The option "disableNotLinkedIncludedItemsValidation" with value 1 is expected'
+                    . ' to be of type "boolean"/'
             ]
         ];
     }
