@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestUniqueKeyIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -35,7 +36,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         return $this->getReference('business_unit');
     }
 
-    public function testCreateIncludedEntity()
+    public function testCreateIncludedEntity(): void
     {
         $data = [
             'data'     => [
@@ -86,7 +87,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         self::assertEquals($productTypeId, $product->getProductType()->getName());
     }
 
-    public function testUpdateIncludedEntity()
+    public function testUpdateIncludedEntity(): void
     {
         $productType = new TestProductType();
         $productType->setName('TEST_PRODUCT_TYPE_1');
@@ -153,7 +154,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         self::assertEquals($productTypeId, $product->getProductType()->getName());
     }
 
-    public function testCreateNotRelatedIncludedEntity()
+    public function testCreateNotRelatedIncludedEntity(): void
     {
         $data = [
             'data'     => [
@@ -185,7 +186,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         );
     }
 
-    public function testCreateIncludedEntityWithNestedDependency()
+    public function testCreateIncludedEntityWithNestedDependency(): void
     {
         $org = $this->getOrganization();
         $bu = $this->getBusinessUnit();
@@ -260,7 +261,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         $this->assertResponseContains($responseContent, $response);
     }
 
-    public function testCreateIncludedEntityWithInversedDependency()
+    public function testCreateIncludedEntityWithInversedDependency(): void
     {
         $org = $this->getOrganization();
         $bu = $this->getBusinessUnit();
@@ -328,7 +329,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         self::assertSame($userId, $result['included'][0]['relationships']['users']['data'][0]['id']);
     }
 
-    public function testTryToCreateIncludedEntityWhenCreateActionForItIsDisabled()
+    public function testTryToCreateIncludedEntityWhenCreateActionForItIsDisabled(): void
     {
         $this->appendEntityConfig(
             TestProductType::class,
@@ -375,7 +376,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         );
     }
 
-    public function testUpdateIncludedEntityWithInversedDependency()
+    public function testUpdateIncludedEntityWithInversedDependency(): void
     {
         $orderId = $this->getReference('order1')->getId();
         $orderLineItem1Id = $this->getReference('order1_line_item1')->getId();
@@ -445,6 +446,259 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         self::assertSame(
             120.0,
             $this->getEntityManager()->find(TestOrderLineItem::class, $orderLineItem3Id)->getQuantity()
+        );
+    }
+
+    public function testUpdateWithIntersectedRelationships(): void
+    {
+        $data = $this->getUpdateWithIntersectedRelationshipsRequestData();
+
+        $response = $this->patch(
+            ['entity' => $this->getEntityType(TestUniqueKeyIdentifier::class), 'id' => '<toString(@item1->id)>'],
+            $data
+        );
+
+        $expectedData = $data;
+        foreach ($expectedData['included'] as &$item) {
+            unset($item['meta']);
+        }
+        unset($item);
+        $this->assertResponseContains($expectedData, $response);
+
+        $em = $this->getEntityManager(TestUniqueKeyIdentifier::class);
+        self::assertEquals(
+            'Updated Item 1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item1')->id)->name
+        );
+        self::assertEquals(
+            'Updated Item 1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item11')->id)->name
+        );
+        self::assertEquals(
+            'Updated Item 1.1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item111')->id)->name
+        );
+        self::assertEquals(
+            'Updated Item 1.1.1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item1111')->id)->name
+        );
+        self::assertEquals(
+            'Updated Item 1.2',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item12')->id)->name
+        );
+    }
+
+    public function testTryToUpdateWithIntersectedRelationshipsAndPrimaryEntityHasError(): void
+    {
+        $data = $this->getUpdateWithIntersectedRelationshipsRequestData();
+        $data['data']['attributes']['name'] = null;
+
+        $response = $this->patch(
+            ['entity' => $this->getEntityType(TestUniqueKeyIdentifier::class), 'id' => '<toString(@item1->id)>'],
+            $data,
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/name']
+            ],
+            $response
+        );
+
+        $em = $this->getEntityManager(TestUniqueKeyIdentifier::class);
+        self::assertEquals(
+            'Item 1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item1')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item11')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item111')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.1.1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item1111')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.2',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item12')->id)->name
+        );
+    }
+
+    public function testTryToUpdateWithIntersectedRelationshipsAndIncludedEntityHasError(): void
+    {
+        $data = $this->getUpdateWithIntersectedRelationshipsRequestData();
+        $data['included'][0]['attributes']['name'] = null;
+
+        $response = $this->patch(
+            ['entity' => $this->getEntityType(TestUniqueKeyIdentifier::class), 'id' => '<toString(@item1->id)>'],
+            $data,
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/included/0/attributes/name']
+            ],
+            $response
+        );
+
+        $em = $this->getEntityManager(TestUniqueKeyIdentifier::class);
+        self::assertEquals(
+            'Item 1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item1')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item11')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item111')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.1.1.1',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item1111')->id)->name
+        );
+        self::assertEquals(
+            'Item 1.2',
+            $em->find(TestUniqueKeyIdentifier::class, $this->getReference('item12')->id)->name
+        );
+    }
+
+    private function getUpdateWithIntersectedRelationshipsRequestData(): array
+    {
+        $entityType = $this->getEntityType(TestUniqueKeyIdentifier::class);
+        $entity1Id = $this->getReference('item1')->id;
+        $entity11Id = $this->getReference('item11')->id;
+        $entity111Id = $this->getReference('item111')->id;
+        $entity1111Id = $this->getReference('item1111')->id;
+        $entity12Id = $this->getReference('item12')->id;
+
+        return [
+            'data' => [
+                'type' => $entityType,
+                'id' => (string)$entity1Id,
+                'attributes' => ['name' => 'Updated Item 1'],
+                'relationships' => [
+                    'children' => ['data' => [['type' => $entityType, 'id' => (string)$entity11Id]]]
+                ]
+            ],
+            'included' => [
+                [
+                    'type' => $entityType,
+                    'id' => (string)$entity11Id,
+                    'meta' => ['update' => true],
+                    'attributes' => ['name' => 'Updated Item 1.1'],
+                    'relationships' => [
+                        'parent' => ['data' => ['type' => $entityType, 'id' => (string)$entity1Id]],
+                        'children' => ['data' => [['type' => $entityType, 'id' => (string)$entity111Id]]]
+                    ]
+                ],
+                [
+                    'type' => $entityType,
+                    'id' => (string)$entity111Id,
+                    'meta' => ['update' => true],
+                    'attributes' => ['name' => 'Updated Item 1.1.1'],
+                    'relationships' => [
+                        'parent' => ['data' => ['type' => $entityType, 'id' => (string)$entity11Id]],
+                        'children' => ['data' => [['type' => $entityType, 'id' => (string)$entity1111Id]]]
+                    ]
+                ],
+                [
+                    'type' => $entityType,
+                    'id' => (string)$entity1111Id,
+                    'meta' => ['update' => true],
+                    'attributes' => ['name' => 'Updated Item 1.1.1.1'],
+                    'relationships' => [
+                        'parent' => ['data' => ['type' => $entityType, 'id' => (string)$entity111Id]]
+                    ]
+                ],
+                [
+                    'type' => $entityType,
+                    'id' => (string)$entity12Id,
+                    'meta' => ['update' => true],
+                    'attributes' => ['name' => 'Updated Item 1.2'],
+                    'relationships' => [
+                        'parent' => ['data' => ['type' => $entityType, 'id' => (string)$entity1Id]],
+                        'relations' => ['data' => [['type' => $entityType, 'id' => (string)$entity111Id]]]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    public function testTryToUpdateWithDuplicatedIncludeEntities(): void
+    {
+        $owner2Id = $this->getReference('owner2')->id;
+        $target1Id = $this->getReference('target1')->id;
+
+        $data = [
+            'data' => [
+                'type' => 'testapiowners',
+                'id' => (string)$owner2Id,
+                'attributes' => [
+                    'name' => 'Test Owner 2 (updated)'
+                ],
+                'relationships' => [
+                    'target' => [
+                        'data' => ['type' => 'testapitargets', 'id' => (string)$target1Id]
+                    ],
+                    'targets' => [
+                        'data' => [
+                            ['type' => 'testapitargets', 'id' => (string)$target1Id]
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type' => 'testapitargets',
+                    'id' => (string)$target1Id,
+                    'meta' => [
+                        'update' => true
+                    ],
+                    'attributes' => [
+                        'name' => 'Test Target 1 (updated, 1)'
+                    ]
+                ],
+                [
+                    'type' => 'testapitargets',
+                    'id' => (string)$target1Id,
+                    'meta' => [
+                        'update' => true
+                    ],
+                    'attributes' => [
+                        'name' => 'Test Target 1 (updated, 2)'
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->patch(
+            ['entity' => 'testapiowners', 'id' => (string)$owner2Id],
+            $data,
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'request data constraint',
+                'detail' => 'The item duplicates the item with the index 0',
+                'source' => ['pointer' => '/included/1']
+            ],
+            $response
         );
     }
 }

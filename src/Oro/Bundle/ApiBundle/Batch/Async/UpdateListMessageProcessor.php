@@ -276,22 +276,33 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->jobRunner->runUniqueByMessage(
             $message,
             function (JobRunner $jobRunner, Job $job) use ($operationId, $body, $chunkFiles, $delayed) {
-                $chunkFileCount = \count($chunkFiles);
                 $rootJob = $job->getRootJob();
                 $this->saveOperationIdToJob($operationId, $rootJob);
-                $this->createOperationInfoFile($operationId, $chunkFileCount);
-                $this->createFinishJob($body, $rootJob);
-                $chunkJobNameTemplate = $job->getName() . ':chunk:%s';
-                if ($delayed) {
-                    $this->sendMessageToCreateChunkJobs(
-                        $jobRunner,
-                        $job->getRootJob(),
+                $disableNotLinkedIncludedItemsValidation = false;
+                $hasErrors = $this->operationManager->hasErrors($operationId);
+                if ($hasErrors) {
+                    $disableNotLinkedIncludedItemsValidation = true;
+                    $this->processingHelper->safeDeleteChunkFiles(
                         $operationId,
-                        $chunkJobNameTemplate,
-                        $body
+                        $this->fileNameProvider->getChunkFileNameTemplate($operationId)
                     );
                 } else {
-                    $this->createChunkJobs($jobRunner, $chunkJobNameTemplate, $body, $chunkFiles);
+                    $this->createOperationInfoFile($operationId, \count($chunkFiles));
+                }
+                $this->createFinishJob($body, $rootJob, $disableNotLinkedIncludedItemsValidation);
+                if (!$hasErrors) {
+                    $chunkJobNameTemplate = $job->getName() . ':chunk:%s';
+                    if ($delayed) {
+                        $this->sendMessageToCreateChunkJobs(
+                            $jobRunner,
+                            $job->getRootJob(),
+                            $operationId,
+                            $chunkJobNameTemplate,
+                            $body
+                        );
+                    } else {
+                        $this->createChunkJobs($jobRunner, $chunkJobNameTemplate, $body, $chunkFiles);
+                    }
                 }
 
                 return true;
@@ -363,15 +374,16 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         );
     }
 
-    private function createFinishJob(array $body, Job $rootJob): void
+    private function createFinishJob(array $body, Job $rootJob, bool $disableNotLinkedIncludedItemsValidation): void
     {
+        $finishJobBody = array_merge($this->processingHelper->getCommonBody($body), [
+            'fileName' => $body['fileName']
+        ]);
+        if ($disableNotLinkedIncludedItemsValidation) {
+            $finishJobBody['disableNotLinkedIncludedItemsValidation'] = true;
+        }
         $context = $this->dependentJob->createDependentJobContext($rootJob);
-        $context->addDependentJob(
-            UpdateListFinishTopic::getName(),
-            array_merge($this->processingHelper->getCommonBody($body), [
-                'fileName' => $body['fileName']
-            ])
-        );
+        $context->addDependentJob(UpdateListFinishTopic::getName(), $finishJobBody);
         $this->dependentJob->saveDependentJob($context);
     }
 

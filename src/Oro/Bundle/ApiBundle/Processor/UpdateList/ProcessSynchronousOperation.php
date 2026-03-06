@@ -62,18 +62,19 @@ class ProcessSynchronousOperation implements ProcessorInterface
             return;
         }
 
-        $status = $this->waitForAsyncOperationFinished($operationId);
-        if (null === $status) {
+        $waitResult = $this->waitForAsyncOperationFinished($operationId);
+        if (null === $waitResult) {
             // wait timeout exceed
             return;
         }
 
+        [$status, $batchErrors] = $waitResult;
         try {
-            if (AsyncOperation::STATUS_SUCCESS === $status) {
+            if (AsyncOperation::STATUS_SUCCESS === $status && !$batchErrors) {
                 $context->setResult($this->getResultData($context, $operationId));
                 $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
             } else {
-                $this->addErrorsToContext($context, $operationId);
+                $this->addBatchErrorsToContext($context, $batchErrors);
             }
         } finally {
             if ($context->isProcessByMessageQueue()) {
@@ -85,7 +86,10 @@ class ProcessSynchronousOperation implements ProcessorInterface
         }
     }
 
-    private function waitForAsyncOperationFinished(int $operationId): ?string
+    /**
+     * @return array{string, array<int, BatchError>}|null [status, batch errors]
+     */
+    private function waitForAsyncOperationFinished(int $operationId): ?array
     {
         $query = $this->doctrineHelper->createQueryBuilder(AsyncOperation::class, 'e')
             ->select('e.status')
@@ -109,7 +113,7 @@ class ProcessSynchronousOperation implements ProcessorInterface
                 ));
             }
             if (AsyncOperation::STATUS_FAILED === $status || AsyncOperation::STATUS_SUCCESS === $status) {
-                return $status;
+                return [$status, $this->loadBatchErrors($operationId)];
             }
             usleep(300);
         }
@@ -125,6 +129,16 @@ class ProcessSynchronousOperation implements ProcessorInterface
         }
 
         return $rows[0]['status'];
+    }
+
+    private function loadBatchErrors(int $operationId): array
+    {
+        return $this->errorManager->readErrors(
+            $this->fileManager,
+            $operationId,
+            0,
+            $this->errorManager->getTotalErrorCount($this->fileManager, $operationId)
+        );
     }
 
     /**
@@ -296,14 +310,12 @@ class ProcessSynchronousOperation implements ProcessorInterface
         }
     }
 
-    private function addErrorsToContext(UpdateListContext $context, int $operationId): void
+    /**
+     * @param UpdateListContext $context
+     * @param BatchError[]      $batchErrors
+     */
+    private function addBatchErrorsToContext(UpdateListContext $context, array $batchErrors): void
     {
-        $batchErrors = $this->errorManager->readErrors(
-            $this->fileManager,
-            $operationId,
-            0,
-            $this->errorManager->getTotalErrorCount($this->fileManager, $operationId)
-        );
         $entityClass = $context->getClassName();
         foreach ($batchErrors as $batchError) {
             $context->addError($this->createError($batchError, $entityClass));

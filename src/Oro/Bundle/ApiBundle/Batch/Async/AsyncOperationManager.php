@@ -108,6 +108,11 @@ class AsyncOperationManager
         });
     }
 
+    public function hasErrors(int $operationId): bool
+    {
+        return (bool)$this->errorManager->readErrors($this->fileManager, $operationId, 0, 1);
+    }
+
     /**
      * @param int          $operationId
      * @param string       $dataFileName

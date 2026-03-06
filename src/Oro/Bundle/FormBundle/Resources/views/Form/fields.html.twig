@@ -419,9 +419,9 @@
                 data-validation-optional-group-handler="{{ form.vars.attr['data-validation-optional-group-handler'] }}"
             {% endif %}
         {% endif %}
-        {% if widget.vars.valid and
-            widget.parent.vars.validation_ignore_if_not_changed is defined and
-            widget.parent.vars.validation_ignore_if_not_changed %}
+        {% if ('collection' in widget.vars.block_prefixes)
+            ? (widget.vars.validation_ignore_if_not_changed is defined and widget.vars.validation_ignore_if_not_changed)
+            : (widget.vars.valid and widget.parent.vars.validation_ignore_if_not_changed is defined and widget.parent.vars.validation_ignore_if_not_changed) %}
             data-validation-ignore
         {% endif %}
     >

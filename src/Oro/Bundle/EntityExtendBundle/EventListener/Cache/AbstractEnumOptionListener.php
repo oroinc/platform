@@ -89,7 +89,7 @@ abstract class AbstractEnumOptionListener
             self::TRANSLATION_DOMAIN,
             Translation::SCOPE_UI
         );
-        $this->translationManager->invalidateCache($locale);
+        // Cache invalidation is handled by TranslationManager::flush() at the end of postFlush()
     }
 
     protected function deleteEnumOptionTranslation(object $entity): void
@@ -108,7 +108,7 @@ abstract class AbstractEnumOptionListener
             $entityManager->remove($translation);
         }
         $this->translationManager->removeTranslationKey($key, self::TRANSLATION_DOMAIN);
-        $this->translationManager->invalidateCache($locale);
+        // Cache invalidation is handled by TranslationManager::flush() at the end of postFlush()
     }
 
     abstract protected function invalidateCache(object $entity);

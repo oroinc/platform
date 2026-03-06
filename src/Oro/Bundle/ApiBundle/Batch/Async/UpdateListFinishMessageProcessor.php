@@ -52,7 +52,9 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
         $messageBody = $message->getBody();
 
         $operationId = $messageBody['operationId'];
-        $this->handleNotProcessedIncludedItems($operationId, $messageBody['fileName']);
+        if (!($messageBody['disableNotLinkedIncludedItemsValidation'] ?? false)) {
+            $this->handleNotLinkedIncludedItems($operationId, $messageBody['fileName']);
+        }
         $this->processingHelper->safeDeleteFile(
             $this->fileNameProvider->getInfoFileName($operationId)
         );
@@ -74,7 +76,7 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
         return self::ACK;
     }
 
-    private function handleNotProcessedIncludedItems(int $operationId, string $dataFileName): void
+    private function handleNotLinkedIncludedItems(int $operationId, string $dataFileName): void
     {
         $notLinkedIncludedItemIndexes = $this->includeMapManager->getNotLinkedIncludedItemIndexes(
             $this->fileManager,
@@ -92,7 +94,7 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
                     'The entity should have a relationship with at least one primary entity'
                     . ' and this should be explicitly specified in the request'
                 );
-                $error->setSource(ErrorSource::createByPointer(sprintf('/%s/%s', $sectionName, $itemIndex)));
+                $error->setSource(ErrorSource::createByPointer(\sprintf('/%s/%s', $sectionName, $itemIndex)));
                 $errors[] = $error;
             }
         }

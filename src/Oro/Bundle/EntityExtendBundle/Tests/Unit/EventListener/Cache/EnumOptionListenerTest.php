@@ -134,9 +134,8 @@ class EnumOptionListenerTest extends TestCase
                 'messages',
                 Translation::SCOPE_UI
             );
-        $this->translationManager->expects(self::once())
-            ->method('invalidateCache')
-            ->with('fr');
+        $this->translationManager->expects(self::never())
+            ->method('invalidateCache');
         $this->translationManager->expects(self::once())
             ->method('flush');
 

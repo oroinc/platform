@@ -43,6 +43,7 @@ class BatchUpdateHandler
             $context->getSummary(),
             $context->getAffectedEntities(),
             $context->hasUnexpectedErrors(),
+            $context->getErrors(),
             $context->getRetryReason()
         );
     }

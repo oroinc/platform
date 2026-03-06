@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Batch\Handler;
 
 use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
+use Oro\Bundle\ApiBundle\Model\Error;
 
 /**
  * Represents the response of API batch update operation.
@@ -16,6 +17,8 @@ class BatchUpdateResponse
     private BatchSummary $summary;
     private BatchAffectedEntities $affectedEntities;
     private bool $hasUnexpectedErrors;
+    /** @var Error[]|null */
+    private ?array $unexpectedErrors;
     private ?string $retryReason;
 
     /**
@@ -24,6 +27,7 @@ class BatchUpdateResponse
      * @param BatchSummary          $summary
      * @param BatchAffectedEntities $affectedEntities
      * @param bool                  $hasUnexpectedErrors
+     * @param Error[]|null          $unexpectedErrors
      * @param string|null           $retryReason
      */
     public function __construct(
@@ -32,6 +36,7 @@ class BatchUpdateResponse
         BatchSummary $summary,
         BatchAffectedEntities $affectedEntities,
         bool $hasUnexpectedErrors,
+        ?array $unexpectedErrors = null,
         ?string $retryReason = null
     ) {
         $this->data = $data;
@@ -39,6 +44,7 @@ class BatchUpdateResponse
         $this->summary = $summary;
         $this->affectedEntities = $affectedEntities;
         $this->hasUnexpectedErrors = $hasUnexpectedErrors;
+        $this->unexpectedErrors = $unexpectedErrors;
         $this->retryReason = $retryReason;
     }
 
@@ -83,6 +89,16 @@ class BatchUpdateResponse
     public function hasUnexpectedErrors(): bool
     {
         return $this->hasUnexpectedErrors;
+    }
+
+    /**
+     * Gets a list of unexpected errors occurred when processing this batch operation.
+     *
+     * @return Error[]
+     */
+    public function getUnexpectedErrors(): array
+    {
+        return $this->unexpectedErrors ?? [];
     }
 
     /**
