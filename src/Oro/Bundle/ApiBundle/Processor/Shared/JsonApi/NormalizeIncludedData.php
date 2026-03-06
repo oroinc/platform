@@ -282,12 +282,23 @@ class NormalizeIncludedData implements ProcessorInterface
             }
         }
         if (null !== $entity) {
-            $includedEntities->add(
-                $entity,
-                $entityClass,
-                $entityIncludeId,
-                new IncludedEntityData($pointer, $index, $isExistingEntity, $targetAction)
-            );
+            if ($includedEntities->contains($entityClass, $entityIncludeId)) {
+                $this->addValidationError(
+                    Constraint::REQUEST_DATA,
+                    $pointer,
+                    \sprintf(
+                        'The item duplicates the item with the index %s',
+                        $includedEntities->getData($includedEntities->get($entityClass, $entityIncludeId))->getIndex()
+                    )
+                );
+            } else {
+                $includedEntities->add(
+                    $entity,
+                    $entityClass,
+                    $entityIncludeId,
+                    new IncludedEntityData($pointer, $index, $isExistingEntity, $targetAction)
+                );
+            }
         }
     }
 

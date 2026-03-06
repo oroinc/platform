@@ -342,7 +342,7 @@ class TestEntitiesMigration implements
         $table->addColumn('key5', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('key6', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('key7', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name', 'string', ['notnull' => true, 'length' => 255]);
         $table->addColumn('parent_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['key5'], 'test_api_unique_key5_idx');
@@ -368,6 +368,15 @@ class TestEntitiesMigration implements
         $tableChildren->addIndex(['child_id']);
         $tableChildren->addForeignKeyConstraint($table, ['parent_id'], ['id']);
         $tableChildren->addForeignKeyConstraint($table, ['child_id'], ['id']);
+
+        $tableRelations = $schema->createTable('test_api_unique_key_id_relations');
+        $tableRelations->addColumn('owner_id', 'integer');
+        $tableRelations->addColumn('relation_id', 'integer');
+        $tableRelations->setPrimaryKey(['owner_id', 'relation_id']);
+        $tableRelations->addIndex(['owner_id']);
+        $tableRelations->addIndex(['relation_id']);
+        $tableRelations->addForeignKeyConstraint($table, ['owner_id'], ['id']);
+        $tableRelations->addForeignKeyConstraint($table, ['relation_id'], ['id']);
     }
 
     /**

@@ -26,5 +26,9 @@ class UpdateListFinishTopic extends AbstractUpdateListTopic
         $resolver
             ->setRequired('fileName')
             ->setAllowedTypes('fileName', 'string');
+
+        $resolver
+            ->setDefined('disableNotLinkedIncludedItemsValidation')
+            ->setAllowedTypes('disableNotLinkedIncludedItemsValidation', 'boolean');
     }
 }

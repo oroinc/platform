@@ -37,7 +37,7 @@ class BatchUpdateHandler
         $this->process($context);
         $this->stepExecutor->executeStep(ApiActionGroup::SAVE_ERRORS, $context, false);
 
-        return new BatchUpdateResponse(
+        $response = new BatchUpdateResponse(
             $context->getResult() ?? [],
             $context->getProcessedItemStatuses() ?? [],
             $context->getSummary(),
@@ -45,6 +45,9 @@ class BatchUpdateHandler
             $context->hasUnexpectedErrors(),
             $context->getRetryReason()
         );
+        $response->setUnexpectedErrors($context->getErrors());
+
+        return $response;
     }
 
     private function process(BatchUpdateContext $context): void

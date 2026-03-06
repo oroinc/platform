@@ -53,7 +53,7 @@ class TestUniqueKeyIdentifier implements TestFrameworkEntityInterface
     #[ORM\Column(name: 'key7', type: Types::STRING, nullable: true)]
     public ?string $key7 = null;
 
-    #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
+    #[ORM\Column(name: 'name', type: Types::STRING, nullable: false)]
     public ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: TestUniqueKeyIdentifier::class)]
@@ -69,6 +69,15 @@ class TestUniqueKeyIdentifier implements TestFrameworkEntityInterface
     #[ORM\InverseJoinColumn(name: 'child_id', referencedColumnName: 'id')]
     protected ?Collection $children = null;
 
+    /**
+     * @var Collection<int, TestUniqueKeyIdentifier>
+     */
+    #[ORM\ManyToMany(targetEntity: TestUniqueKeyIdentifier::class)]
+    #[ORM\JoinTable(name: 'test_api_unique_key_id_relations')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'relation_id', referencedColumnName: 'id')]
+    protected ?Collection $relations = null;
+
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     protected ?OrganizationInterface $organization = null;
@@ -76,6 +85,7 @@ class TestUniqueKeyIdentifier implements TestFrameworkEntityInterface
     public function __construct()
     {
         $this->children = new ArrayCollection();
+        $this->relations = new ArrayCollection();
     }
 
     /**
@@ -110,6 +120,24 @@ class TestUniqueKeyIdentifier implements TestFrameworkEntityInterface
     public function removeChild(TestUniqueKeyIdentifier $item)
     {
         $this->children->removeElement($item);
+    }
+
+    /**
+     * @return Collection<int, TestUniqueKeyIdentifier>
+     */
+    public function getRelations()
+    {
+        return $this->relations;
+    }
+
+    public function addRelation(TestUniqueKeyIdentifier $item)
+    {
+        $this->relations->add($item);
+    }
+
+    public function removeRelation(TestUniqueKeyIdentifier $item)
+    {
+        $this->relations->removeElement($item);
     }
 
     public function getOrganization(): ?Organization

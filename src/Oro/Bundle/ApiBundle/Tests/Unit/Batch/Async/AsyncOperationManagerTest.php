@@ -488,6 +488,30 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->incrementAggregateTime($operationId, $aggregateTime);
     }
 
+    public function testHasErrorsWhenNoErrors(): void
+    {
+        $operationId = 123;
+
+        $this->errorManager->expects(self::once())
+            ->method('readErrors')
+            ->with(self::identicalTo($this->fileManager), $operationId, 0, 1)
+            ->willReturn([]);
+
+        self::assertFalse($this->asyncOperationManager->hasErrors($operationId));
+    }
+
+    public function testHasErrorsWhenErrorsExist(): void
+    {
+        $operationId = 123;
+
+        $this->errorManager->expects(self::once())
+            ->method('readErrors')
+            ->with(self::identicalTo($this->fileManager), $operationId, 0, 1)
+            ->willReturn([BatchError::create('some error')]);
+
+        self::assertTrue($this->asyncOperationManager->hasErrors($operationId));
+    }
+
     public function testAddErrors()
     {
         $operationId = 123;
