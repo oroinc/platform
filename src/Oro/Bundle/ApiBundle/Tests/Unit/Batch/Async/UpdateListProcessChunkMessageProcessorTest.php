@@ -990,6 +990,7 @@ class UpdateListProcessChunkMessageProcessorTest extends TestCase
                 $this->createBatchSummaryFromArray($summaryData),
                 new BatchAffectedEntities(),
                 false,
+                null,
                 'test retry reason'
             ));
 

@@ -16,3 +16,66 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem:
         order: '@order1'
         product: '@product<current()>'
         quantity: 10
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget:
+    target{1..2}:
+        name: 'Test Target <current()>'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner:
+    owner1:
+        name: 'Test Owner 1'
+        target: '@target1'
+        targets: ['@target1', '@target2']
+    owner2:
+        name: 'Test Owner 2'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestUniqueKeyIdentifier:
+    item1:
+        key1: 'item 1'
+        key2: 1
+        key3: 'item 1'
+        key4: 1
+        key5: 'item 1'
+        name: 'Item 1'
+        children: ['@item11']
+        organization: '@organization'
+    item11:
+        key1: 'item 11'
+        key2: 11
+        key3: 'item 11'
+        key4: 11
+        key5: 'item 11'
+        name: 'Item 1.1'
+        parent: '@item1'
+        children: ['@item111']
+        relations: ['@item11']
+        organization: '@organization'
+    item111:
+        key1: 'item 111'
+        key2: 111
+        key3: 'item 111'
+        key4: 111
+        key5: 'item 111'
+        name: 'Item 1.1.1'
+        parent: '@item11'
+        children: ['@item1111']
+        organization: '@organization'
+    item1111:
+        key1: 'item 1111'
+        key2: 1111
+        key3: 'item 1111'
+        key4: 1111
+        key5: 'item 1111'
+        name: 'Item 1.1.1.1'
+        parent: '@item111'
+        organization: '@organization'
+    item12:
+        key1: 'item 12'
+        key2: 12
+        key3: 'item 12'
+        key4: 12
+        key5: 'item 12'
+        name: 'Item 1.2'
+        parent: '@item1'
+        relations: ['@item111']
+        organization: '@organization'

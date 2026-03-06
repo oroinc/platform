@@ -91,8 +91,7 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
                 $startTimestamp,
                 $chunkFile,
                 $operationId,
-                $context->getVersion(),
-                $context->getRequestType(),
+                $context,
                 $context->getClassName(),
                 $dataFileName
             );
@@ -223,19 +222,21 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function processChunkFile(
         float $startTimestamp,
         ChunkFile $chunkFile,
         int $operationId,
-        string $version,
-        RequestType $requestType,
+        UpdateListContext $context,
         string $entityClass,
         string $dataFileName,
         int $chunkCount = 1
     ): void {
         $request = new BatchUpdateRequest(
-            $version,
-            $requestType,
+            $context->getVersion(),
+            $context->getRequestType(),
             $operationId,
             [$entityClass],
             $chunkFile,
@@ -280,13 +281,16 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
                         $chunksToRetry,
                         $chunkFile,
                         $operationId,
-                        $version,
-                        $requestType,
+                        $context,
                         $entityClass,
                         $dataFileName,
                         $chunkCount
                     );
                 }
+            }
+        } elseif ($context->isSynchronousMode()) {
+            foreach ($response->getUnexpectedErrors() as $error) {
+                $context->addError($error);
             }
         }
     }
@@ -296,13 +300,12 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
         array $chunksToRetry,
         ChunkFile $parentChunkFile,
         int $operationId,
-        string $version,
-        RequestType $requestType,
+        UpdateListContext $context,
         string $entityClass,
         string $dataFileName,
         int $chunkCount
     ): void {
-        $dataEncoder = $this->dataEncoderRegistry->getEncoder($requestType);
+        $dataEncoder = $this->dataEncoderRegistry->getEncoder($context->getRequestType());
         if (null === $dataEncoder) {
             return;
         }
@@ -320,8 +323,7 @@ class ProcessWithoutMessageQueue implements ProcessorInterface
                 $startTimestamp,
                 $chunkFile,
                 $operationId,
-                $version,
-                $requestType,
+                $context,
                 $entityClass,
                 $dataFileName,
                 $chunkCount
