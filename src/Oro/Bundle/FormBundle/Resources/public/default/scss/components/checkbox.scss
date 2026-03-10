@@ -160,6 +160,7 @@
         inset-inline-start: $checkbox-switch-before-inset-inline-start;
         opacity: $checkbox-switch-before-opacity;
         transition: $checkbox-switch-before-transition;
+        top: $checkbox-switch-before-top;
     }
 
     &:hover {
