@@ -77,6 +77,7 @@ $checkbox-switch-before-inset-block-start: 0 !default;
 $checkbox-switch-before-inset-inline-start: 0 !default;
 $checkbox-switch-before-opacity: initial !default;
 $checkbox-switch-before-transition: inset-inline-start .15s ease-in-out !default;
+$checkbox-switch-before-top: 1px !default;
 
 $checkbox-switch-hover-background-color: get-var-color('neutral', 'grey3') !default;
 $checkbox-switch-hover-border-color: get-var-color('neutral', 'grey3') !default;
