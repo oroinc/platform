@@ -74,7 +74,7 @@ class SetPasswordHandler
             $this->submitPostPutRequest($this->form, $request);
             if ($this->form->isValid()) {
                 $entity->setPlainPassword($this->form->get('password')->getData());
-                $entity->setPasswordChangedAt(new \DateTime());
+                $entity->setPasswordChangedAt(new \DateTime('now', new \DateTimeZone('UTC')));
 
                 $errors = $this->validator->validate($entity, null, ['security']);
                 if (count($errors) > 0) {

@@ -43,7 +43,7 @@ class ChangePasswordType extends AbstractType
                 'currentPassword',
                 PasswordType::class,
                 [
-                    'required' => false,
+                    'required' => $options['required'],
                     'label' => $options['current_password_label'],
                     'constraints' => [
                         new UserPassword()
@@ -55,7 +55,7 @@ class ChangePasswordType extends AbstractType
                 'plainPassword',
                 RepeatedType::class,
                 [
-                    'required' => false,
+                    'required' => $options['required'],
                     'type' => PasswordType::class,
                     'invalid_message' => $options['plain_password_invalid_message'],
                     'options' => [
@@ -93,6 +93,7 @@ class ChangePasswordType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                'required' => false,
                 'inherit_data' => true,
                 'current_password_label' => 'oro.user.password.label',
                 'plain_password_invalid_message' => 'oro.user.message.password_mismatch',

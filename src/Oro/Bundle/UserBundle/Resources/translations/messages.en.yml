@@ -444,7 +444,9 @@ oro:
                         including you and other administrators. Make sure at least one external authentication method
                         is properly configured, or you may lose access to the system.
             fields:
-                password_min_length.label: Minimal password length
+                password_min_length:
+                    label: Minimal password length
+                    hint: At least {{ length }} characters
                 password_numbers.label: Require a number
                 password_lower_case.label: Require a lower case letter
                 password_upper_case.label: Require an upper case letter

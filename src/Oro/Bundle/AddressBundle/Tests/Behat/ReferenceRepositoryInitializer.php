@@ -20,6 +20,7 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
             'samoa' => ['iso2Code' => 'AS'],
             'united_states' => ['iso2Code' => 'US'],
             'monaco' => ['iso2Code' => 'MC'],
+            'anguilla' => ['iso2Code' => 'AI'],
         ],
         Region::class => [
             'berlin' => ['combinedCode' => 'DE-BE'],
