@@ -63,6 +63,7 @@ class ChangePasswordSubscriber extends UserSubscriber
 
         if ($this->isCurrentUser($user)) {
             $user->setPlainPassword($plainPassword->getData());
+            $user->setPasswordChangedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         }
     }
 }

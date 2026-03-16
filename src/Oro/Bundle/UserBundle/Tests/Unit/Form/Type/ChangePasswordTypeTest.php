@@ -6,7 +6,7 @@ use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Form\Test\FormBuilderInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -34,10 +34,10 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = [
+            'required' => false,
             'current_password_label' => 'label',
             'plain_password_invalid_message' => 'label',
             'first_options_label' => 'label',
-            'first_options_tooltip' => 'label',
             'second_options_label' => 'label'
         ];
 
