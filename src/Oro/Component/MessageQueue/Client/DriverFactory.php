@@ -17,12 +17,17 @@ class DriverFactory implements DriverFactoryInterface
     /** @var array [connection class => driver class, ...] */
     private $connectionToDriverMap;
 
+    /** @var array [driver class => [extra constructor args, ...], ...] */
+    private array $driverArgumentsMap;
+
     /**
      * @param array $connectionToDriverMap [connection class => driver class, ...]
+     * @param array $driverArgumentsMap    [driver class => [extra constructor args, ...], ...]
      */
-    public function __construct(array $connectionToDriverMap)
+    public function __construct(array $connectionToDriverMap, array $driverArgumentsMap = [])
     {
         $this->connectionToDriverMap = $connectionToDriverMap;
+        $this->driverArgumentsMap = $driverArgumentsMap;
     }
 
     #[\Override]
@@ -30,16 +35,17 @@ class DriverFactory implements DriverFactoryInterface
     {
         $connectionClass = get_class($connection);
 
-        if (array_key_exists($connectionClass, $this->connectionToDriverMap)) {
-            $driverClass = $this->connectionToDriverMap[$connectionClass];
-
-            return new $driverClass($connection->createSession(), $config);
-        } else {
+        if (!array_key_exists($connectionClass, $this->connectionToDriverMap)) {
             throw new \LogicException(sprintf(
                 'Unexpected connection instance: "%s", supported "%s"',
                 get_class($connection),
                 implode('", "', array_keys($this->connectionToDriverMap))
             ));
         }
+
+        $driverClass = $this->connectionToDriverMap[$connectionClass];
+        $driverArguments = $this->driverArgumentsMap[$driverClass] ?? [];
+
+        return new $driverClass($connection->createSession(), $config, ...$driverArguments);
     }
 }
