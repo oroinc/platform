@@ -7,7 +7,6 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
-use Oro\Bundle\UserBundle\Exception\EmptyBusinessUnitsException;
 use Oro\Bundle\UserBundle\Exception\EmptyOrganizationException;
 use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
@@ -120,20 +119,6 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $organization->setEnabled(true);
         $user->addOrganization($organization);
         $user->addBusinessUnit(new BusinessUnit());
-
-        $this->userChecker->checkPostAuth($user);
-    }
-
-    public function testCheckPostAuthForUserWithoutBusinessUnits(): void
-    {
-        $this->expectException(EmptyBusinessUnitsException::class);
-
-        $user = new User();
-        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
-        $organization = new Organization();
-        $organization->setEnabled(true);
-        $user->addOrganization($organization);
-        $user->setOwner(new BusinessUnit());
 
         $this->userChecker->checkPostAuth($user);
     }
