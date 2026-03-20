@@ -15,7 +15,7 @@ class OroSegmentBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_11';
+        return 'v1_12';
     }
 
     #[\Override]
