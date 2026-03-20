@@ -11,7 +11,7 @@ class OroReportBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v2_4';
+        return 'v2_5';
     }
 
     #[\Override]
