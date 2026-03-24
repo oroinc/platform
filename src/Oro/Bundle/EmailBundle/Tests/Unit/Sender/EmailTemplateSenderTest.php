@@ -35,8 +35,57 @@ class EmailTemplateSenderTest extends TestCase
     public function testSendEmailTemplateWhenException(): void
     {
         $from = From::emailAddress('no-reply@example.com');
-        $recipient = (new UserStub(42))
-            ->setEmail('recipient@example.com');
+        $recipient = (new UserStub(42))->setEmail('recipient@example.com');
+        $templateName = 'sample_template';
+        $templateParams = ['sample_key' => 'sample_value'];
+
+        $emailModel = new EmailModel();
+        $this->emailModelFromEmailTemplateFactory->expects(self::once())
+            ->method('createEmailModel')
+            ->with($from, $recipient, $templateName, $templateParams)
+            ->willReturn($emailModel);
+
+        $this->emailModelSender->expects(self::once())
+            ->method('send')
+            ->with($emailModel, $emailModel->getOrigin())
+            ->willThrowException(new \Exception('sample error'));
+
+        $this->loggerMock->expects(self::once())->method('error');
+
+        self::assertNull($this->sender->sendEmailTemplate($from, $recipient, $templateName, $templateParams));
+    }
+
+    public function testSendEmailTemplate(): void
+    {
+        $from = From::emailAddress('no-reply@example.com');
+        $recipient = (new UserStub(42))->setEmail('recipient@example.com');
+        $templateName = 'sample_template';
+        $templateParams = ['sample_key' => 'sample_value'];
+
+        $emailModel = new EmailModel();
+        $this->emailModelFromEmailTemplateFactory->expects(self::once())
+            ->method('createEmailModel')
+            ->with($from, $recipient, $templateName, $templateParams)
+            ->willReturn($emailModel);
+
+        $emailUser = $this->createMock(EmailUser::class);
+        $this->emailModelSender->expects(self::once())
+            ->method('send')
+            ->with($emailModel, $emailModel->getOrigin())
+            ->willReturn($emailUser);
+
+        $this->assertLoggerNotCalled();
+
+        self::assertSame(
+            $emailUser,
+            $this->sender->sendEmailTemplate($from, $recipient, $templateName, $templateParams)
+        );
+    }
+
+    public function testSendEmailTemplateOrFailWhenException(): void
+    {
+        $from = From::emailAddress('no-reply@example.com');
+        $recipient = (new UserStub(42))->setEmail('recipient@example.com');
         $templateName = 'sample_template';
         $templateParams = ['sample_key' => 'sample_value'];
 
@@ -66,14 +115,15 @@ class EmailTemplateSenderTest extends TestCase
                 ]
             );
 
-        $this->sender->sendEmailTemplate($from, $recipient, $templateName, $templateParams);
+        $this->expectExceptionObject($exception);
+
+        $this->sender->sendEmailTemplateOrFail($from, $recipient, $templateName, $templateParams);
     }
 
-    public function testSendEmailTemplate(): void
+    public function testSendEmailTemplateOrFail(): void
     {
         $from = From::emailAddress('no-reply@example.com');
-        $recipient = (new UserStub(42))
-            ->setEmail('recipient@example.com');
+        $recipient = (new UserStub(42))->setEmail('recipient@example.com');
         $templateName = 'sample_template';
         $templateParams = ['sample_key' => 'sample_value'];
 
@@ -93,7 +143,7 @@ class EmailTemplateSenderTest extends TestCase
 
         self::assertSame(
             $emailUser,
-            $this->sender->sendEmailTemplate($from, $recipient, $templateName, $templateParams)
+            $this->sender->sendEmailTemplateOrFail($from, $recipient, $templateName, $templateParams)
         );
     }
 }

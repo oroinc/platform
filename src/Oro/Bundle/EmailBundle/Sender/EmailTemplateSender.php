@@ -54,6 +54,36 @@ class EmailTemplateSender implements LoggerAwareInterface
         array $templateContext = []
     ): ?EmailUser {
         try {
+            return $this->sendEmailTemplateOrFail($from, $recipients, $templateName, $templateParams, $templateContext);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Same as {@see sendEmailTemplate()} but re-throws the exception after logging it, so the caller can handle it.
+     *
+     * @param From $from
+     * @param EmailHolderInterface|array<EmailHolderInterface> $recipients
+     * @param EmailTemplateCriteria|string $templateName
+     * @param array $templateParams
+     * @param array $templateContext Email template context. Example:
+     *  [
+     *      'localization' => Localization|int $localization,
+     *      // ... other context parameters supported by the existing candidates names
+     *      // providers {@see EmailTemplateCandidatesProviderInterface}
+     *  ]
+     *
+     * @throws \Throwable
+     */
+    public function sendEmailTemplateOrFail(
+        From $from,
+        EmailHolderInterface|array $recipients,
+        EmailTemplateCriteria|string $templateName,
+        array $templateParams = [],
+        array $templateContext = []
+    ): EmailUser {
+        try {
             $emailModel = $this->emailModelFromEmailTemplateFactory
                 ->createEmailModel($from, $recipients, $templateName, $templateParams, $templateContext);
 
@@ -74,8 +104,8 @@ class EmailTemplateSender implements LoggerAwareInterface
                     'message' => $exception->getMessage(),
                 ]
             );
-        }
 
-        return null;
+            throw $exception;
+        }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -259,6 +261,47 @@ class EmailTemplateRepositoryTest extends WebTestCase
                 'expectedEmailTemplates' => []
             ]
         ];
+    }
+
+    public function testGetDistinctNamesForEntityReturnsNamesForSpecificEntity(): void
+    {
+        $this->loadFixtures([LoadEmailTemplateData::class]);
+
+        /** @var User $owner */
+        $owner = $this->getReference(LoadEmailTemplateData::OWNER_USER_REFERENCE);
+
+        $result = $this->getRepository()->getDistinctNamesForEntity(
+            LoadEmailTemplateData::ENTITY_NAME,
+            $owner->getOrganization()
+        );
+
+        self::assertSame(['no_system', 'not_system_not_visible', 'system', 'system_not_visible'], $result);
+    }
+
+    public function testGetDistinctNamesForEntityWithNullReturnsNamesWithoutEntity(): void
+    {
+        $this->loadFixtures([LoadEmailTemplateData::class]);
+
+        /** @var User $owner */
+        $owner = $this->getReference(LoadEmailTemplateData::OWNER_USER_REFERENCE);
+
+        $result = $this->getRepository()->getDistinctNamesForEntity(null, $owner->getOrganization());
+
+        // Fixture templates with no entity name should be included
+        self::assertContains('no_entity_name', $result);
+        self::assertContains('no_system_no_entity', $result);
+        self::assertContains('system_fail_to_compile', $result);
+
+        // Entity-specific fixture templates should NOT be included
+        self::assertNotContains('no_system', $result);
+        self::assertNotContains('system', $result);
+        self::assertNotContains('system_not_visible', $result);
+        self::assertNotContains('not_system_not_visible', $result);
+
+        // Results should be sorted alphabetically
+        $sortedResult = $result;
+        \sort($sortedResult);
+        self::assertSame($sortedResult, $result);
     }
 
     public function testGetDistinctByEntityNameQueryBuilderWithoutFilters(): void
