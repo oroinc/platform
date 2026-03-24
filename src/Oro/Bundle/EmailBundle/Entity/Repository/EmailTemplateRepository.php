@@ -111,6 +111,30 @@ class EmailTemplateRepository extends EntityRepository
     }
 
     /**
+     * Returns distinct email template names for the given entity name and organization, sorted alphabetically.
+     *
+     * @return string[]
+     */
+    public function getDistinctNamesForEntity(?string $entityName, Organization $organization): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('e.name')
+            ->distinct()
+            ->andWhere('e.organization = :organization')
+            ->setParameter('organization', $organization)
+            ->orderBy('e.name', 'ASC');
+
+        if ($entityName !== null) {
+            $qb->andWhere('e.entityName = :entityName')
+                ->setParameter('entityName', $entityName);
+        } else {
+            $qb->andWhere('e.entityName IS NULL');
+        }
+
+        return \array_column($qb->getQuery()->getArrayResult(), 'name');
+    }
+
+    /**
      * Return a query builder which can be used to get names of entities
      * which have at least one email template
      *

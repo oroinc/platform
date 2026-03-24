@@ -56,6 +56,7 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
             ],
             $response
         );
+        self::assertFalse($response->headers->has('Location'));
     }
 
     public function testPatch()

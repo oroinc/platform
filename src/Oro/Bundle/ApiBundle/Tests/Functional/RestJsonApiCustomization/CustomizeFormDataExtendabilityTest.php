@@ -469,6 +469,7 @@ class CustomizeFormDataExtendabilityTest extends RestJsonApiUpdateListTestCase
         );
         self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
         self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        self::assertTrue($response->headers->has('Location'));
 
         self::assertEquals(
             [

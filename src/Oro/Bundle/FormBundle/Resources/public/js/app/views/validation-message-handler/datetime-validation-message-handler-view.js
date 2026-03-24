@@ -38,8 +38,10 @@ const DateTimeValidationMessageHandlerView = AbstractValidationMessageHandlerVie
 
     isDatepickerActive: function() {
         const $input = $(this.el).parent().find('.datepicker-input');
+        const datepicker = $input.data('datepicker');
 
-        return $input.data('datepicker').dpDiv.is(':visible') && $input.is($.datepicker._lastInput) &&
+        return datepicker && datepicker.dpDiv && datepicker.dpDiv.is(':visible') &&
+            $input.is($.datepicker._lastInput) &&
             $input.hasClass('ui-datepicker-dialog-is-below');
     },
 

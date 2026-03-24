@@ -122,21 +122,6 @@ services:
     # finalize
     #
 
-    oro_api.create.rest.set_location_header:
-        class: Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader
-        arguments:
-            - '@oro_api.rest.routes_registry'
-            - '@router'
-            - '@oro_api.value_normalizer'
-            - '@oro_api.entity_id_transformer_registry'
-        tags:
-            - { name: oro.api.processor, action: create, group: finalize, requestType: rest, priority: -10 }
-
     #
     # normalize_result
     #
-
-    oro_api.create.rest.remove_location_header:
-        class: Oro\Bundle\ApiBundle\Processor\Create\Rest\RemoveLocationHeader
-        tags:
-            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: 100 }

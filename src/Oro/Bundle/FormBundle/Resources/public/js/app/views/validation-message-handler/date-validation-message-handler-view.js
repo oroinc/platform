@@ -16,7 +16,10 @@ const DateValidationMessageHandlerView = AbstractValidationMessageHandlerView.ex
     },
 
     isActive: function() {
-        return this.$el.data('datepicker').dpDiv.is(':visible') && this.$el.is($.datepicker._lastInput) &&
+        const datepicker = this.$el.data('datepicker');
+
+        return datepicker && datepicker.dpDiv && datepicker.dpDiv.is(':visible') &&
+            this.$el.is($.datepicker._lastInput) &&
             this.$el.hasClass('ui-datepicker-dialog-is-below');
     },
 

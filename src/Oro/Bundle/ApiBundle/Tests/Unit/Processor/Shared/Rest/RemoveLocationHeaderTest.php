@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\Rest;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\Create\Rest\RemoveLocationHeader;
+use Oro\Bundle\ApiBundle\Processor\Shared\Rest\RemoveLocationHeader;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class RemoveLocationHeaderTest extends FormProcessorTestCase
