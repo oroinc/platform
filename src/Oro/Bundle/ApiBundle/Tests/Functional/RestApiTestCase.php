@@ -250,6 +250,9 @@ abstract class RestApiTestCase extends ApiTestCase
                 'patch list'
             );
             self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+            if ($response->getStatusCode() === Response::HTTP_OK) {
+                self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
+            }
         }
 
         return $response;
@@ -284,6 +287,7 @@ abstract class RestApiTestCase extends ApiTestCase
                 'patch'
             );
             self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+            self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
         }
 
         return $response;
@@ -318,6 +322,7 @@ abstract class RestApiTestCase extends ApiTestCase
                 'post'
             );
             self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+            self::assertTrue($response->headers->has('Location'), 'The "Location" header must be returned.');
         }
 
         return $response;
@@ -418,6 +423,10 @@ abstract class RestApiTestCase extends ApiTestCase
                 $entityType,
                 'patch relationship'
             );
+            if ($response->getStatusCode() === Response::HTTP_OK) {
+                self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+                self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
+            }
         }
 
         return $response;
@@ -451,6 +460,10 @@ abstract class RestApiTestCase extends ApiTestCase
                 $entityType,
                 'post relationship'
             );
+            if ($response->getStatusCode() === Response::HTTP_OK) {
+                self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+                self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
+            }
         }
 
         return $response;
@@ -484,6 +497,10 @@ abstract class RestApiTestCase extends ApiTestCase
                 $entityType,
                 'delete relationship'
             );
+            if ($response->getStatusCode() === Response::HTTP_OK) {
+                self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+                self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
+            }
         }
 
         return $response;
@@ -551,6 +568,10 @@ abstract class RestApiTestCase extends ApiTestCase
                 $entityType,
                 'patch subresource'
             );
+            if ($response->getStatusCode() === Response::HTTP_OK) {
+                self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+                self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
+            }
         }
 
         return $response;
@@ -584,6 +605,13 @@ abstract class RestApiTestCase extends ApiTestCase
                 $entityType,
                 'post subresource'
             );
+            if ($response->getStatusCode() === Response::HTTP_OK) {
+                self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+                self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
+            } elseif ($response->getStatusCode() === Response::HTTP_CREATED) {
+                self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+                self::assertTrue($response->headers->has('Location'), 'The "Location" header must be returned.');
+            }
         }
 
         return $response;
@@ -617,6 +645,10 @@ abstract class RestApiTestCase extends ApiTestCase
                 $entityType,
                 'delete subresource'
             );
+            if ($response->getStatusCode() === Response::HTTP_OK) {
+                self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+                self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
+            }
         }
 
         return $response;

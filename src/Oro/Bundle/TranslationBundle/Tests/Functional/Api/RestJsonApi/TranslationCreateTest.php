@@ -172,8 +172,12 @@ class TranslationCreateTest extends RestJsonApiTestCase
                         'translatedValue' => null
                     ]
                 ]
-            ]
+            ],
+            [],
+            false
         );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+        self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
         $this->assertResponseContains(['data' => null], $response);
         self::assertFalse($response->headers->has('Location'));
     }

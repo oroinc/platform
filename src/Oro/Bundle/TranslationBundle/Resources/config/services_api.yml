@@ -132,3 +132,8 @@ services:
             - '@oro_api.action_processor_bag'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
+
+    oro_translation.api.set_success_http_response_status_code:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\SetSuccessHttpResponseStatusCode
+        tags:
+            - { name: oro.api.processor, action: create, group: finalize, requestType: rest, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
