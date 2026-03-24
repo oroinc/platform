@@ -178,6 +178,7 @@ class UpsertViaUpdateActionTest extends RestJsonApiTestCase
         $response = $this->patch(['entity' => $entityType, 'id' => 'new item'], $data, [], false);
         self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
         self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        self::assertTrue($response->headers->has('Location'));
 
         $expectedData = $data;
         unset($expectedData['data']['meta']);
@@ -204,6 +205,7 @@ class UpsertViaUpdateActionTest extends RestJsonApiTestCase
         $response = $this->patch(['entity' => $entityType, 'id' => '100'], $data, [], false);
         self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
         self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        self::assertTrue($response->headers->has('Location'));
 
         $expectedData = $data;
         unset($expectedData['data']['meta']);
@@ -235,6 +237,7 @@ class UpsertViaUpdateActionTest extends RestJsonApiTestCase
         );
         self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
         self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        self::assertTrue($response->headers->has('Location'));
 
         $expectedData = $data;
         unset($expectedData['data']['meta']);

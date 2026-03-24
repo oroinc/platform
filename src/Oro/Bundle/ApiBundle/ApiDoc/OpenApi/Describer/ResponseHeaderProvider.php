@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer;
 
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Util;
-use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeletedCountHeader;
+use Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\SetContentLocationHeader;
 use Oro\Bundle\ApiBundle\Request\ApiAction;

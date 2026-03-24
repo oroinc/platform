@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
@@ -19,8 +20,13 @@ class FieldDirectionTest extends RestJsonApiTestCase
                     'name'        => 'A name',
                     'description' => 'A description'
                 ]
-            ]
+            ],
+            [],
+            false
         );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
+        self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
         $this->assertResponseContains(
             [
                 'meta' => [
@@ -56,8 +62,13 @@ class FieldDirectionTest extends RestJsonApiTestCase
                     'name'        => 'A name',
                     'description' => 'A description'
                 ]
-            ]
+            ],
+            [],
+            false
         );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
+        self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
         $this->assertResponseContains(
             [
                 'meta' => [
@@ -91,8 +102,13 @@ class FieldDirectionTest extends RestJsonApiTestCase
                 'meta' => [
                     'name' => 'A name'
                 ]
-            ]
+            ],
+            [],
+            false
         );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
+        self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        self::assertFalse($response->headers->has('Location'), 'The "Location" header must not be returned.');
         $this->assertResponseContains(
             [
                 'meta' => [

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeletedCountHeader;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
 use Oro\Bundle\ApiBundle\Request\Rest\CorsHeaders;

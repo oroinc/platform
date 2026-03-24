@@ -1353,6 +1353,17 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: finalize, collection: true, priority: -10 }
             - { name: oro.api.processor, action: get_relationship, group: finalize, collection: true, priority: -10 }
 
+    oro_api.rest.set_location_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetLocationHeader
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@router'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.entity_id_transformer_registry'
+        tags:
+            - { name: oro.api.processor, action: create, group: finalize, requestType: rest, priority: -10 }
+            - { name: oro.api.processor, action: update, group: finalize, requestType: rest, priority: -10 }
+
     #
     # normalize_result
     #
@@ -1364,6 +1375,12 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: 100 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: true, priority: 100 }
             - { name: oro.api.processor, action: get_relationship, group: normalize_result, collection: true, priority: 100 }
+
+    oro_api.rest.remove_location_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\RemoveLocationHeader
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: 100 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: 100 }
 
     oro_api.disable_full_metadata_mode:
         class: Oro\Bundle\ApiBundle\Processor\Shared\DisableFullMetadataMode

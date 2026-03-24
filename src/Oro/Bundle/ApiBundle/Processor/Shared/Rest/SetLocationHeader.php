@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Create\Rest;
+namespace Oro\Bundle\ApiBundle\Processor\Shared\Rest;
 
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
@@ -11,6 +12,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -40,10 +42,20 @@ class SetLocationHeader implements ProcessorInterface
     #[\Override]
     public function process(ContextInterface $context): void
     {
-        /** @var SingleItemContext $context */
+        /** @var SingleItemContext|FormContext $context */
 
         if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
             // the Location header is already set
+            return;
+        }
+
+        if ($context->isExisting()) {
+            // the Location header is needed only when a new entity was created
+            return;
+        }
+
+        if ($context->getResponseStatusCode() === Response::HTTP_OK) {
+            // the Location header is not needed for 200 (OK) response status code
             return;
         }
 

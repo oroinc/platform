@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\Rest;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
+use Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
