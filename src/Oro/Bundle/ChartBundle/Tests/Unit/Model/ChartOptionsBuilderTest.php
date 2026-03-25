@@ -61,7 +61,7 @@ class ChartOptionsBuilderTest extends TestCase
             ->method('getData')
             ->willReturn(ResultsObject::create($gridData));
 
-        $this->dateHelper->expects($this->once())
+        $this->dateHelper->expects($this->any())
             ->method('getFormatStrings')
             ->willReturn(['viewType' => 'year']);
 
@@ -153,6 +153,36 @@ class ChartOptionsBuilderTest extends TestCase
                             'field_name' => 'CreatedAt',
                             'type' => 'year'
                         ]
+                    ],
+                    'field_types' => [
+                        'id' => 'integer',
+                        'title' => 'string'
+                    ]
+                ],
+            ],
+            'empty data' => [
+                'chartOptions' => [
+                    'data_schema' => [
+                        'label' => 'CreatedAt'
+                    ]
+                ],
+                'gridConfig' => [
+                    'columns' => [
+                        'CreatedAt' => [
+                            'frontend_type' => 'date'
+                        ]
+                    ],
+                ],
+                'gridData' => [
+                    'data' => []
+                ],
+                'fields' => [
+                    ['name' => 'id', 'type' => 'integer'],
+                    ['name' => 'title', 'type' => 'string'],
+                ],
+                'expected' => [
+                    'data_schema' => [
+                        'label' => 'CreatedAt'
                     ],
                     'field_types' => [
                         'id' => 'integer',
