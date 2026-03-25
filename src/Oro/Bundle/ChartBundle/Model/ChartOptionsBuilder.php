@@ -77,20 +77,30 @@ class ChartOptionsBuilder
             sprintf('[columns][%s][frontend_type]', $labelFieldName)
         );
 
-        $dateTypes = [Types::DATETIME_MUTABLE, Types::DATE_MUTABLE, Types::DATETIMETZ_MUTABLE];
-        if (in_array($labelFieldType, $dateTypes)) {
-            $data = $this->datagrid->getData()->offsetGet('data');
-            $dates = array_map(fn ($dateItem) => $dateItem[$labelFieldName], $data);
-            $minDate = new \DateTime(min($dates));
-            $maxDate = new \DateTime(max($dates));
-
-            $formatStrings = $this->dateHelper->getFormatStrings($minDate, $maxDate);
-            $chartOptions['data_schema']['label'] = [
-                'field_name' => $chartOptions['data_schema']['label'],
-                'type' => $formatStrings['viewType']
-            ];
+        if (in_array($labelFieldType, [Types::DATETIME_MUTABLE, Types::DATE_MUTABLE, Types::DATETIMETZ_MUTABLE])) {
+            $this->fillDateOptions($labelFieldName, $chartOptions);
         }
 
         return $this;
+    }
+
+    private function fillDateOptions(string $labelFieldName, array &$chartOptions): void
+    {
+        $data = $this->datagrid->getData()->offsetGet('data');
+
+        if (empty($data)) {
+            return;
+        }
+
+        $dates = array_map(fn ($dateItem) => $dateItem[$labelFieldName], $data);
+
+        $minDate = new \DateTime(min($dates));
+        $maxDate = new \DateTime(max($dates));
+
+        $formatStrings = $this->dateHelper->getFormatStrings($minDate, $maxDate);
+        $chartOptions['data_schema']['label'] = [
+            'field_name' => $chartOptions['data_schema']['label'],
+            'type' => $formatStrings['viewType']
+        ];
     }
 }
