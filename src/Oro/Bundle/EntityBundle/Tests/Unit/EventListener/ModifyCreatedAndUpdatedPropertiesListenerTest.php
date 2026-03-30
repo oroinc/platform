@@ -233,11 +233,64 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends TestCase
         $unitOfWork->expects($this->once())
             ->method('getScheduledEntityUpdates')
             ->willReturn([$collectionItem]);
+        $unitOfWork->expects($this->any())
+            ->method('getOriginalEntityData')
+            ->willReturn(['id' => 1]);
         $unitOfWork->expects($this->once())
             ->method('recomputeSingleEntityChangeSet');
 
         $args = new OnFlushEventArgs($entityManager);
 
+        $this->listener->onFlush($args);
+    }
+
+    public function testModifyCreatedAndUpdatedPropertiesForEntityPersistedDuringFlush(): void
+    {
+        $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
+
+        $datesAwareEntity->expects(self::once())
+            ->method('getCreatedAt');
+        $datesAwareEntity->expects(self::once())
+            ->method('setCreatedAt')
+            ->with(self::equalToWithDelta(new \DateTime(), 1.0));
+        $datesAwareEntity->expects(self::once())
+            ->method('isUpdatedAtSet')
+            ->willReturn(false);
+        $datesAwareEntity->expects(self::once())
+            ->method('setUpdatedAt')
+            ->with(self::equalToWithDelta(new \DateTime(), 1.0));
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $metadataStub = $this->createMock(ClassMetadata::class);
+        $metadataStub->expects($this->any())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($metadataStub);
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork);
+
+        $unitOfWork->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->willReturn([$datesAwareEntity]);
+        $unitOfWork->expects($this->once())
+            ->method('getScheduledEntityUpdates')
+            ->willReturn([]);
+        $unitOfWork->expects($this->once())
+            ->method('getOriginalEntityData')
+            ->with($datesAwareEntity)
+            ->willReturn([]);
+        $unitOfWork->expects($this->never())
+            ->method('recomputeSingleEntityChangeSet');
+        $unitOfWork->expects($this->once())
+            ->method('computeChangeSet')
+            ->with($metadataStub, $datesAwareEntity);
+
+        $args = new OnFlushEventArgs($entityManager);
         $this->listener->onFlush($args);
     }
 
@@ -266,6 +319,9 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends TestCase
         $unitOfWork->expects($this->once())
             ->method('getScheduledEntityUpdates')
             ->willReturn($scheduledForUpdate);
+        $unitOfWork->expects($this->any())
+            ->method('getOriginalEntityData')
+            ->willReturn(['id' => 1]);
         $unitOfWork->expects($this->exactly($countOfRecompute))
             ->method('recomputeSingleEntityChangeSet');
 

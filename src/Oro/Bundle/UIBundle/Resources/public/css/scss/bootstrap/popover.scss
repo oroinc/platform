@@ -6,6 +6,7 @@
 
 .popover {
     box-shadow: $popover-box-shadow;
+    max-width: var(--popover-max-width, #{$popover-max-width});
 
     .arrow {
         z-index: $popover-arrow-z-index;
@@ -66,13 +67,13 @@
     }
 
     &-header {
-        padding: 8px 14px;
+        padding: var(--popover-header-padding, 8px 14px);
         margin: 0;
         font-size: 14px;
-        font-weight: font-weight('light');
+        font-weight: var(--popover-header-font-weight, #{font-weight('light')});
         line-height: 18px;
-        background-color: $primary-900;
-        border-bottom: 1px solid $additional-ultra-light;
+        background-color: var(--popover-header-bg, #{$primary-900});
+        border-bottom: var(--popover-header-border, 1px solid #{$additional-ultra-light});
         border-radius: 5px 5px 0 0;
     }
 }
@@ -81,7 +82,8 @@
 
 .popover-body {
     background-color: $popover-body-bg;
-    padding-right: $popover-body-offset-right;
+    padding: var(--popover-body-padding, #{$popover-body-padding-y} #{$popover-body-padding-x});
+    padding-right: var(--popover-body-padding-right, #{$popover-body-offset-right});
 
     &.popover-no-close-button {
         padding-right: $popover-body-offset-right-no-close;
@@ -90,12 +92,47 @@
 
 .popover-close {
     position: $popover-close-position;
-    top: $popover-close-position-y;
-    right: $popover-close-position-x;
+    top: var(--popover-close-top, #{$popover-close-position-y});
+    right: var(--popover-close-right, #{$popover-close-position-x});
     cursor: $popover-close-cursor;
     color: $popover-close-color;
 
     &::before {
         font-size: $popover-close-before-font-size;
+    }
+}
+
+.popover-html-content {
+    --popover-body-padding-right: #{$content-padding};
+    --popover-max-width: max-content;
+
+    .popover-header {
+        --popover-header-border: none;
+        --popover-header-bg: none;
+        --popover-header-padding: #{$content-padding-medium} #{$content-padding} #{$content-padding-xmd};
+        --popover-header-font-weight: #{font-weight('semi-bold')};
+
+        &:has(~ .loader-mask.shown) {
+            visibility: hidden;
+        }
+    }
+
+    .popover-body {
+        --popover-body-padding: #{$content-padding-medium} #{$content-padding};
+
+        &:has(~ .loader-mask.shown) {
+            visibility: hidden;
+        }
+    }
+
+    &:has(.popover-header:not(:empty)) {
+        .popover-body {
+            --popover-body-padding: 0 #{$content-padding} #{$content-padding-medium};
+        }
+
+        .popover-close {
+            --popover-close-top: #{$content-padding-medium};
+            --popover-close-right: #{$content-padding};
+        }
     }
 }

@@ -37,6 +37,11 @@ const LoadingBarView = BaseView.extend({
     active: false,
 
     /**
+     * @property {Boolean}
+     */
+    requestPending: false,
+
+    /**
      * @inheritdoc
      */
     constructor: function LoadingBarView(options) {
@@ -104,10 +109,24 @@ const LoadingBarView = BaseView.extend({
             }
         });
         this.active = false;
+        this.isRequestPending(false);
     },
 
     setProgress(percentNumber) {
         this.$el.width(`${percentNumber}%`);
+    },
+
+    /**
+     * @param {Boolean} [state] True to notify that an application is going to send a request, false otherwise.
+     *
+     * @returns {Boolean} True if an application is going to send a request, false otherwise.
+     */
+    isRequestPending(state) {
+        if (state !== undefined) {
+            this.requestPending = state;
+        }
+
+        return this.requestPending;
     },
 
     dispose: function() {

@@ -903,7 +903,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertTrue(
             $field->hasAttribute('readonly'),
-            sprintf('Field "%s" has readonly attribute', $fieldName)
+            sprintf('Field "%s" should be readonly', $fieldName)
         );
     }
 

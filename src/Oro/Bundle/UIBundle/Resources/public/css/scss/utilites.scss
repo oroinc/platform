@@ -38,3 +38,11 @@
 .ellipsis {
     @include ellipsis;
 }
+
+.font-medium {
+    font-weight: font-weight('medium');
+}
+
+.text-underline {
+    text-decoration: underline;
+}

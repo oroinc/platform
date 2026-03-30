@@ -304,6 +304,7 @@
             "Oro\\Component\\ConfigExpression\\": "src/Oro/Component/ConfigExpression",
             "Oro\\Component\\DependencyInjection\\": "src/Oro/Component/DependencyInjection",
             "Oro\\Component\\DoctrineUtils\\": "src/Oro/Component/DoctrineUtils",
+            "Oro\\Component\\DraftSession\\": "src/Oro/Component/DraftSession",
             "Oro\\Component\\Duplicator\\": "src/Oro/Component/Duplicator",
             "Oro\\Component\\EntitySerializer\\": "src/Oro/Component/EntitySerializer",
             "Oro\\Component\\Exception\\": "src/Oro/Component/Exception",

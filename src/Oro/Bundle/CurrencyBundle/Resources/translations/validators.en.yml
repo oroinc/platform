@@ -1,4 +1,10 @@
 oro:
     currency:
         price:
-            value.blank: Price value should not be blank.
+            value:
+                blank: Price value should not be blank.
+                invalid: Price value should be a valid number.
+                min: Price value should be equal or greater than {{ limit }}.
+            currency:
+                blank: Currency should not be blank.
+                invalid: Currency should be a valid currency.

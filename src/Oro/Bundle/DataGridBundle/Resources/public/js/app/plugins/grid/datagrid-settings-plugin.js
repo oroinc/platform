@@ -22,33 +22,39 @@ const DatagridSettingPlugin = BasePlugin.extend({
     },
 
     onBeforeToolbarInit: function(toolbarOptions) {
+        const defaultViews = [];
+
+        if (!toolbarOptions.disableGridColumns) {
+            defaultViews.push({
+                id: 'grid',
+                label: __('oro.datagrid.settings.tab.grid'),
+                view: DatagridManageColumnView,
+                options: {
+                    collection: this.main.columns
+                }
+            });
+        }
+
+        if (!toolbarOptions.disableGridFilters) {
+            defaultViews.push({
+                id: 'filters',
+                label: __('oro.datagrid.settings.tab.filters'),
+                view: DatagridManageFilterView,
+                options: {
+                    collection: _.filter(this.main.metadata.filters, function(filter) {
+                        // Do not render filters with visible=false setting
+                        return filter.visible;
+                    }),
+                    addSorting: false
+                }
+            });
+        }
         const options = {
             datagrid: this.main,
             launcherOptions: _.extend(config, {
                 allowDialog: _.isMobile(),
                 componentConstructor: toolbarOptions.componentConstructor || DatagridSettingView,
-                viewConstructors: toolbarOptions.viewConstructors || [
-                    {
-                        id: 'grid',
-                        label: __('oro.datagrid.settings.tab.grid'),
-                        view: DatagridManageColumnView,
-                        options: {
-                            collection: this.main.columns
-                        }
-                    },
-                    {
-                        id: 'filters',
-                        label: __('oro.datagrid.settings.tab.filters'),
-                        view: DatagridManageFilterView,
-                        options: {
-                            collection: _.filter(this.main.metadata.filters, function(filter) {
-                                // Do not render filters with visible=false setting
-                                return filter.visible;
-                            }),
-                            addSorting: false
-                        }
-                    }
-                ],
+                viewConstructors: toolbarOptions.viewConstructors || defaultViews,
                 columns: this.main.columns
             }, toolbarOptions.datagridSettings),
             order: 600

@@ -1051,6 +1051,15 @@ const Grid = Backgrid.Grid.extend({
             });
         });
 
+        this.listenTo(mediator, 'datagrid:highlightUpdated:' + this.name, (...ids) => {
+            ids = ids.map(id => id.toString());
+            this.collection.each(model => {
+                if (ids.includes(model.id)) {
+                    model.set('isUpdated', true);
+                }
+            });
+        });
+
         this.listenTo(mediator, 'datagrid:doInitialRefresh:' + this.name, () => {
             this.setAdditionalParameter('refresh', true);
             this.collection.getFirstPage();

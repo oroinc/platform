@@ -97,3 +97,10 @@ services:
         arguments:
             - '%kernel.project_dir%'
 
+    oro_distribution.routing.router:
+        class: Oro\Bundle\DistributionBundle\Routing\Router
+        decorates: router
+        arguments:
+            - '@.inner'
+        calls:
+            - [ setEventDispatcher, [ '@event_dispatcher' ] ]

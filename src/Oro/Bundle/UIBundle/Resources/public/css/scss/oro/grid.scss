@@ -2,7 +2,7 @@
 
 .grid {
     // Ignore tables
-    &:not(table) {
+    :where(&:not(table)) {
         display: grid;
         grid-template-columns: $grid-template-columns;
         gap: $grid-gap;
@@ -52,6 +52,22 @@
                         }
                     }
                 }
+            }
+        }
+    }
+
+    &-row-gap {
+        @each $row-gap in $grid-row-gap-sizes {
+            &-#{$row-gap} {
+                grid-row-gap: #{$row-gap}px;
+            }
+        }
+    }
+
+    &-column-gap {
+        @each $row-gap in $grid-column-gap-sizes {
+            &-#{$row-gap} {
+                grid-column-gap: #{$row-gap}px;
             }
         }
     }

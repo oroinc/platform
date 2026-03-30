@@ -27,6 +27,8 @@ const Row = Chaplin.CollectionView.extend({
 
     animationDuration: 0,
 
+    CLASS_DECORATION_DELAY: 3000,
+
     /**
      * Override Chaplin delegate events to use events as function
      * This code supports perfomance fix.
@@ -102,6 +104,7 @@ const Row = Chaplin.CollectionView.extend({
         this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
         this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
         this.listenTo(this.model, 'change:isNew', this.onRowNewStatusChange);
+        this.listenTo(this.model, 'change:isUpdated', this.onRowUpdatedStatusChange);
         this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
         this.listenTo(this, 'visibilityChange', this.onVisibilityChange);
         this.listenTo(this.model, 'change:availableActions', this.countActionsClassName);
@@ -206,6 +209,19 @@ const Row = Chaplin.CollectionView.extend({
         this.$el.toggleClass('row-new', model.get('isNew'));
     },
 
+    onRowUpdatedStatusChange(model) {
+        if (model.get('isUpdated')) {
+            this.$el.addClass('row-updated');
+
+            if (this.CLASS_DECORATION_DELAY !== null) {
+                this.delayClassDecoration = setTimeout(() => {
+                    this.$el.removeClass('row-updated');
+                    this.model.set('isUpdated', false, {silent: true});
+                }, this.CLASS_DECORATION_DELAY);
+            }
+        }
+    },
+
     onVisibilityChange(visibleItems) {
         this.countCellClassName(visibleItems.length);
     },
@@ -275,6 +291,11 @@ const Row = Chaplin.CollectionView.extend({
         if (this.clickTimeout) {
             clearTimeout(this.clickTimeout);
         }
+
+        if (this.delayClassDecoration) {
+            clearTimeout(this.delayClassDecoration);
+        }
+
         delete this.columns;
         delete this.cells;
         Row.__super__.dispose.call(this);

@@ -208,7 +208,19 @@
         opacity: $oro-datagrid-row-disabled-opacity;
     }
 
+    &.row-transition {
+        transition: background-color 250ms ease-in-out, opacity 250ms ease-in-out;
+    }
+
     &.row-new {
+        background-color: $cell-success-background;
+
+        &:hover {
+            background-color: color.adjust($cell-success-background, $lightness: -5%);
+        }
+    }
+
+    &.row-updated {
         background-color: $cell-success-background;
 
         &:hover {
