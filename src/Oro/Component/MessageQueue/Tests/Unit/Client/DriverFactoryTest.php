@@ -26,6 +26,40 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $driver->getConfig());
     }
 
+    public function testCreateWithEmptyDriverOptions(): void
+    {
+        $config = new Config('', '');
+
+        $doctrineConnection = $this->createMock(Connection::class);
+        $connection = new DbalConnection($doctrineConnection, 'aTableName');
+
+        $factory = new DriverFactory(
+            [DbalConnection::class => DbalDriver::class],
+            [DbalDriver::class => []]
+        );
+        $driver = $factory->create($connection, $config);
+
+        self::assertInstanceOf(DbalDriver::class, $driver);
+        self::assertSame($config, $driver->getConfig());
+    }
+
+    public function testCreateWithNoMatchingDriverOptions(): void
+    {
+        $config = new Config('', '');
+
+        $doctrineConnection = $this->createMock(Connection::class);
+        $connection = new DbalConnection($doctrineConnection, 'aTableName');
+
+        $factory = new DriverFactory(
+            [DbalConnection::class => DbalDriver::class],
+            ['SomeOtherDriver' => ['extra_arg']]
+        );
+        $driver = $factory->create($connection, $config);
+
+        self::assertInstanceOf(DbalDriver::class, $driver);
+        self::assertSame($config, $driver->getConfig());
+    }
+
     public function testCreateLogicException(): void
     {
         $factory = new DriverFactory([]);
