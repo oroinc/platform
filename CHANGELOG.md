@@ -4,6 +4,7 @@ The current file describes significant changes in the code that may affect the u
 
 ## Changes in the Platform package versions
 
+- [7.0.0](#700-2026-03-31)
 - [6.1.0](#610-2025-03-31)
 - [6.0.0](#600-2024-03-30)
 - [5.1.0](#510-2023-03-31)
@@ -24,7 +25,9 @@ The current file describes significant changes in the code that may affect the u
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
 
-## UNRELEASED
+
+## 7.0.0 (2026-03-31)
+[Show detailed list of changes](incompatibilities-7-0.md)
 
 ### Added
 
@@ -104,30 +107,6 @@ found in the PHP attributes implementing `PHPAttributeConfigurationInterface`
 #### SecurityBundle
 * Сlass `Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter` was removed.
   Moved logic from `DoctrineParamConverter::apply` to `Oro\Bundle\SecurityBundle\EventListener\ControllerListener::checkEntityAccess`.
-
-## Changes in the Platform package versions
-
-- [6.1.0](#610-2025-03-31)
-- [6.0.0](#600-2024-03-30)
-- [5.1.0](#510-2023-03-31)
-- [5.0.0](#500-2022-01-26)
-- [4.2.10](#4210)
-- [4.2.4](#424)
-- [4.2.2](#422)
-- [4.2.0](#420-2020-01-29)
-- [4.1.0](#410-2020-01-31)
-- [4.0.0](#400-2019-07-31)
-- [3.1.4](#314)
-- [3.1.3](#313-2019-02-19)
-- [3.1.2](#312-2019-02-05)
-- [3.1.0](#310-2019-01-30)
-- [3.0.0](#300-2018-07-27)
-- [2.6.0](#260-2018-01-31)
-- [2.5.0](#250-2017-11-30)
-- [2.2.0](#220-2017-05-31)
-- [2.1.0](#210-2017-03-30)
-
-## UNRELEASED
 
 ### Added
 
@@ -2205,8 +2184,6 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * `isIE11` and `isEDGE` methods are removed from `oroui/js/tools` module
 
 
-
-
 ## 4.2.10
 
 ### Changed
@@ -2787,7 +2764,6 @@ must be removed.
   `{ name: oro.workflow.configuration.handler, priority: -100 }`
 
 
-
 ### Removed
 * `*.class` parameters for all entities were removed from the dependency injection container.
 The entity class names should be used directly, e.g. `'Oro\Bundle\EmailBundle\Entity\Email'`
@@ -2876,10 +2852,6 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 * The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
   Use the `alias` attribute of the `oro_ui.content_provider` DIC tag instead.
 * Unneeded `isEnabled()` and `setEnabled()` methods were removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
-
-
-
-
 
 
 ## 4.0.0 (2019-07-31)
@@ -3196,7 +3168,6 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 * Message Queue Topic `oro.importexport.http_import` is deprecated in favor of `oro.importexport.import`.
 
 
-
 ## 3.1.4
 
 ### Removed
@@ -3356,7 +3327,6 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
 * Removed the `loadBeforeAction` and `addToReuse` static methods of `BaseController` in JS. Global Views and Components can now be defined in the HTML over data attributes, the same way as an ordinary [Page Component](https://github.com/oroinc/platform/blob/3.1/src/Oro/Bundle/UIBundle/Resources/doc/reference/page-component.md).
 
 
-
 ## 3.0.0 (2018-07-27)
 [Show detailed list of changes](incompatibilities-3-0.md)
 
@@ -3366,8 +3336,6 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
 * Added the following operators for ComparisonFilter: `*` (`exists`), `!*` (`neq_or_null`), `~` (`contains`), `!~` (`not_contains`), `^` (`starts_with`), `!^` (`not_starts_with`), `$` (`ends_with`), `!$` (`not_ends_with`). For details see [how_to.md](https://doc.oroinc.com/3.1/backend/api/how-to/#advanced-operators-for-string-filter).
 * Added the `case_insensitive` and `value_transformer` options for ComparisonFilter. See [how_to.md](https://doc.oroinc.com/3.1/backend/api/how-to/#enable-case-insensitive-string-filter) for more details.
 * Added a possibility to enable custom API. See [how_to.md](https://doc.oroinc.com/3.1/backend/api/how-to/#enable-custom-api) for more information.
-
-
 
 
 ### Changed
@@ -3422,7 +3390,6 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
 
 #### WorkflowBundle
 * Removed the `oro_workflow.cache.provider.workflow_definition` cache provider. Doctrine result cache is used instead.
-
 
 
 ## 2.6.0 (2018-01-31)
