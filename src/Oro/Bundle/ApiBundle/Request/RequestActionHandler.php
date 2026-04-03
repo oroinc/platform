@@ -22,6 +22,7 @@ use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\UpdateListContext;
 use Oro\Component\ChainProcessor\AbstractParameterBag;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,6 +36,7 @@ abstract class RequestActionHandler
     /** @var string[] */
     private array $requestType;
     private ActionProcessorBagInterface $actionProcessorBag;
+    private ?LoggerInterface $logger = null;
 
     /**
      * @param string[]                    $requestType
@@ -46,12 +48,19 @@ abstract class RequestActionHandler
         $this->actionProcessorBag = $actionProcessorBag;
     }
 
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * Handles "GET /api/{entity}/{id}" request,
      * that returns an entity by its identifier.
      */
     public function handleGet(Request $request): Response
     {
+        $this->logRequest(ApiAction::GET, $request);
+
         $processor = $this->getProcessor(ApiAction::GET);
         /** @var GetContext $context */
         $context = $processor->createContext();
@@ -70,6 +79,8 @@ abstract class RequestActionHandler
      */
     public function handleGetList(Request $request): Response
     {
+        $this->logRequest(ApiAction::GET_LIST, $request);
+
         $processor = $this->getProcessor(ApiAction::GET_LIST);
         /** @var GetListContext $context */
         $context = $processor->createContext();
@@ -87,6 +98,8 @@ abstract class RequestActionHandler
      */
     public function handleDelete(Request $request): Response
     {
+        $this->logRequest(ApiAction::DELETE, $request);
+
         $processor = $this->getProcessor(ApiAction::DELETE);
         /** @var DeleteContext $context */
         $context = $processor->createContext();
@@ -104,6 +117,8 @@ abstract class RequestActionHandler
      */
     public function handleDeleteList(Request $request): Response
     {
+        $this->logRequest(ApiAction::DELETE_LIST, $request);
+
         $processor = $this->getProcessor(ApiAction::DELETE_LIST);
         /** @var DeleteListContext $context */
         $context = $processor->createContext();
@@ -121,6 +136,8 @@ abstract class RequestActionHandler
      */
     public function handleCreate(Request $request): Response
     {
+        $this->logRequest(ApiAction::CREATE, $request, true);
+
         $processor = $this->getProcessor(ApiAction::CREATE);
         /** @var CreateContext $context */
         $context = $processor->createContext();
@@ -139,6 +156,8 @@ abstract class RequestActionHandler
      */
     public function handleUpdate(Request $request): Response
     {
+        $this->logRequest(ApiAction::UPDATE, $request, true);
+
         $processor = $this->getProcessor(ApiAction::UPDATE);
         /** @var UpdateContext $context */
         $context = $processor->createContext();
@@ -160,6 +179,8 @@ abstract class RequestActionHandler
      */
     public function handleUpdateList(Request $request): Response
     {
+        $this->logRequest(ApiAction::UPDATE_LIST, $request);
+
         $processor = $this->getProcessor(ApiAction::UPDATE_LIST);
         /** @var UpdateListContext $context */
         $context = $processor->createContext();
@@ -179,6 +200,8 @@ abstract class RequestActionHandler
      */
     public function handleGetSubresource(Request $request): Response
     {
+        $this->logRequest(ApiAction::GET_SUBRESOURCE, $request);
+
         $processor = $this->getProcessor(ApiAction::GET_SUBRESOURCE);
         /** @var GetSubresourceContext $context */
         $context = $processor->createContext();
@@ -234,6 +257,8 @@ abstract class RequestActionHandler
      */
     public function handleGetRelationship(Request $request): Response
     {
+        $this->logRequest(ApiAction::GET_RELATIONSHIP, $request);
+
         $processor = $this->getProcessor(ApiAction::GET_RELATIONSHIP);
         /** @var GetRelationshipContext $context */
         $context = $processor->createContext();
@@ -253,6 +278,8 @@ abstract class RequestActionHandler
      */
     public function handleUpdateRelationship(Request $request): Response
     {
+        $this->logRequest(ApiAction::UPDATE_RELATIONSHIP, $request, true);
+
         $processor = $this->getProcessor(ApiAction::UPDATE_RELATIONSHIP);
         /** @var UpdateRelationshipContext $context */
         $context = $processor->createContext();
@@ -270,6 +297,8 @@ abstract class RequestActionHandler
      */
     public function handleAddRelationship(Request $request): Response
     {
+        $this->logRequest(ApiAction::ADD_RELATIONSHIP, $request, true);
+
         $processor = $this->getProcessor(ApiAction::ADD_RELATIONSHIP);
         /** @var AddRelationshipContext $context */
         $context = $processor->createContext();
@@ -287,6 +316,8 @@ abstract class RequestActionHandler
      */
     public function handleDeleteRelationship(Request $request): Response
     {
+        $this->logRequest(ApiAction::DELETE_RELATIONSHIP, $request, true);
+
         $processor = $this->getProcessor(ApiAction::DELETE_RELATIONSHIP);
         /** @var DeleteRelationshipContext $context */
         $context = $processor->createContext();
@@ -304,6 +335,8 @@ abstract class RequestActionHandler
      */
     public function handleOptionsItem(Request $request): Response
     {
+        $this->logRequest(ApiAction::OPTIONS, $request);
+
         $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
@@ -322,6 +355,8 @@ abstract class RequestActionHandler
      */
     public function handleOptionsList(Request $request): Response
     {
+        $this->logRequest(ApiAction::OPTIONS, $request);
+
         $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
@@ -339,6 +374,8 @@ abstract class RequestActionHandler
      */
     public function handleOptionsSubresource(Request $request): Response
     {
+        $this->logRequest(ApiAction::OPTIONS, $request);
+
         $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
@@ -356,6 +393,8 @@ abstract class RequestActionHandler
      */
     public function handleOptionsRelationship(Request $request): Response
     {
+        $this->logRequest(ApiAction::OPTIONS, $request);
+
         $processor = $this->getProcessor(ApiAction::OPTIONS);
         /** @var OptionsContext $context */
         $context = $processor->createContext();
@@ -500,6 +539,23 @@ abstract class RequestActionHandler
         return $request->request->all();
     }
 
+    protected function logRequest(string $action, Request $request, bool $logRequestData = false): void
+    {
+        if (null === $this->logger) {
+            return;
+        }
+
+        $context = [
+            'api_action' => $action,
+            'request_uri' => $request->getUri(),
+            'method' => $request->getMethod()
+        ];
+        if ($logRequestData) {
+            $context['request_data'] = $request->request->all();
+        }
+        $this->logger->info('API Request.', $context);
+    }
+
     abstract protected function getRequestHeaders(Request $request): AbstractParameterBag;
 
     abstract protected function getRequestFilters(Request $request, string $action): FilterValueAccessorInterface;
@@ -508,6 +564,8 @@ abstract class RequestActionHandler
 
     private function handleChangeSubresource(Request $request, string $action): Response
     {
+        $this->logRequest($action, $request, true);
+
         $processor = $this->getProcessor($action);
         /** @var ChangeSubresourceContext $context */
         $context = $processor->createContext();

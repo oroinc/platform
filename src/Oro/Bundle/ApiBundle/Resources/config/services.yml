@@ -584,6 +584,10 @@ services:
             - '@oro_api.action_processor_bag'
             - '@oro_api.rest.filter_value_accessor_factory'
             - '@fos_rest.view_handler'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: api }
 
     oro_api.entity_id_transformer_registry:
         class: Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry
