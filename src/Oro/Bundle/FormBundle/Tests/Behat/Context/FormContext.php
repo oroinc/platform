@@ -67,11 +67,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Form $form */
         $this->waitForAjax();
         $form = $this->createElement($formName);
-        $this->spin(function () use ($form, $table) {
-            $form->fill($table);
-
-            return true;
-        }, 3);
+        $form->fill($table);
     }
 
     //@codingStandardsIgnoreStart
@@ -120,6 +116,25 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         $field->clear();
+    }
+
+    /**
+     * Programmatically clears the textarea field.
+     * Use this step before filling new text when the textarea contains big amount of text - to avoid
+     * the performance impact caused by the way how selenium clears form fields (it triggers backspace for each
+     * symbol in the field - {@see \Behat\Mink\Driver\Selenium2Driver::setValue}).
+     *
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" textarea in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" textarea$/
+     */
+    public function iClearTextArea($fieldName, $formName = 'OroForm'): void
+    {
+        $field = $this->getFieldInForm($fieldName, $formName);
+        $xpath = $field->getXpath();
+        $oroSelenium2Driver = $this->getDriver();
+        $oroSelenium2Driver->focus($xpath);
+        $oroSelenium2Driver->executeJsOnXpath($xpath, '{{ELEMENT}}.value = "";');
+        $oroSelenium2Driver->blur($xpath);
     }
 
     /**
@@ -400,10 +415,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *            | Last Name         | Sheen             |
      *            | Primary Email     | charlie@sheen.com |
      *
+     * @Then /^form must contain values:$/
+     * @Then /^form must contains values:$/
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contain values:$/
      */
-    public function formMustContainsValues($formName, TableNode $table)
+    public function formMustContainsValues(TableNode $table, $formName = "OroForm")
     {
         /** @var Form $form */
         $form = $this->createElement($formName);
@@ -515,7 +532,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * Go to System/Configuration and see the fields with default checkboxes
      * Example: And check "Use default" for "Position" field
      *
-     * @Given check :checkbox for :label field
+     * @Given /^(?:|I )check "(?P<checkbox>[^"]*)" for "(?P<label>[^"]*)" field$/
      */
     public function checkUseDefaultForField($label, $checkbox)
     {
@@ -691,7 +708,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues($value);
+            $options = $element->getAllSuggestedValues($this->getSession(), $value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $options);
             }
@@ -748,7 +765,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues($value);
+            $options = $element->getAllSuggestedValues($this->getSession(), $value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertNotContains($optionLabel, $options);
             }

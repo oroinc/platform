@@ -34,14 +34,13 @@ class Select2Entity extends Element implements ClearableInterface
      *
      * @return bool
      */
+    #[\Override]
     public function isVisible()
     {
         return $this->getParent()->isVisible();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($value)
     {
         if (empty($value)) {
@@ -53,6 +52,7 @@ class Select2Entity extends Element implements ClearableInterface
         }
 
         $results = $this->getSuggestions($value);
+        $results = is_array($results) ? $results : [];
 
         if (1 < count($results)) {
             // Try remove (Add new) records
@@ -65,16 +65,14 @@ class Select2Entity extends Element implements ClearableInterface
             });
 
             if (1 === count($results)) {
-                array_shift($results)->click();
-                $this->getDriver()->waitForAjax();
+                $this->clickResult(array_shift($results), $value);
 
                 return;
             }
 
             foreach ($results as $result) {
                 if (trim($result->getText()) == $value) {
-                    $result->click();
-                    $this->getDriver()->waitForAjax();
+                    $this->clickResult($result, $value);
 
                     return;
                 }
@@ -99,8 +97,58 @@ class Select2Entity extends Element implements ClearableInterface
 
         self::assertNotCount(0, $results, sprintf('Not found result for "%s"', $value));
 
-        array_shift($results)->click();
-        $this->getDriver()->waitForAjax();
+        $this->clickResult(array_shift($results), $value);
+    }
+
+    /**
+     * Clicks a Select2 result item with a retry on stale element reference,
+     * which can happen when slow AJAX refreshes the dropdown after typing.
+     *
+     * @param NodeElement $result The result element to click
+     * @param string $expectedText The expected text value, used to re-find the element on stale reference
+     */
+    protected function clickResult(NodeElement $result, string $expectedText = ''): void
+    {
+        $clicked = $this->spin(function () use (&$result, $expectedText) {
+            try {
+                $result->click();
+                $this->getDriver()->waitForAjax();
+
+                return true;
+            } catch (StaleElementReference $e) {
+                $freshResults = array_filter(
+                    $this->getPage()->findAll('css', '.select2-results li'),
+                    fn (NodeElement $el) => $el->isVisible()
+                );
+
+                if (!$freshResults) {
+                    return false;
+                }
+
+                if ($expectedText !== '') {
+                    foreach ($freshResults as $fresh) {
+                        try {
+                            if (trim($fresh->getText()) === $expectedText) {
+                                $result = $fresh;
+
+                                return false;
+                            }
+                        } catch (\Exception $e) {
+                            // element already stale again, keep looking
+                        }
+                    }
+                }
+
+                $result = array_values($freshResults)[0];
+
+                return false;
+            }
+        }, 10);
+
+        self::assertTrue((bool)$clicked, sprintf(
+            'Could not click Select2 result "%s" after retries',
+            $expectedText ?: '(unknown)'
+        ));
     }
 
     /**
@@ -115,9 +163,7 @@ class Select2Entity extends Element implements ClearableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function selectOption($option, $multiple = false)
     {
         $this->setValue($option);
@@ -130,13 +176,22 @@ class Select2Entity extends Element implements ClearableInterface
     public function getSuggestions($value = '')
     {
         $this->attempts = 0;
+        $lastResults = [];
         $resultSet = $this->getResultSet(true, $value);
 
-        $results = $this->spin(function (Select2Entity $element) use ($resultSet) {
+        $this->spin(function (Select2Entity $element) use ($resultSet, &$lastResults) {
             /** @var NodeElement[] $results */
             $results = $resultSet->findAll('css', 'li');
+
+            if (count($results) === 0) {
+                $element->attempts = 0;
+                return false;
+            }
+
+            $lastResults = $results;
+
             if (3 == $element->attempts) {
-                return $results;
+                return true;
             }
 
             try {
@@ -145,14 +200,16 @@ class Select2Entity extends Element implements ClearableInterface
                 }
             } catch (\Exception $e) {
                 $element->attempts = 0;
+
+                return false;
             }
 
             $element->attempts++;
 
-            return [];
-        }, 5);
+            return false;
+        }, 15);
 
-        return $results;
+        return $lastResults;
     }
 
     /**
@@ -163,13 +220,22 @@ class Select2Entity extends Element implements ClearableInterface
     public function getAllSuggestions(Session $session, $value = '')
     {
         $this->attempts = 0;
+        $lastResults = [];
         $resultSet = $this->getResultSetFromAllPages($session, true, $value);
 
-        $results = $this->spin(function (Select2Entity $element) use ($resultSet) {
+        $this->spin(function (Select2Entity $element) use ($resultSet, &$lastResults) {
             /** @var NodeElement[] $results */
             $results = $resultSet->findAll('css', 'li');
+
+            if (count($results) === 0) {
+                $element->attempts = 0;
+                return false;
+            }
+
+            $lastResults = $results;
+
             if (3 == $element->attempts) {
-                return $results;
+                return true;
             }
 
             try {
@@ -178,14 +244,16 @@ class Select2Entity extends Element implements ClearableInterface
                 }
             } catch (\Exception $e) {
                 $element->attempts = 0;
+
+                return false;
             }
 
             $element->attempts++;
 
-            return [];
-        }, 5);
+            return false;
+        }, 15);
 
-        return $results;
+        return $lastResults;
     }
 
     /**
@@ -196,11 +264,44 @@ class Select2Entity extends Element implements ClearableInterface
     public function getResultSet($failOnEmpty = true, $value = '')
     {
         $this->fillSearchField($value, $failOnEmpty);
+        // this line is needed when select2 has AJAX content and page also has other select2-results
+        $this->getDriver()->waitForAjax();
+
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
 
-        /** @var NodeElement $resultSet */
+        $foundResultSet = null;
+        $this->spin(function () use (&$foundResultSet) {
+            foreach ($this->getPage()->findAll('css', '.select2-results') as $resultSet) {
+                if (!$resultSet->isVisible()) {
+                    continue;
+                }
+                $realResults = array_filter(
+                    $resultSet->findAll('css', 'li'),
+                    function (NodeElement $li) {
+                        $class = (string) $li->getAttribute('class');
+                        return !str_contains($class, 'select2-searching')
+                            && !str_contains($class, 'select2-no-results')
+                            && !str_contains($class, 'select2-more-results')
+                            && !str_contains($class, 'select2-ajax-error');
+                    }
+                );
+
+                if (count($realResults) > 0) {
+                    $foundResultSet = $resultSet;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }, 15);
+
+        if ($foundResultSet !== null) {
+            return $foundResultSet;
+        }
+
         foreach ($this->getPage()->findAll('css', '.select2-results') as $resultSet) {
             if ($resultSet->isVisible()) {
                 return $resultSet;
@@ -260,6 +361,24 @@ JS;
                 return $element->getText();
             },
             $this->getSuggestions($value)
+        );
+        $this->close();
+
+        return $suggestions;
+    }
+
+    /**
+     * @param Session $session
+     * @param string $value
+     * @return string[]
+     */
+    public function getAllSuggestedValues(Session $session, $value = '')
+    {
+        $suggestions = array_map(
+            function (NodeElement $element) {
+                return $element->getText();
+            },
+            $this->getAllSuggestions($session, $value)
         );
         $this->close();
 
@@ -414,6 +533,7 @@ JS;
         return null;
     }
 
+    #[\Override]
     public function clear()
     {
         $close = $this->getParent()->find('css', '.select2-search-choice-close');
@@ -425,6 +545,7 @@ JS;
     /**
      * @return string|null
      */
+    #[\Override]
     public function getValue()
     {
         $span = $this->getParent()->find('css', 'span.select2-chosen');
