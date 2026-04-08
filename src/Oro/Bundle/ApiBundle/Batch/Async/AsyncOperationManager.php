@@ -85,7 +85,7 @@ class AsyncOperationManager
         try {
             $summary = $this->loadSummary($operationId);
         } catch (NoResultException $e) {
-            $this->logger->error(
+            $this->logger->warning(
                 'The incrementation of an aggregate time failed because the asynchronous operation was not found.',
                 ['operationId' => $operationId]
             );
