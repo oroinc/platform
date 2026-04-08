@@ -37,6 +37,17 @@ class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($requirement->isFulfilled());
     }
 
+    public function testReadonlyNotFulfilled(): void
+    {
+        $doctrine = $this->getDoctrine($this->getConnection());
+        $readonlyConnections = array_keys($doctrine->getConnections());
+
+        $provider = new MysqlDatabaseRequirementsProvider($doctrine);
+        $provider->setReadOnlyConnections($readonlyConnections);
+
+        $this->assertEmpty($provider->getOroRequirements()->all());
+    }
+
     public function testRequiredVersionNotFulfilled()
     {
         $provider = $this->getProvider($this->getDoctrine($this->getConnection('1.0')), []);

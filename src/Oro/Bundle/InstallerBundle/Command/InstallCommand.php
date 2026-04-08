@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
@@ -14,6 +14,8 @@ use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
+use Oro\Bundle\InstallerBundle\Provider\ReadOnlyConnectionAwareInterface;
+use Oro\Bundle\InstallerBundle\Provider\ReadOnlyConnectionAwareTrait;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\LocaleBundle\Command\LocalizationOptionsCommandTrait;
@@ -40,9 +42,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class InstallCommand extends AbstractCommand implements InstallCommandInterface
+class InstallCommand extends AbstractCommand implements InstallCommandInterface, ReadOnlyConnectionAwareInterface
 {
     use LocalizationOptionsCommandTrait;
+    use ReadOnlyConnectionAwareTrait;
 
     /** @var string */
     protected static $defaultName = 'oro:install';
@@ -335,16 +338,39 @@ HELP
     {
         if ($input->getOption('drop-database')) {
             $output->writeln('<info>Drop schema.</info>');
-            $managers = $this->doctrine->getManagers();
-            foreach ($managers as $manager) {
-                if ($manager instanceof EntityManagerInterface) {
-                    $tool = new SchemaTool($manager);
-                    $tool->dropDatabase();
+            foreach ($this->doctrine->getConnections() as $name => $connection) {
+                if (is_string($name) && $connection instanceof Connection && !$this->isReadOnlyConnection($name)) {
+                    $this->dropDatabase($connection);
                 }
             }
         }
 
         return $this;
+    }
+
+    /**
+     * Drops all schema assets for the given connection by executing generated DDL statements.
+     */
+    protected function dropDatabase(Connection $connection): void
+    {
+        $dropSchemaSql = $this->getDropDatabaseSql($connection);
+
+        foreach ($dropSchemaSql as $sql) {
+            $connection->executeStatement($sql);
+        }
+    }
+
+    /**
+     * Returns SQL statements required to drop all assets for a DBAL connection.
+     */
+    protected function getDropDatabaseSql(Connection $connection): array
+    {
+        $schemaManager = $connection->getSchemaManager();
+        $method = method_exists(AbstractSchemaManager::class, 'introspectSchema')
+            ? 'introspectSchema'
+            : 'createSchema';
+
+        return $schemaManager->$method()->toDropSql($connection->getDatabasePlatform());
     }
 
     protected function getNotBlankValidator(string $message): callable
