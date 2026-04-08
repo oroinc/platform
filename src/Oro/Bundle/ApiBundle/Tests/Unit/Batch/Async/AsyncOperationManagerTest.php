@@ -473,7 +473,7 @@ class AsyncOperationManagerTest extends TestCase
         $this->expectSelectSummaryQuery($operationId, null, $em, $selectQb, true);
 
         $this->logger->expects(self::once())
-            ->method('error')
+            ->method('warning')
             ->with(
                 'The incrementation of an aggregate time failed because the asynchronous operation was not found.',
                 ['operationId' => $operationId]

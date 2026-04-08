@@ -24,7 +24,6 @@ Feature: Multiple Images entity field with DAM
       | Thumbnail Height        | 64           |
       | Maximum Number Of Files | 3            |
       | Use DAM                 | Yes          |
-      | File Applications       | [default]    |
     And I save and close form
     Then I should see "Field saved" flash message
     When I click update schema
