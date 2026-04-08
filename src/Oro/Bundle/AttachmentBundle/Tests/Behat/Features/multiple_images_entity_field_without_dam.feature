@@ -30,7 +30,6 @@ Feature: Multiple Images entity field without DAM
       | Allowed MIME types      | [image/jpeg]   |
       | Maximum Number Of Files | 2             |
       | Use DAM                 | No            |
-      | File Applications       | [default]     |
     And I save and close form
     Then I should see "Field saved" flash message
     When I click update schema

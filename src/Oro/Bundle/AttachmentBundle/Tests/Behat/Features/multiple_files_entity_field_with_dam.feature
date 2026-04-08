@@ -22,7 +22,6 @@ Feature: Multiple Files entity field with DAM
       | File Size (MB)          | 10           |
       | Maximum Number Of Files | 3            |
       | Use DAM                 | Yes          |
-      | File Applications       | [default]    |
     And I save and close form
     Then I should see "Field saved" flash message
     When I click update schema
