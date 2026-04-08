@@ -12,8 +12,11 @@ use Symfony\Requirements\RequirementCollection;
 /**
  * Abstract database requirements
  */
-abstract class AbstractDatabaseRequirementsProvider extends AbstractRequirementsProvider
+abstract class AbstractDatabaseRequirementsProvider extends AbstractRequirementsProvider implements
+    ReadOnlyConnectionAwareInterface
 {
+    use ReadOnlyConnectionAwareTrait;
+
     protected ManagerRegistry $registry;
 
     public function __construct(ManagerRegistry $registry)
@@ -69,7 +72,9 @@ abstract class AbstractDatabaseRequirementsProvider extends AbstractRequirements
         $targetPlatformLabel = $this->getTargetPlatformLabel();
         $requiredPrivileges = $this->getRequiredPrivileges();
 
-        if ($this->getCurrentPlatformName($connection) === $this->getTargetPlatformName()) {
+        if ($this->getCurrentPlatformName($connection) === $this->getTargetPlatformName()
+            && !$this->isReadOnlyConnection($connectionName)
+        ) {
             $platformVersion = $this->getCurrentPlatformVersion($connection) ?? 'undefined';
             $grantedPrivileges = $this->getGrantedPrivileges($connection);
             $privilegesDiff = array_diff($requiredPrivileges, $grantedPrivileges);
@@ -92,7 +97,7 @@ abstract class AbstractDatabaseRequirementsProvider extends AbstractRequirements
             );
 
             $collection->addRequirement(
-                in_array('ALL PRIVILEGES', $grantedPrivileges) || $privilegesDiff === [],
+                in_array('ALL PRIVILEGES', $grantedPrivileges, true) || $privilegesDiff === [],
                 sprintf(
                     'Connection "%s": All required database privileges is granted ',
                     $connectionName
