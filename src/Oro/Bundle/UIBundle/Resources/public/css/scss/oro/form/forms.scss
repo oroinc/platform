@@ -203,6 +203,13 @@
         }
     }
 
+    .control-group:where([data-depend-on]),
+    .control-group:where(:not([data-depend-on]):not(:has(.control-group)):has([data-depend-on])) {
+        &:where(:not(.dependent-field)) {
+            display: none;
+        }
+    }
+
     &:not(.form) {
         .control-group {
             &.attribute-row label.control-label {
