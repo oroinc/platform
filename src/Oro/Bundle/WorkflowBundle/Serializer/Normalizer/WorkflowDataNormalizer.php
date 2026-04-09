@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Serializer\AttributeTypeRestrictionAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
@@ -78,6 +79,12 @@ class WorkflowDataNormalizer implements
             // Skip attributes that already removed from configuration, they will be cleaned after next data update.
             if ($this->hasAttribute($workflow, $attributeName)) {
                 $attribute = $this->getAttribute($workflow, $attributeName);
+
+                // Skip attributes that are restricted by type.
+                if ($this->isRestrictedType($attribute->getType())) {
+                    continue;
+                }
+
                 $attributeValue = $this->denormalizeAttribute($workflow, $attribute, $attributeValue);
                 $denormalizedData[$attributeName] = $attributeValue;
             }
@@ -95,6 +102,13 @@ class WorkflowDataNormalizer implements
         }
 
         return $object;
+    }
+
+    private function isRestrictedType(?string $type): bool
+    {
+        return $type
+            && $this->serializer instanceof AttributeTypeRestrictionAwareSerializer
+            && $this->serializer->isRestrictedType($type);
     }
 
     /**

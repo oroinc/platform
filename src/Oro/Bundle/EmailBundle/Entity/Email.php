@@ -409,7 +409,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
      */
     public function getMultiMessageId()
     {
-        return $this->multiMessageId ? unserialize($this->multiMessageId) : null;
+        return $this->multiMessageId ? unserialize($this->multiMessageId, ['allowed_classes' => false]) : null;
     }
 
     /**
