@@ -12,12 +12,16 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
  * This serializer extends the base serializer to provide workflow-specific serialization
  * capabilities, enabling proper handling of workflow attributes and data.
  */
-class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializer
+class WorkflowDataSerializer extends Serializer implements
+    WorkflowAwareSerializer,
+    AttributeTypeRestrictionAwareSerializer
 {
     /**
      * @var string
      */
     protected $workflowName;
+
+    private array $restrictedTypes = [];
 
     /**
      * @var WorkflowRegistry
@@ -54,5 +58,17 @@ class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializ
     public function getWorkflowName()
     {
         return $this->workflowName;
+    }
+
+    #[\Override]
+    public function setRestrictedTypes(array $restrictedTypes): void
+    {
+        $this->restrictedTypes = $restrictedTypes;
+    }
+
+    #[\Override]
+    public function isRestrictedType(string $type): bool
+    {
+        return \in_array($type, $this->restrictedTypes, true);
     }
 }

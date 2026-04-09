@@ -34,6 +34,8 @@ class ConfigLogDiff
     #[ORM\Column(type: Types::TEXT)]
     protected ?string $diff = null;
 
+    private ?array $unserializedDiff = null;
+
     /**
      * @return int
      */
@@ -48,6 +50,7 @@ class ConfigLogDiff
      */
     public function setDiff(array $configs)
     {
+        $this->unserializedDiff = $configs;
         $this->diff = serialize($configs);
 
         return $this;
@@ -58,7 +61,11 @@ class ConfigLogDiff
      */
     public function getDiff()
     {
-        return unserialize($this->diff);
+        if (null === $this->unserializedDiff) {
+            $this->unserializedDiff = unserialize($this->diff);
+        }
+
+        return $this->unserializedDiff;
     }
 
     /**
