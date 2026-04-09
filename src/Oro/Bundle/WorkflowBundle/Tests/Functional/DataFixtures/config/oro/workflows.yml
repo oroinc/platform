@@ -1,4 +1,30 @@
 workflows:
+    test_flow_with_attributes:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 60
+        attributes:
+            string_attribute:
+                type: string
+            bool_attribute:
+                type: bool
+            array_attribute:
+                type: array
+            object_attribute:
+                type: object
+                options:
+                    class: \DateTime
+        steps:
+            open:
+                order: 10
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
+
     test_flow:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         priority: 60
@@ -136,7 +162,7 @@ workflows:
             second_point_transition:
                  step_to: third_point
                  transition_definition: second_point_transition_definition
-                 
+
     test_active_flow1:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         defaults:

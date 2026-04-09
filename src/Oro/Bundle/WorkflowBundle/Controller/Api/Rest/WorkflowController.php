@@ -17,6 +17,8 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Serializer\AttributeTypeRestrictionAwareSerializer;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +30,17 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class WorkflowController extends AbstractFOSRestController
 {
+    #[\Override]
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                LoggerInterface::class
+            ]
+        );
+    }
+
     /**
      * Returns:
      * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
@@ -52,19 +65,7 @@ class WorkflowController extends AbstractFOSRestController
             $workflowManager = $this->get('oro_workflow.manager');
 
             $entityId = $request->get('entityId', 0);
-            $data = $request->get('data');
-            $dataArray = [];
-            if ($data) {
-                $serializer = $this->get('oro_workflow.serializer.data.serializer');
-                $serializer->setWorkflowName($workflowName);
-                /** @var WorkflowData $data */
-                $data = $serializer->deserialize(
-                    $data,
-                    WorkflowData::class,
-                    'json'
-                );
-                $dataArray = $data->getValues();
-            }
+            $dataArray = $this->getDataArray($request, $workflowName);
 
             $workflow = $workflowManager->getWorkflow($workflowName);
             $entityClass = $workflow->getDefinition()->getRelatedEntity();
@@ -308,5 +309,47 @@ class WorkflowController extends AbstractFOSRestController
         }
 
         return $this->get('oro_workflow.workflow_item_serializer')->serialize($workflowItem);
+    }
+
+    protected function getDataArray(Request $request, string $workflowName): array
+    {
+        $requestData = $request->get('data');
+        if (is_array($requestData)) {
+            // IMPORTANT! Pass data through serializer to ensure that attributes are properly processed.
+            // IMPORTANT! Do not return raw unprocessed array from here.
+            try {
+                $requestData = \json_encode($requestData, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                $this->get(LoggerInterface::class)
+                    ->error('Failed to encode workflow data: ' . $e->getMessage(), ['exception' => $e]);
+            }
+        }
+
+        if ($requestData) {
+            $serializer = $this->get('oro_workflow.serializer.data.serializer');
+            $serializer->setWorkflowName($workflowName);
+
+            // Do not allow receiving array or object attributes from outside.
+            // Such attributes should be allowed only for internal workflow use.
+            if ($serializer instanceof AttributeTypeRestrictionAwareSerializer) {
+                $serializer->setRestrictedTypes(['array', 'object']);
+            }
+            try {
+                /** @var WorkflowData $requestData */
+                $data = $serializer->deserialize(
+                    $requestData,
+                    WorkflowData::class,
+                    'json'
+                );
+            } finally {
+                if ($serializer instanceof AttributeTypeRestrictionAwareSerializer) {
+                    $serializer->setRestrictedTypes([]);
+                }
+            }
+
+            return $data->getValues();
+        }
+
+        return [];
     }
 }
