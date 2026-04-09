@@ -59,7 +59,7 @@ class EntityConfigId implements ConfigIdInterface
     #[\Override]
     public function unserialize($serialized)
     {
-        [$this->className, $this->scope] = unserialize($serialized);
+        [$this->className, $this->scope] = unserialize($serialized, ['allowed_classes' => false]);
     }
 
     public function __serialize(): array

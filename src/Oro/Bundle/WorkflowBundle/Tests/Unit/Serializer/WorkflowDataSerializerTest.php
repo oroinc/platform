@@ -59,4 +59,12 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
         $this->serializer->setWorkflowName($workflowName);
         self::assertEquals($workflow, $this->serializer->getWorkflow());
     }
+
+    public function testTypeRestrictions(): void
+    {
+        $this->serializer->setRestrictedTypes(['array', 'object']);
+        self::assertTrue($this->serializer->isRestrictedType('array'));
+        self::assertTrue($this->serializer->isRestrictedType('object'));
+        self::assertFalse($this->serializer->isRestrictedType('string'));
+    }
 }

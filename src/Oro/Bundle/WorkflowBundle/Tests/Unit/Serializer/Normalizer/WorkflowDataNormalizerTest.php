@@ -332,6 +332,66 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $normalizer->supportsDenormalization('any_value', $type));
     }
 
+    public function testDenormalizeWithRestrictedTypes(): void
+    {
+        $attributeArray = $this->createMock(Attribute::class);
+        $attributeArray->expects($this->once())
+            ->method('getType')
+            ->willReturn('array');
+
+        $attributeStr = $this->createMock(Attribute::class);
+        $attributeStr->expects($this->once())
+            ->method('getType')
+            ->willReturn('string');
+
+        $data = new WorkflowData([
+            'attribute_array' => base64_encode(serialize(['bar'])),
+            'attribute_string' => 'str_attr'
+        ]);
+
+        $serializer = $this->createMock(WorkflowDataSerializer::class);
+        $serializer->expects($this->exactly(2))
+            ->method('isRestrictedType')
+            ->willReturnMap([
+                ['array', true],
+                ['string', false]
+            ]);
+
+        $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $serializer->expects($this->once())
+            ->method('getWorkflow')
+            ->willReturn($this->workflow);
+
+        $this->attributeManager->expects($this->once())
+            ->method('getAttributes')
+            ->willReturn(new ArrayCollection(['attribute_string' => $attributeStr]));
+        $this->workflow->expects($this->once())
+            ->method('getVariables')
+            ->willReturn([]);
+        $this->attributeManager->expects($this->any())
+            ->method('getAttribute')
+            ->willReturnMap([
+                ['attribute_array', $attributeArray],
+                ['attribute_string', $attributeStr]
+            ]);
+
+        $this->attributeNormalizer->expects($this->once())
+            ->method('supportsDenormalization')
+            ->with($this->workflow, $attributeStr, $data->get('attribute_string'))
+            ->willReturn(true);
+        $this->attributeNormalizer->expects($this->once())
+            ->method('denormalize')
+            ->with($this->workflow, $attributeStr, $data->get('attribute_string'))
+            ->willReturn($data->get('attribute_string'));
+
+        $this->assertEquals(
+            new WorkflowData(['attribute_string' => 'str_attr']),
+            $normalizer->denormalize($data, get_class($data))
+        );
+    }
+
     public function supportsDenormalizationDataProvider(): array
     {
         return [

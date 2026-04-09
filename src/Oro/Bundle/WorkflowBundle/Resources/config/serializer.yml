@@ -1,3 +1,10 @@
+parameters:
+    oro_workflow.php_unserializer.trusted_orgs: "%env(default:oro_workflow.php_unserializer.empty_array:csv:ORO_UNSERIALIZE_TRUSTED_ORGS)%"
+    oro_workflow.php_unserializer.not_allowed_classes: "%env(default:oro_workflow.php_unserializer.empty_array:csv:ORO_UNSERIALIZE_NOT_ALLOWED_CLASSES)%"
+    oro_workflow.php_unserializer.block_on_failure: "%env(default:oro_workflow.php_unserializer.default_block:bool:ORO_UNSERIALIZE_BLOCK)%"
+    oro_workflow.php_unserializer.empty_array: []
+    oro_workflow.php_unserializer.default_block: true
+
 services:
     oro_workflow.rest_api.entity_serializer:
         alias: oro_soap.entity_serializer
@@ -35,10 +42,24 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_workflow.php_unserializer:
+        class: Oro\Component\PhpUtils\PhpUnserializer
+        arguments:
+            - '@logger'
+            - '%oro_workflow.php_unserializer.trusted_orgs%'
+            - '%oro_workflow.php_unserializer.not_allowed_classes%'
+            - '%oro_workflow.php_unserializer.block_on_failure%'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
+
     oro_workflow.serializer.data.attribute_normalizer.standard:
         class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer
+        arguments:
+            - '@logger'
+            - '@oro_workflow.php_unserializer'
         tags:
             - { name: oro_workflow.attribute_normalizer }
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.serializer.data.attribute_normalizer.entity:
         class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer
