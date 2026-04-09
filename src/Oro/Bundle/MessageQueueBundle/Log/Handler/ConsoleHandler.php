@@ -74,7 +74,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     {
         $this->commandNestedLevel--;
         if (0 === $this->commandNestedLevel) {
-            $this->handler->onTerminate($event);
+            $this->handler->close();
         }
     }
 
