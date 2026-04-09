@@ -93,7 +93,10 @@ class FieldConfigId implements ConfigIdInterface
     #[\Override]
     public function unserialize($serialized)
     {
-        [$this->className, $this->scope, $this->fieldName, $this->fieldType] = unserialize($serialized);
+        [$this->className, $this->scope, $this->fieldName, $this->fieldType] = unserialize(
+            $serialized,
+            ['allowed_classes' => false]
+        );
     }
 
     public function __serialize(): array

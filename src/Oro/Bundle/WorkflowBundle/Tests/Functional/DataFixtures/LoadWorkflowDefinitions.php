@@ -11,6 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareInterface
 {
+    public const NO_START_STEP_WITH_ATTRS = 'test_flow_with_attributes';
     public const NO_START_STEP    = 'test_flow';
     public const WITH_START_STEP  = 'test_start_step_flow';
     public const WITH_INIT_OPTION = 'test_start_init_option';
