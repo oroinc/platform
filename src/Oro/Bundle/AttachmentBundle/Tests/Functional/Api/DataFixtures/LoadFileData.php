@@ -33,6 +33,8 @@ class LoadFileData extends AbstractFixture implements DependentFixtureInterface
         $user1 = $this->getReference('user_1');
         /** @var User $user2 */
         $user2 = $this->getReference('user_2');
+        /** @var User $user4 */
+        $user4 = $this->getReference('user_4');
 
         $file = new File();
         $file->setFile(new ComponentFile(__DIR__ . '/../../DataFixtures/files/file_1.txt'));
@@ -42,6 +44,7 @@ class LoadFileData extends AbstractFixture implements DependentFixtureInterface
         $file->setParentEntityId($user1->getId());
         $file->setOwner($user);
         $manager->persist($file);
+        $user1->setAvatar($file);
         $this->setReference('file_1', $file);
 
         $file = new File();
@@ -55,7 +58,21 @@ class LoadFileData extends AbstractFixture implements DependentFixtureInterface
         $file->setParentEntityId($user2->getId());
         $file->setOwner($user);
         $manager->persist($file);
+        $user2->setAvatar($file);
         $this->setReference('external_file_1', $file);
+
+        $file = new File();
+        $file->setFilename('external_file');
+        $file->setExternalUrl(ExternalFileFactoryStub::IMAGE_A_TEST_URL);
+        $file->setOriginalFilename('file_1.txt');
+        $file->setMimeType('text/plain');
+        $file->setFileSize(7);
+        $file->setParentEntityClass(User::class);
+        $file->setParentEntityId($user4->getId());
+        $file->setOwner($user);
+        $manager->persist($file);
+        $user4->setAvatar($file);
+        $this->setReference('external_file_2', $file);
 
         $manager->flush();
     }
@@ -92,5 +109,31 @@ class LoadFileData extends AbstractFixture implements DependentFixtureInterface
             ->setEnabled(true);
         $userManager->updateUser($user2);
         $this->setReference('user_2', $user2);
+
+        $user3 = $userManager->createUser();
+        $user3->setUsername('user_3')
+            ->setPlainPassword('user_3')
+            ->setEmail('user_3@example.com')
+            ->setFirstName('Harry')
+            ->setLastName('Carter')
+            ->setOrganization($organization)
+            ->addOrganization($organization)
+            ->addUserRole($role)
+            ->setEnabled(true);
+        $userManager->updateUser($user3);
+        $this->setReference('user_3', $user3);
+
+        $user4 = $userManager->createUser();
+        $user4->setUsername('user_4')
+            ->setPlainPassword('user_4')
+            ->setEmail('user_4@example.com')
+            ->setFirstName('Nikki')
+            ->setLastName('Parker')
+            ->setOrganization($organization)
+            ->addOrganization($organization)
+            ->addUserRole($role)
+            ->setEnabled(true);
+        $userManager->updateUser($user4);
+        $this->setReference('user_4', $user4);
     }
 }
