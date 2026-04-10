@@ -133,6 +133,14 @@ services:
         tags:
             - { name: oro.api.processor, action: customize_form_data, event: pre_submit|post_validate, class: Oro\Bundle\AttachmentBundle\Entity\File }
 
+    oro_attachment.api.link_file_to_parent_entity:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\LinkFileToParentEntity
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.form_property_accessor'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, class: Oro\Bundle\AttachmentBundle\Entity\File }
+
     oro_attachment.api.validate_file_parent:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\ValidateFileParent
         tags:
