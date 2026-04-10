@@ -4,12 +4,16 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Tests\Functional\Api\DataFixtures\LoadFileData;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\ExternalFileFactoryStub;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * @dbIsolationPerTest
+ * @nestTransactionsWithSavepoints
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FileTest extends RestJsonApiTestCase
@@ -22,18 +26,18 @@ class FileTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loadFixtures([LoadUser::class]);
+        $this->loadFixtures([LoadUser::class, LoadFileData::class]);
         $this->externalFileAllowedUrlsRegExp = $this->getExternalFileAllowedUrlsRegExp();
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         if ($this->getExternalFileAllowedUrlsRegExp() !== $this->externalFileAllowedUrlsRegExp) {
             $this->setExternalFileAllowedUrlsRegExp($this->externalFileAllowedUrlsRegExp);
         }
         $this->externalFileAllowedUrlsRegExp = '';
         $this->setIsStoredExternally(false);
+        parent::tearDown();
     }
 
     private function getExternalFileAllowedUrlsRegExp(): string
@@ -59,21 +63,65 @@ class FileTest extends RestJsonApiTestCase
         }
     }
 
-    public function testCreate(): int
+    private function getFileManager(): FileManager
     {
+        return self::getContainer()->get('oro_attachment.file_manager');
+    }
+
+    public function testGet(): void
+    {
+        $fileId = $this->getReference('file_1')->getId();
+
+        $response = $this->get(
+            ['entity' => 'files', 'id' => (string)$fileId]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type' => 'files',
+                    'id' => (string)$fileId,
+                    'attributes' => [
+                        'mimeType' => 'text/plain',
+                        'originalFilename' => 'file_1.txt',
+                        'fileSize' => 7,
+                        'content' => 'ZmlsZV9hCg==',
+                        'parentFieldName' => 'avatar'
+                    ],
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                        ],
+                        'parent' => [
+                            'data' => ['type' => 'users', 'id' => '<toString(@user_1->id)>']
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testCreateWhenParentEntityIsNotLinkedToAnotherFile(): void
+    {
+        /** @var User $user */
+        $user = $this->getReference('user_3');
+        $userId = $user->getId();
+        self::assertTrue(null === $user->getAvatar());
+
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'mimeType'         => 'image/png',
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
                     'originalFilename' => 'blank.png',
-                    'fileSize'         => 95,
-                    'content'          => self::$blankFileContent,
-                    'parentFieldName'  => 'avatar'
+                    'fileSize' => 95,
+                    'content' => self::$blankFileContent,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
-                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                        'data' => ['type' => 'users', 'id' => (string)$userId]
                     ]
                 ]
             ]
@@ -83,55 +131,166 @@ class FileTest extends RestJsonApiTestCase
         $expectedData = $data;
         $expectedData['data']['relationships']['owner']['data'] = [
             'type' => 'users',
-            'id'   => '<toString(@user->id)>'
+            'id' => '<toString(@user->id)>'
         ];
         $this->assertResponseContains($expectedData, $response);
 
         $fileId = (int)$this->getResourceId($response);
 
-        // test that the entity was created
-        $entity = $this->getEntityManager()->find(File::class, $fileId);
-        self::assertNotNull($entity);
+        // test that the File entity was created
+        $file = $this->getEntityManager()->find(File::class, $fileId);
+        self::assertFalse(null === $file);
 
-        // clear entity manager to not affect dependent tests
-        $this->getEntityManager()->clear();
-
-        return $fileId;
+        // test that the File entity was linked to the parent entity
+        $user = $this->getEntityManager()->find(User::class, $userId);
+        self::assertInstanceOf(File::class, $user->getAvatar());
+        self::assertEquals($file->getId(), $user->getAvatar()->getId());
     }
 
-    /**
-     * @depends testCreate
-     */
-    public function testGet(int $fileId): void
+    public function testCreateWhenParentEntityLinkedToAnotherFile(): void
     {
-        $response = $this->get(
-            ['entity' => 'files', 'id' => (string)$fileId]
-        );
+        /** @var User $user */
+        $user = $this->getReference('user_1');
+        $userId = $user->getId();
+        $previousFileId = $user->getAvatar()->getId();
+        $previousFileName = $user->getAvatar()->getFilename();
 
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'blank.png',
-                        'fileSize'         => 95,
-                        'content'          => self::$blankFileContent,
-                        'parentFieldName'  => 'avatar'
-                    ],
-                    'relationships' => [
-                        'owner'  => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ],
-                        'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ]
+        $data = [
+            'data' => [
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'originalFilename' => 'blank.png',
+                    'fileSize' => 95,
+                    'content' => self::$blankFileContent,
+                    'parentFieldName' => 'avatar'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => (string)$userId]
                     ]
                 ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data);
+
+        $expectedData = $data;
+        $expectedData['data']['relationships']['owner']['data'] = [
+            'type' => 'users',
+            'id' => '<toString(@user->id)>'
+        ];
+        $this->assertResponseContains($expectedData, $response);
+
+        $fileId = (int)$this->getResourceId($response);
+
+        // test that the File entity was created
+        $file = $this->getEntityManager()->find(File::class, $fileId);
+        self::assertFalse(null === $file);
+
+        // test that the File entity was linked to the parent entity
+        $user = $this->getEntityManager()->find(User::class, $userId);
+        self::assertInstanceOf(File::class, $user->getAvatar());
+        self::assertEquals($file->getId(), $user->getAvatar()->getId());
+
+        // test that the previously linked File entity was removed
+        $previousFile = $this->getEntityManager()->find(File::class, $previousFileId);
+        self::assertTrue(null === $previousFile);
+        // test that the previously linked file was removed from the filesystem
+        self::assertFalse($this->getFileManager()->hasFile($previousFileName));
+    }
+
+    public function testTryToCreateWhenParentEntityFieldNameIsNotValid(): void
+    {
+        /** @var User $user */
+        $user = $this->getReference('user_1');
+        $userId = $user->getId();
+        $previousFileId = $user->getAvatar()->getId();
+
+        $data = [
+            'data' => [
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'originalFilename' => 'blank.png',
+                    'fileSize' => 95,
+                    'content' => self::$blankFileContent,
+                    'parentFieldName' => 'notExistingField'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => (string)$userId]
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'value constraint',
+                'detail' => 'Invalid parent entity field name.',
+                'source' => ['pointer' => '/data/attributes/parentFieldName']
             ],
             $response
         );
+
+        // test that the previous File entity was not unlinked from the parent entity
+        $user = $this->getEntityManager()->find(User::class, $userId);
+        self::assertInstanceOf(File::class, $user->getAvatar());
+        self::assertEquals($previousFileId, $user->getAvatar()->getId());
+
+        // test that the previously linked File entity was not removed
+        $previousFile = $this->getEntityManager()->find(File::class, $previousFileId);
+        self::assertFalse(null === $previousFile);
+    }
+
+    public function testCreateWhenParentEntityLinkedToAnotherFileWithoutParentEntityFieldName(): void
+    {
+        /** @var User $user */
+        $user = $this->getReference('user_4');
+        $userId = $user->getId();
+        $previousFileId = $user->getAvatar()->getId();
+
+        $data = [
+            'data' => [
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'originalFilename' => 'blank.png',
+                    'fileSize' => 95,
+                    'content' => self::$blankFileContent,
+                    'parentFieldName' => 'avatar'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => (string)$userId]
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data);
+
+        $expectedData = $data;
+        $expectedData['data']['relationships']['owner']['data'] = [
+            'type' => 'users',
+            'id' => '<toString(@user->id)>'
+        ];
+        $this->assertResponseContains($expectedData, $response);
+
+        $fileId = (int)$this->getResourceId($response);
+
+        // test that the File entity was created
+        $file = $this->getEntityManager()->find(File::class, $fileId);
+        self::assertFalse(null === $file);
+
+        // test that the File entity was linked to the parent entity
+        $user = $this->getEntityManager()->find(User::class, $userId);
+        self::assertInstanceOf(File::class, $user->getAvatar());
+        self::assertEquals($file->getId(), $user->getAvatar()->getId());
+
+        // test that the previously linked File entity was not removed
+        $previousFile = $this->getEntityManager()->find(File::class, $previousFileId);
+        self::assertFalse(null === $previousFile);
     }
 
     public function testTryToCreateWithoutOriginalFilename(): void
@@ -413,17 +572,17 @@ class FileTest extends RestJsonApiTestCase
         );
     }
 
-    public function testCreateWithExternalUrl(): int
+    public function testCreateWithExternalUrl(): void
     {
         $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'externalUrl'     => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                    'parentFieldName' => 'avatar',
+                'type' => 'files',
+                'attributes' => [
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -437,7 +596,7 @@ class FileTest extends RestJsonApiTestCase
         $expectedData = $data;
         $expectedData['data']['relationships']['owner']['data'] = [
             'type' => 'users',
-            'id'   => '<toString(@user->id)>'
+            'id' => '<toString(@user->id)>'
         ];
         $this->assertResponseContains($expectedData, $response);
 
@@ -446,18 +605,12 @@ class FileTest extends RestJsonApiTestCase
         // test that the entity was created
         $entity = $this->getEntityManager()->find(File::class, $fileId);
         self::assertNotNull($entity);
-
-        // clear entity manager to not affect dependent tests
-        $this->getEntityManager()->clear();
-
-        return $fileId;
     }
 
-    /**
-     * @depends testCreateWithExternalUrl
-     */
-    public function testGetExternalUrl(int $fileId): void
+    public function testGetExternalUrl(): void
     {
+        $fileId = $this->getReference('external_file_1')->getId();
+
         $response = $this->get(
             ['entity' => 'files', 'id' => (string)$fileId]
         );
@@ -465,21 +618,21 @@ class FileTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'image-a.png',
-                        'fileSize'         => 95,
-                        'externalUrl'      => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                        'parentFieldName'  => 'avatar',
+                    'type' => 'files',
+                    'id' => (string)$fileId,
+                    'attributes' => [
+                        'mimeType' => 'text/plain',
+                        'originalFilename' => 'file_1.txt',
+                        'fileSize' => 7,
+                        'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                        'parentFieldName' => 'avatar'
                     ],
                     'relationships' => [
-                        'owner'  => [
+                        'owner' => [
                             'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
                         ],
                         'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                            'data' => ['type' => 'users', 'id' => '<toString(@user_2->id)>']
                         ]
                     ]
                 ]
@@ -488,94 +641,58 @@ class FileTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @depends testCreateWithExternalUrl
-     */
-    public function testUpdateExternalUrl(int $fileId): int
+    public function testUpdateExternalUrl(): void
     {
         $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
+        $fileId = $this->getReference('external_file_1')->getId();
+
         $data = [
             'data' => [
-                'type'       => 'files',
-                'id'         => (string)$fileId,
+                'type' => 'files',
+                'id' => (string)$fileId,
                 'attributes' => [
-                    'externalUrl'     => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
-                    'parentFieldName' => 'avatar',
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
+                    'parentFieldName' => 'avatar'
                 ]
             ]
         ];
         $response = $this->patch(['entity' => 'files', 'id' => (string)$fileId], $data);
 
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'image-b.png',
-                        'fileSize'         => 96,
-                        'externalUrl'      => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
-                        'parentFieldName'  => 'avatar',
+        $expectedData = [
+            'data' => [
+                'type' => 'files',
+                'id' => (string)$fileId,
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'originalFilename' => 'image-b.png',
+                    'fileSize' => 96,
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
+                    'parentFieldName' => 'avatar'
+                ],
+                'relationships' => [
+                    'owner' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
                     ],
-                    'relationships' => [
-                        'owner'  => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ],
-                        'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ]
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user_2->id)>']
                     ]
                 ]
-            ],
-            $response
-        );
+            ]
+        ];
+        $this->assertResponseContains($expectedData, $response);
 
-        return $fileId;
-    }
-
-    /**
-     * @depends testUpdateExternalUrl
-     */
-    public function testGetExternalUrlAfterPatch(int $fileId): void
-    {
         $response = $this->get(
             ['entity' => 'files', 'id' => (string)$fileId]
         );
-
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'image-b.png',
-                        'fileSize'         => 96,
-                        'externalUrl'      => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
-                        'parentFieldName'  => 'avatar',
-                    ],
-                    'relationships' => [
-                        'owner'  => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ],
-                        'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ]
-                    ]
-                ]
-            ],
-            $response
-        );
+        $this->assertResponseContains($expectedData, $response);
     }
 
-    /**
-     * @depends testCreateWithExternalUrl
-     */
-    public function testDeleteExternalUrl(int $fileId): void
+    public function testDeleteExternalUrl(): void
     {
+        $fileId = $this->getReference('external_file_1')->getId();
+
         $response = $this->delete(
             ['entity' => 'files', 'id' => (string)$fileId]
         );
@@ -585,5 +702,133 @@ class FileTest extends RestJsonApiTestCase
         // Checks that the File entity was deleted.
         $entity = $this->getEntityManager()->find(File::class, $fileId);
         self::assertNull($entity);
+    }
+
+    public function testTryToChangeParentEntity(): void
+    {
+        /** @var User $previousUser */
+        $previousUser = $this->getReference('user_1');
+        $previousUserId = $previousUser->getId();
+        /** @var User $user */
+        $user = $this->getReference('user_4');
+        $userId = $user->getId();
+
+        $fileId = $this->getReference('file_1')->getId();
+
+        $data = [
+            'data' => [
+                'type' => 'files',
+                'id' => (string)$fileId,
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => (string)$userId]
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->patch(['entity' => 'files', 'id' => (string)$fileId], $data);
+
+        $expectedData = [
+            'data' => [
+                'type' => 'files',
+                'id' => (string)$fileId,
+                'attributes' => [
+                    'mimeType' => 'text/plain',
+                    'originalFilename' => 'file_1.txt',
+                    'fileSize' => 7,
+                    'externalUrl' => null,
+                    'parentFieldName' => 'avatar'
+                ],
+                'relationships' => [
+                    'owner' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ],
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => (string)$previousUserId]
+                    ]
+                ]
+            ]
+        ];
+        $this->assertResponseContains($expectedData, $response);
+
+        // test that the linked to the parent entity was not changed
+        $previousUser = $this->getEntityManager()->find(User::class, $previousUserId);
+        self::assertInstanceOf(File::class, $previousUser->getAvatar());
+        self::assertEquals($fileId, $previousUser->getAvatar()->getId());
+
+        // test that the linked File entity was not removed
+        $file = $this->getEntityManager()->find(File::class, $fileId);
+        self::assertFalse(null === $file);
+
+        // test that the parent entity was not changed
+        self::assertEquals(User::class, $file->getParentEntityClass());
+        self::assertEquals($previousUserId, $file->getParentEntityId());
+    }
+
+    public function testTryToChangeParentEntityFieldName(): void
+    {
+        /** @var User $user */
+        $user = $this->getReference('user_1');
+        $userId = $user->getId();
+
+        $fileId = $this->getReference('file_1')->getId();
+
+        $data = [
+            'data' => [
+                'type' => 'files',
+                'id' => (string)$fileId,
+                'attributes' => [
+                    'parentFieldName' => 'other'
+                ]
+            ]
+        ];
+        $response = $this->patch(['entity' => 'files', 'id' => (string)$fileId], $data);
+
+        $expectedData = [
+            'data' => [
+                'type' => 'files',
+                'id' => (string)$fileId,
+                'attributes' => [
+                    'mimeType' => 'text/plain',
+                    'originalFilename' => 'file_1.txt',
+                    'fileSize' => 7,
+                    'externalUrl' => null,
+                    'parentFieldName' => 'avatar'
+                ],
+                'relationships' => [
+                    'owner' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ],
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => (string)$userId]
+                    ]
+                ]
+            ]
+        ];
+        $this->assertResponseContains($expectedData, $response);
+
+        // test that the linked to the parent entity was not changed
+        $user = $this->getEntityManager()->find(User::class, $userId);
+        self::assertInstanceOf(File::class, $user->getAvatar());
+        self::assertEquals($fileId, $user->getAvatar()->getId());
+
+        // test that the linked File entity was not removed
+        $file = $this->getEntityManager()->find(File::class, $fileId);
+        self::assertFalse(null === $file);
+
+        // test that the parent entity field name was not changed
+        self::assertEquals('avatar', $file->getParentEntityFieldName());
+    }
+
+    public function testTryToChangeParentEntityViaRelationship(): void
+    {
+        $response = $this->patchRelationship(
+            ['entity' => 'files', 'id' => '<toString(@file_1->id)>', 'association' => 'parent'],
+            ['data' => ['type' => 'users', 'id' => '<toString(@user_4->id)>']],
+            [],
+            false
+        );
+
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 }
