@@ -13,17 +13,18 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
 {
+    private EntityDefinitionFieldConfig $config;
     private NestedAssociationListener $listener;
 
     #[\Override]
     protected function setUp(): void
     {
-        $config = new EntityDefinitionFieldConfig();
-        $targetConfig = $config->createAndSetTargetEntity();
+        $this->config = new EntityDefinitionFieldConfig();
+        $targetConfig = $this->config->createAndSetTargetEntity();
         $targetConfig->addField('__class__')->setPropertyPath('relatedObjectClassName');
         $targetConfig->addField('id')->setPropertyPath('relatedObjectId');
 
-        $this->listener = new NestedAssociationListener(PropertyAccess::createPropertyAccessor(), $config);
+        $this->listener = new NestedAssociationListener(PropertyAccess::createPropertyAccessor(), $this->config);
     }
 
     private function getFormEvent(object $entity, mixed $data): FormEvent
@@ -52,6 +53,23 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
             ],
             NestedAssociationListener::getSubscribedEvents()
         );
+    }
+
+    public function testShouldNotSetRelatedFieldsOnPostSubmitWhenAssociationIsReadonly()
+    {
+        $entity = new ObjectWithNestedAssociation();
+        $this->config->setFormOption('mapped', false);
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::never())
+            ->method('getData');
+        $form->expects(self::never())
+            ->method('getParent');
+
+        $this->listener->postSubmit(new FormEvent($form, null));
+
+        self::assertNull($entity->relatedObjectClassName);
+        self::assertNull($entity->relatedObjectId);
     }
 
     public function testShouldSetRelatedFieldsOnPostSubmit()
