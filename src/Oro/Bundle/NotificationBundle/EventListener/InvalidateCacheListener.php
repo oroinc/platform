@@ -52,7 +52,7 @@ class InvalidateCacheListener
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($entity instanceof EmailNotification) {
                 $changeSet = $uow->getEntityChangeSet($entity);
-                if (isset($changeSet['entityName']) || isset($changeSet['event'])) {
+                if (isset($changeSet['entityName']) || isset($changeSet['eventName'])) {
                     return true;
                 }
             }
