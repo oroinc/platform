@@ -58,6 +58,7 @@ oro_behat_extension:
             type: 'css'
             locator: 'input[name="property_path"].select2-offscreen'
           Label: 'label'
+          Required: 'required'
 
     Workflow System Label:
       selector: '.badge:contains("System") i.fa-circle'
