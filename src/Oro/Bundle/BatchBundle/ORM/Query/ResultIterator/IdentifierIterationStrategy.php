@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\Query\ResultIterator;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query;
+use Oro\Bundle\EntityBundle\Helper\IdHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
 /**
@@ -43,6 +45,7 @@ class IdentifierIterationStrategy implements IdentityIterationStrategyInterface
      */
     public function setDataQueryIdentifiers(Query $query, array $identifiers)
     {
-        $query->setParameter(LimitIdentifierWalker::PARAMETER_IDS, $identifiers);
+        $idsString = IdHelper::getIdsSequence($identifiers);
+        $query->setParameter(LimitIdentifierWalker::PARAMETER_IDS, $idsString, ParameterType::STRING);
     }
 }
