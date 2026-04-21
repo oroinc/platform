@@ -185,7 +185,7 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         return $this->uriSecurityHelper;
     }
 
-    private function getTokenAccessor(): TokenAccessorInterface
+    protected function getTokenAccessor(): TokenAccessorInterface
     {
         if (null === $this->tokenAccessor) {
             $this->tokenAccessor = $this->container->get(TokenAccessorInterface::class);
