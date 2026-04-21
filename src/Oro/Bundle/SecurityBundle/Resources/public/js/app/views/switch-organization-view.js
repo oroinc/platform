@@ -11,6 +11,15 @@ const SwitchOrganizationView = BaseView.extend({
      */
     autoRender: true,
 
+    optionNames: BaseView.prototype.optionNames.concat(['organizations']),
+
+    /**
+     * @type {Array|null}
+     * Static list of organizations [{id, name}, ...] passed from the server-side template.
+     * When provided, the select2 dropdown uses this data directly instead of making API requests.
+     */
+    organizations: null,
+
     events: {
         'change input[type="hidden"]': 'onChange',
         'select2:select input[type="hidden"]': 'onChange',
@@ -39,6 +48,19 @@ const SwitchOrganizationView = BaseView.extend({
             opts.formatSearching = function() {
                 return __('Loading...');
             };
+
+            if (this.organizations) {
+                // Filter the pre-loaded organizations locally on each keystroke - avoids hitting the autocomplete
+                // endpoint when the whole list is already on the client.
+                const staticData = this.organizations;
+                opts.query = function(query) {
+                    const term = (query.term || '').toLowerCase();
+                    const results = term
+                        ? staticData.filter(item => item.name.toLowerCase().includes(term))
+                        : staticData;
+                    query.callback({results, more: false});
+                };
+            }
         }
     },
 

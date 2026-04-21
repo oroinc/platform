@@ -118,7 +118,11 @@
 {% endblock %}
 
 {% block oro_acl_switch_organization_widget %}
-    <div class="organization-switcher" data-page-component-view="orosecurity/js/app/views/switch-organization-view">
+    {% set organizations = get_user_organizations_count() <= 10 ? get_enabled_organizations() : [] %}
+    <div class="organization-switcher"
+        data-page-component-view="orosecurity/js/app/views/switch-organization-view"
+        {% if organizations %}data-page-component-options="{{ {organizations: organizations}|json_encode|e('html_attr') }}"{% endif %}
+    >
         {{ form_widget(form.organization, {
             attr: {
                 isButtonsEnabled: false,
