@@ -1,6 +1,11 @@
 parameters:
     log_stacktrace_level: null
     oro_logger.detailed_logs_default_level: error
+    oro_log_trace_id_header: '%env(ORO_LOG_TRACE_ID_HEADER)%'
+    oro_log_trace_console: '%env(ORO_LOG_TRACE_CONSOLE)%'
+
+    env(ORO_LOG_TRACE_ID_HEADER): "X-Request-ID"
+    env(ORO_LOG_TRACE_CONSOLE): null
 
 services:
     oro_logger.cache:
@@ -61,6 +66,13 @@ services:
         tags:
             - { name: monolog.processor }
 
+    oro_logger.processor.trace:
+        class: Oro\Bundle\LoggerBundle\Monolog\Processor\TraceProcessor
+        arguments:
+            - '@oro_logger.trace.manager'
+        tags:
+            - { name: monolog.processor }
+
     oro_logger.consumption_extension.interruption_detail:
         class: Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension
         public: false
@@ -98,3 +110,43 @@ services:
             - '@?debug.stopwatch'
         tags:
             - { name: monolog.logger, channel: doctrine }
+
+    oro_logger.event_subscriber.application_name:
+        class: Oro\Bundle\LoggerBundle\EventSubscriber\Trace\ApplicationNameSubscriber
+        arguments:
+            - '@oro_logger.trace.manager'
+            - '@doctrine'
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
+            - { name: monolog.logger, channel: oro_logger }
+
+    oro_logger.event_listener.request_trace:
+        class: Oro\Bundle\LoggerBundle\EventListener\Trace\RequestTraceListener
+        arguments:
+            - '@oro_logger.trace.manager'
+            - '%oro_log_trace_id_header%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 520 }
+
+    oro_logger.event_listener.console_trace:
+        class: Oro\Bundle\LoggerBundle\EventListener\Trace\ConsoleTraceListener
+        arguments:
+            - '@oro_logger.trace.manager'
+            - '%oro_log_trace_console%'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 300 }
+
+    oro_logger.async.message_trace_producer_middleware:
+        class: Oro\Bundle\LoggerBundle\Async\MessageTraceProducerMiddleware
+        arguments:
+            - '@oro_logger.trace.manager'
+        lazy: false
+        tags:
+            - { name: oro_message_queue.middleware }
+            - { name: oro_message_queue.consumption.extension, priority: 520 }
+
+    oro_logger.trace.manager:
+        class: Oro\Bundle\LoggerBundle\Trace\TraceManager
+        arguments:
+            - '@event_dispatcher'

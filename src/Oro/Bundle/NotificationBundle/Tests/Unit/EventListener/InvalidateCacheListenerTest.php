@@ -162,7 +162,7 @@ class InvalidateCacheListenerTest extends TestCase
         $this->uow->expects(self::once())
             ->method('getEntityChangeSet')
             ->with($emailNotification)
-            ->willReturn(['event' => []]);
+            ->willReturn(['eventName' => []]);
 
         $this->notificationManager->expects(self::once())
             ->method('clearCache');

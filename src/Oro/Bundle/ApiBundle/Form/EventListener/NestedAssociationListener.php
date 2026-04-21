@@ -37,6 +37,11 @@ class NestedAssociationListener implements EventSubscriberInterface
 
     public function postSubmit(FormEvent $event): void
     {
+        if (!$this->config->getFormOption('mapped', true)) {
+            // the nested association is read-only
+            return;
+        }
+
         $form = $event->getForm();
         $data = $form->getData();
         $entity = $form->getParent()->getData();

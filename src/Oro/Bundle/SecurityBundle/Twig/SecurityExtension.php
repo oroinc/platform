@@ -164,7 +164,7 @@ class SecurityExtension extends AbstractExtension implements ServiceSubscriberIn
         return $this->container->get(PermissionManager::class);
     }
 
-    private function getTokenAccessor(): TokenAccessorInterface
+    protected function getTokenAccessor(): TokenAccessorInterface
     {
         return $this->container->get(TokenAccessorInterface::class);
     }

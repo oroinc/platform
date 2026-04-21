@@ -199,6 +199,63 @@ class WorkflowControllerTest extends WebTestCase
         );
     }
 
+    // Check Ticket BAP-23335
+    public function testStartWorkflowWithPassedAttributes(): void
+    {
+        $testEntity = $this->createNewEntity();
+
+        $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::NO_START_STEP_WITH_ATTRS);
+        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::NO_START_STEP_WITH_ATTRS);
+
+        $this->client->jsonRequest(
+            'POST',
+            $this->getUrl(
+                'oro_api_workflow_start',
+                [
+                    'workflowName' => LoadWorkflowDefinitions::NO_START_STEP_WITH_ATTRS,
+                    'transitionName' => LoadWorkflowDefinitions::START_TRANSITION,
+                    'entityId' => $testEntity->getId(),
+                    'data' => [
+                        'string_attribute' => 'test_string_attribute',
+                        'bool_attribute' => true,
+                        'array_attribute' => base64_encode(serialize([1, 2, 3])),
+                        'object_attribute' => base64_encode(
+                            serialize(new \DateTime('2011-11-11 11:11:11', new \DateTimeZone('UTC')))
+                        ),
+                    ]
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::NO_START_STEP_WITH_ATTRS);
+
+        $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::NO_START_STEP_WITH_ATTRS);
+
+        $this->assertEquals(
+            [
+                'workflowItem' => [
+                    'id' => $workflowItem->getId(),
+                    'workflow_name' => $workflowItem->getWorkflowName(),
+                    'entity_id' => $workflowItem->getEntityId(),
+                    'entity_class' => $workflowItem->getEntityClass(),
+                    'result' => null,
+                ]
+            ],
+            $result
+        );
+
+        $data = $workflowItem->getData();
+        $this->assertTrue($data->has('entity'));
+        $this->assertEquals('test_string_attribute', $data->get('string_attribute'));
+        $this->assertTrue($data->get('bool_attribute'));
+        // Check that passed array attribute is skipped
+        $this->assertEquals([], $data->get('array_attribute'));
+        // Check that passed object attribute is skipped
+        $this->assertFalse($data->has('object_attribute'));
+    }
+
     public function testStartWorkflow(): void
     {
         $testEntity = $this->createNewEntity();

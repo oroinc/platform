@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\ORM\Query\ResultIterator;
 
 use Doctrine\ORM\Query\AST;
 use Doctrine\ORM\Query\TreeWalkerAdapter;
+use Oro\Bundle\EntityBundle\ORM\Query\AST\AnyExpression;
 
 /**
  * Modifies AST to use primary keys as main condition
@@ -41,11 +42,9 @@ class LimitIdentifierWalker extends TreeWalkerAdapter
         );
         $pathExpression->type = $pathType;
 
-        // create Where In Expression
-        $arithmeticExpression = new AST\ArithmeticExpression();
-        $arithmeticExpression->simpleArithmeticExpression = new AST\SimpleArithmeticExpression([$pathExpression]);
-        $expression = new AST\InExpression($arithmeticExpression);
-        $expression->literals[] = new AST\InputParameter(':' . self::PARAMETER_IDS);
+        // create Where ANY() Expression
+        $anyExpr = new AnyExpression(new AST\InputParameter(':' . self::PARAMETER_IDS));
+        $expression = new AST\ComparisonExpression($pathExpression, '=', $anyExpr);
 
         // create a condition and insert it to existing Where Expression
         $conditionalPrimary = new AST\ConditionalPrimary();
