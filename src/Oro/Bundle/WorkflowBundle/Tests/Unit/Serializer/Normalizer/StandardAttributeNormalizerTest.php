@@ -5,24 +5,29 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer;
+use Oro\Component\PhpUtils\Exception\UnsafeUnserializationException;
+use Oro\Component\PhpUtils\PhpUnserializerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
-class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
+class StandardAttributeNormalizerTest extends TestCase
 {
-    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflow;
+    private Workflow&MockObject $workflow;
+    private Attribute&MockObject $attribute;
+    private LoggerInterface&MockObject $logger;
+    private PhpUnserializerInterface&MockObject $unserializer;
 
-    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
-    private $attribute;
-
-    /** @var StandardAttributeNormalizer */
-    private $normalizer;
+    private StandardAttributeNormalizer $normalizer;
 
     protected function setUp(): void
     {
         $this->workflow = $this->createMock(Workflow::class);
         $this->attribute = $this->createMock(Attribute::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->unserializer = $this->createMock(PhpUnserializerInterface::class);
 
-        $this->normalizer = new StandardAttributeNormalizer();
+        $this->normalizer = new StandardAttributeNormalizer($this->logger, $this->unserializer);
     }
 
     /**
@@ -185,63 +190,188 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
                 'value' => '-12345.67',
                 'expected' => -12345.67,
             ],
-            'not_array' => [
-                'type' => 'array',
-                'value' => false,
-                'expected' => [],
-            ],
-            'not_array_after_unserialized' => [
-                'type' => 'array',
-                'value' => $this->serializeBase64('somestring'),
-                'expected' => [],
-            ],
-            'array' => [
-                'type' => 'array',
-                'value' => $this->serializeBase64([1, 2, 3]),
-                'expected' => [1, 2, 3],
-            ],
         ];
     }
 
-    /**
-     * @dataProvider denormalizeObjectDataProvider
-     */
-    public function testDenormalizeObject(string $value, string $class, ?object $expected)
+    public function testDenormalizeArrayWhenValueIsNotString()
     {
-        $type = 'object';
-
-        $this->workflow->expects($this->never())
-            ->method($this->anything());
-
         $this->attribute->expects($this->once())
             ->method('getType')
-            ->willReturn($type);
-        $this->attribute->expects($this->once())
-            ->method('getOption')->with('class')
-            ->willReturn($class);
+            ->willReturn('array');
 
-        $this->assertEquals($expected, $this->normalizer->denormalize($this->workflow, $this->attribute, $value));
+        $this->unserializer->expects($this->never())->method('unserialize');
+
+        $this->assertEquals([], $this->normalizer->denormalize($this->workflow, $this->attribute, false));
     }
 
-    public function denormalizeObjectDataProvider(): array
+    public function testDenormalizeArrayWhenUnserializedValueIsNotArray(): void
     {
-        return [
-            'not_object' => [
-                'value' => $this->serializeBase64('01.1'),
-                'class' => 'stdClass',
-                'expected' => null,
-            ],
-            'not_instance_of_class' => [
-                'value' => $this->serializeBase64(new \DateTime()),
-                'class' => 'stdClass',
-                'expected' => null,
-            ],
-            'object' => [
-                'value' => $this->serializeBase64(new \stdClass()),
-                'class' => 'stdClass',
-                'expected' => new \stdClass(),
-            ],
-        ];
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('array');
+
+        $this->unserializer->expects($this->once())
+            ->method('unserialize')
+            ->with(serialize('somestring'), ['allowed_classes' => false])
+            ->willReturn('somestring');
+
+        $this->assertEquals(
+            [],
+            $this->normalizer->denormalize($this->workflow, $this->attribute, $this->serializeBase64('somestring'))
+        );
+    }
+
+    public function testDenormalizeArray(): void
+    {
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('array');
+
+        $this->unserializer->expects($this->once())
+            ->method('unserialize')
+            ->with(serialize([1, 2, 3]), ['allowed_classes' => false])
+            ->willReturn([1, 2, 3]);
+
+        $this->assertEquals(
+            [1, 2, 3],
+            $this->normalizer->denormalize($this->workflow, $this->attribute, $this->serializeBase64([1, 2, 3]))
+        );
+    }
+
+    public function testDenormalizeObjectWhenUnserializedValueIsNotObject(): void
+    {
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('object');
+        $this->attribute->expects($this->exactly(2))
+            ->method('getOption')
+            ->with('class')
+            ->willReturn(\stdClass::class);
+
+        $this->unserializer->expects($this->once())
+            ->method('unserialize')
+            ->with(serialize('01.1'), [PhpUnserializerInterface::WHITELIST_CLASSES_KEY => [\stdClass::class]])
+            ->willReturn('01.1');
+
+        $this->assertNull(
+            $this->normalizer->denormalize($this->workflow, $this->attribute, $this->serializeBase64('01.1'))
+        );
+    }
+
+    public function testDenormalizeObjectWhenUnserializedValueIsNotInstanceOfClass(): void
+    {
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('object');
+        $this->attribute->expects($this->exactly(2))
+            ->method('getOption')
+            ->with('class')
+            ->willReturn(\stdClass::class);
+
+        $dateTime = new \DateTime('2011-11-11 11:11:11', new \DateTimeZone('UTC'));
+
+        $this->unserializer->expects($this->once())
+            ->method('unserialize')
+            ->with(serialize($dateTime), [PhpUnserializerInterface::WHITELIST_CLASSES_KEY => [\stdClass::class]])
+            ->willReturn($dateTime);
+
+        $this->assertNull(
+            $this->normalizer->denormalize($this->workflow, $this->attribute, $this->serializeBase64($dateTime))
+        );
+    }
+
+    public function testDenormalizeObject(): void
+    {
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('object');
+        $this->attribute->expects($this->exactly(2))
+            ->method('getOption')
+            ->with('class')
+            ->willReturn(\DateTime::class);
+
+        $dateTime = new \DateTime('2011-11-11 11:11:11', new \DateTimeZone('UTC'));
+
+        $this->unserializer->expects($this->once())
+            ->method('unserialize')
+            ->with(serialize($dateTime), [PhpUnserializerInterface::WHITELIST_CLASSES_KEY => [\DateTime::class]])
+            ->willReturn($dateTime);
+
+        $this->assertEquals(
+            $dateTime,
+            $this->normalizer->denormalize($this->workflow, $this->attribute, $this->serializeBase64($dateTime))
+        );
+    }
+
+    public function testDenormalizeArrayLogsErrorWhenBase64DecodeFails(): void
+    {
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('array');
+
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('Failed to base64 decode workflow attribute value', $this->anything());
+
+        $result = $this->normalizer->denormalize($this->workflow, $this->attribute, '!invalid-base64!');
+
+        $this->assertEquals([], $result);
+    }
+
+    public function testDenormalizeObjectLogsErrorWhenBase64DecodeFails(): void
+    {
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('object');
+        $this->attribute->expects($this->once())
+            ->method('getOption')->with('class')
+            ->willReturn(\stdClass::class);
+
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('Failed to base64 decode workflow attribute value', $this->anything());
+
+        $result = $this->normalizer->denormalize($this->workflow, $this->attribute, '!invalid-base64!');
+
+        $this->assertNull($result);
+    }
+
+    public function testDenormalizeObjectLogsCriticalOnUnsafeUnserialization(): void
+    {
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn('object');
+        $this->attribute->expects($this->any())
+            ->method('getOption')->with('class')
+            ->willReturn(\stdClass::class);
+
+        $exception = UnsafeUnserializationException::create(['ArrayObject']);
+        $arrayObject = new \ArrayObject();
+        $this->unserializer->expects($this->once())
+            ->method('unserialize')
+            ->with(serialize($arrayObject), [PhpUnserializerInterface::WHITELIST_CLASSES_KEY => [\stdClass::class]])
+            ->willThrowException($exception);
+
+        $this->logger->expects($this->once())
+            ->method('critical')
+            ->with(
+                'Failed to unserialize workflow attribute value',
+                $this->callback(
+                    fn (array $context) => $context['exception'] instanceof UnsafeUnserializationException
+                        && $context['attribute'] === $this->attribute
+                )
+            );
+
+        // The attribute class ('stdClass') is whitelisted, but the serialized value contains
+        // \ArrayObject which is neither in the whitelist nor in an allowed org namespace,
+        // so PhpUnserializer must still throw UnsafeUnserializationException.
+        $result = $this->normalizer->denormalize(
+            $this->workflow,
+            $this->attribute,
+            $this->serializeBase64($arrayObject)
+        );
+
+        $this->assertNull($result);
     }
 
     /**

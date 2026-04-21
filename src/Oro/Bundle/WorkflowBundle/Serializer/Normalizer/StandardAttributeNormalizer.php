@@ -4,10 +4,19 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Component\PhpUtils\Exception\UnsafeUnserializationException;
+use Oro\Component\PhpUtils\PhpUnserializerInterface;
+use Psr\Log\LoggerInterface;
 
+/**
+ * Normalizes and denormalizes standard workflow attribute types.
+ *
+ * This normalizer handles conversion of scalar and object attribute values between
+ * their model representation and serializable form.
+ */
 class StandardAttributeNormalizer implements AttributeNormalizer
 {
-    protected $normalTypes = array(
+    protected $normalTypes = [
         'string'  => 'string',
         'int'     => 'integer',
         'integer' => 'integer',
@@ -16,7 +25,13 @@ class StandardAttributeNormalizer implements AttributeNormalizer
         'float'   => 'float',
         'array'   => 'array',
         'object'  => 'object',
-    );
+    ];
+
+    public function __construct(
+        private LoggerInterface $logger,
+        private PhpUnserializerInterface $unserializer
+    ) {
+    }
 
     /**
      * {@inheritdoc}
@@ -74,7 +89,7 @@ class StandardAttributeNormalizer implements AttributeNormalizer
     protected function normalizeArray($value)
     {
         if (!is_array($value)) {
-            $value = array();
+            $value = [];
         }
         return $this->serialize($value);
     }
@@ -141,17 +156,22 @@ class StandardAttributeNormalizer implements AttributeNormalizer
 
     /**
      * @param mixed $value
+     * @param ParameterInterface $attribute
      * @return array
      */
-    protected function denormalizeArray($value)
+    protected function denormalizeArray($value, ParameterInterface $attribute)
     {
         if (!is_string($value)) {
-            return array();
+            return [];
         }
-        $value = $this->unserialize($value);
+
+        // For arrays allow only scalar values, to be converted to json in the future
+        $value = $this->unserialize($value, ['allowed_classes' => false], $attribute);
+
         if (!is_array($value)) {
-            return array();
+            return [];
         }
+
         return $value;
     }
 
@@ -162,11 +182,21 @@ class StandardAttributeNormalizer implements AttributeNormalizer
      */
     protected function denormalizeObject($value, ParameterInterface $attribute)
     {
-        $value = $this->unserialize($value);
         $class = $attribute->getOption('class');
+        if (empty($class) || !class_exists($class)) {
+            return null;
+        }
+
+        /**
+         * It's not possible to restrict unserialize to attribute class because it may be of a complex type
+         * with relations to other classes.
+         */
+        $value = $this->unserialize($value, [], $attribute);
+
         if (!is_object($value) || !$value instanceof $class) {
             $value = null;
         }
+
         return $value;
     }
 
@@ -196,18 +226,47 @@ class StandardAttributeNormalizer implements AttributeNormalizer
     }
 
     /**
-     * @param string $value
+     * @param mixed $value
+     * @param array $options
+     * @param ParameterInterface|null $attribute
      * @return mixed|null
      */
-    protected function unserialize($value)
+    protected function unserialize($value, array $options = [], ?ParameterInterface $attribute = null)
     {
         if (!is_string($value)) {
             return null;
         }
-        $value = base64_decode($value);
+
+        $value = base64_decode($value, true);
         if (!is_string($value) || !$value) {
+            $this->logger->error(
+                'Failed to base64 decode workflow attribute value',
+                [
+                    'attribute' => $attribute,
+                    'value' => $value
+                ]
+            );
+
             return null;
         }
-        return unserialize($value);
+
+        try {
+            $configuredAllowedClass = $attribute?->getOption('class');
+            if ($configuredAllowedClass) {
+                $options[PhpUnserializerInterface::WHITELIST_CLASSES_KEY] = [$configuredAllowedClass];
+            }
+
+            return $this->unserializer->unserialize($value, $options);
+        } catch (UnsafeUnserializationException $e) {
+            $this->logger->critical(
+                'Failed to unserialize workflow attribute value',
+                [
+                    'exception' => $e,
+                    'attribute' => $attribute
+                ]
+            );
+
+            return null;
+        }
     }
 }

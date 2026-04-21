@@ -5,6 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Audit\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ *  Entity that represents Config Log Diff
+ *
  * @ORM\Table(name="oro_entity_config_log_diff")
  * @ORM\Entity
  */
@@ -50,6 +52,8 @@ class ConfigLogDiff
      */
     protected $diff;
 
+    private ?array $unserializedDiff = null;
+
     /**
      * @return int
      */
@@ -64,6 +68,7 @@ class ConfigLogDiff
      */
     public function setDiff(array $configs)
     {
+        $this->unserializedDiff = $configs;
         $this->diff = serialize($configs);
 
         return $this;
@@ -74,7 +79,11 @@ class ConfigLogDiff
      */
     public function getDiff()
     {
-        return unserialize($this->diff);
+        if (null === $this->unserializedDiff) {
+            $this->unserializedDiff = unserialize($this->diff);
+        }
+
+        return $this->unserializedDiff;
     }
 
     /**
