@@ -83,6 +83,11 @@ services:
         tags:
             - { name: form.type, alias: oro_type_entity_filter }
 
+    oro_filter.form.type.filter.entity_autocomplete:
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\EntityAutocompleteFilterType
+        tags:
+            - { name: form.type }
+
     oro_filter.form.type.filter.choice_tree:
         class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType
         arguments:
