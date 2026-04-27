@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Filter;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -12,6 +11,7 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityAutocompleteFilterType;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
@@ -54,11 +54,14 @@ class SegmentFilter extends EntityFilter
     #[\Override]
     public function getMetadata(): array
     {
-        $metadata = parent::getMetadata();
+        // Cannot delegate to ChoiceFilter::getMetadata() — it reads choices/multiple vars
+        // that do not exist on the HiddenType-backed autocomplete field and would throw TypeError.
+        // Call AbstractFilter::getMetadata() logic instead and append entity_ids
+        $metadata = AbstractFilter::getMetadata();
+        $metadata['choices'] = ['route' => 'oro_form_autocomplete_search'];
 
         $entityIds = [];
-        $configIds = $this->entityConfigProvider->getIds();
-        foreach ($configIds as $configId) {
+        foreach ($this->entityConfigProvider->getIds() as $configId) {
             $className = $configId->getClassName();
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
@@ -69,7 +72,6 @@ class SegmentFilter extends EntityFilter
                 $entityIds[$className] = array_shift($identifiers);
             }
         }
-
         $metadata['entity_ids'] = $entityIds;
 
         return $metadata;
@@ -113,31 +115,29 @@ class SegmentFilter extends EntityFilter
     }
 
     #[\Override]
+    protected function getFormType()
+    {
+        return EntityAutocompleteFilterType::class;
+    }
+
+    #[\Override]
     protected function createForm(): FormInterface
     {
         $entityName = $this->entityNameProvider->getEntityName();
 
-        // hard coded field, do not allow to pass any option
         return $this->formFactory->create(
             $this->getFormType(),
             [],
             [
                 'csrf_protection' => false,
                 'field_options'   => [
-                    'class'         => Segment::class,
-                    'choice_label'  => 'name',
-                    'required'      => true,
-                    'query_builder' => function (EntityRepository $repo) use ($entityName) {
-                        $qb = $repo->createQueryBuilder('s');
-                        if ($entityName) {
-                            $qb
-                                ->where('s.entity = :entity')
-                                ->setParameter('entity', $entityName);
-                        }
-
-                        return $qb;
-                    }
-                ]
+                    'autocomplete_alias' => 'oro_segment',
+                    'configs'            => [
+                        'route_parameters' => [
+                            'entity_class' => $entityName,
+                        ],
+                    ],
+                ],
             ]
         );
     }
