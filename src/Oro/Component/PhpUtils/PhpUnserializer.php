@@ -30,7 +30,14 @@ class PhpUnserializer implements PhpUnserializerInterface
         'oro\\bundle\\pdfgeneratorbundle\\pdffile\\pdffile',
         'oro\\bundle\\dotmailerbundle\\provider\\csvstringreader',
         'oro\\bundle\\batchbundle\\monolog\\handler\\batchloghandler',
-        'oro\\bundle\\maintenancebundle\\drivers\\filedriver'
+        'oro\\bundle\\maintenancebundle\\drivers\\filedriver',
+        'oro\\bundle\\elasticsearchbundle\\resultsetiterator\\searchresponseiterator',
+        'oro\\bundle\\redisconfigbundle\\session\\storage\\handler\\redislockingsessionhandler',
+        'oro\\bundle\\emailbundle\\mailer\\transport\\transport',
+        'oro\\bundle\\loggerbundle\\monolog\\disablehandlerwrapper',
+        'oro\\bundle\\searchbundle\\query\\indexerquery',
+        'oro\\component\\layout\\dataproviderdecorator',
+        'oro\\bundle\\importexportbundle\\file\\filemanager',
     ];
 
     private array $trustedOrgs;
@@ -92,7 +99,7 @@ class PhpUnserializer implements PhpUnserializerInterface
         $usedClasses = array_unique($usedClasses);
         // Make all values lowercase to avoid case-sensitive comparisons
         $usedClasses = $this->normalizeArray($usedClasses);
-        // Remove leading backslashes and doctrine proxy class prefix
+        // Remove leading backslashes and doctrine proxy class prefix to normalize class name for further checks
         $usedClasses = array_map(
             static function (string $className) {
                 $className = ltrim($className, '\\');
