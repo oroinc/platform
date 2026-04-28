@@ -43,9 +43,18 @@ class MaterializedViewManagerTest extends WebTestCase
 
         $materializedViewInfo = self::getMaterializedViewInfo(self::getContainer(), $materializedViewName);
         self::assertNotNull($materializedViewInfo);
+        // pg_matviews.definition is produced by pg_get_viewdef() which deparses the internal query tree.
+        // PostgreSQL >= 16 omits unambiguous table-alias qualifiers (e.g. "o0_.id" becomes "id"),
+        // while Doctrine always emits them. Strip alias qualifiers from both sides before comparing
+        // so the assertion is Doctrine and PostgreSQL-version-agnostic.
+        $normalizeSql = static function (string $sql): string {
+            $sql = mb_strtolower(preg_replace('/\s+/', ' ', trim($sql, ' ;')));
+            // Remove "<alias>." column qualifiers (word followed by a dot before a non-digit word char)
+            return preg_replace('/\b\w+\.(?=[a-z_])/i', '', $sql);
+        };
         self::assertEquals(
-            mb_strtolower(QueryUtil::getExecutableSql($query)),
-            mb_strtolower(preg_replace('/\s+/', ' ', trim($materializedViewInfo['definition'], ' ;')))
+            $normalizeSql(QueryUtil::getExecutableSql($query)),
+            $normalizeSql($materializedViewInfo['definition'])
         );
         self::assertTrue($materializedViewInfo['ispopulated']);
     }
