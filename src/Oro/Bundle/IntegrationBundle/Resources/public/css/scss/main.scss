@@ -22,3 +22,12 @@
     // stylelint-disable-next-line declaration-no-important
     background-position: center !important;
 }
+
+.topic-label {
+    font-size: $base-font-size--s;
+    font-weight: font-weight('light');
+}
+
+.additional-select2__result-entry-info.topic-label {
+    margin-left: 24px;
+}

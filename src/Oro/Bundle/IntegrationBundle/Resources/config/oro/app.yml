@@ -3,3 +3,13 @@ oro_entity:
         Oro\Bundle\IntegrationBundle\Entity\Channel:
             full: [ name ]
             short: [ name ]
+
+security:
+    firewalls:
+        oro_integration_webhook:
+            pattern: '^/webhook/consume/*'
+            security: false
+
+oro_security:
+    access_control:
+        - { path: '^/webhook/consume/*', roles: 'PUBLIC_ACCESS' }

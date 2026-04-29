@@ -42,3 +42,37 @@
     {% import '@OroIntegration/Form/javascript.html.twig' as jsRenderer %}
     {{ jsRenderer.renderIntegrationFormJS(form) }}
 {% endblock %}
+
+{% block oro_integration_webhook_field_widget %}
+    {%- import '@OroUI/macros.html.twig' as UI -%}
+    {% set webhookId = form.vars.value %}
+
+    <div class="control-group control-group-checkbox">
+        <div class="control-label wrap">
+            {{- 'oro.integration.webhookconsumersettings.form.webhook_url.label'|trans -}}
+        </div>
+        <div class="controls grid">
+            <div class="text-nowrap text-truncate grid-col-11">
+                {%- set webhook_endpoint_url_span_id = form.vars.id ~ '--webhook-endpoint-url' -%}
+                {%- set webhook_endpoint_url = url('oro_integration_webhook_consume', {id: webhookId})|default('oro.ui.empty'|trans) -%}
+                <span id="{{ webhook_endpoint_url_span_id }}"
+                      title="{{ webhook_endpoint_url }}">{{ webhook_endpoint_url }}</span>
+            </div>
+            <div class="grid-col-1">
+                {{- UI.clientLink({
+                    aCss: 'btn btn-icon btn-icon-sm',
+                    iCss: 'fa-copy',
+                    title: 'oro.ui.button.copy_to_clipboard.label'|trans,
+                    labelInIcon: false,
+                    pageComponent: {
+                        view: {
+                            view: 'oroui/js/app/views/element-value-copy-to-clipboard-view',
+                            elementSelector: '#' ~ webhook_endpoint_url_span_id
+                        }
+                    }
+                }) -}}
+            </div>
+            <input type="hidden" name="{{ form.vars.full_name }}" value="{{ webhookId }}">
+        </div>
+    </div>
+{% endblock %}

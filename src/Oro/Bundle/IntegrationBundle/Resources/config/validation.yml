@@ -12,3 +12,15 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
             - NotBlank: ~
         organization:
             - NotBlank: ~
+
+Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings:
+    properties:
+        notificationUrl:
+            - NotBlank: ~
+            - Url: ~
+        topic:
+            - NotBlank: ~
+            - Oro\Bundle\IntegrationBundle\Validator\Constraints\ValidWebhookTopic: ~
+        format:
+            - NotBlank: ~
+            - Oro\Bundle\IntegrationBundle\Validator\Constraints\ValidWebhookFormat: ~

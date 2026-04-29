@@ -162,3 +162,93 @@ datagrids:
             toolbarOptions:
                 pageSize:
                     default_per_page: 10
+
+    oro-integration-remote-webhook-grid:
+        extended_entity_name: Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings
+        acl_resource: oro_integration_webhook_producer_settings_view
+        options:
+            entity_pagination: true
+        source:
+            type: orm
+            query:
+                select:
+                    - rw.id
+                    - rw.notificationUrl
+                    - rw.topic
+                    - rw.enabled
+                    - rw.createdAt
+                    - rw.updatedAt
+                from:
+                    - {table: Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings, alias: rw}
+        columns:
+            topic:
+                label: oro.integration.webhookproducersettings.topic.label
+                type: twig
+                frontend_type: html
+                template: '@OroIntegration/WebhookProducerSettings/Datagrid/topic.html.twig'
+            notificationUrl:
+                label: oro.integration.webhookproducersettings.notification_url.label
+            enabled:
+                label: oro.integration.webhookproducersettings.enabled.label
+                frontend_type: boolean
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime
+            updatedAt:
+                label: oro.ui.updated_at
+                frontend_type: datetime
+        sorters:
+            columns:
+                notificationUrl:
+                    data_name: rw.notificationUrl
+                topic:
+                    data_name: rw.topic
+                enabled:
+                    data_name: rw.enabled
+                createdAt:
+                    data_name: rw.createdAt
+                updatedAt:
+                    data_name: rw.updatedAt
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                notificationUrl:
+                    type: string
+                    data_name: rw.notificationUrl
+                topic:
+                    type: string
+                    data_name: rw.topic
+                enabled:
+                    type: boolean
+                    data_name: rw.enabled
+                createdAt:
+                    type: datetime
+                    data_name: rw.createdAt
+                updatedAt:
+                    type: datetime
+                    data_name: rw.updatedAt
+        properties:
+            id: ~
+            view_link:
+                type: url
+                route: oro_integration_webhook_producer_settings_view
+                params: [id]
+            update_link:
+                type: url
+                route: oro_integration_webhook_producer_settings_update
+                params: [id]
+        actions:
+            view:
+                type: navigate
+                label: oro.grid.action.view
+                link: view_link
+                icon: eye
+                acl_resource: oro_integration_webhook_producer_settings_view
+                rowAction: true
+            update:
+                type: navigate
+                label: oro.grid.action.update
+                link: update_link
+                icon: edit
+                acl_resource: oro_integration_webhook_producer_settings_update

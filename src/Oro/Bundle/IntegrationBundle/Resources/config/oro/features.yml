@@ -8,19 +8,32 @@ features:
             - oro_integration_create
             - oro_integration_update
             - oro_integration_schedule
+            - oro_integration_webhook_producer_settings_index
+            - oro_integration_webhook_producer_settings_view
+            - oro_integration_webhook_producer_settings_create
+            - oro_integration_webhook_producer_settings_update
+            - oro_integration_webhook_consume
         commands:
             - oro:cron:integration:cleanup
             - oro:cron:integration:sync
         entities:
             - Oro\Bundle\IntegrationBundle\Entity\Channel
+            - Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings
+            - Oro\Bundle\IntegrationBundle\Entity\WebhookConsumerSettings
         api_resources:
             - Oro\Bundle\IntegrationBundle\Entity\Channel
+            - Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings
+            - Oro\Bundle\IntegrationBundle\Api\Model\WebhookTopic
+            - Oro\Bundle\IntegrationBundle\Api\Model\WebhookFormat
         operations:
             - oro_integration_activate
             - oro_integration_deactivate
             - oro_integration_delete
+            - oro_webhook_producer_settings_activate
+            - oro_webhook_producer_settings_deactivate
         navigation_items:
             - application_menu.system_tab.integrations_submenu.integrations_list
+            - application_menu.system_tab.integrations_submenu.integration_webhook_producer_settings_list
         placeholder_items:
             - force_sync_button
             - sync_button

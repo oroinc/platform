@@ -2,9 +2,10 @@ import routing from 'routing';
 import mediator from 'oroui/js/mediator';
 import tools from 'oroui/js/tools';
 import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
 import moduleConfig from 'module-config';
 const config = {
-    message: _.__('oro.ui.error.performing'),
+    message: __('oro.ui.error.performing'),
     loginRoute: 'oro_user_security_login',
     ...moduleConfig(module.id)
 };
