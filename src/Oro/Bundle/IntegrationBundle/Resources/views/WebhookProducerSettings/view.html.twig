@@ -1,0 +1,66 @@
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+
+{% oro_title_set({params : {"%id%": entity.id} }) %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_integration_webhook_producer_settings_index'),
+        'indexLabel': 'oro.integration.webhookproducersettings.page.title'|trans,
+        'entityTitle': entity.id
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block breadcrumbs %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {{ parent() }}
+    <span class="page-title__status">
+        {% if entity.enabled %}
+            {{ UI.badge('oro.integration.webhookproducersettings.enabled.enabled.label'|trans, 'enabled') }}
+        {% else %}
+            {{ UI.badge('oro.integration.webhookproducersettings.enabled.disabled.label'|trans, 'disabled') }}
+        {% endif %}
+
+        {% placeholder view_page_title_status with {entity: entity} %}
+    </span>
+{% endblock breadcrumbs %}
+
+{% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {% set id = 'webhook-remote-webhook-view' %}
+
+    {% set formatLabel = 'N/A' %}
+    {% if webhook_formats[entity.format] is defined %}
+        {% set formatLabel = webhook_formats[entity.format] %}
+    {% endif %}
+
+    {% set topic = webhook_topics[entity.topic] %}
+    {% set topic_data %}
+        {% include '@OroIntegration/WebhookProducerSettings/webhookTopicMolecule.html.twig' with {'topic': topic} %}
+    {% endset %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.integration.webhookproducersettings.block.general'|trans,
+            'class': 'active',
+            'subblocks': [
+                {
+                    'title': '',
+                    'data': [
+                        UI.renderHtmlProperty('oro.integration.webhookproducersettings.topic.label'|trans, topic_data),
+                        UI.renderProperty('oro.integration.webhookproducersettings.notification_url.label'|trans, entity.notificationUrl),
+                        UI.renderProperty('oro.integration.webhookproducersettings.format.label'|trans, formatLabel|trans),
+                        UI.renderProperty('oro.integration.webhookproducersettings.verify_ssl.label'|trans, entity.verifySsl ? 'oro.integration.webhookproducersettings.choice.yes.label'|trans : 'oro.integration.webhookproducersettings.choice.no.label'|trans),
+                    ]
+                }
+            ]
+        }
+    ] %}
+
+    {% set data = {'dataBlocks': dataBlocks} %}
+    {{ parent() }}
+{% endblock content_data %}

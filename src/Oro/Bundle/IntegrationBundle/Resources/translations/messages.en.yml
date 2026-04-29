@@ -3,6 +3,9 @@ oro:
         menu:
             integrations_submenu.label: Integrations
             integrations_list.label: Manage Integrations
+            webhook_producer_settings:
+                label: Webhooks
+                description: Manage webhook endpoints
 
         datagrid:
             column:
@@ -21,6 +24,9 @@ oro:
                     saved: Integration saved
                     activated: Integration activated
                     deactivated: Integration deactivated
+            webhook_producer_settings:
+                saved:
+                    message: Webhook settings saved successfully
 
         integration:
             entity_label:        Integration
@@ -89,6 +95,77 @@ oro:
             code.label:      Status
             message.label:   Message
             connector.label: Connector
+        webhookconsumersettings:
+            entity_label: Webhook Consumer Settings
+            entity_plural_label: Webhook Consumer Settings
+            entity_grid_all_view_label: All %entity_plural_label%
+            id.label: ID
+            processor:
+                label: Processor
+                description: Processor that handles the webhook request
+            enabled:
+                label: Enabled
+                description: Whether this webhook is active
+                yes.label: Yes
+                no.label: No
+            form:
+                webhook_url:
+                    label: Webhook URL
+        webhookproducersettings:
+            entity_label: Webhook Producer Settings
+            entity_plural_label: Webhook Producer Settings
+            entity_grid_all_view_label: All Webhooks
+            entity_description: Webhook endpoint configuration
+            entity_name:
+                label: 'Webhook %topic% - %notificationUrl%'
+            id.label: ID
+            notification_url:
+                label: Notification URL
+                description: The URL to send webhook notifications to
+            topic:
+                label: Topic
+                description: Topic name that identifies the webhook event
+                placeholder: Select a topic
+            secret:
+                label: Secret
+                description: Secret key used to sign the webhook payload
+            enabled:
+                enabled.label: Enabled
+                disabled.label: Disabled
+                label: Enabled
+                description: Whether this webhook is active
+            choice:
+                yes.label: Yes
+                no.label: No
+            verify_ssl:
+                label: Verify SSL
+                description: Whether to verify the SSL certificate of the notification URL
+            format:
+                label: Payload Format
+                description: Defines payload format and request/response processing logic specifically for this webhook
+                placeholder: Select a format
+                default:
+                    label: Default (JSON:API)
+                thin:
+                    label: Thin payload
+            system:
+                label: Is System
+                description: Indicates whether the webhook is a system webhook. The system webhooks cannot be deleted.
+            owner:
+                label: Owner
+                description: A user who created the webhook.
+            organization:
+                label: Organization
+                description: An organization that the webhook belongs to.
+            actions:
+                entity.label: Webhook
+                activate.label: Activate
+                activated.message: Webhook activated successfully
+                deactivate.label: Deactivate
+                deactivated.message: Webhook deactivated successfully
+            block:
+                general: General Information
+            page.title: Webhooks
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
         sync_error: 'Failed to add sync job to the queue.'
@@ -127,3 +204,23 @@ oro:
             attribute:
                 actionAllowed.label: 'Action is allowed'
                 actionSuccess.label: 'Action is successful'
+
+        entity_config:
+            attribute:
+                webhook_accessible:
+                    label: Webhook accessible
+                    tooltip: Select whether this entity should be accessible via webhook.
+                webhook_relations_includes:
+                    label: Webhook relations includes
+                    tooltip: >
+                        Select the relations to include in the webhook payload. 
+                        Use the JSON:API includes format, which is a comma-separated list of relation paths. 
+                        A relation path is a dot-separated list of relation names. For example: organization,owner.groups
+
+        webhook_topic:
+            entity_topic:
+                event:
+                    created: created
+                    updated: updated
+                    deleted: deleted
+                label: '%entity% %event%'

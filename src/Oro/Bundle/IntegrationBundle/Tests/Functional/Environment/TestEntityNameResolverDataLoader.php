@@ -4,8 +4,10 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Environment;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoaderInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestIntegrationTransport;
 
 class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoaderInterface
@@ -37,6 +39,21 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
             return ['integrationChannel'];
         }
 
+        if (WebhookProducerSettings::class === $entityClass) {
+            $webhookProducerSettings = new WebhookProducerSettings();
+            $webhookProducerSettings->setOrganization($repository->getReference('organization'));
+            $webhookProducerSettings->setOwner($repository->getReference('user'));
+            $webhookProducerSettings->setNotificationUrl('https://example.com/webhook');
+            $webhookProducerSettings->setTopic('order.created');
+            $webhookProducerSettings->setEnabled(true);
+            $webhookProducerSettings->setFormat('default');
+            $repository->setReference('webhookProducerSettings', $webhookProducerSettings);
+            $em->persist($webhookProducerSettings);
+            $em->flush();
+
+            return ['webhookProducerSettings'];
+        }
+
         return $this->innerDataLoader->loadEntity($em, $repository, $entityClass);
     }
 
@@ -50,6 +67,14 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
     ): string {
         if (Channel::class === $entityClass) {
             return 'Test Channel';
+        }
+
+        if (WebhookProducerSettings::class === $entityClass) {
+            if (EntityNameProviderInterface::SHORT === $format) {
+                return (string)$repository->getReference($entityReference)->getId();
+            }
+
+            return 'Webhook order.created - https://example.com/webhook';
         }
 
         return $this->innerDataLoader->getExpectedEntityName(

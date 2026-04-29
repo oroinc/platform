@@ -1,0 +1,27 @@
+entity_config:
+    integration:
+        entity:
+            items:
+                webhook_accessible:
+                    options:
+                        value_type: boolean
+                    form:
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
+                        options:
+                            choices:
+                                No: false
+                                Yes: true
+                            placeholder: false
+                            block: other
+                            label: oro.integration.entity_config.attribute.webhook_accessible.label
+                            tooltip: oro.integration.entity_config.attribute.webhook_accessible.tooltip
+                webhook_relations_includes:
+                    options:
+                        value_type: string
+                    form:
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\TextType
+                        options:
+                            label:  oro.integration.entity_config.attribute.webhook_relations_includes.label
+                            required: false
+                            block: other
+                            tooltip: oro.integration.entity_config.attribute.webhook_relations_includes.tooltip

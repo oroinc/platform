@@ -5,3 +5,5 @@ services:
 
     Oro\Bundle\IntegrationBundle\Async\Topic\SyncIntegrationTopic: ~
     Oro\Bundle\IntegrationBundle\Async\Topic\ReverseSyncIntegrationTopic: ~
+    Oro\Bundle\IntegrationBundle\Async\Topic\SendWebhookNotificationTopic: ~
+    Oro\Bundle\IntegrationBundle\Async\Topic\ProcessSingleWebhookNotificationTopic: ~

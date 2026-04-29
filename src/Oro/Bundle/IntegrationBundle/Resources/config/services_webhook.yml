@@ -1,0 +1,224 @@
+parameters:
+    oro_integration.webhook_notification_http_timeout: 30
+    oro_integration.webhook.http_retry_strategy.http_codes: !php/const Symfony\Component\HttpClient\Retry\GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES
+    oro_integration.webhook.http_retry_strategy.delay_ms: 1000
+    oro_integration.webhook.http_retry_strategy.multiplier: 2.0
+    oro_integration.webhook.http_retry_strategy.max_delay_ms: 0
+    oro_integration.webhook.http_retry_strategy.jitter: 0.1
+
+services:
+    # Automatically inject logger and set webhook logger channel for all services that implement LoggerAwareInterface
+    _instanceof:
+        Psr\Log\LoggerAwareInterface:
+            calls:
+                - ['setLogger', ['@logger']]
+            tags:
+                - { name: monolog.logger, channel: webhook }
+
+    Oro\Bundle\IntegrationBundle\EventListener\WebhookProducerSettingsDatagridListener:
+        arguments:
+            - '@oro_integration.webhook_configuration_provider'
+        tags:
+            - {name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-integration-remote-webhook-grid, method: onResultAfter}
+
+    oro_integration.provider.webhook_producer_settings_entity_name:
+        class: Oro\Bundle\IntegrationBundle\Provider\WebhookProducerSettingsEntityNameProvider
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro_entity.name_provider, priority: 100 }
+
+    Oro\Bundle\IntegrationBundle\EntityConfig\EntityConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    oro_integration.webhook_configuration_provider:
+        class: Oro\Bundle\IntegrationBundle\Provider\WebhookConfigurationProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity.entity_alias_provider'
+            - '@event_dispatcher'
+            - '@translator'
+
+    Oro\Bundle\IntegrationBundle\Provider\WebhookConfigurationProvider:
+        alias: 'oro_integration.webhook_configuration_provider'
+
+    Oro\Bundle\IntegrationBundle\EventListener\WebhookNotificationEventListener:
+        arguments:
+            - '@oro_integration.webhook_notifier'
+        tags:
+            - { name: kernel.event_listener, event: oro_integration.webhook_notify, method: onNotify }
+
+    Oro\Bundle\IntegrationBundle\EventListener\WebhookEntityListener:
+        arguments:
+            - '@oro_integration.webhook_notifier'
+            - '@oro_integration.webhook_configuration_provider'
+        tags:
+            - { name: doctrine.event_listener, event: postPersist, priority: -1024 }
+            - { name: doctrine.event_listener, event: postUpdate, priority: -1024 }
+            - { name: doctrine.event_listener, event: preRemove, priority: -1024 }
+            - { name: doctrine.event_listener, event: postFlush, priority: -1024 }
+            - { name: doctrine.event_listener, event: onClear, priority: -1024 }
+
+    oro_integration.webhook_event_data_provider.json_api:
+        class: Oro\Bundle\IntegrationBundle\Provider\JsonApiFormatWebhookEventDataProvider
+        arguments:
+            - '@oro_api.action_processor_bag'
+            - '@oro_entity_config.config_manager'
+
+    # Webhook Notifier (queues notifications for async processing)
+    oro_integration.webhook_notifier:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookNotifier
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_integration.webhook_event_data_provider.json_api'
+            - '@oro_message_queue.client.message_producer'
+
+    # Webhook Notification Sender (handles actual HTTP delivery with retry)
+    oro_integration.webhook_notification_sender:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookNotificationSender
+        arguments:
+            - '@oro_integration.webhook_http_client'
+            - '@oro_integration.webhook_request_processor'
+            - '@oro_integration.webhook_response_processor'
+
+    # Webhook processor
+    oro_integration.webhook_processor_registry:
+        class: Oro\Bundle\IntegrationBundle\Processor\ProcessorRegistry
+        arguments:
+            - !tagged_locator { tag: 'oro_integration.webhook_processor', default_index_method: 'getName' }
+
+    Oro\Bundle\IntegrationBundle\Processor\ProcessorRegistry:
+        alias: 'oro_integration.webhook_processor_registry'
+
+    # Webhook Format Provider
+    oro_integration.webhook_format_provider:
+        class: Oro\Bundle\IntegrationBundle\Provider\WebhookFormatProvider
+        calls:
+            - ['addFormat', ['default', 'oro.integration.webhookproducersettings.format.default.label']]
+            - ['addFormat', ['thin', 'oro.integration.webhookproducersettings.format.thin.label']]
+
+    Oro\Bundle\IntegrationBundle\Provider\WebhookFormatProvider:
+        alias: 'oro_integration.webhook_format_provider'
+
+    # Webhook Request Processors
+    oro_integration.webhook_request_processor.thin_payload:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookRequestProcessor\ThinPayloadWebhookRequestProcessor
+        tags:
+            - { name: oro_integration.webhook_request_processor, format: thin }
+
+    oro_integration.webhook_request_processor:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookRequestProcessor\WebhookRequestProcessor
+        arguments:
+            - !tagged_locator { tag: 'oro_integration.webhook_request_processor', index_by: 'format' }
+
+    # Webhook Response Processors
+    oro_integration.webhook_response_processor.success:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookResponseProcessor\SuccessWebhookResponseProcessor
+        tags:
+            - { name: oro_integration.webhook_response_processor, priority: 300 }
+
+    oro_integration.webhook_response_processor.http_gone:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookResponseProcessor\HttpGoneWebhookResponseProcessor
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_integration.webhook_response_processor, priority: 200 }
+
+    oro_integration.webhook_response_processor.retryable_error:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookResponseProcessor\RetryableErrorWebhookResponseProcessor
+        arguments:
+            - '@oro_integration.webhook_http_client'
+            - '@oro_integration.webhook.http_retry_strategy'
+        tags:
+            - { name: oro_integration.webhook_response_processor, priority: 100 }
+
+    oro_integration.webhook_response_processor.fallback:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookResponseProcessor\FallbackWebhookResponseProcessor
+        tags:
+            - { name: oro_integration.webhook_response_processor, priority: -255 }
+
+    oro_integration.webhook_response_processor:
+        class: Oro\Bundle\IntegrationBundle\Model\WebhookResponseProcessor\WebhookResponseProcessor
+        arguments:
+            - !tagged_iterator oro_integration.webhook_response_processor
+
+    # Message Queue Processor (creates jobs for each notification endpoint)
+    oro_integration.async.webhook_notification_processor:
+        class: Oro\Bundle\IntegrationBundle\Async\WebhookNotificationProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.runner'
+            - '@oro_security.token_accessor'
+            - '@oro_security.authorization_checker'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    # Single Notification Processor (processes individual endpoint)
+    oro_integration.async.process_single_notification_processor:
+        class: Oro\Bundle\IntegrationBundle\Async\ProcessSingleWebhookNotificationProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_integration.webhook_notification_sender'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    # HTTP Client for webhooks
+    oro_integration.webhook.http_retry_strategy:
+        class: Symfony\Component\HttpClient\Retry\GenericRetryStrategy
+        arguments:
+            - '%oro_integration.webhook.http_retry_strategy.http_codes%'
+            - '%oro_integration.webhook.http_retry_strategy.delay_ms%'
+            - '%oro_integration.webhook.http_retry_strategy.multiplier%'
+            - '%oro_integration.webhook.http_retry_strategy.max_delay_ms%'
+            - '%oro_integration.webhook.http_retry_strategy.jitter%'
+
+    oro_integration.webhook_http_client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+        arguments:
+            -
+                timeout: '%oro_integration.webhook_notification_http_timeout%'
+
+    # Voter
+    oro_integration.acl.voter.webhook_producer_settings:
+        class: Oro\Bundle\IntegrationBundle\Acl\Voter\WebhookProducerSettingsVoter
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        calls:
+            - [setClassName, ['Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings']]
+        tags:
+            - { name: security.voter }
+
+    # Validator
+    oro_integration.validator.valid_webhook_topic:
+        class: Oro\Bundle\IntegrationBundle\Validator\Constraints\ValidWebhookTopicValidator
+        arguments:
+            - '@oro_integration.webhook_configuration_provider'
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_integration.validator.valid_webhook_format:
+        class: Oro\Bundle\IntegrationBundle\Validator\Constraints\ValidWebhookFormatValidator
+        arguments:
+            - '@oro_integration.webhook_format_provider'
+        tags:
+            - { name: validator.constraint_validator }
+
+    # Form Type
+    oro_integration.form.type.webhook_field:
+        class: Oro\Bundle\IntegrationBundle\Form\Type\WebhookFieldType
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: form.type }
+
+    oro_integration.form.type.webhook_producer_settings:
+        class: Oro\Bundle\IntegrationBundle\Form\Type\WebhookProducerSettingsType
+        arguments:
+            - '@oro_integration.webhook_configuration_provider'
+            - '@oro_integration.webhook_format_provider'
+        tags:
+            - { name: form.type }

@@ -10,7 +10,14 @@ navigation:
                 route:    'oro_integration_index'
                 position: 10
                 extras:
-                    routes:  'oro_integration_*'
+                    routes:  ['oro_integration_index', 'oro_integration_update', 'oro_integration_create']
+            integration_webhook_producer_settings_list:
+                label: 'oro.integration.menu.webhook_producer_settings.label'
+                route: 'oro_integration_webhook_producer_settings_index'
+                position: 100
+                extras:
+                    routes: 'oro_integration_webhook_producer_settings_*'
+                    description: 'oro.integration.menu.webhook_producer_settings.description'
         tree:
             application_menu:
                 children:
@@ -19,7 +26,12 @@ navigation:
                             integrations_submenu:
                                 children:
                                     integrations_list: ~
+                                    integration_webhook_producer_settings_list: ~
     titles:
         oro_integration_index:  ~
         oro_integration_update: '%integration.name%'
         oro_integration_create: 'Create Integration'
+        oro_integration_webhook_producer_settings_index: ~
+        oro_integration_webhook_producer_settings_view: "%id%"
+        oro_integration_webhook_producer_settings_create: "Add Webhook"
+        oro_integration_webhook_producer_settings_update: "Webhook %id% - Edit"
