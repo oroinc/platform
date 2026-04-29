@@ -123,7 +123,8 @@ class BeforeMapObjectSearchListener
                             'target_type' => $targetType,
                             'target_fields' => [$fieldName . '_' . $targetField]
                         ]
-                    ]
+                    ],
+                    'target_fields' => []
                 ];
             } elseif (in_array($fieldType, [Indexer::RELATION_MANY_TO_MANY, Indexer::RELATION_ONE_TO_MANY])) {
                 $config = $extendConfigProvider->getConfig($className, $fieldName);
@@ -157,7 +158,8 @@ class BeforeMapObjectSearchListener
                 $field = [
                     'name' => $fieldName,
                     'relation_type' => $fieldType,
-                    'relation_fields' => $fields
+                    'relation_fields' => $fields,
+                    'target_fields' => []
                 ];
             } else {
                 $field = [
