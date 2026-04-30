@@ -171,11 +171,16 @@ class ParameterBinder
                 );
             }
         }
-        if ((null === $result || $result === [] || $result === ['']) && isset($config['default'])) {
+        if ($this->isEmptyValue($result) && array_key_exists('default', $config)) {
             $result = $config['default'];
         }
 
         return $result;
+    }
+
+    private function isEmptyValue(mixed $value): bool
+    {
+        return null === $value || '' === $value || [] === $value || [''] === $value;
     }
 
     /**
