@@ -349,7 +349,7 @@ class ScriptHandler
     private static function pnpmCi(IOInterface $inputOutput, int $timeout = 60, bool $verbose = false): void
     {
         $logLevel = $verbose ? 'info' : 'error';
-        $npmCiCmd = ['pnpm', 'install', '--lockfile-only', '--loglevel', $logLevel];
+        $npmCiCmd = ['pnpm', 'install', '--frozen-lockfile', '--loglevel', $logLevel];
 
         if (self::runProcess($inputOutput, $npmCiCmd, $timeout) !== 0) {
             throw new \RuntimeException('Failed to install pnpm assets');
