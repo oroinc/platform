@@ -72,7 +72,7 @@ class UserChecker implements UserCheckerInterface
             throw $exception;
         }
 
-        if ($user->getAuthStatus() && $user->getAuthStatus()->getInternalId() !== UserManager::STATUS_ACTIVE) {
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getInternalId() === UserManager::STATUS_RESET) {
             $exception = new CredentialsResetException('Password reset.');
             $exception->setUser($user);
 
