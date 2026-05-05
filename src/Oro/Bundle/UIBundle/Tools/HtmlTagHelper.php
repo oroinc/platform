@@ -195,6 +195,17 @@ class HtmlTagHelper implements TranslatorAwareInterface
         return $purifier->purify($string);
     }
 
+    /**
+     * Escape All HTML without HTMLPurifier, not allow embedded tags
+     *
+     * @param string $string
+     * @return string
+     */
+    public function escapeAll(string $string): string
+    {
+        return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
     public function stripLongWords(string $string, int $maxLength = self::MAX_STRING_LENGTH): string
     {
         $words = preg_split('/\s+/', $string);
