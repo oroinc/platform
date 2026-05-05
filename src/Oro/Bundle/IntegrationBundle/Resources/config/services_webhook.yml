@@ -18,6 +18,11 @@ services:
     Oro\Bundle\IntegrationBundle\EventListener\WebhookProducerSettingsDatagridListener:
         arguments:
             - '@oro_integration.webhook_configuration_provider'
+        # Use the ghost-object lazy-loading strategy so that Symfony does not need to
+        # subclass the listener. Virtual-proxy (subclass) generation is incompatible
+        # with final classes and causes a container build failure when the Symfony
+        # Profiler is enabled.
+        lazy: 'Oro\Bundle\DataGridBundle\Event\OrmResultAfterListenerInterface'
         tags:
             - {name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-integration-remote-webhook-grid, method: onResultAfter}
 
