@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-17964
 
 Feature: Update schema with not accessible entity

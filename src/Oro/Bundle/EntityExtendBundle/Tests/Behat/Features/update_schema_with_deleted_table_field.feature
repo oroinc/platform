@@ -1,5 +1,4 @@
 @ticket-BB-22635
-@regression
 Feature: Update schema with deleted table field
   In order to have correct schema when we have deleted old field (with update schema)
   As administrator
