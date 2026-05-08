@@ -212,7 +212,7 @@
             "@oroinc/jquery.nicescroll": "3.6.6",
             "@babel/runtime": "^7.28.6",
             "core-js": "^3.48.0",
-            "@oroinc/codemirror-expression-editor": "1.0.3"
+            "@oroinc/codemirror-expression-editor": "1.0.4"
         },
         "branch-alias": {
             "dev-master": "7.0-dev"
