@@ -1,4 +1,15 @@
 api:
+    entity_aliases:
+        Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings:
+            alias: webhook
+            plural_alias: webhooks
+        Oro\Bundle\IntegrationBundle\Api\Model\WebhookTopic:
+            alias: webhooktopic
+            plural_alias: webhooktopics
+        Oro\Bundle\IntegrationBundle\Api\Model\WebhookFormat:
+            alias: webhookformat
+            plural_alias: webhookformats
+
     entities:
         Oro\Bundle\IntegrationBundle\Entity\Channel:
             documentation_resource: '@OroIntegrationBundle/Resources/doc/api/channel.md'
@@ -22,6 +33,89 @@ api:
                 organization:
                     exclude: true
             actions:
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+
+        Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings:
+            documentation_resource: '@OroIntegrationBundle/Resources/doc/api/webhook_producer_settings.md'
+            fields:
+                secret:
+                    exclude: true
+                system:
+                    form_options:
+                        mapped: false
+                topic:
+                    target_class: Oro\Bundle\IntegrationBundle\Api\Model\WebhookTopic
+                    form_type: Oro\Bundle\IntegrationBundle\Api\Form\Type\WebhookTopicAssociationType
+                format:
+                    target_class: Oro\Bundle\IntegrationBundle\Api\Model\WebhookFormat
+                    form_type: Oro\Bundle\IntegrationBundle\Api\Form\Type\WebhookFormatAssociationType
+            actions:
+                get_list:
+                    description: Get Webhooks
+                get:
+                    description: Get Webhook
+                create:
+                    description: Create Webhook
+                    fields:
+                        secret:
+                            exclude: false
+                update:
+                    description: Update Webhook
+                delete:
+                    description: Delete Webhook
+                delete_list:
+                    description: Delete Webhooks
+            subresources:
+                topic:
+                    actions:
+                        get_subresource: false
+                        get_relationship: false
+                        update_relationship: false
+                format:
+                    actions:
+                        get_subresource: false
+                        get_relationship: false
+                        update_relationship: false
+            filters:
+                fields:
+                    topic:
+                        allow_array: true
+
+        Oro\Bundle\IntegrationBundle\Api\Model\WebhookTopic:
+            documentation_resource: '@OroIntegrationBundle/Resources/doc/api/webhook_topic.md'
+            disable_meta_properties: true
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: string
+                label:
+                    data_type: string
+            actions:
+                get_list:
+                    disable_paging: true
+                    disable_sorting: true
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+
+        Oro\Bundle\IntegrationBundle\Api\Model\WebhookFormat:
+            documentation_resource: '@OroIntegrationBundle/Resources/doc/api/webhook_format.md'
+            disable_meta_properties: true
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: string
+                    property_path: key
+                label:
+                    data_type: string
+            actions:
+                get_list:
+                    disable_paging: true
+                    disable_sorting: true
                 create: false
                 update: false
                 delete: false

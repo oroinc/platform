@@ -32,13 +32,16 @@ const SegmentConditionView = AbstractConditionView.extend({
         SegmentConditionView.__super__.onChoiceInputReady.call(this, choiceInputView);
         if (this.filter) {
             const filterValue = this._getFilterValue();
-            const label = this.filter.getSelectedLabel();
-            if (filterValue && label) {
-                choiceInputView.setData({
-                    id: 'segment_' + filterValue.value,
-                    text: label
-                });
-            }
+            const labelPromise = this.filter.getSelectedLabel();
+            labelPromise.then(response => {
+                const result = response.results[0];
+                if (filterValue && result) {
+                    choiceInputView.setData({
+                        id: 'segment_' + filterValue.value,
+                        text: result.name
+                    });
+                }
+            }).catch(() => {});
         }
     },
 

@@ -1,0 +1,15 @@
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% set gridName = 'oro-integration-remote-webhook-grid' %}
+{% set pageTitle = 'oro.integration.webhookproducersettings.page.title'|trans %}
+
+{% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {% if is_granted('oro_integration_webhook_producer_settings_create') %}
+        {{ UI.addButton({
+            'path' : path('oro_integration_webhook_producer_settings_create'),
+            'entity_label' : 'oro.integration.webhookproducersettings.actions.entity.label'|trans
+        }) }}
+    {% endif %}
+{% endblock %}

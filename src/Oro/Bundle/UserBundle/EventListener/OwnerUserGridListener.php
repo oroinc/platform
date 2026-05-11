@@ -51,7 +51,7 @@ class OwnerUserGridListener
             : User::class;
         $entityId = $parameters->get('entity_id');
         $object = $entityId
-            ? $this->doctrine->getRepository($entityClass)->find((int)$entityId)
+            ? $this->doctrine->getRepository($entityClass)->find($entityId)
             : ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, $entityClass);
 
         $observer = new OneShotIsGrantedObserver();

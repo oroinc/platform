@@ -9,7 +9,10 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -155,5 +158,143 @@ class BeforeMapObjectSearchListenerTest extends TestCase
         $event = new SearchMappingCollectEvent($mappingConfig);
         $this->listener->prepareEntityMapEvent($event);
         $this->assertEquals($this->expectedConfig, $event->getMappingConfig());
+    }
+
+    /**
+     * @dataProvider relationFieldDataProvider
+     */
+    public function testRelationFieldHasEmptyTargetFields(
+        string $fieldType,
+        string $fieldName,
+        array $extendFieldData,
+        string $targetFieldType,
+        array $expectedField
+    ): void {
+        $className = TestActivity::class;
+        $mappingConfig = [$className => ['fields' => []]];
+
+        $entityConfigId = new EntityConfigId('extend', $className);
+        $entityConfig = new Config($entityConfigId);
+        $entityConfig->set('is_extend', true);
+        $entityConfig->set('state', ExtendScope::STATE_ACTIVE);
+        $entityConfig->set('owner', ExtendScope::OWNER_SYSTEM);
+
+        $searchFieldId = new FieldConfigId('search', $className, $fieldName, $fieldType);
+        $searchFieldConfig = new Config($searchFieldId);
+        $searchFieldConfig->set('searchable', true);
+
+        $extendFieldId = new FieldConfigId('extend', $className, $fieldName, $fieldType);
+        $extendFieldConfig = new Config($extendFieldId);
+        foreach ($extendFieldData as $key => $value) {
+            $extendFieldConfig->set($key, $value);
+        }
+
+        $extendProvider = $this->createMock(ConfigProvider::class);
+        $extendProvider->expects($this->once())
+            ->method('getConfigs')
+            ->willReturn([$entityConfig]);
+        $extendProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className, $fieldName)
+            ->willReturn($extendFieldConfig);
+
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendProvider);
+        $this->configManager->expects($this->once())
+            ->method('getConfigs')
+            ->with('search', $className)
+            ->willReturn([$searchFieldConfig]);
+        $this->configManager->expects($this->any())
+            ->method('getId')
+            ->willReturnCallback(
+                fn (string $scope, string $entity, string $field) => new FieldConfigId(
+                    $scope,
+                    $entity,
+                    $field,
+                    $targetFieldType
+                )
+            );
+
+        $event = new SearchMappingCollectEvent($mappingConfig);
+        $this->listener->prepareEntityMapEvent($event);
+
+        $resultFields = $event->getMappingConfig()[$className]['fields'];
+        $this->assertCount(1, $resultFields);
+        $this->assertSame($expectedField, $resultFields[0]);
+    }
+
+    public static function relationFieldDataProvider(): array
+    {
+        return [
+            'many-to-one' => [
+                'fieldType'       => RelationType::MANY_TO_ONE,
+                'fieldName'       => 'target',
+                'extendFieldData' => [
+                    'target_entity' => TestActivityTarget::class,
+                    'target_field'  => 'string',
+                ],
+                'targetFieldType' => 'string',
+                'expectedField'   => [
+                    'name'            => 'target',
+                    'relation_type'   => 'many-to-one',
+                    'relation_fields' => [
+                        [
+                            'name'          => 'string',
+                            'target_type'   => 'text',
+                            'target_fields' => ['target_string'],
+                        ],
+                    ],
+                    'target_fields'   => [],
+                ],
+            ],
+            'one-to-many' => [
+                'fieldType'       => RelationType::ONE_TO_MANY,
+                'fieldName'       => 'targets',
+                'extendFieldData' => [
+                    'target_entity'   => TestActivityTarget::class,
+                    'target_grid'     => ['string'],
+                    'target_title'    => [],
+                    'target_detailed' => [],
+                ],
+                'targetFieldType' => 'string',
+                'expectedField'   => [
+                    'name'            => 'targets',
+                    'relation_type'   => 'one-to-many',
+                    'relation_fields' => [
+                        [
+                            'name'          => 'string',
+                            'target_type'   => 'text',
+                            'target_fields' => ['targets_string'],
+                        ],
+                    ],
+                    'target_fields'   => [],
+                ],
+            ],
+            'many-to-many' => [
+                'fieldType'       => RelationType::MANY_TO_MANY,
+                'fieldName'       => 'relatedTargets',
+                'extendFieldData' => [
+                    'target_entity'   => TestActivityTarget::class,
+                    'target_grid'     => ['string'],
+                    'target_title'    => [],
+                    'target_detailed' => [],
+                ],
+                'targetFieldType' => 'string',
+                'expectedField'   => [
+                    'name'            => 'relatedTargets',
+                    'relation_type'   => 'many-to-many',
+                    'relation_fields' => [
+                        [
+                            'name'          => 'string',
+                            'target_type'   => 'text',
+                            'target_fields' => ['relatedTargets_string'],
+                        ],
+                    ],
+                    'target_fields'   => [],
+                ],
+            ],
+        ];
     }
 }

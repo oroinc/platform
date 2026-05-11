@@ -18,6 +18,10 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string', length: 30)]
 abstract class Transport
 {
+    // Add webhook relation to all integration transports to keep one row in a single transport table.
+    // Individual transports should implement WebhookAwareInterface to notify the system that it works with webhooks.
+    use WebhookHolderTrait;
+
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]

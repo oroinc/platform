@@ -144,6 +144,14 @@ services:
             - '@oro_segment.query.dynamic_segment.query_builder'
             - '@oro_security.owner.metadata_provider.chain'
 
+    oro_segment.autocomplete.segment_search_handler:
+        class: Oro\Bundle\SegmentBundle\Autocomplete\SegmentSearchHandler
+        arguments:
+            - '@doctrine'
+            - '@request_stack'
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_segment }
+
     oro_segment.placeholder.segment_condition_filter:
         class: Oro\Bundle\SegmentBundle\Placeholder\SegmentConditionFilter
         public: true

@@ -124,6 +124,46 @@ operations:
                 type: 'success'
             - '@redirect': {route: oro_integration_index}
 
+    oro_webhook_producer_settings_activate:
+        label: oro.integration.webhookproducersettings.actions.activate.label
+        applications: [default]
+        acl_resource: [EDIT, $.data]
+        order: 20
+        datagrids:
+            - oro-integration-remote-webhook-grid
+        routes:
+            - oro_integration_webhook_producer_settings_view
+        button_options:
+            icon: fa-check
+        preconditions:
+            '@equal': [$.data.enabled, false]
+        actions:
+            - '@assign_value': [$.data.enabled, true]
+            - '@flush_entity': [$.data]
+            - '@flash_message':
+                message: oro.integration.webhookproducersettings.actions.activated.message
+                type: 'success'
+
+    oro_webhook_producer_settings_deactivate:
+        label: oro.integration.webhookproducersettings.actions.deactivate.label
+        applications: [default]
+        acl_resource: [EDIT, $.data]
+        order: 20
+        datagrids:
+            - oro-integration-remote-webhook-grid
+        routes:
+            - oro_integration_webhook_producer_settings_view
+        button_options:
+            icon: fa-close
+        preconditions:
+            '@equal': [$.data.enabled, true]
+        actions:
+            - '@assign_value': [$.data.enabled, false]
+            - '@flush_entity': [$.data]
+            - '@flash_message':
+                message: oro.integration.webhookproducersettings.actions.deactivated.message
+                type: 'success'
+
     DELETE:
         exclude_entities:
             - Oro\Bundle\IntegrationBundle\Entity\Channel

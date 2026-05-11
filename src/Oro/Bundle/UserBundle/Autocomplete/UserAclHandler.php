@@ -67,7 +67,7 @@ class UserAclHandler implements SearchHandlerInterface
 
         $hasMore = false;
         $object = $entityId
-            ? $this->doctrine->getRepository($entityClass)->find((int)$entityId)
+            ? $this->doctrine->getRepository($entityClass)->find($entityId)
             : ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, $entityClass);
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);

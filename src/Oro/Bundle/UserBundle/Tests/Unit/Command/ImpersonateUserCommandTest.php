@@ -57,7 +57,7 @@ class ImpersonateUserCommandTest extends TestCase
         $this->assertReturnsSuccessAndSuggestsUrl($commandTester);
         $this->assertProducedWarning(
             $commandTester,
-            'You will not be able to login as this user until the auth status is changed to "Active".'
+            'The user\'s auth status is "Test".'
         );
     }
 

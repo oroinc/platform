@@ -1,0 +1,84 @@
+{% extends '@OroUI/actions/update.html.twig' %}
+{% form_theme form with '@OroForm/Form/fields.html.twig' %}
+
+{% if form.vars.value.id %}
+    {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
+{% endif %}
+
+{% set formAction = form.vars.value.id
+    ? path('oro_integration_webhook_producer_settings_update', { id: form.vars.value.id })
+    : path('oro_integration_webhook_producer_settings_create')
+%}
+
+{% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {{ parent() }}
+
+    {{ UI.cancelButton(path('oro_integration_webhook_producer_settings_index')) }}
+
+    {% set html = UI.saveAndCloseButton({
+        'route': 'oro_integration_webhook_producer_settings_index'
+    }) %}
+    {% if is_granted('oro_integration_webhook_producer_settings_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_integration_webhook_producer_settings_create'
+        }) %}
+    {% endif %}
+    {% if form.vars.value.id or is_granted('oro_integration_webhook_producer_settings_update') %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_integration_webhook_producer_settings_update',
+            'params': {'id': '$id'}
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% if form.vars.value.id %}
+        {% set breadcrumbs = {
+                'entity':      form.vars.value,
+                'indexPath':   path('oro_integration_webhook_producer_settings_index'),
+                'indexLabel':  'oro.integration.webhookproducersettings.page.title'|trans,
+                'entityTitle': form.vars.value.id
+            }
+        %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.integration.webhookproducersettings.actions.entity.label'|trans}) %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {% set id = 'webhook-remote-webhook-edit' %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.integration.webhookproducersettings.block.general'|trans,
+            'class': 'active',
+            'subblocks': [
+                {
+                    'title': '',
+                    'data': [
+                        form_row(form.enabled),
+                        form_row(form.notificationUrl),
+                        form_row(form.secret),
+                        form_row(form.topic),
+                        form_row(form.format),
+                        form_row(form.verifySsl),
+                    ]
+                }
+            ]
+        }
+    ] %}
+
+    {% set data = {
+        'formErrors': form_errors(form) ? form_errors(form) : null,
+        'dataBlocks': dataBlocks
+    } %}
+
+    {{ parent() }}
+{% endblock content_data %}

@@ -1,0 +1,25 @@
+data:
+    type: webhooks
+    id: '<toString(@oro_integration:webhook_department.create_enabled->id)>'
+    attributes:
+        notificationUrl: 'https://example.com/webhook/department.created/1'
+        enabled: true
+        system: false
+        verifySsl: true
+    relationships:
+        topic:
+            data:
+                type: webhooktopics
+                id: testdepartment.created
+        format:
+            data:
+                type: webhookformats
+                id: default
+        owner:
+            data:
+                type: users
+                id: '<toString(@user->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'

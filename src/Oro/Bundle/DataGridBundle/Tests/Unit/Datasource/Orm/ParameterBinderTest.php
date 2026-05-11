@@ -164,6 +164,49 @@ class ParameterBinderTest extends TestCase
                     new Parameter('entity_name', [0]),
                 ]
             ],
+            'default applied for empty string value' => [
+                'bindParameters' => [
+                    'entity_name' => [
+                        'default' => 'fallback',
+                    ]
+                ],
+                'datagridParameters' => [
+                    'entity_name' => ''
+                ],
+                'oldQueryParameters' => [],
+                'expectedQueryParameters' => [
+                    new Parameter('entity_name', 'fallback'),
+                ]
+            ],
+            'default null applied for empty string value' => [
+                'bindParameters' => [
+                    'entity_id' => [
+                        'default' => null,
+                        'type' => Types::INTEGER,
+                    ]
+                ],
+                'datagridParameters' => [
+                    'entity_id' => ''
+                ],
+                'oldQueryParameters' => [],
+                'expectedQueryParameters' => [
+                    new Parameter('entity_id', null, Types::INTEGER),
+                ]
+            ],
+            'default null applied for empty array value' => [
+                'bindParameters' => [
+                    'entity_id' => [
+                        'default' => null,
+                    ]
+                ],
+                'datagridParameters' => [
+                    'entity_id' => []
+                ],
+                'oldQueryParameters' => [],
+                'expectedQueryParameters' => [
+                    new Parameter('entity_id', null),
+                ]
+            ],
             'default catch exception' => [
                 'bindParameters' => [
                     'entity_name' => [

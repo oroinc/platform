@@ -5,3 +5,27 @@ acls:
         permission: ASSIGN
         group_name: ""
         bindings: ~
+
+    oro_integration_webhook_producer_settings_view:
+        type: entity
+        class: Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings
+        permission: VIEW
+        group_name: ""
+
+    oro_integration_webhook_producer_settings_create:
+        type: entity
+        class: Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings
+        permission: CREATE
+        group_name: ""
+
+    oro_integration_webhook_producer_settings_update:
+        type: entity
+        class: Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings
+        permission: EDIT
+        group_name: ""
+
+    oro_integration_webhook_producer_settings_delete:
+        type: entity
+        class: Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings
+        permission: DELETE
+        group_name: ""

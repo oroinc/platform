@@ -535,4 +535,28 @@ HTML;
 
         $this->assertEquals([], $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
     }
+
+    /** @dataProvider escapeProvider */
+    public function testEscapeAll(string $input, string $expected): void
+    {
+        self::assertEquals($expected, $this->helper->escapeAll($input));
+    }
+
+    public function escapeProvider(): array
+    {
+        return [
+            'Tags escapetion without quotes' => [
+                '<div><p>Hello world</p></div><script>alert(1);</script>',
+                '&lt;div&gt;&lt;p&gt;Hello world&lt;/p&gt;&lt;/div&gt;&lt;script&gt;alert(1);&lt;/script&gt;'
+            ],
+            'Tags escapetion with double quotes' => [
+                '<p>"Hello world"</p>',
+                '&lt;p&gt;&quot;Hello world&quot;&lt;/p&gt;'
+            ],
+            'Tags escapetion with single quotes' => [
+                "<p>'Hello world'</p>",
+                '&lt;p&gt;&#039;Hello world&#039;&lt;/p&gt;'
+            ]
+        ];
+    }
 }

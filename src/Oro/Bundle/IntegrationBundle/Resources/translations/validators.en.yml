@@ -1,0 +1,7 @@
+oro:
+    integration:
+        validator:
+            webhook_topic:
+                invalid: 'This value is not a known webhook topic.'
+            webhook_format:
+                invalid: 'This value is not a known webhook format.'

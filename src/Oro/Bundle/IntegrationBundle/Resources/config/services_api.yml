@@ -1,0 +1,57 @@
+services:
+    oro_integration.api.webhook_topic_repository:
+        class: Oro\Bundle\IntegrationBundle\Api\Repository\WebhookTopicRepository
+        arguments:
+            - '@oro_integration.webhook_configuration_provider'
+
+    oro_integration.api.webhook_format_repository:
+        class: Oro\Bundle\IntegrationBundle\Api\Repository\WebhookFormatRepository
+        arguments:
+            - '@oro_integration.webhook_format_provider'
+            - '@translator'
+
+    oro_integration.api.form.type.webhook_topic_association:
+        class: Oro\Bundle\IntegrationBundle\Api\Form\Type\WebhookTopicAssociationType
+        tags:
+            - { name: oro.api.form.type, alias: Oro\Bundle\IntegrationBundle\Api\Form\Type\WebhookTopicAssociationType }
+
+    oro_integration.api.form.type.webhook_format_association:
+        class: Oro\Bundle\IntegrationBundle\Api\Form\Type\WebhookFormatAssociationType
+        tags:
+            - { name: oro.api.form.type, alias: Oro\Bundle\IntegrationBundle\Api\Form\Type\WebhookFormatAssociationType }
+
+    oro_integration.api.load_webhook_topics:
+        class: Oro\Bundle\IntegrationBundle\Api\Processor\LoadWebhookTopics
+        arguments:
+            - '@oro_integration.api.webhook_topic_repository'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\IntegrationBundle\Api\Model\WebhookTopic }
+
+    oro_integration.api.load_webhook_topic:
+        class: Oro\Bundle\IntegrationBundle\Api\Processor\LoadWebhookTopic
+        arguments:
+            - '@oro_integration.api.webhook_topic_repository'
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\IntegrationBundle\Api\Model\WebhookTopic }
+
+    oro_integration.api.load_webhook_formats:
+        class: Oro\Bundle\IntegrationBundle\Api\Processor\LoadWebhookFormats
+        arguments:
+            - '@oro_integration.api.webhook_format_repository'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\IntegrationBundle\Api\Model\WebhookFormat }
+
+    oro_integration.api.load_webhook_format:
+        class: Oro\Bundle\IntegrationBundle\Api\Processor\LoadWebhookFormat
+        arguments:
+            - '@oro_integration.api.webhook_format_repository'
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\IntegrationBundle\Api\Model\WebhookFormat }
+
+    oro_integration.api.expand_webhook_format:
+        class: Oro\Bundle\IntegrationBundle\Api\Processor\ExpandWebhookFormat
+        arguments:
+            - '@oro_integration.api.webhook_format_repository'
+            - '@oro_api.object_normalizer'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true, class: Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings }

@@ -1,4 +1,6 @@
 import _ from 'underscore';
+import routing from 'routing';
+import $ from 'jquery';
 import AbstractFilter from 'oro/filter/abstract-filter';
 
 /**
@@ -104,9 +106,22 @@ const SegmentFilter = AbstractFilter.extend({
         };
     },
 
-    getSelectedLabel: function() {
+    getSelectedLabel: async function() {
+        const ajaxSegmentChoiceRoute = this.choices.route || false;
+        if (ajaxSegmentChoiceRoute) {
+            return $.ajax({
+                url: routing.generate(ajaxSegmentChoiceRoute),
+                data: {
+                    name: 'oro_segment',
+                    query: this.value.value,
+                    search_by_id: 1
+                }
+            });
+        }
+
+        // Fallback for old themes using a pre-loaded choice list
         const choice = _.find(this.choices, val => val.value === this.value.value);
-        return _.result(choice, 'label');
+        return {results: choice ? [{name: choice.label}] : []};
     }
 });
 

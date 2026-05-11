@@ -1,0 +1,176 @@
+data:
+    -
+        type: webhooks
+        id: '<toString(@oro_integration:webhook_department.create_enabled->id)>'
+        attributes:
+            notificationUrl: 'https://example.com/webhook/department.created/1'
+            enabled: true
+            system: false
+            verifySsl: true
+        relationships:
+            topic:
+                data:
+                    type: webhooktopics
+                    id: testdepartment.created
+            format:
+                data:
+                    type: webhookformats
+                    id: default
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+    -
+        type: webhooks
+        id: '<toString(@oro_integration:webhook_department.create_enabled_second->id)>'
+        attributes:
+            notificationUrl: 'https://example.com/webhook/department.created/2'
+            enabled: true
+            system: false
+            verifySsl: true
+        relationships:
+            topic:
+                data:
+                    type: webhooktopics
+                    id: testdepartment.created
+            format:
+                data:
+                    type: webhookformats
+                    id: default
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+    -
+        type: webhooks
+        id: '<toString(@oro_integration:webhook_department.update_enabled->id)>'
+        attributes:
+            notificationUrl: 'https://example.com/webhook/department.updated'
+            enabled: true
+            system: false
+            verifySsl: true
+        relationships:
+            topic:
+                data:
+                    type: webhooktopics
+                    id: testdepartment.updated
+            format:
+                data:
+                    type: webhookformats
+                    id: default
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+    -
+        type: webhooks
+        id: '<toString(@oro_integration:webhook_department.create_disabled->id)>'
+        attributes:
+            notificationUrl: 'https://example.com/webhook/department.created/disabled'
+            enabled: false
+            system: false
+            verifySsl: true
+        relationships:
+            topic:
+                data:
+                    type: webhooktopics
+                    id: testdepartment.created
+            format:
+                data:
+                    type: webhookformats
+                    id: default
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+    -
+        type: webhooks
+        id: '<toString(@oro_integration:webhook_employee.create_enabled->id)>'
+        attributes:
+            notificationUrl: 'https://example.com/webhook/employee.created'
+            enabled: true
+            system: false
+            verifySsl: true
+        relationships:
+            topic:
+                data:
+                    type: webhooktopics
+                    id: testemployee.created
+            format:
+                data:
+                    type: webhookformats
+                    id: default
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+    -
+        type: webhooks
+        id: '<toString(@oro_integration:webhook_employee.delete_disabled->id)>'
+        attributes:
+            notificationUrl: 'https://example.com/webhook/employee.deleted'
+            enabled: false
+            system: false
+            verifySsl: false
+        relationships:
+            topic:
+                data:
+                    type: webhooktopics
+                    id: testemployee.deleted
+            format:
+                data:
+                    type: webhookformats
+                    id: default
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+    -
+        type: webhooks
+        id: '<toString(@oro_integration:webhook_department.create_system->id)>'
+        attributes:
+            notificationUrl: 'https://example.com/webhook/department.created/system'
+            enabled: true
+            system: true
+            verifySsl: false
+        relationships:
+            topic:
+                data:
+                    type: webhooktopics
+                    id: testdepartment.created
+            format:
+                data:
+                    type: webhookformats
+                    id: default
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'

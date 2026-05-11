@@ -1,0 +1,6 @@
+{% set topic = record.getValue('topicModel') %}
+{% if topic %}
+    {% include '@OroIntegration/WebhookProducerSettings/webhookTopicMolecule.html.twig' with {'topic': topic} %}
+{% else %}
+    {{ value }}
+{% endif %}

@@ -7,11 +7,54 @@ Feature: Managing users roles
   As an Administrator
   I want to be able to manage user roles
 
-  Scenario: User role create
-    Given I login as administrator
+  Scenario: Sort users grid on Create Role page
+    Given the following users:
+      | firstName | lastName | email              | username | authStatus         |
+      | Wendy     | Williams | wendy@williams.com | wendy    | @admin->authStatus |
+      | Brad      | Pitt     | brad@pitt.com      | brad     | @admin->authStatus |
+    And I login as administrator
     And go to System/User Management/Roles
     When I click "Create Role"
-    And I save and close form
+
+    And I sort "Role Users Grid" by "Has role"
+    Then I should see following "Role Users Grid" grid containing rows:
+      | Username |
+      | admin    |
+    When I reset "Role Users Grid" grid
+
+    And I sort "Role Users Grid" by "First Name"
+    Then I should see following "Role Users Grid" grid containing rows:
+      | First Name |
+      | Brad       |
+      | John       |
+      | Wendy      |
+    When I reset "Role Users Grid" grid
+
+    And I sort "Role Users Grid" by "Last Name"
+    Then I should see following "Role Users Grid" grid containing rows:
+      | Last Name |
+      | Doe       |
+      | Pitt      |
+      | Williams  |
+    When I reset "Role Users Grid" grid
+
+    And I sort "Role Users Grid" by "Primary Email"
+    Then I should see following "Role Users Grid" grid containing rows:
+      | Primary Email      |
+      | admin@example.com  |
+      | brad@pitt.com      |
+      | wendy@williams.com |
+    When I reset "Role Users Grid" grid
+
+    And I sort "Role Users Grid" by "Username"
+    Then I should see following "Role Users Grid" grid containing rows:
+      | Username |
+      | admin    |
+      | brad     |
+      | wendy    |
+
+  Scenario: Create user role
+    Given I save and close form
     Then I should see validation errors:
       | Role | This value should not be blank. |
     And I fill form with:
