@@ -36,7 +36,7 @@ class UpdateHandlerFacade
 
     /**
      * Handles update action of controller used to create or update entity on separate page or widget dialog.
-     * Has reusable segments such as $formHandler and $resultProvider to be able use your custom services by alias
+     * Has reusable segments such as $formHandler and $resultProvider to be able to use your custom services by alias
      *
      * @param string|object $data Data of form or FQCN
      * @param string|FormInterface $form Form instance or form_type name
