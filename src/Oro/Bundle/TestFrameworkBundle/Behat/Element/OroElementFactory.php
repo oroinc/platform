@@ -208,13 +208,16 @@ class OroElementFactory implements SuiteAwareInterface
      */
     public function findElementContainsByCss($name, $text, ?Element $context = null)
     {
-        return $this->findElement(
+        $element = $this->findElement(
             $name,
             function ($selector) use ($text) {
                 return $this->selectorManipulator->addContainsSuffix($selector, $text);
             },
             $context
         );
+        $element->setOption('text', $text);
+
+        return $element;
     }
 
     /**
@@ -228,7 +231,7 @@ class OroElementFactory implements SuiteAwareInterface
      */
     public function findElementContainsByXPath($name, $text, $useChildren = true, ?Element $context = null)
     {
-        return $this->findElement(
+        $element = $this->findElement(
             $name,
             function ($selector) use ($text, $useChildren) {
                 return $this->selectorManipulator->getContainsXPathSelector(
@@ -239,6 +242,9 @@ class OroElementFactory implements SuiteAwareInterface
             },
             $context
         );
+        $element->setOption('text', $text);
+
+        return $element;
     }
 
     /**

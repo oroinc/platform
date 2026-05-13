@@ -25,7 +25,7 @@ class ConfigConverterTest extends TestCase
         $this->configConverter = new ConfigConverter($this->entityOverrideProviderRegistry);
     }
 
-    public function testConvertConfigWithoutParentResourceClass(): void
+    public function testConvertConfigWithoutParentResourceClassAndIdentifierFieldNames(): void
     {
         $config = [
             'exclusion_policy' => 'all'
@@ -73,6 +73,20 @@ class ConfigConverterTest extends TestCase
         $convertedConfig = $this->configConverter->convertConfig($config);
 
         self::assertFalse($convertedConfig->has('parent_resource_class'));
+        self::assertFalse($convertedConfig->has('skip_acl_for_root_entity'));
+    }
+
+    public function testConvertConfigWithIdentifierFieldNames(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'identifier_field_names' => ['id']
+        ];
+
+        $convertedConfig = $this->configConverter->convertConfig($config);
+
+        self::assertTrue($convertedConfig->has('identifier_field_names'));
+        self::assertEquals(['id'], $convertedConfig->get('identifier_field_names'));
         self::assertFalse($convertedConfig->has('skip_acl_for_root_entity'));
     }
 

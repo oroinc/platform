@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Update;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -46,10 +48,17 @@ class SaveEntity implements ProcessorInterface
             return;
         }
 
-        $this->flushDataHandler->flushData(
-            $this->doctrineHelper->getEntityManagerForClass($entityClass),
-            new FlushDataHandlerContext([$context], $context->getSharedData())
-        );
+        try {
+            $this->flushDataHandler->flushData(
+                $this->doctrineHelper->getEntityManagerForClass($entityClass),
+                new FlushDataHandlerContext([$context], $context->getSharedData())
+            );
+        } catch (UniqueConstraintViolationException $e) {
+            $context->addError(
+                Error::createConflictValidationError('The entity already exists.')
+                    ->setInnerException($e)
+            );
+        }
 
         $context->setProcessed(self::OPERATION_NAME);
     }

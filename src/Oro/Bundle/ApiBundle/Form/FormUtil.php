@@ -33,11 +33,19 @@ class FormUtil
     }
 
     /**
+     * Checks whether the form does not have errors.
+     */
+    public static function isValid(FormInterface $form): bool
+    {
+        return $form->isSynchronized() && $form->isValid();
+    }
+
+    /**
      * Checks whether the form is submitted and does not have errors.
      */
     public static function isSubmittedAndValid(FormInterface $form): bool
     {
-        return $form->isSubmitted() && $form->isValid();
+        return $form->isSubmitted() && self::isValid($form);
     }
 
     /**
@@ -45,7 +53,7 @@ class FormUtil
      */
     public static function isNotSubmittedOrSubmittedAndValid(FormInterface $form): bool
     {
-        return !$form->isSubmitted() || $form->isValid();
+        return !$form->isSubmitted() || self::isValid($form);
     }
 
     /**

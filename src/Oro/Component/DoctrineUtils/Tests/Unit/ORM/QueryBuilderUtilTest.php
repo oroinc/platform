@@ -495,7 +495,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
         $this->assertEquals(
             $expectedClass,
-            QueryBuilderUtil::findClassByAlias($qb, ArrayUtil::getIn($qb->getDqlPart('join'), $joinPath)->getAlias())
+            QueryBuilderUtil::findClassByAlias($qb, ArrayUtil::getIn($qb->getDQLPart('join'), $joinPath)->getAlias())
         );
     }
 
@@ -508,7 +508,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
         $this->assertEquals(
             $expectedClass,
-            QueryBuilderUtil::getJoinClass($qb, ArrayUtil::getIn($qb->getDqlPart('join'), $joinPath))
+            QueryBuilderUtil::getJoinClass($qb, ArrayUtil::getIn($qb->getDQLPart('join'), $joinPath))
         );
     }
 

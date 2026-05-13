@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Processor\Update\SaveEntity;
@@ -116,6 +118,40 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $this->context->setResult($entity);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
+    }
+
+    public function testProcessWhenEntityAlreadyExists(): void
+    {
+        $entity = new \stdClass();
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $exception = $this->createMock(UniqueConstraintViolationException::class);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with(\stdClass::class, $this->context->getConfig())
+            ->willReturn(\stdClass::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityManagerForClass')
+            ->with(\stdClass::class)
+            ->willReturn($em);
+
+        $this->flushDataHandler->expects(self::once())
+            ->method('flushData')
+            ->willThrowException($exception);
+
+        $this->context->setResult($entity);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getId());
+        self::assertEquals(
+            [
+                Error::createConflictValidationError('The entity already exists.')
+                    ->setInnerException($exception)
+            ],
+            $this->context->getErrors()
+        );
         self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 }

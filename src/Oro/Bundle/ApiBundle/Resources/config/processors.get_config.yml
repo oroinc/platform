@@ -47,6 +47,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteAssociationHelper
         arguments:
             - '@oro_api.config_provider'
+            - '@oro_api.doctrine_helper'
 
     oro_api.complete_definition_helper.custom_data_type:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDataTypeHelper
@@ -148,6 +149,14 @@ services:
             - '@oro_api.config_loader_factory'
         tags:
             - { name: oro.api.processor, action: get_config, priority: -5 }
+
+    oro_api.get_config.configure_ext_id_entities:
+        class: Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigureExtIdEntities
+        arguments:
+            - '%oro_api.ext_id_entities%'
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, requestType: ext_id, priority: -7 }
 
     oro_api.api.get_config.add_enum_option_associations:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\AddEnumOptionAssociations

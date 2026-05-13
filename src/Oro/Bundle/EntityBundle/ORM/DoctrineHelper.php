@@ -187,7 +187,7 @@ class DoctrineHelper implements ResetInterface
     }
 
     /**
-     * Gets the name of the single id field.
+     * Gets the name of the single identifier field name for the given entity or class.
      *
      * @param object|string $entityOrClass  An entity object, entity class name or entity proxy class name
      * @param bool          $throwException Whether to throw exception in case the entity has several identifier fields
@@ -201,14 +201,41 @@ class DoctrineHelper implements ResetInterface
         $fieldNames = $this->getEntityIdentifierFieldNames($entityOrClass);
 
         $result = null;
-        if (count($fieldNames) > 1) {
+        if (\count($fieldNames) > 1) {
             if ($throwException) {
-                throw new Exception\InvalidEntityException(
-                    sprintf(
-                        'Can\'t get single identifier field name for "%s" entity.',
-                        $this->getEntityClass($entityOrClass)
-                    )
-                );
+                throw new Exception\InvalidEntityException(\sprintf(
+                    'Can\'t get single identifier field name for "%s" entity.',
+                    $this->getEntityClass($entityOrClass)
+                ));
+            }
+        } else {
+            $result = $fieldNames ? reset($fieldNames) : null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets the name of the single identifier field name for the given entity class.
+     *
+     * @param string $entityClass The real class name of an entity
+     * @param bool   $throwException Whether to throw exception in case the entity has several identifier fields
+     *
+     * @return string|null
+     *
+     * @throws Exception\InvalidEntityException
+     */
+    public function getSingleEntityIdentifierFieldNameForClass($entityClass, $throwException = true)
+    {
+        $fieldNames = $this->getEntityIdentifierFieldNamesForClass($entityClass);
+
+        $result = null;
+        if (\count($fieldNames) > 1) {
+            if ($throwException) {
+                throw new Exception\InvalidEntityException(\sprintf(
+                    'Can\'t get single identifier field name for "%s" entity.',
+                    $entityClass
+                ));
             }
         } else {
             $result = $fieldNames ? reset($fieldNames) : null;

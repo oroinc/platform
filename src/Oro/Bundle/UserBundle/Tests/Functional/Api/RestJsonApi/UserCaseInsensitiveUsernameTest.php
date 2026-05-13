@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
-use Symfony\Component\HttpFoundation\Response;
 
 class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
 {
@@ -22,10 +21,14 @@ class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
         $data = $this->getData();
         $response = $this->post(['entity' => 'users'], $data, [], false);
 
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        self::assertStringContainsString('This username is already registered by another user. '
-            . 'Please provide unique username. Source: usernameLowercase.', $response->getContent());
-
+        $this->assertResponseValidationError(
+            [
+                'title' => 'unique entity constraint',
+                'detail' => 'This username is already registered by another user.'
+                    . ' Please provide unique username. Source: usernameLowercase.'
+            ],
+            $response
+        );
         self::assertEmpty($this->findUser($data['data']['attributes']['email']));
     }
 
