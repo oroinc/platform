@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\JsonApi;
 
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi\FixFieldNaming;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -233,32 +236,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenExistsFieldNamedType()
-    {
-        $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'type' => null
-            ]
-        ];
-
-        $this->context->setResult($this->createConfigObject($config));
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'all',
-                'fields'           => [
-                    'classType' => [
-                        'property_path' => 'type'
-                    ]
-                ]
-            ],
-            $this->context->getResult()
-        );
-    }
-
-    public function testProcessWhenIdentifierFieldNamedIdHasPropertyPath()
+    public function testProcessWhenIdentifierFieldNamedIdHasPropertyPath(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -320,7 +298,91 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenFieldNamedTypeHasPropertyPath()
+    public function testProcessForRenamedIdFieldAndFiltersAndSortersAreRequested(): void
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['renamedId'],
+            'fields'                 => [
+                'renamedId' => [
+                    'property_path' => 'realId'
+                ]
+            ]
+        ];
+        $filters = [
+            'fields' => [
+                'renamedId' => null
+            ]
+        ];
+        $sorters = [
+            'fields' => [
+                'renamedId' => null
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setExtra(new FiltersConfigExtra());
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->context->setExtra(new SortersConfigExtra());
+        $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => [
+                        'property_path' => 'realId'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'id' => null
+                ]
+            ],
+            $this->context->getFilters()
+        );
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'id' => null
+                ]
+            ],
+            $this->context->getSorters()
+        );
+    }
+
+    public function testProcessWhenExistsFieldNamedType(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'type' => null
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'classType' => [
+                        'property_path' => 'type'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWhenFieldNamedTypeHasPropertyPath(): void
     {
         $config = [
             'exclusion_policy' => 'all',

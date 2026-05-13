@@ -323,10 +323,10 @@ class TagTest extends RestJsonApiTestCase
         $this->assertResponseContains($data, $response);
 
         $this->getEntityManager()->clear();
-        $this->assertResponseContains(
-            $entities,
-            $this->getRelationship(['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities'])
+        $tagEntitiesResponse = $this->getRelationship(
+            ['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities']
         );
+        $this->assertResponseContains($entities, $tagEntitiesResponse, true);
     }
 
     public function testUpdate(): void
@@ -388,10 +388,10 @@ class TagTest extends RestJsonApiTestCase
         $this->assertResponseContains($data, $response);
 
         $this->getEntityManager()->clear();
-        $this->assertResponseContains(
-            $entities,
-            $this->getRelationship(['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities'])
+        $tagEntitiesResponse = $this->getRelationship(
+            ['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities']
         );
+        $this->assertResponseContains($entities, $tagEntitiesResponse, true);
     }
 
     public function testTryToCreateWithoutName(): void
@@ -467,7 +467,6 @@ class TagTest extends RestJsonApiTestCase
         $response = $this->getRelationship(
             ['entity' => 'tags', 'id' => '<toString(@tag1->id)>', 'association' => 'taxonomy']
         );
-
         $this->assertResponseContains(
             ['data' => ['type' => 'taxonomies', 'id' => '<toString(@taxonomy1->id)>']],
             $response
@@ -547,7 +546,6 @@ class TagTest extends RestJsonApiTestCase
         $response = $this->getRelationship(
             ['entity' => 'tags', 'id' => '<toString(@tag1->id)>', 'association' => 'entities']
         );
-
         $this->assertResponseContains(
             [
                 'data' => [
@@ -556,7 +554,8 @@ class TagTest extends RestJsonApiTestCase
                     ['type' => 'testactivities', 'id' => '<toString(@activity2->id)>']
                 ]
             ],
-            $response
+            $response,
+            true
         );
     }
 
@@ -575,10 +574,10 @@ class TagTest extends RestJsonApiTestCase
         );
 
         $this->getEntityManager()->clear();
-        $this->assertResponseContains(
-            $data,
-            $this->getRelationship(['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities'])
+        $tagEntitiesResponse = $this->getRelationship(
+            ['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities']
         );
+        $this->assertResponseContains($data, $tagEntitiesResponse, true);
     }
 
     public function testAddRelationshipForEntities(): void
@@ -594,6 +593,9 @@ class TagTest extends RestJsonApiTestCase
         );
 
         $this->getEntityManager()->clear();
+        $tagEntitiesResponse = $this->getRelationship(
+            ['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities']
+        );
         $this->assertResponseContains(
             [
                 'data' => [
@@ -603,7 +605,8 @@ class TagTest extends RestJsonApiTestCase
                     ['type' => 'testactivities', 'id' => '<toString(@activity3->id)>']
                 ]
             ],
-            $this->getRelationship(['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities'])
+            $tagEntitiesResponse,
+            true
         );
     }
 
@@ -620,6 +623,9 @@ class TagTest extends RestJsonApiTestCase
         );
 
         $this->getEntityManager()->clear();
+        $tagEntitiesResponse = $this->getRelationship(
+            ['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities']
+        );
         $this->assertResponseContains(
             [
                 'data' => [
@@ -627,7 +633,8 @@ class TagTest extends RestJsonApiTestCase
                     ['type' => 'testactivities', 'id' => '<toString(@activity2->id)>']
                 ]
             ],
-            $this->getRelationship(['entity' => 'tags', 'id' => (string)$tagId, 'association' => 'entities'])
+            $tagEntitiesResponse,
+            true
         );
     }
 
@@ -753,10 +760,10 @@ class TagTest extends RestJsonApiTestCase
         $this->assertResponseContains($data, $response);
 
         $this->getEntityManager()->clear();
-        $this->assertResponseContains(
-            $tags,
-            $this->getRelationship(['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags'])
+        $tagsResponse = $this->getRelationship(
+            ['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags']
         );
+        $this->assertResponseContains($tags, $tagsResponse, true);
     }
 
     public function testTaggableEntityCreateWithoutTags(): void
@@ -779,10 +786,10 @@ class TagTest extends RestJsonApiTestCase
         $this->assertResponseContains($data, $response);
 
         $this->getEntityManager()->clear();
-        $this->assertResponseContains(
-            ['data' => []],
-            $this->getRelationship(['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags'])
+        $tagsResponse = $this->getRelationship(
+            ['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags']
         );
+        $this->assertResponseContains(['data' => []], $tagsResponse);
     }
 
     public function testTaggableEntityUpdateForTags(): void
@@ -811,10 +818,10 @@ class TagTest extends RestJsonApiTestCase
         $this->assertResponseContains($data, $response);
 
         $this->getEntityManager()->clear();
-        $this->assertResponseContains(
-            $tags,
-            $this->getRelationship(['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags'])
+        $tagsResponse = $this->getRelationship(
+            ['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags']
         );
+        $this->assertResponseContains($tags, $tagsResponse, true);
     }
 
     public function testTaggableEntityUpdateWithoutTags(): void
@@ -837,6 +844,9 @@ class TagTest extends RestJsonApiTestCase
         $this->assertResponseContains($data, $response);
 
         $this->getEntityManager()->clear();
+        $tagsResponse = $this->getRelationship(
+            ['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags']
+        );
         $this->assertResponseContains(
             [
                 'data' => [
@@ -844,7 +854,8 @@ class TagTest extends RestJsonApiTestCase
                     ['type' => 'tags', 'id' => '<toString(@tag2->id)>']
                 ]
             ],
-            $this->getRelationship(['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags'])
+            $tagsResponse,
+            true
         );
     }
 
@@ -963,7 +974,6 @@ class TagTest extends RestJsonApiTestCase
         $response = $this->getRelationship(
             ['entity' => 'testactivities', 'id' => '<toString(@activity1->id)>', 'association' => 'tags']
         );
-
         $this->assertResponseContains(
             [
                 'data' => [
@@ -971,7 +981,8 @@ class TagTest extends RestJsonApiTestCase
                     ['type' => 'tags', 'id' => '<toString(@tag2->id)>']
                 ]
             ],
-            $response
+            $response,
+            true
         );
     }
 
@@ -990,10 +1001,10 @@ class TagTest extends RestJsonApiTestCase
         );
 
         $this->getEntityManager()->clear();
-        $this->assertResponseContains(
-            $data,
-            $this->getRelationship(['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags'])
+        $tagsResponse = $this->getRelationship(
+            ['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags']
         );
+        $this->assertResponseContains($data, $tagsResponse, true);
     }
 
     public function testTaggableEntityAddRelationshipForTags(): void
@@ -1009,6 +1020,9 @@ class TagTest extends RestJsonApiTestCase
         );
 
         $this->getEntityManager()->clear();
+        $tagsResponse = $this->getRelationship(
+            ['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags']
+        );
         $this->assertResponseContains(
             [
                 'data' => [
@@ -1017,7 +1031,8 @@ class TagTest extends RestJsonApiTestCase
                     ['type' => 'tags', 'id' => '<toString(@tag3->id)>']
                 ]
             ],
-            $this->getRelationship(['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags'])
+            $tagsResponse,
+            true
         );
     }
 
@@ -1034,13 +1049,16 @@ class TagTest extends RestJsonApiTestCase
         );
 
         $this->getEntityManager()->clear();
+        $tagsResponse = $this->getRelationship(
+            ['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags']
+        );
         $this->assertResponseContains(
             [
                 'data' => [
                     ['type' => 'tags', 'id' => '<toString(@tag2->id)>']
                 ]
             ],
-            $this->getRelationship(['entity' => 'testactivities', 'id' => (string)$entityId, 'association' => 'tags'])
+            $tagsResponse
         );
     }
 }

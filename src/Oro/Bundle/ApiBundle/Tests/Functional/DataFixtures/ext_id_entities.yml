@@ -1,0 +1,99 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+    department_1:
+        name: 'Department 1'
+        externalId: 'ext_department_1'
+        staff: ['@employee_1', '@employee_4']
+        organization: '@organization'
+        owner: '@business_unit'
+    department_2:
+        name: 'Department 2'
+        externalId: 'ext_department_2'
+        staff: ['@employee_2']
+        organization: '@organization'
+        owner: '@business_unit'
+    department_3:
+        name: 'Department 3'
+        staff: ['@employee_3']
+        organization: '@organization'
+        owner: '@business_unit'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
+    employee_1:
+        name: 'Employee 1'
+        externalId: 'ext_employee_1'
+        organization: '@organization'
+        owner: '@business_unit'
+    employee_2:
+        name: 'Employee 2'
+        externalId: 'ext_employee_2'
+        organization: '@organization'
+        owner: '@business_unit'
+    employee_3:
+        name: 'Employee 3'
+        externalId: 'ext_employee_3'
+        organization: '@organization'
+        owner: '@business_unit'
+    employee_4:
+        name: 'Employee 4'
+        organization: '@organization'
+        owner: '@business_unit'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget:
+    target_1:
+        name: 'Target 1'
+        externalId: 'ext_target_1'
+    target_2:
+        name: 'Target 2'
+        externalId: 'ext_target_2'
+    target_3:
+        name: 'Target 3'
+        externalId: 'ext_target_3'
+    target_4:
+        name: 'Target 4'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner:
+    owner_1:
+        name: 'Owner 1'
+        externalId: 'ext_owner_1'
+        target: '@target_1'
+        targets: ['@target_1', '@target_2']
+    owner_2:
+        name: 'Owner 2'
+        externalId: 'ext_owner_2'
+        target: '@target_4'
+        targets: ['@target_1', '@target_4']
+    owner_3:
+        name: 'Owner 3'
+        target: '@target_3'
+        targets: ['@target_3']
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivityTarget:
+    activity_target_1:
+        name: 'Activity Target 1'
+    activity_target_2:
+        name: 'Activity Target 2'
+    activity_target_3:
+        name: 'Activity Target 3'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:
+    activity_1:
+        name: 'Activity 1'
+        externalId: 'ext_activity_1'
+        test_owner_655b996: ['@owner_1', '@owner_3']
+        test_target_67911c5: ['@target_1', '@target_4']
+        test_activity_target_3a5bdf73: ['@activity_target_1', '@activity_target_3']
+    activity_2:
+        name: 'Activity 2'
+        externalId: 'ext_activity_2'
+        test_owner_655b996: ['@owner_1', '@owner_2']
+        test_target_67911c5: ['@target_1', '@target_2']
+        test_activity_target_3a5bdf73: ['@activity_target_1', '@activity_target_2']
+    activity_3:
+        name: 'Activity 3'
+        test_owner_655b996: ['@owner_1', '@owner_3']
+        test_target_67911c5: ['@target_1', '@target_4']
+        test_activity_target_3a5bdf73: ['@activity_target_1', '@activity_target_3']

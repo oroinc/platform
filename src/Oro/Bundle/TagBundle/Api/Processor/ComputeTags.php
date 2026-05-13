@@ -42,7 +42,8 @@ class ComputeTags implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        if (!$this->taggableHelper->isTaggable($context->getClassName())) {
+        $entityClass = $context->getClassName();
+        if (!$this->taggableHelper->isTaggable($entityClass)) {
             return;
         }
 
@@ -51,17 +52,20 @@ class ComputeTags implements ProcessorInterface
             return;
         }
 
-        $ids = [];
         $config = $context->getConfig();
-        $idFieldName = $this->getIdentifierFieldName($config);
+        $idFieldName = $this->getIdentifierFieldName($entityClass, $config);
+        if (!$idFieldName) {
+            return;
+        }
+
+        $ids = [];
         foreach ($data as $item) {
             $ids[] = $item[$idFieldName];
         }
 
         $tags = $this->loadTagsAssociationData(
-            $context->getClassName(),
+            $entityClass,
             $ids,
-            $idFieldName,
             $config->getField(self::FIELD_NAME)->getTargetEntity(),
             $context->getNormalizationContext()
         );
@@ -72,17 +76,19 @@ class ComputeTags implements ProcessorInterface
         $context->setData($data);
     }
 
-    private function getIdentifierFieldName(EntityDefinitionConfig $config): string
+    private function getIdentifierFieldName(string $entityClass, EntityDefinitionConfig $config): ?string
     {
-        $idFieldNames = $config->getIdentifierFieldNames();
+        $idFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldNameForClass($entityClass, false);
+        if (!$idFieldName) {
+            return null;
+        }
 
-        return reset($idFieldNames);
+        return $config->findFieldNameByPropertyPath($idFieldName);
     }
 
     private function loadTagsAssociationData(
         string $entityClass,
         array $ids,
-        string $idFieldName,
         EntityDefinitionConfig $config,
         array $normalizationContext
     ): array {
@@ -106,13 +112,21 @@ class ComputeTags implements ProcessorInterface
         $data = $this->entitySerializer->serializeEntities($tags, Tag::class, $config, $normalizationContext);
 
         $result = [];
+        $tagIdFieldName = $this->getTagIdentifierFieldName($config);
         foreach ($data as $item) {
-            $tagId = $item[$idFieldName];
+            $tagId = $item[$tagIdFieldName];
             foreach ($map[$tagId] as $entityId) {
                 $result[$entityId][] = $item;
             }
         }
 
         return $result;
+    }
+
+    private function getTagIdentifierFieldName(EntityDefinitionConfig $config): string
+    {
+        $idFieldNames = $config->getIdentifierFieldNames();
+
+        return reset($idFieldNames);
     }
 }

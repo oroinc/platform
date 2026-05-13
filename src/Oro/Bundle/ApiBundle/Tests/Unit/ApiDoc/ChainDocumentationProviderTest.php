@@ -48,9 +48,11 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider1->expects(self::once())
             ->method('getDocumentation')
+            ->with(self::identicalTo($requestType))
             ->willReturn('provider1 documentation');
         $this->provider2->expects(self::once())
             ->method('getDocumentation')
+            ->with(self::identicalTo($requestType))
             ->willReturn('provider2 documentation');
         $this->provider3->expects(self::never())
             ->method('getDocumentation');
@@ -67,9 +69,11 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider1->expects(self::once())
             ->method('getDocumentation')
+            ->with(self::identicalTo($requestType))
             ->willReturn(null);
         $this->provider2->expects(self::once())
             ->method('getDocumentation')
+            ->with(self::identicalTo($requestType))
             ->willReturn('provider2 documentation');
         $this->provider3->expects(self::never())
             ->method('getDocumentation');

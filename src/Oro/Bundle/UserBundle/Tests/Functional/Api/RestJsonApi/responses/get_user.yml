@@ -21,6 +21,7 @@ data:
         passwordRequestedAt: null
         passwordChangedAt: null
         emails: {  }
+        externalId: ext_simple_user
     relationships:
         groups:
             data: []

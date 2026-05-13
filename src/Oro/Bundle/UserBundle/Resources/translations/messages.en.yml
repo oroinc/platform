@@ -114,6 +114,9 @@ oro:
             label:                          First name
             description:                    The first name of the user.
         id.label:                           Id
+        external_id:
+            label:                          External ID
+            description:                    A unique identifier from an external system.
         avatar:
             label:                          Avatar
             description:                    The user's photo or other picture associated with the user.

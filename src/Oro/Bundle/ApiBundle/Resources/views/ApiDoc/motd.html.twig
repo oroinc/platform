@@ -9,7 +9,7 @@
     div.motd div.documentation a { text-decoration: none; }
     div.motd div.documentation a.main { font-size: 1.2em; }
     div.motd div.documentation p { padding: 10px 0 0 0; }
-    div.motd div.documentation ul { padding-left: 10px; list-style-type: disc; list-style-position: inside; }
+    div.motd div.documentation ul { padding: 10px 0 0 10px; list-style-type: disc; list-style-position: inside; }
     table tbody tr td tr td { padding: 0 0 6px 0; }
     table tbody tr td p { padding: 0 0 5px 0; }
     #sandbox_configuration { padding-top: 16px; padding-bottom: 5px; }
@@ -216,7 +216,7 @@
         {%- endfor -%}
         if (documentationUrl) {
             documentation = '<a href="' + documentationUrl + '" class="main"'
-                + ' target="_blank">The documentation</a>' + documentation;
+                + ' target="_blank">Web Services API Guide</a>' + documentation;
         }
         if (documentation) {
             $motd.append('<div class="documentation">' + documentation + '</div>');

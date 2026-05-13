@@ -34,8 +34,8 @@ class DocumentationProvider implements DocumentationProviderInterface
     #[\Override]
     public function getDocumentation(RequestType $requestType): ?string
     {
-        if (false === strrpos($this->resource, '.md')) {
-            throw new \InvalidArgumentException(sprintf(
+        if (!str_ends_with($this->resource, '.md')) {
+            throw new \InvalidArgumentException(\sprintf(
                 'The documentation resource "%s" must be a Markdown document.',
                 $this->resource
             ));

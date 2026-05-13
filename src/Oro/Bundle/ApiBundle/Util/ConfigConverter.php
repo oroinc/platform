@@ -37,8 +37,25 @@ class ConfigConverter extends BaseConfigConverter
         if (!empty($config[ConfigUtil::RESOURCE_CLASS])) {
             $result->set(ConfigUtil::RESOURCE_CLASS, $config[ConfigUtil::RESOURCE_CLASS]);
         }
+        if (!empty($config[ConfigUtil::IDENTIFIER_FIELD_NAMES])) {
+            $result->set(ConfigUtil::IDENTIFIER_FIELD_NAMES, $config[ConfigUtil::IDENTIFIER_FIELD_NAMES]);
+        }
         if (($config[AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY] ?? false)) {
             $result->set(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY, true);
+        }
+    }
+
+    #[\Override]
+    protected function buildFieldConfig(FieldConfig $result, array $config): void
+    {
+        parent::buildFieldConfig($result, $config);
+
+        $targetEntity = $result->getTargetEntity();
+        if (null !== $targetEntity) {
+            $resourceClass = $config[ConfigUtil::RESOURCE_CLASS] ?? $config[ConfigUtil::TARGET_CLASS] ?? null;
+            if ($resourceClass) {
+                $targetEntity->set(ConfigUtil::RESOURCE_CLASS, $resourceClass);
+            }
         }
     }
 

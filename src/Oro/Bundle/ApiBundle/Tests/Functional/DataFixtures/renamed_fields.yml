@@ -1,7 +1,8 @@
 Oro\Bundle\TestFrameworkBundle\Entity\TestProductType:
     test_product_type{1..2}:
-        name: type<current()>
+        name: 'type<current()>'
+        label: 'product type <current()>'
 Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
     test_product{1..2}:
-        name: product <current()>
+        name: 'product <current()>'
         productType: '@test_product_type<current()>'

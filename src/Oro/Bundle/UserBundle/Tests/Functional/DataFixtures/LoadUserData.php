@@ -64,7 +64,8 @@ class LoadUserData extends AbstractFixture implements
             ->addOrganization($organization)
             ->addBusinessUnit($organizationBusinessUnit)
             ->addUserRole($role)
-            ->setEnabled(true);
+            ->setEnabled(true)
+            ->setExternalId('ext_' . self::SIMPLE_USER);
         $userManager->updateUser($user);
 
         $user2 = $userManager->createUser();
@@ -78,7 +79,8 @@ class LoadUserData extends AbstractFixture implements
             ->addOrganization($organization)
             ->addBusinessUnit($organizationBusinessUnit)
             ->addUserRole($role)
-            ->setEnabled(true);
+            ->setEnabled(true)
+            ->setExternalId('ext_' . self::SIMPLE_USER_2);
         $userManager->updateUser($user2);
 
         $userWithToken = $userManager->createUser();

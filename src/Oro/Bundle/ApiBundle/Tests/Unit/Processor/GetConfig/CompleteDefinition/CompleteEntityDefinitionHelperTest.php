@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\CompleteDefinition
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteAssociationHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteEntityDefinitionHelper;
@@ -405,7 +406,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -468,7 +469,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -549,7 +550,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -636,7 +637,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'realAssociation1' => [
@@ -724,7 +725,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -810,7 +811,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -893,7 +894,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -982,7 +983,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -1042,7 +1043,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -1128,7 +1129,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -1222,7 +1223,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
         $rootEntityMetadata->expects(self::once())
@@ -1297,7 +1298,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
         $rootEntityMetadata->expects(self::never())
@@ -1374,7 +1375,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -1449,7 +1450,120 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForTranslatableEntity()
+    public function testCompleteDefinitionForInheritanceMappingEntityAssociation(): void
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['type' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type' => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
+        $associationMetadata->setInheritanceType(ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
+
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredRelation')
+            ->with($rootEntityMetadata, 'association1')
+            ->willReturn(false);
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->withConsecutive(
+                [
+                    EntityIdentifier::class,
+                    $context->getVersion(),
+                    $context->getRequestType(),
+                    [new FilterIdentifierFieldsConfigExtra(), new EntityDefinitionConfigExtra()]
+                ],
+                [
+                    'Test\Association1Target',
+                    $context->getVersion(),
+                    $context->getRequestType(),
+                    [new FilterIdentifierFieldsConfigExtra(), new EntityDefinitionConfigExtra()],
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields' => [
+                            'id' => [
+                                'property_path' => 'customizedIdentifier'
+                            ]
+                        ]
+                    ]
+                ),
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields' => [
+                            'id' => [
+                                'property_path' => 'customizedIdentifier'
+                            ],
+                            'renameId' => [
+                                'property_path' => 'id'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields' => [
+                    'id' => null,
+                    'association1' => [
+                        'exclusion_policy' => 'all',
+                        'target_class' => EntityIdentifier::class,
+                        'target_type' => 'to-one',
+                        'collapse' => true,
+                        'identifier_field_names' => ['id'],
+                        'resource_class' => 'Test\Association1Target',
+                        'fields' => [
+                            'id' => [
+                                'property_path' => 'customizedIdentifier'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForTranslatableEntity(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2017,7 +2131,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
 
@@ -2064,7 +2178,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
 
@@ -2110,7 +2224,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
 
@@ -2155,7 +2269,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -2461,7 +2575,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
 
@@ -2510,7 +2624,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
 
@@ -2563,7 +2677,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [];
 
@@ -2870,7 +2984,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -2973,7 +3087,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -3082,7 +3196,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -3200,7 +3314,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -3315,7 +3429,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
@@ -3382,7 +3496,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id' => ['ty[e' => 'integer']
+            'id' => ['type' => 'integer']
         ];
         $rootEntityMetadata->associationMappings = [
             'association1' => [
