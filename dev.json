@@ -78,7 +78,7 @@
         "symfony/security-acl": "~3.3.4",
         "symfony/acl-bundle": "~2.4.0",
         "twig/twig": "~v3.21.1",
-        "doctrine/orm": "~2.20.6",
+        "doctrine/orm": "2.20.10",
         "doctrine/doctrine-bundle": "~2.18.0",
         "doctrine/dbal": "~3.10.2",
         "doctrine/annotations": "~1.14.2",
