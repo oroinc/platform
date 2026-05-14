@@ -153,7 +153,7 @@
         margin-top: -($field-size + $arrow-height);
         left: 10px;
         border-style: solid;
-        border-color: $danger-lighten transparent;
+        border-color: $error-lighten transparent;
         border-width: $arrow-height ($arrow-height - 1) 0;
     }
 
@@ -168,15 +168,15 @@
             padding: 5px 8px 6px 30px;
             border-radius: $input-field-border-radius;
             font-size: $base-font-size - 1;
-            background-color: $danger-lighten;
-            color: $danger-ultra-dark;
+            background-color: $error-lighten;
+            color: $error;
 
             @include fa-icon($fa-var-times, before, true) {
                 position: absolute;
                 left: 9px;
                 top: 3px;
                 font-size: $icon-font-size;
-                color: $danger-darken;
+                color: $error;
             }
         }
     }

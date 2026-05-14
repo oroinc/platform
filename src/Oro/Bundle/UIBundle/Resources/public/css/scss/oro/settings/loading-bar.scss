@@ -3,7 +3,7 @@
 @use 'sass:color';
 
 $loading-bar-display: none !default;
-$loading-bar-background: $extra !default;
+$loading-bar-background: $primary-accent !default;
 $loading-bar-box-shadow: none !default;
 $loading-bar-border-radius: 3px !default;
 $loading-bar-position: absolute !default;

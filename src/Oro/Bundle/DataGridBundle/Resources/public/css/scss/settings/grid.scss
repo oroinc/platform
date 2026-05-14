@@ -55,7 +55,7 @@ $oro-datagrid-footer-cell-color: $text-secondary !default;
 $oro-datagrid-footer-cell-inner-offset: 0 8px !default;
 $oro-datagrid-footer-cell-outer-inner-offset: 8px !default;
 
-$oro-datagrid-row-selected: $extra-300 !default;
+$oro-datagrid-row-selected: $primary-accent-extra-light !default;
 $oro-datagrid-row-disabled-opacity: .4 !default;
 
 $oro-datagrid-action-inner-offset: 8px 18px 7px 8px !default;
@@ -78,7 +78,7 @@ $oro-datagrid-all-header-cell-icon-offset: 6px !default;
 $oro-datagrid-all-header-cell-icon: $fa-var-caret-down !default;
 
 $oro-datagrid-sticky-shadow: 0 6px 6px -4px rgba(0, 0, 0, .2) !default;
-$oro-datagrid-highlight-bg: $extra-300 !default;
+$oro-datagrid-highlight-bg: $primary-accent-extra-light !default;
 
 // board view
 
@@ -106,9 +106,9 @@ $oro-datagrid-card-box-shadow: 0 2px 4px 0 rgba(0 0 0 / 5%) !default;
 $oro-datagrid-card-box-shadow-hover: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 
 $oro-datagrid-card-transition-status-box-shadow: 0 2px 4px 0 rgba(0 0 0 / 5%) !default;
-$oro-datagrid-card-transition-status-error-background: $danger-ultra-light !default;
-$oro-datagrid-card-transition-status-success-background: $success-ultra-light !default;
-$oro-datagrid-card-transition-status-in-progress-background: $extra-300 !default;
+$oro-datagrid-card-transition-status-error-background: $error-lighten !default;
+$oro-datagrid-card-transition-status-success-background: $success-light !default;
+$oro-datagrid-card-transition-status-in-progress-background: $primary-accent-extra-light !default;
 
 $oro-datagrid-card-sortable-helper-border-color: $primary-750 !default;
 $oro-datagrid-card-sortable-helper-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
@@ -118,7 +118,7 @@ $oro-datagrid-card-card-amount-font-weight: font-weight('bold') !default;
 $oro-datagrid-card-card-amount-line-height: 1.36 !default;
 $oro-datagrid-card-card-additional-font-size: 14px !default;
 $oro-datagrid-card-card-date-font-size: 13px !default;
-$oro-datagrid-card-card-date-color: $additional-lighten !default;
+$oro-datagrid-card-card-date-color: $additional-light !default;
 
 $oro-datagrid-placeholder-offset: 13px 16px !default;
 $oro-datagrid-placeholder-background: $primary-860 !default;
@@ -133,7 +133,7 @@ $oro-datagrid-editable-action-offset-end: $oro-datagrid-body-cell-inner-horizont
 $oro-datagrid-editable-action-offset-top: $oro-datagrid-body-cell-inner-top -
     $oro-datagrid-editable-action-inner-offset;
 $oro-datagrid-editable-cell-offset: 34px !default;
-$oro-datagrid-editable-error: $danger-darken !default;
+$oro-datagrid-editable-error: $error !default;
 
 $oro-datagrid-editable-loader-size: 14px !default;
 $oro-datagrid-editable-loader-width: 2px !default;

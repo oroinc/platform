@@ -4,8 +4,8 @@ $sidebar-minimized-width: 52px !default;
 $sidebar-maximized-width: 252px !default;
 $sidebar-bg-color: rgba(255, 255, 255, .3) !default;
 $sidebar-color: $text-primary !default;
-$sidebar-active-color: $secondary-200 !default;
-$sidebar-resize-border-color-hover: $secondary !default;
+$sidebar-active-color: $primary-main-light !default;
+$sidebar-resize-border-color-hover: $primary-main !default;
 
 $sidebar-scroll-bar-background-color: rgba($primary-400, .2) !default;
 $sidebar-scroll-bar-background-color-hover: rgba($primary-400, .7) !default;
@@ -30,4 +30,4 @@ $sidebar-icon-toggle-expanded: $fa-var-angle-down !default;
 $sidebar-icon-loading: $fa-var-refresh !default;
 $sidebar-icon-right: var(--fa-var-arrow-right) !default;
 $sidebar-icon-left: var(--fa-var-arrow-left) !default;
-$sidebar-icon-highlight-color: $extra !default;
+$sidebar-icon-highlight-color: $primary-accent !default;

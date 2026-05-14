@@ -535,7 +535,7 @@ span.icon.grid .fa-paperclip {
                     }
 
                     .fa {
-                        color: $additional-lighten;
+                        color: $additional-light;
                         font-size: 15px;
                         margin-right: 1px;
                         margin-left: 0;
@@ -573,7 +573,7 @@ span.icon.grid .fa-paperclip {
 }
 
 .forged-required label em {
-    color: $danger-darken;
+    color: $error;
     font-size: 15px;
     line-height: 1px;
 }
@@ -664,11 +664,11 @@ a.attachment .icon .fa-link {
 
 .oro-email-user-emails .email-count {
     margin-left: 4px;
-    color: $danger-light;
+    color: $error-light;
 }
 
 .has-new-emails .fa-user-circle {
-    color: $danger-light;
+    color: $error-light;
 }
 
 a.sync-btn span.dots {

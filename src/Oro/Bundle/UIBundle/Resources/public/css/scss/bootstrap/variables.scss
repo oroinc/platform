@@ -173,7 +173,7 @@ $progress-font-size: 22px;
 $progress-bg: $primary-860;
 $progress-border-radius: 0;
 $progress-box-shadow: null;
-$progress-bar-color: $additional-dark;
+$progress-bar-color: $primary;
 $progress-bar-bg: $primary-600;
 
 $tooltip-arrow-width: 10px;
@@ -245,7 +245,7 @@ $header-text-color: #cad2da;
 $inline-action-color: #94b4c9;
 $inline-action-background: $primary-main-light;
 $cell-selected-background: $inline-action-background;
-$row-selected-background: $extra-300;
+$row-selected-background: $primary-accent-extra-light;
 $row-highlight-background: color.adjust($row-selected-background, $lightness: -2%);
 $cell-success-background: $success-light;
 $cell-success-color: $success;
@@ -267,32 +267,32 @@ $btn-text-color: $primary-400;
 
 $accordion-heading-background-color: #eaeaea;
 
-$success-background: $success-ultra-light;
-$success-border: $success-ultra-light;
-$success-text: $success-darken;
-$success-close: $success-darken;
+$success-background: $success-light;
+$success-border: $success-light;
+$success-text: $success;
+$success-close: $success;
 
-$error-background: $danger-ultra-light;
-$error-border: $danger-ultra-light;
-$error-text: $danger-ultra-dark;
-$error-close: $danger-darken;
+$error-background: $error-lighten;
+$error-border: $error-lighten;
+$error-text: $error;
+$error-close: $error;
 
 $warning-background: $warning-light;
 $warning-border: $warning-light;
-$warning-text: $warning-darken;
-$warning-close: $warning-dark;
+$warning-text: $warning;
+$warning-close: $warning;
 
-$info-text: $info-ultra-dark;
+$info-text: $info;
 $info-background: $info-lighten;
 $info-border: $info-lighten;
-$info-close: $info-dark;
+$info-close: $info;
 
 $error-message-balloon-background: color.adjust($error-text, $lightness: 20%);
 
 $hover-transition: all 230ms ease-out !default;
 
 // Links
-$link-color: $info-dark;
+$link-color: $info;
 $link-color-hover: $secondary-secondary-5;
 $menu-item-color: $primary-200;
 

@@ -142,7 +142,7 @@
                 .mail-icon {
                     @include fa-icon($email-active-mail-icon);
 
-                    color: $extra;
+                    color: $primary-accent;
                 }
 
                 .from-name {

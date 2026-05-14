@@ -33,9 +33,9 @@ $input-disabled-background-color: $neutral-grey-3 !default;
 $input-disabled-color: $text-disabled !default;
 $input-disabled-resize: none !default;
 
-$input-error-border-color: $danger-dark !default;
+$input-error-border-color: $error !default;
 $input-error-box-shadow: none !default;
-$input-error-color: $danger-dark !default;
+$input-error-color: $error !default;
 
 $uploader-border-radius: $input-field-border-radius !default;
 $uploader-background-color: $input-background-color !default;

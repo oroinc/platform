@@ -9,18 +9,18 @@
     .with-thin-row-placeholder &.row-placeholder {
         position: relative;
         z-index: 1;
-        box-shadow: 0 0 0 $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+        box-shadow: 0 0 0 $sorting-placeholder-thin-box-shadow-size $secondary-secondary-5;
 
         &:first-child {
             box-shadow:
                 0 $sorting-placeholder-thin-box-shadow-size 0
-                $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+                $sorting-placeholder-thin-box-shadow-size $secondary-secondary-5;
         }
 
         &:last-child {
             box-shadow:
                 0 (- $sorting-placeholder-thin-box-shadow-size)
-                0 $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+                0 $sorting-placeholder-thin-box-shadow-size $secondary-secondary-5;
         }
 
         td {

@@ -3,7 +3,7 @@
 /* stylelint-disable no-descending-specificity */
 
 body {
-    background: $primary-accent-gradient;
+    background: $primary-background;
 }
 
 @mixin responsive-inline-position() {
@@ -215,14 +215,14 @@ body.backdrop {
 
     > li {
         @if ($add-border-to-last-el) {
-            border-bottom: 1px solid $additional-extra-lighten;
+            border-bottom: 1px solid $additional-extra-light;
 
             &:last-child {
                 border-color: $page-border-color;
             }
         } @else {
             &:not(:last-child) {
-                border-bottom: 1px solid $additional-extra-lighten;
+                border-bottom: 1px solid $additional-extra-light;
             }
         }
 

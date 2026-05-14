@@ -98,15 +98,15 @@
         }
 
         .cm-nonmatchingBracket {
-            background-color: $danger-ultra-light;
+            background-color: $error-lighten;
 
             .cm-tag-punctuation {
-                color: $danger;
+                color: $error;
             }
         }
 
         .cm-matchingBracket {
-            background-color: $success-extra-lighten;
+            background-color: $success-light;
         }
     }
 
@@ -200,11 +200,11 @@
     }
 
     .cm-lintRange-error {
-        background-color: $danger-ultra-light;
+        background-color: $error-lighten;
         background-image: none;
 
         > span {
-            color: $danger;
+            color: $error;
         }
     }
 
@@ -234,8 +234,8 @@
         right: 9px;
         bottom: 9px;
         padding: 2px 10px;
-        background-color: $danger-ultra-light;
-        color: $danger;
+        background-color: $error-lighten;
+        color: $error;
         border: none;
         line-height: $line-height-base;
     }
@@ -369,8 +369,8 @@
     }
 
     .cm-tooltip-lint {
-        background-color: $danger-lighten;
-        color: $danger-ultra-dark;
+        background-color: $error-lighten;
+        color: $error;
         padding: 2px 8px 1px 30px;
         border-radius: $input-field-border-radius;
         font-size: $base-font-size;
@@ -381,13 +381,13 @@
             left: 9px;
             top: 0;
             font-size: $icon-font-size;
-            color: $danger-darken;
+            color: $error;
         }
 
         + .cm-tooltip-arrow {
             &::before,
             &::after {
-                border-bottom-color: $danger-ultra-light;
+                border-bottom-color: $error-lighten;
             }
         }
 
@@ -400,7 +400,7 @@
 
     &:has(> .cm-tooltip-lint) {
         border: none;
-        --tooltip-border-color: #{$danger-lighten};
-        --tooltip-background-color: #{$danger-lighten};
+        --tooltip-border-color: #{$error-lighten};
+        --tooltip-background-color: #{$error-lighten};
     }
 }

@@ -7,15 +7,15 @@
 
     .translation-status {
         .status-up-to-date {
-            color: $success-darken;
+            color: $success;
         }
 
         .status-install_available {
-            color: $warning-darken;
+            color: $success;
         }
 
         .status-update_available {
-            color: $success-darken;
+            color: $success;
         }
     }
 }

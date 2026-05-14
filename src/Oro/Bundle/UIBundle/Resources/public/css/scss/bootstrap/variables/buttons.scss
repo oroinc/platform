@@ -105,11 +105,11 @@ $btn-theme-lighter: (
 ) !default;
 
 $btn-theme-primary: (
-    'background': $secondary,
+    'background': $primary-main,
     'hover-background': $secondary-secondary-5,
     'active-background': $secondary-secondary-4,
     'disabled-background': $text-disabled,
-    'border': $secondary,
+    'border': $primary-main,
     'disabled-opacity': 1
 ) !default;
 
@@ -145,10 +145,10 @@ $btn-theme-warning: (
 $btn-theme-danger: (
     'background': $secondary-secondary-3,
     'border': $secondary-secondary-3,
-    'hover-background': $danger-dark,
-    'hover-border': $danger-dark,
-    'active-background': $danger-dark,
-    'active-border': $danger-dark,
+    'hover-background': $error,
+    'hover-border': $error,
+    'active-background': $error,
+    'active-border': $error,
 ) !default;
 
 $btn-theme-white: (
@@ -157,18 +157,13 @@ $btn-theme-white: (
     'border': transparent
 ) !default;
 
-$btn-theme-dark: (
-    'background': $additional,
-    'border': $additional
-) !default;
-
 $btn-theme-inverse: (
     'background': $primary-inverse,
     'hover-background': $primary-main-light,
     'active-background': $secondary-secondary-4,
     'active-border': $secondary-secondary-4,
     'border': $primary-main,
-    'color': $secondary,
+    'color': $primary-main,
     'disabled-background': $neutral-grey-3,
     'disabled-border': $text-disabled,
     'disabled-color': $text-disabled,
@@ -186,7 +181,6 @@ $btn-theme-keys: map.merge(
         'success': $btn-theme-success,
         'warning': $btn-theme-warning,
         'danger': $btn-theme-danger,
-        'dark': $btn-theme-dark,
         'inverse': $btn-theme-inverse,
         'white': $btn-theme-white
     ),
@@ -205,8 +199,8 @@ $btn-theme-square-default: (
     'active-color': $primary-500,
     'active-box-shadow': inset 0 2px 3px 2px rgba(0 0 0 / 21%),
     'focus-box-shadow': none,
-    'focus-visible-box-shadow': 0 0 6px 0 rgba($secondary-100, .8),
-    'focus-visible-border': $secondary-100,
+    'focus-visible-box-shadow': 0 0 6px 0 rgba($secondary-focus, .8),
+    'focus-visible-border': $secondary-focus,
     'disabled-opacity': .25
 ) !default;
 
@@ -222,8 +216,8 @@ $btn-theme-square-light: (
     'active-color': $primary-500,
     'active-box-shadow': none,
     'focus-box-shadow': none,
-    'focus-visible-box-shadow': 0 0 6px 0 rgba($secondary-100, .8),
-    'focus-visible-border': $secondary-100,
+    'focus-visible-box-shadow': 0 0 6px 0 rgba($secondary-focus, .8),
+    'focus-visible-border': $secondary-focus,
     'disabled-opacity': .25
 ) !default;
 
@@ -239,8 +233,8 @@ $btn-theme-square-lighter: (
     'active-color': $primary-500,
     'active-box-shadow': none,
     'focus-box-shadow': none,
-    'focus-visible-box-shadow': 0 0 6px 0 rgba($secondary-100, .8),
-    'focus-visible-border': $secondary-100,
+    'focus-visible-box-shadow': 0 0 6px 0 rgba($secondary-focus, .8),
+    'focus-visible-border': $secondary-focus,
     'disabled-opacity': .25
 ) !default;
 
