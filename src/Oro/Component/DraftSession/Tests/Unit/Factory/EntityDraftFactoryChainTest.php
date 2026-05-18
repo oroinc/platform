@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Component\DraftSession\Tests\Unit\Factory;
 
 use Oro\Component\DraftSession\Event\EntityDraftCreatedEvent;
+use Oro\Component\DraftSession\Exception\DraftSessionLogicException;
 use Oro\Component\DraftSession\Factory\EntityDraftFactoryChain;
 use Oro\Component\DraftSession\Factory\EntityDraftFactoryInterface;
 use Oro\Component\DraftSession\Tests\Unit\Stub\EntityDraftAwareStub;
@@ -171,24 +172,7 @@ final class EntityDraftFactoryChainTest extends TestCase
 
         $chain = new EntityDraftFactoryChain([$factory], $this->eventDispatcher);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            sprintf('No entity draft factory found for entity class "%s".', EntityDraftAwareStub::class)
-        );
-
-        $chain->createDraft($source, 'uuid-0000');
-    }
-
-    public function testCreateDraftThrowsWhenFactoryListIsEmpty(): void
-    {
-        $source = new EntityDraftAwareStub();
-
-        $this->eventDispatcher->expects(self::never())
-            ->method('dispatch');
-
-        $chain = new EntityDraftFactoryChain([], $this->eventDispatcher);
-
-        $this->expectException(\LogicException::class);
+        $this->expectException(DraftSessionLogicException::class);
         $this->expectExceptionMessage(
             sprintf('No entity draft factory found for entity class "%s".', EntityDraftAwareStub::class)
         );

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Oro\Component\DraftSession\ExtendedFields;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -73,7 +75,7 @@ class EntityDraftExtendedFieldsProvider
         string $className,
         string $fieldName,
         array $excludedFieldNames,
-        $attributeConfigProvider
+        ConfigProvider $attributeConfigProvider
     ): bool {
         if (in_array($fieldName, $excludedFieldNames, true)) {
             return true;
@@ -90,7 +92,7 @@ class EntityDraftExtendedFieldsProvider
         return false;
     }
 
-    private function shouldSkipExtendConfig($extendConfig, $extendConfigProvider): bool
+    private function shouldSkipExtendConfig(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider): bool
     {
         // Only process custom extended fields
         if (!$extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {

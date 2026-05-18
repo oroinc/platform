@@ -7,11 +7,13 @@ namespace Oro\Component\DraftSession\Tests\Unit\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Oro\Component\DraftSession\Entity\EntityDraftAwareInterface;
+use Oro\Component\DraftSession\Entity\EntityDraftAwareTrait;
 
 class EntityDraftAwareStub implements EntityDraftAwareInterface
 {
-    private ?int $id = null;
-    private ?string $draftSessionUuid = null;
+    use EntityDraftAwareTrait;
+
+    private ?int $id;
     private ?EntityDraftAwareInterface $draftSource = null;
     private Collection $drafts;
 
@@ -24,48 +26,5 @@ class EntityDraftAwareStub implements EntityDraftAwareInterface
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getDraftSessionUuid(): ?string
-    {
-        return $this->draftSessionUuid;
-    }
-
-    public function setDraftSessionUuid(?string $draftSessionUuid): EntityDraftAwareInterface
-    {
-        $this->draftSessionUuid = $draftSessionUuid;
-
-        return $this;
-    }
-
-    public function getDraftSource(): ?EntityDraftAwareInterface
-    {
-        return $this->draftSource;
-    }
-
-    public function setDraftSource(EntityDraftAwareInterface $draftSource): EntityDraftAwareInterface
-    {
-        $this->draftSource = $draftSource;
-
-        return $this;
-    }
-
-    public function getDrafts(): Collection
-    {
-        return $this->drafts;
-    }
-
-    public function addDraft(EntityDraftAwareInterface $draft): EntityDraftAwareInterface
-    {
-        $this->drafts->add($draft);
-
-        return $this;
-    }
-
-    public function removeDraft(EntityDraftAwareInterface $draft): EntityDraftAwareInterface
-    {
-        $this->drafts->removeElement($draft);
-
-        return $this;
     }
 }

@@ -7,6 +7,7 @@ namespace Oro\Component\DraftSession\Factory;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Component\DraftSession\Entity\EntityDraftAwareInterface;
 use Oro\Component\DraftSession\Event\EntityDraftCreatedEvent;
+use Oro\Component\DraftSession\Exception\DraftSessionLogicException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -54,7 +55,7 @@ class EntityDraftFactoryChain implements EntityDraftFactoryInterface
             }
         }
 
-        throw new \LogicException(
+        throw new DraftSessionLogicException(
             sprintf(
                 'No entity draft factory found for entity class "%s".',
                 $entityClass,

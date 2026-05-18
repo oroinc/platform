@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Oro\Component\DraftSession\Tests\Unit\Synchronizer;
 
+use Oro\Component\DraftSession\Event\EntityFromDraftSyncBeforeEvent;
 use Oro\Component\DraftSession\Event\EntityFromDraftSyncEvent;
+use Oro\Component\DraftSession\Event\EntityToDraftSyncBeforeEvent;
 use Oro\Component\DraftSession\Event\EntityToDraftSyncEvent;
+use Oro\Component\DraftSession\Exception\DraftSessionLogicException;
 use Oro\Component\DraftSession\Synchronizer\EntityDraftSynchronizerChain;
 use Oro\Component\DraftSession\Synchronizer\EntityDraftSynchronizerInterface;
 use Oro\Component\DraftSession\Tests\Unit\Stub\EntityDraftAwareStub;
@@ -80,9 +83,12 @@ final class EntityDraftSynchronizerChainTest extends TestCase
             ->method('synchronizeFromDraft')
             ->with($draft, $entity);
 
-        $this->eventDispatcher->expects(self::once())
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(self::isInstanceOf(EntityFromDraftSyncEvent::class));
+            ->withConsecutive(
+                [self::isInstanceOf(EntityFromDraftSyncBeforeEvent::class)],
+                [self::isInstanceOf(EntityFromDraftSyncEvent::class)]
+            );
 
         $chain = new EntityDraftSynchronizerChain([$synchronizer], $this->eventDispatcher);
         $chain->synchronizeFromDraft($draft, $entity);
@@ -111,9 +117,12 @@ final class EntityDraftSynchronizerChainTest extends TestCase
             ->method('synchronizeFromDraft')
             ->with($draft, $entity);
 
-        $this->eventDispatcher->expects(self::once())
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(self::isInstanceOf(EntityFromDraftSyncEvent::class));
+            ->withConsecutive(
+                [self::isInstanceOf(EntityFromDraftSyncBeforeEvent::class)],
+                [self::isInstanceOf(EntityFromDraftSyncEvent::class)]
+            );
 
         $chain = new EntityDraftSynchronizerChain([$synchronizer1, $synchronizer2], $this->eventDispatcher);
         $chain->synchronizeFromDraft($draft, $entity);
@@ -141,7 +150,7 @@ final class EntityDraftSynchronizerChainTest extends TestCase
             ->method('synchronizeFromDraft')
             ->with($draft, $entity);
 
-        $this->eventDispatcher->expects(self::once())
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch');
 
         $chain = new EntityDraftSynchronizerChain([$synchronizer1, $synchronizer2], $this->eventDispatcher);
@@ -152,16 +161,16 @@ final class EntityDraftSynchronizerChainTest extends TestCase
     {
         $draft = new EntityDraftAwareStub();
         $entity = new EntityDraftAwareStub();
-        $dispatchedEvent = null;
+        $dispatchedEvents = [];
 
         $synchronizer = $this->createMock(EntityDraftSynchronizerInterface::class);
         $synchronizer->method('supports')->willReturn(true);
         $synchronizer->method('synchronizeFromDraft');
 
-        $this->eventDispatcher->expects(self::once())
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(static function (EntityFromDraftSyncEvent $event) use (&$dispatchedEvent) {
-                $dispatchedEvent = $event;
+            ->willReturnCallback(static function (object $event) use (&$dispatchedEvents): object {
+                $dispatchedEvents[] = $event;
 
                 return $event;
             });
@@ -169,8 +178,10 @@ final class EntityDraftSynchronizerChainTest extends TestCase
         $chain = new EntityDraftSynchronizerChain([$synchronizer], $this->eventDispatcher);
         $chain->synchronizeFromDraft($draft, $entity);
 
-        self::assertSame($draft, $dispatchedEvent->getSource());
-        self::assertSame($entity, $dispatchedEvent->getTarget());
+        self::assertCount(2, $dispatchedEvents);
+        self::assertInstanceOf(EntityFromDraftSyncEvent::class, $dispatchedEvents[1]);
+        self::assertSame($draft, $dispatchedEvents[1]->getSource());
+        self::assertSame($entity, $dispatchedEvents[1]->getTarget());
     }
 
     public function testSynchronizeFromDraftThrowsLogicExceptionWhenNoSynchronizerSupports(): void
@@ -191,7 +202,7 @@ final class EntityDraftSynchronizerChainTest extends TestCase
 
         $chain = new EntityDraftSynchronizerChain([$synchronizer], $this->eventDispatcher);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(DraftSessionLogicException::class);
         $this->expectExceptionMessage(
             sprintf('No entity draft synchronizer found for entity class "%s".', EntityDraftAwareStub::class)
         );
@@ -213,9 +224,12 @@ final class EntityDraftSynchronizerChainTest extends TestCase
             ->method('synchronizeToDraft')
             ->with($entity, $draft);
 
-        $this->eventDispatcher->expects(self::once())
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(self::isInstanceOf(EntityToDraftSyncEvent::class));
+            ->withConsecutive(
+                [self::isInstanceOf(EntityToDraftSyncBeforeEvent::class)],
+                [self::isInstanceOf(EntityToDraftSyncEvent::class)]
+            );
 
         $chain = new EntityDraftSynchronizerChain([$synchronizer], $this->eventDispatcher);
         $chain->synchronizeToDraft($entity, $draft);
@@ -244,9 +258,12 @@ final class EntityDraftSynchronizerChainTest extends TestCase
             ->method('synchronizeToDraft')
             ->with($entity, $draft);
 
-        $this->eventDispatcher->expects(self::once())
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(self::isInstanceOf(EntityToDraftSyncEvent::class));
+            ->withConsecutive(
+                [self::isInstanceOf(EntityToDraftSyncBeforeEvent::class)],
+                [self::isInstanceOf(EntityToDraftSyncEvent::class)]
+            );
 
         $chain = new EntityDraftSynchronizerChain([$synchronizer1, $synchronizer2], $this->eventDispatcher);
         $chain->synchronizeToDraft($entity, $draft);
@@ -256,7 +273,7 @@ final class EntityDraftSynchronizerChainTest extends TestCase
     {
         $entity = new EntityDraftAwareStub();
         $draft = new EntityDraftAwareStub();
-        $dispatchedEvent = null;
+        $dispatchedEvents = [];
 
         $synchronizer = $this->createMock(EntityDraftSynchronizerInterface::class);
         $synchronizer
@@ -265,10 +282,10 @@ final class EntityDraftSynchronizerChainTest extends TestCase
         $synchronizer
             ->method('synchronizeToDraft');
 
-        $this->eventDispatcher->expects(self::once())
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(static function (EntityToDraftSyncEvent $event) use (&$dispatchedEvent) {
-                $dispatchedEvent = $event;
+            ->willReturnCallback(static function (object $event) use (&$dispatchedEvents): object {
+                $dispatchedEvents[] = $event;
 
                 return $event;
             });
@@ -276,8 +293,13 @@ final class EntityDraftSynchronizerChainTest extends TestCase
         $chain = new EntityDraftSynchronizerChain([$synchronizer], $this->eventDispatcher);
         $chain->synchronizeToDraft($entity, $draft);
 
-        self::assertSame($entity, $dispatchedEvent->getSource());
-        self::assertSame($draft, $dispatchedEvent->getTarget());
+        self::assertCount(2, $dispatchedEvents);
+        self::assertInstanceOf(EntityToDraftSyncBeforeEvent::class, $dispatchedEvents[0]);
+        self::assertSame($entity, $dispatchedEvents[0]->getSource());
+        self::assertSame($draft, $dispatchedEvents[0]->getTarget());
+        self::assertInstanceOf(EntityToDraftSyncEvent::class, $dispatchedEvents[1]);
+        self::assertSame($entity, $dispatchedEvents[1]->getSource());
+        self::assertSame($draft, $dispatchedEvents[1]->getTarget());
     }
 
     public function testSynchronizeToDraftThrowsLogicExceptionWhenNoSynchronizerSupports(): void
@@ -298,7 +320,7 @@ final class EntityDraftSynchronizerChainTest extends TestCase
 
         $chain = new EntityDraftSynchronizerChain([$synchronizer], $this->eventDispatcher);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(DraftSessionLogicException::class);
         $this->expectExceptionMessage(
             sprintf('No entity draft synchronizer found for entity class "%s".', EntityDraftAwareStub::class)
         );

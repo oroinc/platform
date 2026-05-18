@@ -50,7 +50,7 @@ final class KeepDraftSessionUuidOnRouteGenerateListenerTest extends TestCase
 
         $this->listener->onRouterGenerate($event);
 
-        self::assertEquals($existingUuid, $event->getParameter('draftSessionUuid'));
+        self::assertSame($existingUuid, $event->getParameter('draftSessionUuid'));
     }
 
     public function testDoesNothingWhenUuidNotInRequestContext(): void
@@ -71,7 +71,7 @@ final class KeepDraftSessionUuidOnRouteGenerateListenerTest extends TestCase
 
         $this->listener->onRouterGenerate($event);
 
-        self::assertEquals($contextUuid, $event->getParameter('draftSessionUuid'));
+        self::assertSame($contextUuid, $event->getParameter('draftSessionUuid'));
     }
 
     public function testWorksWithMultipleApplicableRoutes(): void
@@ -81,15 +81,15 @@ final class KeepDraftSessionUuidOnRouteGenerateListenerTest extends TestCase
 
         $event1 = new RouterGenerateEvent('oro_order_create', [], 1);
         $this->listener->onRouterGenerate($event1);
-        self::assertEquals($contextUuid, $event1->getParameter('draftSessionUuid'));
+        self::assertSame($contextUuid, $event1->getParameter('draftSessionUuid'));
 
         $event2 = new RouterGenerateEvent('oro_order_update', [], 1);
         $this->listener->onRouterGenerate($event2);
-        self::assertEquals($contextUuid, $event2->getParameter('draftSessionUuid'));
+        self::assertSame($contextUuid, $event2->getParameter('draftSessionUuid'));
 
         $event3 = new RouterGenerateEvent('oro_order_view', [], 1);
         $this->listener->onRouterGenerate($event3);
-        self::assertEquals($contextUuid, $event3->getParameter('draftSessionUuid'));
+        self::assertSame($contextUuid, $event3->getParameter('draftSessionUuid'));
     }
 
     public function testDoesNothingWithEmptyApplicableRoutes(): void
@@ -122,7 +122,7 @@ final class KeepDraftSessionUuidOnRouteGenerateListenerTest extends TestCase
         $event = new RouterGenerateEvent('custom_route', [], 1);
         $listener->onRouterGenerate($event);
 
-        self::assertEquals($customUuid, $event->getParameter('customUuid'));
+        self::assertSame($customUuid, $event->getParameter('customUuid'));
     }
 
     public function testDoesNothingWhenRequestContextParameterIsNull(): void
@@ -158,6 +158,6 @@ final class KeepDraftSessionUuidOnRouteGenerateListenerTest extends TestCase
 
         $this->listener->onRouterGenerate($event);
 
-        self::assertEquals($existingUuid, $event->getParameter('draftSessionUuid'));
+        self::assertSame($existingUuid, $event->getParameter('draftSessionUuid'));
     }
 }
