@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -2440,6 +2441,75 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'association1' => [
                         'data_type' => 'string'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testCompleteFiltersForAssociationsWithEntityIdentifierTargetClass(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields' => [
+                'association1' => [
+                    'targetClass' => EntityIdentifier::class,
+                    'targetEntity' => $this->createConfigObject(
+                        [
+                            'exclusion_policy' => 'all',
+                            'fields' => [
+                                'id' => ['property_path' => 'newIdentifier']
+                            ],
+                            'identifierFieldNames' => ['id']
+                        ]
+                    )
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('association1')
+            ->willReturn(false);
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedFields')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedAssociations')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn(['association1' => 'integer']);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject([], ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields' => [
+                    'association1' => [
+                        'data_type' => 'integer',
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],

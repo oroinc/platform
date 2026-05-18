@@ -1,4 +1,28 @@
 services:
+    oro_api.api_doc.documentation_provider.ext_id_integration_common_docs:
+        class: Oro\Bundle\ApiBundle\ApiDoc\DocumentationProvider
+        arguments:
+            - '@@OroApiBundle/Resources/doc/api_ext_id/common.md'
+            - '@file_locator'
+        tags:
+            - { name: oro.api.documentation_provider, requestType: ext_id, priority: 250 }
+
+    oro_api.api_doc.documentation_provider.ext_id_integration_common_docs.resources:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ExtIdEntitiesDocumentationProvider
+        arguments:
+            - '%oro_api.ext_id_entities%'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.documentation_provider, requestType: ext_id, priority: 245 }
+
+    oro_api.api_doc.documentation_provider.ext_id_integration_common_docs.notes:
+        class: Oro\Bundle\ApiBundle\ApiDoc\DocumentationProvider
+        arguments:
+            - '@@OroApiBundle/Resources/doc/api_ext_id/common_notes.md'
+            - '@file_locator'
+        tags:
+            - { name: oro.api.documentation_provider, requestType: ext_id, priority: 240 }
+
     oro_api.async_operation.compute_summary:
         class: Oro\Bundle\ApiBundle\Batch\Processor\AsyncOperation\ComputeOperationSummary
         tags:

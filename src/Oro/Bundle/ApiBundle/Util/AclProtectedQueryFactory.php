@@ -72,7 +72,7 @@ class AclProtectedQueryFactory extends QueryFactory
 
     private function modifyQuery(QueryBuilder $qb, EntityConfig $config): void
     {
-        $options = [];
+        $options = ['config' => $config];
         $resourceClass = $config->get(ConfigUtil::RESOURCE_CLASS);
         if ($resourceClass) {
             $options['resourceClass'] = $resourceClass;

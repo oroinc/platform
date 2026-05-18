@@ -162,11 +162,8 @@ const AbstractWidgetView = BaseView.extend({
             this._wid = this.options.wid;
         }
 
-        const saOrgIdSelector = $('input#_sa_org_id');
-        const saOrgId = saOrgIdSelector ? saOrgIdSelector.val() : null;
-        if (saOrgId !== null && saOrgId > 0) {
-            systemAccessModeOrganizationProvider.setOrganizationId(saOrgId);
-        }
+        const saOrgId = parseInt($('input#_sa_org_id').val(), 10);
+        systemAccessModeOrganizationProvider.setOrganizationId(saOrgId > 0 ? saOrgId : null);
 
         this.on('adoptedFormSubmitClick', this._onAdoptedFormSubmitClick.bind(this));
         this.on('adoptedFormResetClick', this._onAdoptedFormResetClick.bind(this));

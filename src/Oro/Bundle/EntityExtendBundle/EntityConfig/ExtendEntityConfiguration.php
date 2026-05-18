@@ -43,7 +43,8 @@ class ExtendEntityConfiguration implements EntityConfigInterface
                 ->defaultFalse()
             ->end()
             ->variableNode('unique_key')
-                ->info('`array|null` unique keys configuration with structure: [["name" => string, "key" => string[]]]')
+                ->info('`array|null` unique keys configuration in the following format: '
+                . '["keys" => [["name" => string, "key" => string[]], ...]]')
             ->end()
             ->arrayNode('index')
                 ->info('`string[]` list of index field of the entity. All available index state you can find in ' .
@@ -79,15 +80,15 @@ class ExtendEntityConfiguration implements EntityConfigInterface
             ->arrayNode('pending_changes')
                 ->info('`object` when a user changes something that requires schema update, this change is not ' .
                 'applied to the configuration, but is stored into “pending_changes” as changeset. The format of ' .
-                'changeset is [‘scope’ => [‘field’ => [‘oldValue’, ‘newValue’], …], …].' . "\n" .
+                'changeset is ["scope" => ["field" => [oldValue, newValue], ...], ...].' . "\n" .
                 'Let’s assume that a user has an active activity email and changes it to a task. In this case, the ' .
                 'value of pending changes would be like in the example.')
                 ->example([
                     'activity' => [
                         'activities' => [
                             ['Oro\Bundle\EmailBundle\Entity\Email'],
-                            ['Oro\Bundle\TaskBundle\Entity\Task'],
-                        ],
+                            ['Oro\Bundle\TaskBundle\Entity\Task']
+                        ]
                     ]
                 ])
                 ->ignoreExtraKeys(false)

@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 #[ORM\Entity]
 #[ORM\Table(name: 'test_api_target')]
 #[ORM\Index(columns: ['name'], name: 'test_api_t_name_idx')]
+#[ORM\UniqueConstraint(name: 'test_api_t_external_id_idx', columns: ['external_id'])]
 #[Config]
 class TestTarget implements TestFrameworkEntityInterface
 {
@@ -31,6 +32,9 @@ class TestTarget implements TestFrameworkEntityInterface
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'target_id', referencedColumnName: 'id')]
     protected ?Collection $owners = null;
+
+    #[ORM\Column(name: 'external_id', type: Types::STRING, length: 36, unique: true, nullable: true)]
+    protected ?string $externalId = null;
 
     public function __construct()
     {
@@ -64,5 +68,17 @@ class TestTarget implements TestFrameworkEntityInterface
             $this->owners->removeElement($owner);
             $owner->removeTarget($this);
         }
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+
+        return $this;
     }
 }

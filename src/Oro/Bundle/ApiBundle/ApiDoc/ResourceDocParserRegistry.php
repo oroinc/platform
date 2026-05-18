@@ -50,6 +50,11 @@ class ResourceDocParserRegistry
             ));
         }
 
-        return $this->container->get($parserServiceId);
+        $parser = $this->container->get($parserServiceId);
+        if ($parser instanceof RequestAwareResourceDocParserInterface) {
+            $parser->setRequestType($requestType);
+        }
+
+        return $parser;
     }
 }

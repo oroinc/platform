@@ -22,6 +22,7 @@ data:
             passwordRequestedAt: null
             passwordChangedAt: null
             emails: {  }
+            externalId: ext_simple_user
         relationships:
             groups:
                 data: []
@@ -54,3 +55,63 @@ data:
                 data:
                     type: userauthstatuses
                     id: active
+            tags:
+                data: []
+    -
+        type: users
+        id: '<toString(@user_with_confirmation_token->id)>'
+        attributes:
+            phone: null
+            title: null
+            googleId: null
+            username: user_with_confirmation_token
+            email: user_with_confirmation_token@example.com
+            namePrefix: null
+            firstName: Forgot
+            middleName: null
+            lastName: Password
+            nameSuffix: null
+            birthday: null
+            enabled: true
+            lastLogin: null
+            createdAt: '@user_with_confirmation_token->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@user_with_confirmation_token->updatedAt->format("Y-m-d\TH:i:s\Z")'
+            loginCount: 0
+            passwordRequestedAt: null
+            passwordChangedAt: null
+            emails: {  }
+            externalId: null
+        relationships:
+            groups:
+                data: []
+            owner:
+                data:
+                    type: businessunits
+                    id: '<toString(@business_unit->id)>'
+            businessUnits:
+                data:
+                    -
+                        type: businessunits
+                        id: '<toString(@business_unit->id)>'
+            organizations:
+                data:
+                    -
+                        type: organizations
+                        id: '<toString(@organization->id)>'
+            userRoles:
+                data:
+                    -
+                        type: userroles
+                        id: '<toString(@ROLE_USER->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            avatar:
+                data: null
+            auth_status:
+                data:
+                    type: userauthstatuses
+                    id: active
+            tags:
+                data: []

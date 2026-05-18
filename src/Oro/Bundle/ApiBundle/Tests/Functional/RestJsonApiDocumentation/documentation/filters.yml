@@ -3,6 +3,10 @@ filters:
         requirement: '-?\d+(,-?\d+)*|-?\d+\.\.-?\d+'
         type: 'integer or array or range'
         operators: 'eq,neq,lt,lte,gt,gte'
+    'filter[externalId]':
+        requirement: '.+'
+        type: 'string or array'
+        operators: 'eq,neq,exists,neq_or_null'
     'filter[title]':
         requirement: '.+'
         type: 'string'

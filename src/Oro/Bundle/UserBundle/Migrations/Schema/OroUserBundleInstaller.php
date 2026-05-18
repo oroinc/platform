@@ -9,9 +9,12 @@ use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
@@ -40,7 +43,7 @@ class OroUserBundleInstaller implements
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v2_14';
+        return 'v2_15';
     }
 
     #[\Override]
@@ -118,6 +121,9 @@ class OroUserBundleInstaller implements
     private function createOroUserTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_user');
+        $table->addOption(OroOptions::KEY, [
+            'extend' => ['unique_key' => ['keys' => [['name' => 'external_id', 'key' => ['external_id']]]]]
+        ]);
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
@@ -125,17 +131,10 @@ class OroUserBundleInstaller implements
         $table->addColumn('username_lowercase', 'string', ['length' => 255]);
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
         $table->addColumn('email_lowercase', 'string', ['length' => 255]);
-        $table->addColumn(
-            'phone',
-            'string',
-            [
-                'length'      => 255,
-                'oro_options' => [
-                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM],
-                    'dataaudit' => ['auditable' => true]
-                ]
-            ]
-        );
+        $table->addColumn('phone', 'string', ['length' => 255, OroOptions::KEY => [
+            'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM],
+            'dataaudit' => ['auditable' => true]
+        ]]);
         $table->addColumn('name_prefix', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
         $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
         $table->addColumn('middle_name', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
@@ -152,17 +151,17 @@ class OroUserBundleInstaller implements
         $table->addColumn('login_count', 'integer', ['default' => '0', 'precision' => 0, 'unsigned' => true]);
         $table->addColumn('createdAt', 'datetime', ['precision' => 0]);
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
-        $table->addColumn(
-            'title',
-            'string',
-            [
-                'length'      => 255,
-                'oro_options' => [
-                    'extend'   => ['owner' => ExtendScope::OWNER_CUSTOM],
-                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
-                ]
-            ]
-        );
+        $table->addColumn('title', 'string', ['length' => 255, OroOptions::KEY => [
+            'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
+        ]]);
+        $table->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false, OroOptions::KEY => [
+            ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
+            'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_HIDDEN],
+            'importexport' => ['excluded' => true],
+            'dataaudit' => ['auditable' => true]
+        ]]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
@@ -284,20 +283,14 @@ class OroUserBundleInstaller implements
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
         $table->addColumn('role', 'string', ['length' => 30, 'precision' => 0]);
         $table->addColumn('label', 'string', ['length' => 30, 'precision' => 0]);
-        $table->addColumn(
-            'extend_description',
-            'text',
-            [
-                'oro_options' => [
-                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
-                    'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
-                    'merge'     => ['display' => true],
-                    'dataaudit' => ['auditable' => true],
-                    'form'      => ['type' => OroResizeableRichTextType::class],
-                    'view'      => ['type' => 'html'],
-                ]
-            ]
-        );
+        $table->addColumn('extend_description', 'text', [OroOptions::KEY => [
+            'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+            'merge' => ['display' => true],
+            'dataaudit' => ['auditable' => true],
+            'form' => ['type' => OroResizeableRichTextType::class],
+            'view' => ['type' => 'html'],
+        ]]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
     }

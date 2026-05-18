@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'test_api_person')]
+#[ORM\UniqueConstraint(name: 'test_api_person_external_id_idx', columns: ['external_id'])]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
 #[ORM\DiscriminatorMap(['employee' => TestEmployee::class, 'buyer' => TestBuyer::class])]
@@ -24,6 +25,9 @@ abstract class TestPerson implements TestFrameworkEntityInterface
     #[ORM\ManyToOne(targetEntity: TestDepartment::class, inversedBy: 'staff')]
     #[ORM\JoinColumn(name: 'department_id', referencedColumnName: 'id')]
     protected ?TestDepartment $department = null;
+
+    #[ORM\Column(name: 'external_id', type: Types::STRING, length: 36, unique: true, nullable: true)]
+    protected ?string $externalId = null;
 
     /**
      * @return int
@@ -71,5 +75,17 @@ abstract class TestPerson implements TestFrameworkEntityInterface
     public function setDepartment($department)
     {
         $this->department = $department;
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+
+        return $this;
     }
 }

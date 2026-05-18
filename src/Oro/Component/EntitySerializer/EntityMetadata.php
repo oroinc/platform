@@ -92,6 +92,14 @@ class EntityMetadata
     }
 
     /**
+     * Checks if a value of the given field can be null.
+     */
+    public function isFieldNullable(string $fieldName): bool
+    {
+        return $this->metadata->hasField($fieldName) && $this->metadata->isNullable($fieldName);
+    }
+
+    /**
      * Gets the mapping of the given association.
      */
     public function getAssociationMapping(string $fieldName): array

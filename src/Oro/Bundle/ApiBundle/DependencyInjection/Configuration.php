@@ -52,6 +52,7 @@ class Configuration implements ConfigurationInterface
         $this->appendCorsNode($node);
         $this->appendFeatureDependedFirewalls($node);
         $this->appendBatchApiNode($node);
+        $this->appendExtIdNode($node);
 
         return $treeBuilder;
     }
@@ -108,7 +109,7 @@ class Configuration implements ConfigurationInterface
                 ->defaultValue(100)
             ->end()
             ->booleanNode('use_absolute_urls_for_api')
-                ->info('Use absolute URLs for assets in API responses')
+                ->info('Whether absolute URLs for assets should be used in API responses.')
                 ->defaultFalse()
             ->end();
     }
@@ -220,11 +221,11 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('headers')
                             ->info('Headers that should be sent with requests from the sandbox.')
                             ->example([
-                                'Accept'       => 'application/vnd.api+json',
+                                'Accept' => 'application/vnd.api+json',
                                 'Content-Type' => [
                                     ['value' => 'application/vnd.api+json', 'actions' => ['create', 'update']]
                                 ],
-                                'X-Include'    => [
+                                'X-Include' => [
                                     ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
                                     ['value' => 'deletedCount', 'actions' => ['delete_list']]
                                 ]
@@ -486,21 +487,19 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('actions')
                 ->info('The definition of API actions.')
-                ->example(
-                    [
-                        'get' => [
-                            'processor_service_id' => 'oro_api.get.processor',
-                            'processing_groups' => [
-                                'load_data' => [
-                                    'priority' => -10
-                                ],
-                                'normalize_data' => [
-                                    'priority' => -20
-                                ]
+                ->example([
+                    'get' => [
+                        'processor_service_id' => 'oro_api.get.processor',
+                        'processing_groups' => [
+                            'load_data' => [
+                                'priority' => -10
+                            ],
+                            'normalize_data' => [
+                                'priority' => -20
                             ]
                         ]
                     ]
-                )
+                ])
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->validate()
@@ -549,10 +548,7 @@ class Configuration implements ConfigurationInterface
                     . ' The key is the name of an operator.'
                     . ' The value is optional and it is a short name of an operator.'
                 )
-                ->example([
-                    'eq'     => '=',
-                    'regexp' => null
-                ])
+                ->example(['eq' => '=', 'regexp' => null])
                 ->useAttributeAsKey('name')
                 ->prototype('scalar')->end()
             ->end();
@@ -583,19 +579,17 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('filters')
                 ->info('The definition of filters.')
-                ->example(
-                    [
-                        'integer' => [
-                            'supported_operators' => ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
-                        ],
-                        'primaryField' => [
-                            'class' => PrimaryFieldFilter::class
-                        ],
-                        'association' => [
-                            'factory' => ['@oro_api.filter_factory.association', 'createFilter']
-                        ]
+                ->example([
+                    'integer' => [
+                        'supported_operators' => ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
+                    ],
+                    'primaryField' => [
+                        'class' => PrimaryFieldFilter::class
+                    ],
+                    'association' => [
+                        'factory' => ['@oro_api.filter_factory.association', 'createFilter']
                     ]
-                )
+                ])
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->validate()
@@ -673,17 +667,15 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_type_guesses')
                 ->info('The definition of data-type to form type guesses.')
-                ->example(
-                    [
-                        'integer' => [
-                            'form_type' => IntegerType::class,
-                        ],
-                        'datetime' => [
-                            'form_type' => DateTimeType::class,
-                            'options'   => ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']
-                        ],
+                ->example([
+                    'integer' => [
+                        'form_type' => IntegerType::class,
+                    ],
+                    'datetime' => [
+                        'form_type' => DateTimeType::class,
+                        'options' => ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']
                     ]
-                )
+                ])
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->performNoDeepMerging()
@@ -888,6 +880,33 @@ class Configuration implements ConfigurationInterface
                 )
                 ->example([User::class => 20]);
         $this->configureLimitPerEntity($syncProcessingIncludedDataLimitPerEntityNode);
+    }
+
+    private function appendExtIdNode(NodeBuilder $node): void
+    {
+        $node
+            ->arrayNode('ext_id_entities')
+                ->info('The identifier field names for API resources in "JSON:API EXT ID" API.')
+                ->example([User::class => 'external_id'])
+                ->defaultValue([])
+                ->useAttributeAsKey('name')
+                ->normalizeKeys(false)
+                ->validate()
+                    ->always(function (array $v) {
+                        foreach ($v as $key => $val) {
+                            if (!\is_string($key) || !$key) {
+                                throw new \InvalidArgumentException(\sprintf(
+                                    'The entity class should be a non empty string, but got %s.',
+                                    \is_string($key) ? '"' . $key . '"' : $key
+                                ));
+                            }
+                        }
+
+                        return $v;
+                    })
+                ->end()
+                ->prototype('scalar')->cannotBeEmpty()->end()
+            ->end();
     }
 
     private function configureLimitPerEntity(ArrayNodeDefinition $node): void

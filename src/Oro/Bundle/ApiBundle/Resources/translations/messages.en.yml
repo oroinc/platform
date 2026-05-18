@@ -145,6 +145,9 @@ oro:
                 rest_json_api:
                     label: Back-Office API
                     description: JSON:API for back-office resources.
+                ext_id_rest_json_api:
+                    label: Back-Office Integration API
+                    description: JSON:API for back-office resources, where they are identified by an identifier provided by an external system.
             entity: Entity
 
         system_configuration:

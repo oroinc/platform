@@ -14,6 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'test_api_department')]
+#[ORM\UniqueConstraint(name: 'test_api_department_external_id_idx', columns: ['external_id'])]
 #[Config(
     defaultValues: [
         'ownership' => [
@@ -49,6 +50,9 @@ class TestDepartment implements TestFrameworkEntityInterface
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     protected ?OrganizationInterface $organization = null;
+
+    #[ORM\Column(name: 'external_id', type: Types::STRING, length: 36, unique: true, nullable: true)]
+    protected ?string $externalId = null;
 
     public function __construct()
     {
@@ -173,6 +177,18 @@ class TestDepartment implements TestFrameworkEntityInterface
     public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
+
+        return $this;
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
 
         return $this;
     }

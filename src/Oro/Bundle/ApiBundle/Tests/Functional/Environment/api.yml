@@ -77,6 +77,8 @@ api:
             filters:
                 fields:
                     name: ~
+                    externalId:
+                        allow_array: true
             actions:
                 get_list:
                     page_size: 3
@@ -94,6 +96,8 @@ api:
             filters:
                 fields:
                     name: ~
+                    externalId:
+                        allow_array: true
             sorters:
                 fields:
                     name: ~
@@ -273,7 +277,13 @@ api:
                     actions:
                         get_subresource: false
                         add_subresource: true
-        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType:
+            filters:
+                fields:
+                    label: ~
+            sorters:
+                fields:
+                    label: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestWithoutIdGenerator: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCompositeIdentifier:
             fields:
@@ -448,14 +458,28 @@ api:
                     data_type: unidirectionalAssociation:uniM2M
                     target_class: Extend\Entity\TestApiE1
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner:
+            fields:
+                externalId:
+                    property_path: external_id
+            filters:
+                fields:
+                    externalId:
+                        allow_array: true
             actions:
                 update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivityTarget: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:
             exclude: false # override system wide exclude rule, see Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigExclusionProvider
             fields:
                 activityTargets:
                     data_type: association:manyToMany:activity
+                externalId:
+                    property_path: external_id
+            filters:
+                fields:
+                    externalId:
+                        allow_array: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassOwnerModel: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassTargetModel: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTargetA: ~
