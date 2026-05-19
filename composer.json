@@ -200,7 +200,7 @@
             "jquery": "3.5.*",
             "jquery-ui": "1.13.*",
             "backbone": "1.4.*",
-            "underscore": "1.13.*",
+            "underscore": "^1.13.8",
             "@oroinc/jquery.uniform": "4.3.*",
             "overlayscrollbars": "1.13.*",
             "@oroinc/font-awesome": "4.7.0-oro2",
