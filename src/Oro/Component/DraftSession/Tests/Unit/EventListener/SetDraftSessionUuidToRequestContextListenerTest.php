@@ -75,7 +75,7 @@ final class SetDraftSessionUuidToRequestContextListenerTest extends TestCase
 
         $this->listener->onKernelRequest($event);
 
-        self::assertEquals($existingUuid, $this->requestContext->getParameter('uuid'));
+        self::assertSame($existingUuid, $this->requestContext->getParameter('uuid'));
     }
 
     public function testSetsUuidFromRequest(): void
@@ -95,7 +95,7 @@ final class SetDraftSessionUuidToRequestContextListenerTest extends TestCase
 
         $this->listener->onKernelRequest($event);
 
-        self::assertEquals($requestUuid, $this->requestContext->getParameter('uuid'));
+        self::assertSame($requestUuid, $this->requestContext->getParameter('uuid'));
     }
 
     public function testDoesNothingWhenUuidNotInRequest(): void
@@ -137,6 +137,6 @@ final class SetDraftSessionUuidToRequestContextListenerTest extends TestCase
 
         $customListener->onKernelRequest($event);
 
-        self::assertEquals('custom-value', $this->requestContext->getParameter('custom_uuid'));
+        self::assertSame('custom-value', $this->requestContext->getParameter('custom_uuid'));
     }
 }

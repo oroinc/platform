@@ -7,30 +7,28 @@ namespace Oro\Component\DraftSession\Entity;
 use Doctrine\Common\Collections\Collection;
 
 /**
- * Interface for entities that support session-based draft editing.
+ * Interface for entities that support full session-based draft editing.
  *
- * Provides the contract for draft session UUID tracking,
- * draft source reference (self-referencing for new entities),
- * and a one-to-many collection of draft copies.
+ * Extends {@see DraftSessionAwareInterface} with the full draft lifecycle contract:
+ * draft source reference (self-referencing) and a one-to-many collection of draft copies.
+ *
+ * Entities that only need to be associated with a draft session by UUID should implement
+ * {@see DraftSessionAwareInterface} instead.
  *
  * NOTE: This is intentionally separate from the platform's
  * {@see \Oro\Bundle\DraftBundle\Entity\DraftableInterface} which serves a different purpose
  * (project-based publish workflow vs. session-based edit drafts).
  */
-interface EntityDraftAwareInterface
+interface EntityDraftAwareInterface extends DraftSessionAwareInterface
 {
     /**
      * @return string|int|null
      */
     public function getId();
 
-    public function getDraftSessionUuid(): ?string;
-
-    public function setDraftSessionUuid(?string $draftSessionUuid): self;
-
     public function getDraftSource(): ?self;
 
-    public function setDraftSource(self $draftSource): self;
+    public function setDraftSource(?self $draftSource): self;
 
     /**
      * @return Collection<self>

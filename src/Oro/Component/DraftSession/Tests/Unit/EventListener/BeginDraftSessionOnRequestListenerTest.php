@@ -83,27 +83,6 @@ final class BeginDraftSessionOnRequestListenerTest extends TestCase
         self::assertNull($event->getResponse());
     }
 
-    public function testOnKernelRequestDoesNothingWhenParameterNotInRouteParams(): void
-    {
-        $request = new Request();
-        $request->attributes->set('_route', 'non_applicable_route');
-        $request->attributes->set('_route_params', ['draftSessionUuid' => '']);
-        $request->attributes->set('draftSessionUuid', '');
-
-        $event = new RequestEvent(
-            $this->createMock(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
-        );
-
-        $this->urlGenerator->expects(self::never())
-            ->method('generate');
-
-        $this->listener->onKernelRequest($event);
-
-        self::assertNull($event->getResponse());
-    }
-
     public function testOnKernelRequestDoesNothingWhenRouteIsNull(): void
     {
         $request = new Request();
@@ -171,10 +150,10 @@ final class BeginDraftSessionOnRequestListenerTest extends TestCase
 
         $this->listener->onKernelRequest($event);
 
-        self::assertEquals('test_route', $request->attributes->get('_route'));
+        self::assertSame('test_route', $request->attributes->get('_route'));
         self::assertArrayHasKey('draftSessionUuid', $capturedParams);
         self::assertArrayHasKey('id', $capturedParams);
-        self::assertEquals(123, $capturedParams['id']);
+        self::assertSame(123, $capturedParams['id']);
         self::assertNotEmpty($capturedParams['draftSessionUuid']);
         self::assertIsString($capturedParams['draftSessionUuid']);
         self::assertMatchesRegularExpression(
@@ -183,7 +162,7 @@ final class BeginDraftSessionOnRequestListenerTest extends TestCase
         );
         self::assertNotNull($event->getResponse());
         self::assertInstanceOf(RedirectResponse::class, $event->getResponse());
-        self::assertEquals('/test-route/123?draftSessionUuid=generated-uuid', $event->getResponse()->getTargetUrl());
+        self::assertSame('/test-route/123?draftSessionUuid=generated-uuid', $event->getResponse()->getTargetUrl());
     }
 
     public function testOnKernelRequestWithCustomParameterName(): void
@@ -222,12 +201,15 @@ final class BeginDraftSessionOnRequestListenerTest extends TestCase
         self::assertInstanceOf(RedirectResponse::class, $event->getResponse());
     }
 
-    public function testOnKernelRequestWithEmptyStringUuid(): void
+    /**
+     * @dataProvider missingOrInvalidUuidProvider
+     */
+    public function testOnKernelRequestRedirectsWhenUuidIsMissingOrInvalid(mixed $uuid): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'test_route');
-        $request->attributes->set('_route_params', ['draftSessionUuid' => '']);
-        $request->attributes->set('draftSessionUuid', '');
+        $request->attributes->set('_route_params', ['draftSessionUuid' => $uuid]);
+        $request->attributes->set('draftSessionUuid', $uuid);
 
         $event = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
@@ -244,48 +226,11 @@ final class BeginDraftSessionOnRequestListenerTest extends TestCase
         self::assertInstanceOf(RedirectResponse::class, $event->getResponse());
     }
 
-    public function testOnKernelRequestWithNullUuid(): void
+    public static function missingOrInvalidUuidProvider(): iterable
     {
-        $request = new Request();
-        $request->attributes->set('_route', 'test_route');
-        $request->attributes->set('_route_params', ['draftSessionUuid' => null]);
-        $request->attributes->set('draftSessionUuid', null);
-
-        $event = new RequestEvent(
-            $this->createMock(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
-        );
-
-        $this->urlGenerator->expects(self::once())
-            ->method('generate')
-            ->willReturn('/test-route?draftSessionUuid=generated-uuid');
-
-        $this->listener->onKernelRequest($event);
-
-        self::assertInstanceOf(RedirectResponse::class, $event->getResponse());
-    }
-
-    public function testOnKernelRequestRedirectsWhenUuidIsNonString(): void
-    {
-        $request = new Request();
-        $request->attributes->set('_route', 'test_route');
-        $request->attributes->set('_route_params', ['draftSessionUuid' => 123]);
-        $request->attributes->set('draftSessionUuid', 123);
-
-        $event = new RequestEvent(
-            $this->createMock(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
-        );
-
-        $this->urlGenerator->expects(self::once())
-            ->method('generate')
-            ->willReturn('/test-route?draftSessionUuid=generated-uuid');
-
-        $this->listener->onKernelRequest($event);
-
-        self::assertInstanceOf(RedirectResponse::class, $event->getResponse());
+        yield 'empty string' => [''];
+        yield 'null' => [null];
+        yield 'non-string integer' => [123];
     }
 
     public function testOnKernelRequestPreservesQueryParameters(): void
@@ -317,13 +262,13 @@ final class BeginDraftSessionOnRequestListenerTest extends TestCase
         self::assertArrayHasKey('id', $capturedParams);
         self::assertArrayHasKey('foo', $capturedParams);
         self::assertArrayHasKey('baz', $capturedParams);
-        self::assertEquals(456, $capturedParams['id']);
-        self::assertEquals('bar', $capturedParams['foo']);
-        self::assertEquals('qux', $capturedParams['baz']);
+        self::assertSame(456, $capturedParams['id']);
+        self::assertSame('bar', $capturedParams['foo']);
+        self::assertSame('qux', $capturedParams['baz']);
         self::assertNotEmpty($capturedParams['draftSessionUuid']);
         self::assertNotNull($event->getResponse());
         self::assertInstanceOf(RedirectResponse::class, $event->getResponse());
-        self::assertEquals(
+        self::assertSame(
             '/test-route/456?draftSessionUuid=generated-uuid&foo=bar&baz=qux',
             $event->getResponse()->getTargetUrl()
         );

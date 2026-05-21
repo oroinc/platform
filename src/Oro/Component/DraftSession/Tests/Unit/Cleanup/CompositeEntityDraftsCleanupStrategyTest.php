@@ -26,7 +26,7 @@ final class CompositeEntityDraftsCleanupStrategyTest extends TestCase
 
         $threshold = new \DateTime('today -7 days', new \DateTimeZone('UTC'));
 
-        self::assertEquals(8, $composite->cleanupEntityDrafts($threshold, 100));
+        self::assertSame(8, $composite->cleanupEntityDrafts($threshold, 100));
     }
 
     public function testCleanupEntityDraftsPassesThresholdAndBatchSize(): void
@@ -44,7 +44,7 @@ final class CompositeEntityDraftsCleanupStrategyTest extends TestCase
 
         $composite = new CompositeEntityDraftsCleanupStrategy([$strategy]);
 
-        self::assertEquals(2, $composite->cleanupEntityDrafts($threshold, 50));
+        self::assertSame(2, $composite->cleanupEntityDrafts($threshold, 50));
     }
 
     public function testCleanupEntityDraftsWithEmptyStrategies(): void
@@ -53,7 +53,7 @@ final class CompositeEntityDraftsCleanupStrategyTest extends TestCase
 
         $threshold = new \DateTime('today -7 days', new \DateTimeZone('UTC'));
 
-        self::assertEquals(0, $composite->cleanupEntityDrafts($threshold, 100));
+        self::assertSame(0, $composite->cleanupEntityDrafts($threshold, 100));
     }
 
     public function testCleanupEntityDraftsCallsAllStrategiesEvenWhenSomeReturnZero(): void
@@ -77,6 +77,6 @@ final class CompositeEntityDraftsCleanupStrategyTest extends TestCase
 
         $threshold = new \DateTime('today -7 days', new \DateTimeZone('UTC'));
 
-        self::assertEquals(7, $composite->cleanupEntityDrafts($threshold, 100));
+        self::assertSame(7, $composite->cleanupEntityDrafts($threshold, 100));
     }
 }

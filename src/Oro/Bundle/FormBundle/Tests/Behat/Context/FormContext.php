@@ -33,6 +33,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     private Inflector $inflector;
 
+    public const POSITION_MAP = [
+        'first' => 0,
+        'second' => 1,
+        'third' => 2,
+        'fourth' => 3,
+        'fifth' => 4,
+    ];
+
     public function __construct()
     {
         $this->inflector = (new InflectorFactory())->build();
@@ -414,14 +422,34 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *            | First Name        | Charlie           |
      *            | Last Name         | Sheen             |
      *            | Primary Email     | charlie@sheen.com |
+     * Example: And second "Order Line Item Draft Edit Form" must contain values:
+     *            | Product | product-kit-01 |
      *
      * @Then /^form must contain values:$/
      * @Then /^form must contains values:$/
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contain values:$/
+     * @Then /^(?P<position>\w+) "(?P<formName>(?:[^"]|\\")*)" must contains values:$/
+     * @Then /^(?P<position>\w+) "(?P<formName>(?:[^"]|\\")*)" must contain values:$/
      */
-    public function formMustContainsValues(TableNode $table, $formName = "OroForm")
+    public function formMustContainsValues(TableNode $table, $formName = "OroForm", ?string $position = null)
     {
+        if ($position !== null) {
+            $index = $this->getPosition($position);
+            if ($index === null) {
+                self::fail(sprintf('Invalid position "%s"', $position));
+            }
+            $elements = $this->findAllElements($formName);
+            if (!array_key_exists($index, $elements)) {
+                self::fail(sprintf('"%s" not available at position "%s"', $formName, $position));
+            }
+            /** @var Form $form */
+            $form = $elements[$index];
+            $form->assertFields($table);
+
+            return;
+        }
+
         /** @var Form $form */
         $form = $this->createElement($formName);
         $form->assertFields($table);
@@ -1172,5 +1200,10 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         } else {
             self::fail(sprintf('There is no "%s" action for this "%s" content', $action, $content));
         }
+    }
+
+    private function getPosition(string $rowNumber): ?int
+    {
+        return self::POSITION_MAP[$rowNumber] ?? null;
     }
 }

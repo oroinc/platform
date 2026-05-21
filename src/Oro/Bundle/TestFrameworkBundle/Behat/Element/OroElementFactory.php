@@ -159,6 +159,7 @@ class OroElementFactory implements SuiteAwareInterface
             ['type' => 'xpath', 'locator' => $element->getXpath()]
         );
         $this->injectSuite($element);
+        $this->injectOptions($element, $this->configuration[$configName]);
 
         return $element;
     }
