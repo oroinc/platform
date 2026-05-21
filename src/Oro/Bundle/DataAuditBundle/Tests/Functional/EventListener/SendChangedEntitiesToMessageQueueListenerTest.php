@@ -1267,4 +1267,20 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         self::assertArrayHasKey('owner_description', $messageBody);
         self::assertSame('John Doe - admin@example.com', $messageBody['owner_description']);
     }
+
+    public function testShouldNotSendMessageWhenOnlyNonAuditableFieldsChanged()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $owner->setNotAuditableProperty('someValue');
+        $em->flush();
+
+        self::assertMessagesEmpty(AuditChangedEntitiesTopic::getName());
+    }
 }
