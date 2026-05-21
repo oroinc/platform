@@ -8,6 +8,8 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
@@ -191,5 +193,70 @@ class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldConfig');
 
         $this->assertTrue($this->provider->isAuditableField($entityClass, $fieldName));
+    }
+
+    public function testGetNonAuditableFieldsWhenEnum(): void
+    {
+        $this->configManager->expects(self::never())
+            ->method('getConfigs');
+
+        $this->assertSame([], $this->provider->getNonAuditableFields(TestEnumValue::class));
+    }
+
+    public function testGetNonAuditableFieldsReturnsOnlyExplicitlyNonAuditableFields(): void
+    {
+        $entityClass = \stdClass::class;
+
+        $nonAuditableFieldConfig = $this->createMock(ConfigInterface::class);
+        $nonAuditableFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('auditable')
+            ->willReturn(false);
+        $nonAuditableFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn(new FieldConfigId(AuditConfigProvider::DATA_AUDIT_SCOPE, $entityClass, 'lastLogin'));
+
+        $auditableFieldConfig = $this->createMock(ConfigInterface::class);
+        $auditableFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('auditable')
+            ->willReturn(true);
+        $auditableFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn(new FieldConfigId(AuditConfigProvider::DATA_AUDIT_SCOPE, $entityClass, 'username'));
+
+        $entityLevelConfig = $this->createMock(ConfigInterface::class);
+        $entityLevelConfig->expects($this->once())
+            ->method('is')
+            ->with('auditable')
+            ->willReturn(false);
+        $entityLevelConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn(new EntityConfigId(AuditConfigProvider::DATA_AUDIT_SCOPE, $entityClass));
+
+        $this->configManager->expects($this->once())
+            ->method('getConfigs')
+            ->with(AuditConfigProvider::DATA_AUDIT_SCOPE, $entityClass)
+            ->willReturn([$nonAuditableFieldConfig, $auditableFieldConfig, $entityLevelConfig]);
+
+        $this->assertSame(['lastLogin'], $this->provider->getNonAuditableFields($entityClass));
+    }
+
+    public function testGetNonAuditableFieldsWhenAllFieldsAreAuditable(): void
+    {
+        $entityClass = \stdClass::class;
+
+        $auditableFieldConfig = $this->createMock(ConfigInterface::class);
+        $auditableFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('auditable')
+            ->willReturn(true);
+
+        $this->configManager->expects($this->once())
+            ->method('getConfigs')
+            ->with(AuditConfigProvider::DATA_AUDIT_SCOPE, $entityClass)
+            ->willReturn([$auditableFieldConfig]);
+
+        $this->assertSame([], $this->provider->getNonAuditableFields($entityClass));
     }
 }
