@@ -20,6 +20,8 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
+    protected array $loadedTopics = [];
+
     public function __construct(
         private DoctrineHelper $doctrineHelper,
         private WebhookEventDataProviderInterface $eventDataProvider,
@@ -61,9 +63,13 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
 
     private function hasActiveNotifications(string $topic): bool
     {
-        return $this->doctrineHelper
-            ->getEntityRepository(WebhookProducerSettings::class)
-            ->hasActiveWebhooks($topic);
+        if (!array_key_exists($topic, $this->loadedTopics)) {
+            $this->loadedTopics[$topic] = $this->doctrineHelper
+                ->getEntityRepository(WebhookProducerSettings::class)
+                ->hasActiveWebhooks($topic);
+        }
+
+        return $this->loadedTopics[$topic];
     }
 
     private function peformNotificationSend(
