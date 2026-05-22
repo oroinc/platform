@@ -311,10 +311,18 @@ JS;
                     return false;
                 }
                 
-                var isInAction = window.mediatorCachedForSelenium.execute('isInAction');
-                
+                const isInAction = window.mediatorCachedForSelenium.execute('isInAction');
                 if (isInAction !== false) {
                     return false;
+                }
+                
+                try {
+                    const isRequestPending = window.mediatorCachedForSelenium.execute('isRequestPending');
+                    if (isRequestPending === true) {
+                        return false;
+                    }   
+                } catch (e) {
+                    // Handler is not available, we can proceed. 
                 }
             } catch (e) {
                 return false;

@@ -115,10 +115,13 @@ class ModifyCreatedAndUpdatedPropertiesListener
      */
     protected function updateChangeSets($entity, EntityManager $em, UnitOfWork $uow)
     {
-        $uow->recomputeSingleEntityChangeSet(
-            $em->getClassMetadata(ClassUtils::getClass($entity)),
-            $entity
-        );
+        $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
+        if (!$uow->getOriginalEntityData($entity)) {
+            // Entity was persisted during the flush cycle and its changeset was not computed yet.
+            $uow->computeChangeSet($metadata, $entity);
+        } else {
+            $uow->recomputeSingleEntityChangeSet($metadata, $entity);
+        }
     }
 
     /**
