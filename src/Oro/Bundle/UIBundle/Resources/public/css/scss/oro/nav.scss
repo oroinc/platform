@@ -184,6 +184,12 @@
                 }
             }
         }
+
+        &:only-child {
+            .nav-link {
+                border-radius: $nav-link-border-radius;
+            }
+        }
     }
 
     .dropdown-toggle {

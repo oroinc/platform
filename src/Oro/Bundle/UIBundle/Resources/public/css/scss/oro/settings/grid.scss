@@ -8,3 +8,6 @@ $grid-template-columns: var(
 $grid-gap: var(--grid-gap, #{$offset-inline}) !default;
 
 $grid-aligns: start, center, end !default;
+
+$grid-row-gap-sizes: 4, 6, 8, 12, 16, 24 !default;
+$grid-column-gap-sizes: 4, 6, 8, 12, 16, 24 !default;
