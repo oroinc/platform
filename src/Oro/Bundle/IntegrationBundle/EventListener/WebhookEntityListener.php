@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
-use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\IntegrationBundle\Model\WebhookNotifierInterface;
 use Oro\Bundle\IntegrationBundle\Provider\WebhookConfigurationProvider;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
@@ -21,7 +21,6 @@ final class WebhookEntityListener implements OptionalListenerInterface
     use OptionalListenerTrait;
 
     private array $scheduledNotifications = [];
-    private array $loadedTopics = [];
 
     public function __construct(
         private WebhookNotifierInterface $webhookNotifier,
@@ -36,11 +35,12 @@ final class WebhookEntityListener implements OptionalListenerInterface
         }
 
         $entity = $args->getObject();
-        $topic = $this->webhookConfigurationProvider
-            ->getTopicNameByEntityEvent($entity, WebhookConfigurationProvider::EVENT_CREATE);
-        if (!$this->isNotificationAllowed($entity, $topic, $args)) {
+        if (!$this->webhookConfigurationProvider->isEntityAccessibleByWebhooks($entity)) {
             return;
         }
+
+        $topic = $this->webhookConfigurationProvider
+            ->getTopicNameByEntityEvent($entity, WebhookConfigurationProvider::EVENT_CREATE);
 
         // Postpone notification sending until flush to be sure that all relations are ready for serialization.
         $this->scheduledNotifications[] = [$topic, $entity];
@@ -48,34 +48,20 @@ final class WebhookEntityListener implements OptionalListenerInterface
 
     public function postUpdate(PostUpdateEventArgs $args): void
     {
-        if (!$this->enabled) {
-            return;
-        }
-
-        $entity = $args->getObject();
-        $topic = $this->webhookConfigurationProvider
-            ->getTopicNameByEntityEvent($entity, WebhookConfigurationProvider::EVENT_UPDATE);
-        if (!$this->isNotificationAllowed($entity, $topic, $args)) {
-            return;
-        }
-
-        $this->webhookNotifier->sendEntityEventNotification($topic, $entity);
+        $this->notifyChanges(
+            WebhookConfigurationProvider::EVENT_UPDATE,
+            $args->getObject(),
+            $args->getObjectManager()
+        );
     }
 
     public function preRemove(PreRemoveEventArgs $args): void
     {
-        if (!$this->enabled) {
-            return;
-        }
-
-        $entity = $args->getObject();
-        $topic = $this->webhookConfigurationProvider
-            ->getTopicNameByEntityEvent($entity, WebhookConfigurationProvider::EVENT_DELETE);
-        if (!$this->isNotificationAllowed($entity, $topic, $args)) {
-            return;
-        }
-
-        $this->webhookNotifier->sendEntityEventNotification($topic, $entity);
+        $this->notifyChanges(
+            WebhookConfigurationProvider::EVENT_DELETE,
+            $args->getObject(),
+            $args->getObjectManager()
+        );
     }
 
     public function postFlush(PostFlushEventArgs $args): void
@@ -103,23 +89,34 @@ final class WebhookEntityListener implements OptionalListenerInterface
     private function clearStorages()
     {
         $this->scheduledNotifications = [];
-        $this->loadedTopics = [];
     }
 
-    private function isNotificationAllowed(
-        object $entity,
-        string $topic,
-        LifecycleEventArgs $args
-    ): bool {
+    private function notifyChanges(string $event, object $entity, ObjectManager $objectManager): void
+    {
+        if (!$this->enabled) {
+            return;
+        }
+
         if (!$this->webhookConfigurationProvider->isEntityAccessibleByWebhooks($entity)) {
-            return false;
+            return;
         }
 
-        if (!isset($this->loadedTopics[$topic])) {
-            $repo = $args->getObjectManager()->getRepository(WebhookProducerSettings::class);
-            $this->loadedTopics[$topic] = $repo->hasActiveWebhooks($topic);
-        }
+        $topic = $this->webhookConfigurationProvider->getTopicNameByEntityEvent($entity, $event);
 
-        return $this->loadedTopics[$topic];
+        $this->webhookNotifier->sendEntityEventNotification($topic, $entity);
+        $id = $this->getEntityId($entity, $objectManager);
+        if ($id !== null) {
+            $this->webhookNotifier->sendEntityEventNotification($topic . '.' . $id, $entity);
+        }
+    }
+
+    private function getEntityId(object $entity, ObjectManager $objectManager): int|string|null
+    {
+        $identifiers = $objectManager
+            ->getClassMetadata(ClassUtils::getClass($entity))
+            ->getIdentifierValues($entity);
+        $id = reset($identifiers);
+
+        return $id !== false ? $id : null;
     }
 }
