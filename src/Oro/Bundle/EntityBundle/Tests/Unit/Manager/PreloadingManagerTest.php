@@ -72,9 +72,12 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('stdclass');
 
         $event = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($event, $eventName);
+            ->withConsecutive(
+                [$event, $eventName],
+                [$event, PreloadEntityEvent::EVENT_NAME]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityMetadataForClass')
@@ -137,9 +140,12 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('stdclass');
 
         $event = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($event, $eventName);
+            ->withConsecutive(
+                [$event, $eventName],
+                [$event, PreloadEntityEvent::EVENT_NAME]
+            );
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
         $this->doctrineHelper->expects($this->once())
@@ -211,9 +217,14 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             $fieldsToPreload[$targetField],
             $context
         );
-        $this->eventDispatcher->expects($this->exactly(2))
+        $this->eventDispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->withConsecutive([$event1, $eventName1], [$event2, $eventName2]);
+            ->withConsecutive(
+                [$event1, $eventName1],
+                [$event1, PreloadEntityEvent::EVENT_NAME],
+                [$event2, $eventName2],
+                [$event2, PreloadEntityEvent::EVENT_NAME]
+            );
 
         $this->manager->preloadInEntities($entities, $fieldsToPreload, $context);
     }
@@ -264,9 +275,12 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getAssociationTargetClass');
 
         $event1 = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($event1, $eventName1);
+            ->withConsecutive(
+                [$event1, $eventName1],
+                [$event1, PreloadEntityEvent::EVENT_NAME]
+            );
 
         $this->manager->preloadInEntities($entities, $fieldsToPreload, $context);
     }
@@ -331,9 +345,14 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             $fieldsToPreload[$targetField],
             $context
         );
-        $this->eventDispatcher->expects($this->exactly(2))
+        $this->eventDispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->withConsecutive([$event1, $eventName1], [$event2, $eventName2]);
+            ->withConsecutive(
+                [$event1, $eventName1],
+                [$event1, PreloadEntityEvent::EVENT_NAME],
+                [$event2, $eventName2],
+                [$event2, PreloadEntityEvent::EVENT_NAME]
+            );
 
         $this->manager->preloadInEntities($entities, $fieldsToPreload, $context);
     }
@@ -384,9 +403,12 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getAssociationTargetClass');
 
         $event1 = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($event1, $eventName1);
+            ->withConsecutive(
+                [$event1, $eventName1],
+                [$event1, PreloadEntityEvent::EVENT_NAME]
+            );
 
         $this->manager->preloadInEntities($entities, $fieldsToPreload, $context);
     }
@@ -444,9 +466,12 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getAssociationTargetClass');
 
         $event1 = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($event1, $eventName1);
+            ->withConsecutive(
+                [$event1, $eventName1],
+                [$event1, PreloadEntityEvent::EVENT_NAME]
+            );
 
         $this->manager->preloadInEntities($entities, $fieldsToPreload, $context);
     }

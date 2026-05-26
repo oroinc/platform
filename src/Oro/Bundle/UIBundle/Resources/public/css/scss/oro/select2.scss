@@ -504,12 +504,15 @@
     }
 
     &.select2-container-disabled {
+        background-color: $select2-choice-disabled-background-color;
+
         .select2-choice,
         .select2-choices {
             border-color: $select2-choice-disabled-border-color;
             background-color: $select2-choice-disabled-background-color;
             color: $select2-choice-disabled-color;
             cursor: $select2-choice-disabled-cursor;
+            opacity: .5;
         }
 
         .select2-search-choice-close {

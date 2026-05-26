@@ -490,6 +490,24 @@ define(function(require) {
                 }
             });
             return versions;
+        },
+
+        /**
+         * Scrolls element into view if it is not visible in viewport
+         *
+         * @param {Element} element
+         * @param {*} options
+         */
+        elementScrollIntoViewIfNeeded(element, options) {
+            if ('scrollIntoViewIfNeeded' in element) {
+                return element.scrollIntoViewIfNeeded(options);
+            }
+
+            const rect = element.getBoundingClientRect();
+
+            if (!(rect.top >= 0 && rect.bottom <= window.innerHeight)) {
+                element.scrollIntoView(options);
+            }
         }
     });
 

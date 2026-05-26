@@ -27,6 +27,7 @@ define(function(require) {
 
             mediator.setHandler('showLoadingBar', this.showLoading, this);
             mediator.setHandler('hideLoadingBar', this.hideLoading, this);
+            mediator.setHandler('isRequestPending', this.isRequestPending, this);
 
             if (options.showOnStartup) {
                 this.showLoading();
@@ -59,6 +60,16 @@ define(function(require) {
          */
         hideLoading: function() {
             this.view.hideLoader();
+            this.isRequestPending(false);
+        },
+
+        /**
+         * @param {Boolean} [state] True to notify that an application is going to send a request, false otherwise.
+         *
+         * @returns {Boolean} True if an application is going to send a request, false otherwise.
+         */
+        isRequestPending: function(state) {
+            return this.view.isRequestPending(state);
         }
     });
 

@@ -3,7 +3,7 @@
 @import 'form-selectors';
 
 $field-size: 32px !default;
-$field-width: 294px !default;
+$field-width: var(--input-field-width, 294px) !default;
 $select-caret-offset-end: 10px !default;
 
 $input-field-border-radius: $border-radius !default;
@@ -130,10 +130,6 @@ $add-on-last-child-border-radius: 0 $border-radius $border-radius 0 !default;
 $add-on-first-child-border-radius: $border-radius 0 0 $border-radius !default;
 $add-on-only-child-border-radius: $border-radius !default;
 
-$add-on-disabled-border-color: $primary-800 !default;
-$add-on-disabled-background-color: $primary-900 !default;
-$add-on-disabled-color: $primary-700 !default;
-
 $add-on-append-border-radius: $border-radius !default;
 $add-on-append-offset-left: -1px !default;
 $add-on-append-outer-offset-left: $content-padding-xs !default;
@@ -154,3 +150,8 @@ $controls-selector-width: 100% !default;
 $control-group-bottom-offset: $content-padding-medium !default;
 
 $control-group-choice-choice-widget-offset-top: 6px !default;
+
+$add-on-append-disabled-color: $neutral-dark !default;
+$add-on-append-disabled-background: $neutral-grey-3 !default;
+$add-on-append-disabled-border: $text-disabled !default;
+$add-on-append-disabled-opacity: .5 !default;

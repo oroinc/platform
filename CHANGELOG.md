@@ -28,6 +28,12 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### DraftSession Component
+* Added `\Oro\Component\DraftSession` component — provides session-based entity draft editing. Read the development documentation for more details.
+
+#### FormBundle
+* Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
+
 #### EmailBundle
 * Added ability to add attachments to email template:
     * Added `\Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel` and `\Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment` to represent an email template attachment.

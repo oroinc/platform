@@ -589,6 +589,10 @@ define(function(require) {
          * Reflects datagrid state in URL.
          */
         updateStateInUrl: function() {
+            if (this.grid.routerEnabled === false) {
+                return;
+            }
+
             const key = this.collection.stateHashKey();
             const hash = this.collection.stateHashValue(true);
 

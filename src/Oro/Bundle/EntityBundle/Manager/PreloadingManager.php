@@ -86,6 +86,7 @@ class PreloadingManager
         );
         $event = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
         $this->eventDispatcher->dispatch($event, $eventName);
+        $this->eventDispatcher->dispatch($event, PreloadEntityEvent::EVENT_NAME);
 
         foreach ($fieldsToPreload as $targetField => $subFields) {
             if (!$subFields) {

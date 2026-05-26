@@ -24,6 +24,8 @@ class DefaultPreloadingListener
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
+    private bool $stopPropagation = false;
+
     /** @var array */
     private $entityIdField = [];
 
@@ -31,6 +33,14 @@ class DefaultPreloadingListener
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->propertyAccessor = $propertyAccessor;
+    }
+
+    /**
+     * @param bool $stopPropagation Whether this listener should stop propagation.
+     */
+    public function setStopPropagation(bool $stopPropagation): void
+    {
+        $this->stopPropagation = $stopPropagation;
     }
 
     public function onPreload(PreloadEntityEvent $preloadEntityEvent): void
@@ -87,6 +97,10 @@ class DefaultPreloadingListener
 
         $this->loadToManyRelations($mainEntityClass, $mainEntitiesByFields);
         $this->loadToOneRelationsByIds($targetEntitiesByIds);
+
+        if ($this->stopPropagation) {
+            $preloadEntityEvent->stopPropagation();
+        }
     }
 
     /**
