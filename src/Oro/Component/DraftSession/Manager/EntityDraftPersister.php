@@ -157,7 +157,9 @@ class EntityDraftPersister implements LoggerAwareInterface
     ): void {
         $this->eventDispatcher->dispatch(new EntityDraftPersistBeforeEvent($draft, $entity));
 
-        $entityManager->persist($draft);
+        if (!$entityManager->getUnitOfWork()->isScheduledForDelete($draft)) {
+            $entityManager->persist($draft);
+        }
 
         $this->entityManagerIsolator->flushDraftEntities($entityManager);
 
