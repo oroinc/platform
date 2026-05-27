@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Duplicator\Filter;
 
+use DeepCopy\Reflection\ReflectionHelper;
+
 /**
  * Performs a shallow copy of a property value during object duplication.
  *
@@ -14,7 +16,7 @@ class ShallowCopyFilter implements Filter
     #[\Override]
     public function apply($object, $property, $objectCopier)
     {
-        $reflectionProperty = new \ReflectionProperty($object, $property);
+        $reflectionProperty = ReflectionHelper::getProperty($object, $property);
         $value = $reflectionProperty->getValue($object);
         $reflectionProperty->setValue($object, clone $value);
     }

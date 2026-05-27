@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Duplicator\Filter;
 
+use DeepCopy\Reflection\ReflectionHelper;
+
 /**
  * Replaces a property value with a specified value during object duplication.
  *
@@ -24,8 +26,7 @@ class ReplaceValueFilter implements Filter
     #[\Override]
     public function apply($object, $property, $objectCopier)
     {
-        $reflectionProperty = new \ReflectionProperty($object, $property);
-
+        $reflectionProperty = ReflectionHelper::getProperty($object, $property);
         $reflectionProperty->setValue($object, $this->value);
     }
 }
