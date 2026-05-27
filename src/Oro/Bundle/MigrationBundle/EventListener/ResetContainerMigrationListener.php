@@ -14,10 +14,26 @@ class ResetContainerMigrationListener implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
+    /**
+     * Static flag to prevent recursive resets across multiple listener instances
+     * This is necessary because container reset may recreate the listener
+     */
+    private static bool $isResetting = false;
+
     public function onPostUp(PostUpMigrationLifeCycleEvent $event)
     {
         if ($event->getMigration() instanceof ResetContainerMigration) {
-            $this->container->reset();
+            // Prevent recursive reset calls - use static flag to persist across instances
+            if (self::$isResetting) {
+                return;
+            }
+
+            self::$isResetting = true;
+            try {
+                $this->container->reset();
+            } finally {
+                self::$isResetting = false;
+            }
         }
     }
 }

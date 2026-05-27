@@ -4,6 +4,8 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture;
 
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
+use Twig\Node\Expression\Binary\AndBinary;
+use Twig\Node\Expression\Unary\NegUnary;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
@@ -57,8 +59,8 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
     public function getOperators()
     {
         return [
-            ['foo_unary' => []],
-            ['foo_binary' => []],
+            ['foo_unary' => ['precedence' => 500, 'class' => NegUnary::class]],
+            ['foo_binary' => ['precedence' => 10, 'class' => AndBinary::class, 'associativity' => 1]],
         ];
     }
 

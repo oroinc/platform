@@ -6,7 +6,7 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitGarbageCollectionExtension;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\Test\TestLogger;
+use Oro\Component\Testing\Logger\TestLogger;
 
 class LimitGarbageCollectionExtensionTest extends \PHPUnit\Framework\TestCase
 {

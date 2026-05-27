@@ -187,6 +187,15 @@ class OroEntityExtendBundle extends Bundle
         $process = new Process($processArguments, $projectDir);
         $process->setTimeout(self::CACHE_GENERATION_TIMEOUT);
 
+        // SymfonyRuntime CVE-2024-50340 Patch Bypass
+        $process->setEnv([
+            'QUERY_STRING' => false,
+            'REQUEST_METHOD' => false,
+            'REQUEST_URI' => false,
+            'REQUEST_TIME' => false,
+            'REQUEST_TIME_FLOAT' => false,
+        ]);
+
         return $process;
     }
 }

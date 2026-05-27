@@ -1,24 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Twig\TitleSetTokenParser;
-use Twig\ExpressionParser;
-use Twig\Node\Node;
+use PHPUnit\Framework\TestCase;
+use Twig\Node\Expression\ArrayExpression;
 use Twig\Parser;
 use Twig\Token;
 use Twig\TokenStream;
 
-class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
+class TitleSetTokenParserTest extends TestCase
 {
     public function testParsing()
     {
-        $node = $this->createMock(Node::class);
-
-        $exprParser = $this->createMock(ExpressionParser::class);
-        $exprParser->expects($this->once())
-           ->method('parseArguments')
-           ->willReturn($node);
+        $expr = $this->createMock(ArrayExpression::class);
 
         $stream = new TokenStream([
             new Token(Token::BLOCK_END_TYPE, '', 1),
@@ -27,8 +24,8 @@ class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
 
         $parser = $this->createMock(Parser::class);
         $parser->expects($this->once())
-           ->method('getExpressionParser')
-           ->willReturn($exprParser);
+           ->method('parseExpression')
+           ->willReturn($expr);
         $parser->expects($this->once())
            ->method('getStream')
            ->willReturn($stream);

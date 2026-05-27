@@ -108,9 +108,8 @@ class UiExtensionTest extends TestCase
             ->willReturn(new TemplateWrapper($this->environment, $template));
 
         $this->environment->expects(self::once())
-            ->method('mergeGlobals')
-            ->with(['key' => 'value', 'extraKey' => 'value'])
-            ->willReturn(['key' => 'value', 'extraKey' => 'value']);
+            ->method('getGlobals')
+            ->willReturn([]);
 
         $template->expects(self::once())
             ->method('renderBlock')

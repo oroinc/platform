@@ -3,7 +3,7 @@
 namespace Oro\Component\PhpUtils\Tests\Unit\CommandExecutor;
 
 use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor;
-use Psr\Log\Test\TestLogger;
+use Oro\Component\Testing\Logger\TestLogger;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class CommandExecutorTest extends \PHPUnit\Framework\TestCase

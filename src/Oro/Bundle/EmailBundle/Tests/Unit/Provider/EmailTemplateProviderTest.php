@@ -141,19 +141,21 @@ class EmailTemplateProviderTest extends TestCase
             ->expects(self::never())
             ->method('getEmailTemplate');
 
-        $exception = new LoaderError(
-            sprintf('Unable to find one of the following email templates: "%s".', implode('", "', [$name1, $name2]))
+        $exceptionMessage = sprintf(
+            'Unable to find one of the following email templates: "%s".',
+            implode('", "', [$name1, $name2])
         );
         $this->loggerMock
             ->expects(self::once())
             ->method('error')
             ->with(
                 'Failed to load email template "{name}": {message}',
-                [
-                    'name' => $emailTemplateCriteria->getName(),
-                    'message' => $exception->getMessage(),
-                    'exception' => $exception,
-                ]
+                self::callback(static function (array $context) use ($emailTemplateCriteria, $exceptionMessage) {
+                    return $context['name'] === $emailTemplateCriteria->getName()
+                        && $context['message'] === $exceptionMessage
+                        && $context['exception'] instanceof LoaderError
+                        && $context['exception']->getMessage() === $exceptionMessage;
+                })
             );
 
         $this->provider->loadEmailTemplate($emailTemplateCriteria, $templateContext);

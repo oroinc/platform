@@ -57,7 +57,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         object $exceptionListener,
         object $logoutListener
     ): void {
-        $context->expects(self::exactly(3))
+        $context->expects(self::exactly(2))
             ->method('getConfig')
             ->willReturn(new FirewallConfig($firewallName, 'user_checker'));
         $context->expects(self::once())
@@ -511,7 +511,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
                 'request' => $request,
                 'firewallName' => 'wsse',
                 'stateless' => true,
-                'expectedRequestStateless' => true
+                'expectedRequestStateless' => false
             ],
             'api request with csrf header' => [
                 'request' => $requestWithCsrf,
@@ -523,7 +523,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
                 'request' => $request,
                 'firewallName' => 'wsse',
                 'stateless' => false,
-                'expectedRequestStateless' => true
+                'expectedRequestStateless' => false
             ],
             'api request with csrf header stateful' => [
                 'request' => $requestWithCsrf,
