@@ -21,13 +21,11 @@ class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopic
         return [
             'required only' => [
                 'body' => [
-                    'jobId' => 42,
                     'entityData' => ['sample_key' => 'sample_value'],
                     'timestamp' => $time,
                     'transaction_id' => 142,
                 ],
                 'expectedBody' => [
-                    'jobId' => 42,
                     'entityData' => ['sample_key' => 'sample_value'],
                     'timestamp' => $time,
                     'transaction_id' => 142,
@@ -40,7 +38,6 @@ class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopic
             ],
             'all options' => [
                 'body' => [
-                    'jobId' => 42,
                     'entityData' => ['sample_key' => 'sample_value'],
                     'timestamp' => $time,
                     'transaction_id' => 142,
@@ -51,7 +48,6 @@ class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopic
                     'owner_description' => 'sample description',
                 ],
                 'expectedBody' => [
-                    'jobId' => 42,
                     'entityData' => ['sample_key' => 'sample_value'],
                     'timestamp' => $time,
                     'transaction_id' => 142,
@@ -64,7 +60,6 @@ class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopic
             ],
             'options with alternative types' => [
                 'body' => [
-                    'jobId' => 42,
                     'entityData' => ['sample_key' => 'sample_value'],
                     'timestamp' => $time,
                     'transaction_id' => '142',
@@ -73,7 +68,6 @@ class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopic
                     'impersonation_id' => '11142',
                 ],
                 'expectedBody' => [
-                    'jobId' => 42,
                     'entityData' => ['sample_key' => 'sample_value'],
                     'timestamp' => $time,
                     'transaction_id' => '142',
@@ -93,7 +87,7 @@ class AuditChangedEntitiesInverseCollectionsChunkTopicTest extends AbstractTopic
             'empty' => [
                 'body' => [],
                 'exceptionClass' => MissingOptionsException::class,
-                'exceptionMessage' => '/The required options "entityData", "jobId", "timestamp", '
+                'exceptionMessage' => '/The required options "entityData", "timestamp", '
                     . '"transaction_id" are missing./',
             ],
         ];

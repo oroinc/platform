@@ -12,23 +12,22 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 class LoadTestAuditDataWithOneToManyData extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
-    private const CHILD_COUNT = 4;
 
     /**
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
-        $owner = new TestAuditDataOwner();
-        for ($childIndex = 1; $childIndex <= self::CHILD_COUNT; $childIndex++) {
-            $child = new TestAuditDataChild();
-            $owner->addChildrenOneToMany($child);
-            $manager->persist($child);
+        for ($ownerIndex = 0; $ownerIndex < 3; $ownerIndex++) {
+            $owner = new TestAuditDataOwner();
+            for ($childIndex = 0; $childIndex < 4; $childIndex++) {
+                $child = new TestAuditDataChild();
+                $owner->addChildrenOneToMany($child);
+                $manager->persist($child);
+            }
+            $this->addReference('test_audit_owner_' . ($ownerIndex + 1), $owner);
+            $manager->persist($owner);
         }
-
-        $manager->persist($owner);
         $manager->flush();
-
-        $this->addReference('testAuditOwner', $owner);
     }
 }

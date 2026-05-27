@@ -24,10 +24,8 @@ class AuditChangedEntitiesInverseCollectionsChunkTopic extends AbstractAuditTopi
         parent::configureMessageBody($resolver);
 
         $resolver
-            ->setRequired([
-                'jobId',
-                'entityData',
-            ])
+            ->setDefined(['jobId'])
+            ->setRequired(['entityData'])
             ->addAllowedTypes('jobId', 'int')
             ->addAllowedTypes('entityData', 'array');
     }
