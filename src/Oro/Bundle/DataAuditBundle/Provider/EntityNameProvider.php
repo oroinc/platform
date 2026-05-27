@@ -12,28 +12,16 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
  */
 class EntityNameProvider
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var EntityNameResolver */
-    private $entityNameResolver;
-
-    public function __construct(ManagerRegistry $doctrine, EntityNameResolver $entityNameResolver)
-    {
-        $this->doctrine = $doctrine;
-        $this->entityNameResolver = $entityNameResolver;
+    public function __construct(
+        private readonly ManagerRegistry $doctrine,
+        private readonly EntityNameResolver $entityNameResolver
+    ) {
     }
 
     /**
      * Gets a human-readable representation of the entity.
-     *
-     * @param string $auditEntryClass The class name of the audit entity
-     * @param string $entityClass     The class name of the audited entity
-     * @param int    $entityId        The identifier of the audited entity
-     *
-     * @return string
      */
-    public function getEntityName($auditEntryClass, $entityClass, $entityId)
+    public function getEntityName(string $auditEntryClass, string $entityClass, mixed $entityId): string
     {
         $entity = $this->doctrine->getManagerForClass($entityClass)->find($entityClass, $entityId);
         if ($entity) {
@@ -48,15 +36,11 @@ class EntityNameProvider
         return sprintf('%s::%s', (new \ReflectionClass($entityClass))->getShortName(), $entityId);
     }
 
-    /**
-     * @param string $auditEntryClass
-     * @param string $entityClass
-     * @param int    $entityId
-     *
-     * @return string|null
-     */
-    private function findObjectNameFromLastAuditEntry($auditEntryClass, $entityClass, $entityId)
-    {
+    private function findObjectNameFromLastAuditEntry(
+        string $auditEntryClass,
+        string $entityClass,
+        mixed $entityId
+    ): ?string {
         $rows = $this->getAuditRepository($auditEntryClass)
             ->createQueryBuilder('a')
             ->select('a.objectName')
@@ -64,7 +48,7 @@ class EntityNameProvider
             ->orderBy('a.version', 'DESC')
             ->setMaxResults(1)
             ->setParameter('objectClass', $entityClass)
-            ->setParameter('objectId', (string) $entityId)
+            ->setParameter('objectId', (string)$entityId)
             ->getQuery()
             ->getArrayResult();
 
@@ -73,12 +57,7 @@ class EntityNameProvider
             : null;
     }
 
-    /**
-     * @param string $auditEntryClass
-     *
-     * @return EntityRepository
-     */
-    private function getAuditRepository($auditEntryClass)
+    private function getAuditRepository(string $auditEntryClass): EntityRepository
     {
         return $this->doctrine->getRepository($auditEntryClass);
     }

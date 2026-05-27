@@ -6,11 +6,8 @@ use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollection
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsTopic;
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -21,31 +18,13 @@ use Psr\Log\LoggerInterface;
 class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProcessor implements
     TopicSubscriberInterface
 {
-    private JobRunner $jobRunner;
-
-    private MessageProducerInterface $producer;
-
-    private LoggerInterface $logger;
-
-    private EntityAuditStrategyProcessorInterface $strategyProcessor;
-
     private int $batchSize = 500;
 
     public function __construct(
-        JobRunner $jobRunner,
-        MessageProducerInterface $producer,
-        LoggerInterface $logger,
-        EntityAuditStrategyProcessorInterface $strategyProcessor
+        private readonly MessageProducerInterface $producer,
+        private readonly EntityAuditStrategyProcessorInterface $strategyProcessor,
+        private readonly LoggerInterface $logger
     ) {
-        $this->jobRunner = $jobRunner;
-        $this->producer = $producer;
-        $this->logger = $logger;
-        $this->strategyProcessor = $strategyProcessor;
-    }
-
-    public function getBatchSize(): int
-    {
-        return $this->batchSize;
     }
 
     public function setBatchSize(int $batchSize): void
@@ -57,7 +36,7 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         try {
-            return $this->processCollections($message->getBody(), $message) ? self::ACK : self::REJECT;
+            $this->processCollections($message->getBody());
         } catch (\Exception $e) {
             $this->logger->error(
                 'Unexpected exception occurred during queue message processing',
@@ -66,21 +45,20 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
 
             return self::REJECT;
         }
+
+        return self::ACK;
     }
 
-    /**
-     * @param array $body
-     * @param MessageInterface $message
-     *
-     * @return mixed|null
-     */
-    protected function processCollections(array $body, MessageInterface $message)
+    private function processCollections(array $body): void
     {
         $collectionsData = array_merge(
             $this->processEntityFromCollection($body['entities_inserted'], 'inserted'),
             $this->processEntityFromCollection($body['entities_updated'], 'changed'),
             $this->processEntityFromCollection($body['entities_deleted'], 'deleted')
         );
+        if (!$collectionsData) {
+            return;
+        }
 
         unset(
             $body['entities_inserted'],
@@ -89,54 +67,71 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
             $body['collections_updated']
         );
 
-        return $this->jobRunner->runUniqueByMessage(
-            $message,
-            function (JobRunner $jobRunner, Job $job) use ($body, $collectionsData) {
-                $index = 0;
-                foreach ($collectionsData as $sourceEntityData) {
-                    $this->createDelayed($jobRunner, $job, $sourceEntityData, $body, $index);
-                }
-
-                return true;
-            }
-        );
+        $chunks = $this->getChunks($collectionsData);
+        foreach ($chunks as $chunkEntityData) {
+            $chunkBody = $body;
+            $chunkBody['entityData'] = $chunkEntityData;
+            $this->producer->send(AuditChangedEntitiesInverseCollectionsChunkTopic::getName(), $chunkBody);
+        }
     }
 
-    private function createDelayed(JobRunner $jobRunner, Job $job, array $entityData, array $body, int &$index): void
+    private function getChunks(array $collectionsData): array
     {
-        if (!\is_array($entityData) || !isset($entityData['fields'])) {
-            return;
+        $chunks = [];
+        foreach ($collectionsData as $entityData) {
+            $chunks[] = $this->splitByChunks($entityData);
         }
 
+        $chunks = array_merge(...$chunks);
+
+        return $this->optimizeChunks($chunks);
+    }
+
+    private function optimizeChunks(array $chunks): array
+    {
+        $optimizedChunks = [];
+        $lastOptimizedChunkEntityData = [];
+        $lastOptimizedChunkEntityCount = 0;
+        foreach ($chunks as $entityData) {
+            $entityCount = 0;
+            foreach ($entityData['fields'] as $fieldData) {
+                $entityCount += \count($fieldData['entity_ids']);
+            }
+            if (($lastOptimizedChunkEntityCount + $entityCount) > $this->batchSize) {
+                $optimizedChunks[] = $lastOptimizedChunkEntityData;
+                $lastOptimizedChunkEntityData = [];
+                $lastOptimizedChunkEntityCount = 0;
+            }
+            $lastOptimizedChunkEntityData[] = $entityData;
+            $lastOptimizedChunkEntityCount += $entityCount;
+        }
+        if ($lastOptimizedChunkEntityData) {
+            $optimizedChunks[] = $lastOptimizedChunkEntityData;
+        }
+
+        return $optimizedChunks;
+    }
+
+    private function splitByChunks(array $entityData): array
+    {
+        $chunks = [];
         foreach ($entityData['fields'] as $key => $fieldData) {
-            $entityIds = array_chunk($fieldData['entity_ids'], $this->getBatchSize());
-            foreach ($entityIds as $chunk) {
+            $entityIds = array_chunk($fieldData['entity_ids'], $this->batchSize);
+            foreach ($entityIds as $chunkEntityIds) {
                 $entityData['fields'] = [
                     $key => [
                         'entity_class' => $fieldData['entity_class'],
                         'field_name' => $fieldData['field_name'],
-                        'entity_ids' => $chunk
+                        'entity_ids' => $chunkEntityIds
                     ]
                 ];
-
-                $jobRunner->createDelayed(
-                    sprintf('%s:chunk:%s', $job->getName(), ++$index),
-                    function (JobRunner $jobRunner, Job $child) use ($body, $entityData) {
-                        $body['entityData'] = $entityData;
-                        $body['jobId'] = $child->getId();
-                        $this->producer->send(
-                            AuditChangedEntitiesInverseCollectionsChunkTopic::getName(),
-                            new Message($body)
-                        );
-                    }
-                );
+                $chunks[] = $entityData;
             }
         }
+
+        return $chunks;
     }
 
-    /**
-     * Prepare data from collections.
-     */
     private function processEntityFromCollection(array $sourceEntitiesData, string $set): array
     {
         $collectionsData = [];
