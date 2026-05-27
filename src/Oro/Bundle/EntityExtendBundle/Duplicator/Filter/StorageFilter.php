@@ -22,20 +22,27 @@ class StorageFilter implements Filter
         }
 
         $reflectionProperty = ReflectionHelper::getProperty($object, $property);
-        $reflectionProperty->setAccessible(true);
-
         $oldStorage = $reflectionProperty->getValue($object);
 
         if ($oldStorage instanceof \ArrayObject) {
-            $oldStorageIterator = new \ArrayIterator($oldStorage->getArrayCopy());
-            $newStorageData = $objectCopier($oldStorageIterator);
+            $this->unsetSerializedNormalizedData($oldStorage);
+
+            $data = $oldStorage->getArrayCopy();
+            $copiedBag = $objectCopier((object)$data);
 
             $newStorage = new ExtendEntityStorage(
-                $newStorageData->getArrayCopy(),
+                (array)$copiedBag,
                 \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS
             );
 
             $reflectionProperty->setValue($object, $newStorage);
+        }
+    }
+
+    private function unsetSerializedNormalizedData(\ArrayObject $storage): void
+    {
+        if ($storage->offsetExists('serialized_normalized')) {
+            $storage->offsetUnset('serialized_normalized');
         }
     }
 }
