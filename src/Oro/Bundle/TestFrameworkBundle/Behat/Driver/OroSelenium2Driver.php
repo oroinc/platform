@@ -7,6 +7,7 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\ScreenshotTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\ElementValueInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder;
 use WebDriver\Element;
@@ -19,6 +20,7 @@ use WebDriver\Key;
 class OroSelenium2Driver extends Selenium2Driver
 {
     use AssertTrait;
+    use ScreenshotTrait;
 
     private Manipulator $xpathManipulator;
     private Escaper $xpathEscaper;
@@ -251,25 +253,31 @@ JS;
      * Wait AJAX request
      * @param int $time Time should be in milliseconds
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function waitForAjax($time = 120000)
     {
         $jsAppActiveCheck = <<<JS
         (function () {
             if (document['readyState'] !== 'complete') {
+                console.info('Waiting for readyState to be complete');
                 return false;
             }
             
             if (document.title === 'Loading...') {
+                console.info('Waiting for "Loading..." title to be removed');
                 return false;
             }
             
             if (document.body.classList.contains('loading') && !document.body.classList.contains('modal-open')) {
                 // confirmation dialog can be shown over loading mask
+                console.info('Waiting for loading class to be removed from body');
                 return false;
             }
             
             if (document.body.classList.contains('img-loading')) {
+                console.info('Waiting for img-loading class to be removed from body');
                 return false;
             }
 
@@ -281,11 +289,13 @@ JS;
             
             // Check for loading bar components
             if (document.querySelector('.loading-bar.show') !== null) {
+                console.info('Waiting for .loading-bar to hide');
                 return false;
             }
             
             // Check for any loading mask views that are shown
             if (document.querySelector('.loader-mask.shown') !== null) {
+                console.info('Waiting for .loader-mask to hide');
                 return false;
             }
             
@@ -301,6 +311,7 @@ JS;
                     && (typeof(jQuery) === 'undefined' || jQuery == null))
                     || (typeof(jQuery) !== 'undefined' && jQuery.active)
                 ) {
+                    console.info('Waiting for app.js to load');
                     return false;
                 }
                 
@@ -308,23 +319,27 @@ JS;
                     loadModules(['oroui/js/mediator'], function(mediator) {
                         window.mediatorCachedForSelenium = mediator;
                     });
+                    console.info('Waiting for mediatorCachedForSelenium to load');
                     return false;
                 }
                 
                 const isInAction = window.mediatorCachedForSelenium.execute('isInAction');
                 if (isInAction !== false) {
+                    console.info('Waiting for isInAction flag to turn off');
                     return false;
                 }
                 
                 try {
                     const isRequestPending = window.mediatorCachedForSelenium.execute('isRequestPending');
                     if (isRequestPending === true) {
+                        console.info('Waiting for isRequestPending flag to turn off');
                         return false;
                     }   
                 } catch (e) {
                     // Handler is not available, we can proceed. 
                 }
             } catch (e) {
+                console.info('Waiting for exception to resolve: ' + e.message);
                 return false;
             }
 
@@ -335,6 +350,7 @@ JS;
         $result = $this->wait($time, $jsAppActiveCheck);
 
         if (!$result) {
+            $this->takeScreenshot();
             self::fail(sprintf('Wait for ajax more than %d seconds', $time / 1000));
         }
 

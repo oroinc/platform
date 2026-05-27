@@ -5,8 +5,8 @@ import BaseView from 'oroui/js/app/views/base/view';
 
 const IGNORE = [':input[type=button]', ':input[type=submit]', ':input[type=reset]',
     ':input[type=password]', ':input[type=file]', ':input[name$="[_token]"]',
-    '[data-ignore-form-state-change] :input', ':input[name^=temp-validation-name]',
-    ':input[data-fake-front-field]'].join(', ');
+    '[data-ignore-form-state-change] :input', ':input[data-ignore-form-state-change]',
+    ':input[name^=temp-validation-name]', ':input[data-fake-front-field]'].join(', ');
 
 /**
  * Reusable view that tracks form state and detects unsaved changes.

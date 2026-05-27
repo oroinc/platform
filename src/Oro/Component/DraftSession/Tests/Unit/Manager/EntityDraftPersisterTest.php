@@ -146,9 +146,12 @@ final class EntityDraftPersisterTest extends TestCase
             ->willReturn('provider-uuid');
 
         $this->unitOfWork
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('isScheduledForDelete')
-            ->with($entity)
+            ->withConsecutive(
+                [$entity],
+                [$draft]
+            )
             ->willReturn(false);
 
         $this->eventDispatcher
@@ -207,10 +210,13 @@ final class EntityDraftPersisterTest extends TestCase
         $draft->setDraftSource($entity);
 
         $this->unitOfWork
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('isScheduledForDelete')
-            ->with($entity)
-            ->willReturn(true);
+            ->withConsecutive(
+                [$entity],
+                [$draft]
+            )
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->eventDispatcher
             ->expects(self::exactly(2))
@@ -265,7 +271,7 @@ final class EntityDraftPersisterTest extends TestCase
         $inputDraft->setDraftSource($entity);
 
         $this->unitOfWork
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('isScheduledForDelete')
             ->with($inputDraft)
             ->willReturn(false);
@@ -326,9 +332,12 @@ final class EntityDraftPersisterTest extends TestCase
         $draft->setDraftSource($entity);
 
         $this->unitOfWork
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('isScheduledForDelete')
-            ->with($entity)
+            ->withConsecutive(
+                [$entity],
+                [$draft]
+            )
             ->willReturn(false);
 
         $this->entityDraftRepository
@@ -360,6 +369,63 @@ final class EntityDraftPersisterTest extends TestCase
 
         self::assertSame($draft, $result);
         self::assertFalse($draft->isDraftDelete());
+    }
+
+    public function testSaveToEntityDraftDoesNotPersistDraftWhenScheduledForDelete(): void
+    {
+        $entity = new EntityDraftAwareStub(10);
+        $draft = new EntityDraftAwareStub(100);
+        $draft->setDraftSessionUuid('explicit-uuid');
+        $draft->setDraftSource($entity);
+
+        $this->unitOfWork
+            ->expects(self::exactly(2))
+            ->method('isScheduledForDelete')
+            ->willReturnCallback(static function ($entity) use ($draft): bool {
+                if ($entity === $draft) {
+                    return true;
+                }
+
+                return false;
+            });
+
+        $this->doctrineListenersIsolator
+            ->expects(self::once())
+            ->method('disableListeners');
+
+        $this->entityDraftRepository
+            ->expects(self::once())
+            ->method('findEntityDraft')
+            ->with($entity, 'explicit-uuid')
+            ->willReturn($draft);
+
+        $this->entityDraftSynchronizer
+            ->expects(self::once())
+            ->method('synchronizeToDraft')
+            ->with($entity, $draft);
+
+        $this->eventDispatcher
+            ->expects(self::exactly(2))
+            ->method('dispatch')
+            ->willReturnArgument(0);
+
+        $this->entityManager
+            ->expects(self::never())
+            ->method('persist')
+            ->with($draft);
+
+        $this->entityManagerIsolator
+            ->expects(self::once())
+            ->method('flushDraftEntities')
+            ->with($this->entityManager);
+
+        $this->doctrineListenersIsolator
+            ->expects(self::once())
+            ->method('enableListeners');
+
+        $result = $this->persister->saveToEntityDraft($entity, 'explicit-uuid');
+
+        self::assertSame($draft, $result);
     }
 
     public function testSaveToEntityDraftEnablesListenersWhenExceptionOccurs(): void
