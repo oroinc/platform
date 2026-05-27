@@ -46,6 +46,7 @@ dynamic-imports:
         - oroform/js/app/views/fields-groups-collection-view
         - oroform/js/app/views/form-loading-view
         - oroform/js/app/views/form-ajax-reloading-view
+        - oroform/js/app/views/form-state-tracker-view
         - oroform/js/app/views/form-validate-view
         - oroform/js/app/views/lazy-validation-collection-view
         - oroform/js/app/views/simple-color-choice-view

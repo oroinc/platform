@@ -25,6 +25,7 @@ class WebhookConfigurationProvider
 
     public const string ENTITY_CLASS_KEY = 'entityClass';
     public const string ICON_KEY = 'icon';
+    private const string DEFAULT_ICON = 'fa-podcast';
 
     public function __construct(
         private ConfigManager $entityConfigManager,
@@ -73,6 +74,13 @@ class WebhookConfigurationProvider
         return $this->getEntityAlias($className) . '.' . $event;
     }
 
+    public function getIcon(string $entityClass): string
+    {
+        $entityConfig = $this->entityConfigManager->getEntityConfig('entity', $entityClass);
+
+        return $entityConfig->get('icon') ?? self::DEFAULT_ICON;
+    }
+
     private function getEntityAlias(string $className): string
     {
         $alias = $this->entityAliasProvider->getEntityAlias($className);
@@ -112,7 +120,7 @@ class WebhookConfigurationProvider
                     $label,
                     [
                         self::ENTITY_CLASS_KEY => $entityClass,
-                        self::ICON_KEY => $entityConfig->get('icon') ?? 'fa-podcast'
+                        self::ICON_KEY => $this->getIcon($entityClass)
                     ]
                 );
             }

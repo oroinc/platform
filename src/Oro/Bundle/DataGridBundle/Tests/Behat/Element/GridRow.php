@@ -166,6 +166,33 @@ class GridRow extends TableRow
         $this->getDriver()->waitForAjax();
     }
 
+    public function find(string $selector, $locator)
+    {
+        $text = $this->getOption('text');
+        if (!$text) {
+            return parent::find($selector, $locator);
+        }
+
+        $items = $this->findAll($selector, $locator);
+        $itemCount = count($items);
+        if (0 === $itemCount) {
+            return null;
+        }
+        if (1 === $itemCount) {
+            return current($items);
+        }
+
+        $text = trim(str_replace('"', ' ', $text));
+        foreach ($items as $item) {
+            $row = $item->find('xpath', '/ancestor::tr');
+            if (null !== $row && null !== $row->find('xpath', sprintf('//td[normalize-space()="%s"]', $text))) {
+                return $item;
+            }
+        }
+
+        return reset($items);
+    }
+
     /**
      * @param string $action anchor of link - Create, Edit, Delete etc.
      * @return NodeElement|null

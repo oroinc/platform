@@ -106,10 +106,7 @@ class ReCaptchaServiceTest extends TestCase
             ->with('encryptedPrivateKey')
             ->willReturn('privateKey');
 
-        $response = $this->createMock(Response::class);
-        $response->expects($this->any())
-            ->method('isSuccess')
-            ->willReturn($isSuccess);
+        $response = new Response($isSuccess);
 
         $request = $this->createMock(Request::class);
         $request->expects($this->once())

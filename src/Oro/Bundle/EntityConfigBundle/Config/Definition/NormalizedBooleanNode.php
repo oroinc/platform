@@ -5,7 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Config\Definition;
 use Symfony\Component\Config\Definition\BooleanNode;
 
 /**
- *  The node definition class for boolean type with normalization of value
+ * The node for a normalized boolean value.
+ * The "normalized" means that any non-boolean value is converted to a boolean value.
  */
 class NormalizedBooleanNode extends BooleanNode
 {

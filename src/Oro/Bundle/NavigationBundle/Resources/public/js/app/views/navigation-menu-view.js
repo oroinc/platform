@@ -375,11 +375,20 @@ const NavigationMenuView = BaseView.extend({
 
         event.preventDefault();
 
+        if (this.focusFromRootCloseButton($element, false)) {
+            return;
+        }
+
         if (this.isMenuBar($currentMenu)) {
             this.hideSubMenu();
             this.moveFocusToPreviousRelativeSibling($currentMenu);
         } else {
-            const $lastOpenedPopup = this.getPopupMenus($element).first();
+            const $lastOpenedPopup = this.getIndexedParentMenus($element).first();
+
+            if (!$lastOpenedPopup.length) {
+                return;
+            }
+
             const $prevElement = this.getFocusableElementByIndex($lastOpenedPopup.attr(MENU_ITEM_INDEX_ATTR));
             const $prevMenu = this.getCurrentMenu($prevElement);
 
@@ -408,6 +417,10 @@ const NavigationMenuView = BaseView.extend({
 
         event.preventDefault();
 
+        if (this.focusFromRootCloseButton($element, true)) {
+            return;
+        }
+
         if (this.isMenuBar($currentMenu) && !this.isVerticalMenu($currentMenu)) {
             this.hideSubMenu();
             this.moveFocusToNextRelativeSibling($currentMenu);
@@ -417,7 +430,7 @@ const NavigationMenuView = BaseView.extend({
                 this.setFocus(this.getFirstFocusableElement($subMenu));
             } else {
                 this.setFocus(this.getRootFocusableElement($element));
-                this.moveFocusToNextRelativeSibling($element.closest(`[${MENU_BAR_ATTR}]`));
+                this.moveFocusToNextRelativeSibling(this.getPrimaryMenuBar());
             }
         }
     },
@@ -429,9 +442,14 @@ const NavigationMenuView = BaseView.extend({
         const $element = $(event.target);
         const $currentMenu = this.getCurrentMenu($element);
         const $subMenu = this.getSubMenu($element);
-        const $prevNext = this.moveFocusToPreviousRelativeSibling($currentMenu);
 
         event.preventDefault();
+
+        if (this.focusFromRootCloseButton($element, false)) {
+            return;
+        }
+
+        const $prevNext = this.moveFocusToPreviousRelativeSibling($currentMenu);
 
         if (this.isMenuBar($currentMenu)) {
             if (this.isVerticalMenu($currentMenu)) {
@@ -470,9 +488,14 @@ const NavigationMenuView = BaseView.extend({
         const $element = $(event.target);
         const $currentMenu = this.getCurrentMenu($element);
         const $subMenu = this.getSubMenu($element);
-        const $nextEl = this.moveFocusToNextRelativeSibling($currentMenu);
 
         event.preventDefault();
+
+        if (this.focusFromRootCloseButton($element, true)) {
+            return;
+        }
+
+        const $nextEl = this.moveFocusToNextRelativeSibling($currentMenu);
 
         if (this.isMenuBar($currentMenu)) {
             if (this.isVerticalMenu($currentMenu)) {
@@ -645,8 +668,134 @@ const NavigationMenuView = BaseView.extend({
      * @param {jQuery.Element} $element
      * @returns {jQuery.Element}
      */
+    getCurrentPopupPanel($element) {
+        const $popupMenus = this.getPopupMenus($element);
+        const $menuPanels = $popupMenus.filter((index, el) => $(el).attr('role') === 'menu');
+
+        return $menuPanels.length ? $menuPanels.last() : $popupMenus.last();
+    },
+
+    /**
+     * @param {jQuery.Element} $element
+     * @returns {jQuery.Element}
+     */
+    getPopupPanelFocusableElements($element) {
+        const $popupPanel = this.getCurrentPopupPanel($element);
+
+        if (!$popupPanel.length) {
+            return $([]);
+        }
+
+        return $popupPanel.find('a:focusable, button:focusable');
+    },
+
+    /**
+     * @param {jQuery.Element} $element
+     * @param {boolean} [isNext=true]
+     * @returns {jQuery.Element}
+     */
+    getPopupPanelRelativeFocusableElement($element, isNext = true) {
+        const $focusableItems = this.getPopupPanelFocusableElements($element);
+        const focusableItems = $focusableItems.toArray();
+
+        if (!focusableItems.length) {
+            return $([]);
+        }
+
+        const index = focusableItems.findIndex(node => node.isSameNode($element[0]));
+
+        if (index === -1) {
+            return $([]);
+        }
+
+        const nextIndex = isNext
+            ? (index + 1) % focusableItems.length
+            : (index - 1 + focusableItems.length) % focusableItems.length;
+
+        return $(focusableItems[nextIndex]);
+    },
+
+    /**
+     * @param {jQuery.Element} $element
+     * @returns {jQuery.Element}
+     */
+    getIndexedParentMenus($element) {
+        return $element.parents(this.options.subMenus, this.$el)
+            .filter((index, el) => $(el).attr(MENU_ITEM_INDEX_ATTR) !== void 0);
+    },
+
+    /**
+     * @returns {jQuery.Element}
+     */
+    getPrimaryMenuBar() {
+        if (this.isMenuBar(this.$el)) {
+            return this.$el;
+        }
+
+        const $menuBar = this.$(`[${MENU_BAR_ATTR}]`).first();
+
+        return $menuBar.length ? $menuBar : this.$el;
+    },
+
+    /**
+     * @param {jQuery.Element} $element
+     * @param {boolean} [isNext=true]
+     * @returns {boolean}
+     */
+    focusFromRootCloseButton($element, isNext = true) {
+        const $currentMenu = this.getCurrentMenu($element);
+
+        if (!$element.is(this.options.closeMenu) || !$currentMenu.is(this.$el)) {
+            return false;
+        }
+
+        this.setFocus(
+            isNext
+                ? this.getFirstFocusableElementInGroup(this.getPrimaryMenuBar())
+                : this.getLastFocusableElementInGroup(this.getPrimaryMenuBar())
+        );
+
+        return true;
+    },
+
+    /**
+     * @param {jQuery.Element} $element
+     * @param {boolean} [isNext=true]
+     * @returns {jQuery.Element}
+     */
+    getNestedSubMenuRelativeFocusableElement($element, isNext = true) {
+        const $indexedParentMenus = this.getIndexedParentMenus($element);
+
+        if ($indexedParentMenus.length < 2) {
+            return $([]);
+        }
+
+        const $focusableItems = $indexedParentMenus.first().find(this.options.focusableElements);
+
+        if (!$focusableItems.length) {
+            return $([]);
+        }
+
+        const focusableItems = $focusableItems.toArray();
+        const index = focusableItems.findIndex(node => node.isSameNode($element[0]));
+
+        if (index === -1) {
+            return $([]);
+        }
+
+        const nextIndex = isNext
+            ? (index + 1) % focusableItems.length
+            : (index - 1 + focusableItems.length) % focusableItems.length;
+
+        return $(focusableItems[nextIndex]);
+    },
+
+    /**
+     * @param {jQuery.Element} $element
+     * @returns {jQuery.Element}
+     */
     getRootFocusableElement($element) {
-        const index = this.getPopupMenus($element).last().attr(MENU_ITEM_INDEX_ATTR);
+        const index = this.getIndexedParentMenus($element).last().attr(MENU_ITEM_INDEX_ATTR);
 
         return index === void 0 ? $element : this.getFocusableElementByIndex(index);
     },
@@ -763,17 +912,28 @@ const NavigationMenuView = BaseView.extend({
      * @returns {jQuery.Element}
      */
     moveFocusToNextRelativeSibling($menu) {
-        let $el = this.getClosestFocusableElement($menu, true);
+        const $currentElement = $(document.activeElement);
+        let $el = this.getNestedSubMenuRelativeFocusableElement($currentElement, true);
+
+        if (!$el.length) {
+            $el = this.getClosestFocusableElement($menu, true);
+        }
+
+        if (!$el.length) {
+            $el = this.getPopupPanelRelativeFocusableElement($currentElement, true);
+        }
+
+        if ($el.length) {
+            this.setFocus($el);
+            return $el;
+        }
+
         let $parentMenu = $menu.parent().closest(this.options.subMenus);
         const $nextMenu = $menu.next(this.options.subMenus);
         let $nextParentMenu = $parentMenu.next(this.options.subMenus);
 
         let attempt = 0;
-        while (!$el.length || attempt < MAX_TRY_ATTEND) {
-            if ($el.length) {
-                break;
-            }
-
+        while (!$el.length && attempt < MAX_TRY_ATTEND) {
             attempt += 1;
 
             if ($nextMenu.length) {
@@ -826,17 +986,28 @@ const NavigationMenuView = BaseView.extend({
      * @returns {jQuery.Element}
      */
     moveFocusToPreviousRelativeSibling($menu) {
-        let $el = this.getClosestFocusableElement($menu, false);
+        const $currentElement = $(document.activeElement);
+        let $el = this.getNestedSubMenuRelativeFocusableElement($currentElement, false);
+
+        if (!$el.length) {
+            $el = this.getClosestFocusableElement($menu, false);
+        }
+
+        if (!$el.length) {
+            $el = this.getPopupPanelRelativeFocusableElement($currentElement, false);
+        }
+
+        if ($el.length) {
+            this.setFocus($el);
+            return $el;
+        }
+
         let $parentMenu = $menu.parent().closest(this.options.subMenus);
         const $prevMenu = $menu.prev(this.options.subMenus);
         let $prevParentMenu = $parentMenu.prev(this.options.subMenus);
 
         let attempt = 0;
-        while (!$el.length || attempt < MAX_TRY_ATTEND) {
-            if ($el.length) {
-                break;
-            }
-
+        while (!$el.length && attempt < MAX_TRY_ATTEND) {
             attempt += 1;
 
             if ($prevMenu.length) {

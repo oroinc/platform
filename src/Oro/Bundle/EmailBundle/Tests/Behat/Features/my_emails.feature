@@ -1,8 +1,8 @@
 @regression
 @ticket-BAP-15471
 @fixture-OroEmailBundle:my-emails.yml
-Feature: My emails 
-  In order to get access to my emails  
+Feature: My emails
+  In order to get access to my emails
   As an administrator
   I need to CRUD emails in backend office
 

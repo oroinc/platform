@@ -76,6 +76,15 @@ class Element extends NodeElement
 
     /**
      * @param string $key
+     * @param string|array|null $value
+     */
+    public function setOption($key, $value)
+    {
+        $this->options[$key] = $value;
+    }
+
+    /**
+     * @param string $key
      * @return string|array|null
      */
     public function getOption($key)

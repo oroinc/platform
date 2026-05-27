@@ -37,16 +37,17 @@ class GetWithRenamedFieldsTest extends RestJsonApiTestCase
             TestProductType::class,
             [
                 'fields'  => [
-                    'renamedName' => ['property_path' => 'name']
+                    'renamedName' => ['property_path' => 'name'],
+                    'renamedLabel' => ['property_path' => 'label']
                 ],
                 'filters' => [
                     'fields' => [
-                        'renamedName' => null
+                        'renamedLabel' => null
                     ]
                 ],
                 'sorters' => [
                     'fields' => [
-                        'renamedName' => null
+                        'renamedLabel' => null
                     ]
                 ]
             ]
@@ -73,11 +74,21 @@ class GetWithRenamedFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains('renamed_fields_filter.yml', $response);
     }
 
+    public function testFilteringByRenamedRelatedId()
+    {
+        $response = $this->cget(
+            ['entity' => 'testproducts'],
+            ['filter[productType.id]' => 'type2']
+        );
+
+        $this->assertResponseContains('renamed_fields_filter.yml', $response);
+    }
+
     public function testFilteringByRenamedRelatedField()
     {
         $response = $this->cget(
             ['entity' => 'testproducts'],
-            ['filter[productType.renamedName]' => 'type2']
+            ['filter[productType.renamedLabel]' => 'product type 2']
         );
 
         $this->assertResponseContains('renamed_fields_filter.yml', $response);
@@ -127,18 +138,30 @@ class GetWithRenamedFieldsTest extends RestJsonApiTestCase
                 ],
                 'expected' => 'renamed_fields_sort_desc.yml'
             ],
+            'sort by renamed related identity field (ASC)'   => [
+                'params'   => [
+                    'sort' => 'productType.id'
+                ],
+                'expected' => 'renamed_fields_sort_asc.yml'
+            ],
+            'sort by renamed related identity field (DESC)'  => [
+                'params'   => [
+                    'sort' => '-productType.id'
+                ],
+                'expected' => 'renamed_fields_sort_desc.yml'
+            ],
             'sort by renamed related field (ASC)'   => [
                 'params'   => [
-                    'sort' => 'productType.renamedName'
+                    'sort' => 'productType.renamedLabel'
                 ],
                 'expected' => 'renamed_fields_sort_asc.yml'
             ],
             'sort by renamed related field (DESC)'  => [
                 'params'   => [
-                    'sort' => '-productType.renamedName'
+                    'sort' => '-productType.renamedLabel'
                 ],
                 'expected' => 'renamed_fields_sort_desc.yml'
-            ],
+            ]
         ];
     }
 }

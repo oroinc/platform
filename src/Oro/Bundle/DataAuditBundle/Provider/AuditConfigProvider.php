@@ -122,6 +122,25 @@ class AuditConfigProvider
         return $result;
     }
 
+    public function getNonAuditableFields(string $entityClass): array
+    {
+        // EnumOption entities are always fully auditable — no fields to exclude.
+        if (is_a($entityClass, EnumOptionInterface::class, true)) {
+            return [];
+        }
+
+        $result = [];
+        $configs = $this->configManager->getConfigs(self::DATA_AUDIT_SCOPE, $entityClass);
+        foreach ($configs as $config) {
+            $configId = $config->getId();
+            if (!$this->isAuditable($config) && $configId instanceof FieldConfigId) {
+                $result[] = $configId->getFieldName();
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * @param ConfigInterface $config
      *

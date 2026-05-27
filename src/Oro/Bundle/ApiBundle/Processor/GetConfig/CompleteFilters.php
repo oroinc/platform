@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -310,8 +311,13 @@ class CompleteFilters extends CompleteSection
         ?string $targetClass,
         string $defaultDataType
     ): string {
-        if ($targetClass && \count($targetDefinition->getIdentifierFieldNames()) === 1) {
-            $identifierFieldName = $targetDefinition->getIdentifierFieldNames()[0];
+        if (!$targetClass || is_a($targetClass, EntityIdentifier::class, true)) {
+            return $defaultDataType;
+        }
+
+        $identifierFieldNames = $targetDefinition->getIdentifierFieldNames();
+        if (\count($identifierFieldNames) === 1) {
+            $identifierFieldName = $identifierFieldNames[0];
             $idPropertyPath = $targetDefinition->getField($identifierFieldName)?->getPropertyPath();
             if ($idPropertyPath && $idPropertyPath !== $identifierFieldName) {
                 if (ExtendHelper::isOutdatedEnumOptionEntity($targetClass)) {

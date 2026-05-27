@@ -39,7 +39,7 @@
         > .control-label {
             width: $form-horizontal-control-label-width;
             font-weight: font-weight('light');
-            text-align: right;
+            text-align: var(--form-horizontal-control-label-text-align, right);
             flex-shrink: 0;
 
             .ui-dialog-content &,
@@ -68,9 +68,9 @@
 
         .controls {
             margin-left: $form-horizontal-control-margin-start;
-            text-align: left;
+            text-align: var(--form-horizontal-control-text-align, left);
             flex-grow: 1;
-            min-width: $field-width;
+            min-width: var(--form-horizontal-control-min-width, #{$field-width});
 
             &:has(.select2-offscreen) {
                 position: relative;
@@ -81,7 +81,7 @@
             }
 
             &:first-child {
-                margin-left: $form-horizontal-control-label-width + $form-horizontal-control-margin-start;
+                margin-left: calc(#{$form-horizontal-control-label-width} + #{$form-horizontal-control-margin-start});
 
                 .ui-dialog-content & {
                     margin-left: $form-horizontal-control-margin-start;

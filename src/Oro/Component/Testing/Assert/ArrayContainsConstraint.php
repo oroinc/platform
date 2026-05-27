@@ -224,7 +224,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
         try {
             if (\is_string($actual) && \is_string($expected)) {
                 $propertyPath = $this->getPropertyPath($path);
-                if (isset($this->useStartsWithComparison[$propertyPath])) {
+                if ($expected && isset($this->useStartsWithComparison[$propertyPath])) {
                     \PHPUnit\Framework\Assert::assertStringStartsWith($expected, $actual);
                 } elseif ($actual !== $expected) {
                     throw new \PHPUnit\Framework\ExpectationFailedException(sprintf(

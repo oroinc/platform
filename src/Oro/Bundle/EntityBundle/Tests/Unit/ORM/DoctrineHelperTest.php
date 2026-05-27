@@ -425,7 +425,7 @@ class DoctrineHelperTest extends TestCase
         $entity = new ItemStubProxy();
         $class = 'ItemStubProxy';
 
-        $this->classMetadata->expects($this->any())
+        $this->classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
@@ -472,7 +472,7 @@ class DoctrineHelperTest extends TestCase
         $entity = new ItemStubProxy();
         $class = 'ItemStubProxy';
 
-        $this->classMetadata->expects($this->any())
+        $this->classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
@@ -485,6 +485,58 @@ class DoctrineHelperTest extends TestCase
             ->willReturn($this->em);
 
         $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity);
+    }
+
+    /**
+     * @dataProvider getSingleEntityIdentifierFieldNameDataProvider
+     */
+    public function testGetSingleEntityIdentifierFieldNameForClass(
+        ?string $expected,
+        array $identifiers,
+        bool $throwException = true
+    ): void {
+        $class = 'ItemStubProxy';
+
+        $this->classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(array_keys($identifiers));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->willReturn($this->classMetadata);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($this->em);
+
+        $this->assertEquals(
+            $expected,
+            $this->doctrineHelper->getSingleEntityIdentifierFieldNameForClass($class, $throwException)
+        );
+    }
+
+    public function testGetSingleEntityIdentifierFieldNameForClassIncorrectIdentifier(): void
+    {
+        $this->expectException(InvalidEntityException::class);
+        $this->expectExceptionMessage('Can\'t get single identifier field name for "ItemStubProxy" entity.');
+
+        $identifiers = ['key1' => 'value1', 'key2' => 'value2'];
+
+        $class = 'ItemStubProxy';
+
+        $this->classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(array_keys($identifiers));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->willReturn($this->classMetadata);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($this->em);
+
+        $this->doctrineHelper->getSingleEntityIdentifierFieldNameForClass($class);
     }
 
     /**

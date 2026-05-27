@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Fixtures\RequestAwareResourceDocParserStub;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -67,6 +68,27 @@ class ResourceDocParserRegistryTest extends TestCase
             $resourceDocParser,
             $registry->getParser(new RequestType(['another']))
         );
+    }
+
+    public function testShouldSetRequestTypeForRequestAwareReturnResourceDocParser(): void
+    {
+        $requestType = new RequestType(['rest', 'json_api', 'another']);
+        $registry = $this->getResourceDocParserRegistry([
+            ['resourceDocParser1', 'rest&json_api'],
+            ['resourceDocParser2', 'rest'],
+            ['resourceDocParser3', null]
+        ]);
+
+        $resourceDocParser = $this->createMock(RequestAwareResourceDocParserStub::class);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('resourceDocParser1')
+            ->willReturn($resourceDocParser);
+        $resourceDocParser->expects(self::once())
+            ->method('setRequestType')
+            ->with(self::identicalTo($requestType));
+
+        self::assertSame($resourceDocParser, $registry->getParser($requestType));
     }
 
     public function testShouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser(): void

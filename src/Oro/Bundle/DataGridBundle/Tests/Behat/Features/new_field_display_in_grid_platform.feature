@@ -2,7 +2,6 @@
 @fixture-OroDataGridBundle:DisplayInGridEntities.yml
 # load at least one report so that the Reports & Segments -> Manage Custom Reports page shows a grid
 @fixture-OroConfigBundle:custom_report.yml
-@regression
 
 Feature: New Field Display in Grid (Platform)
   In order to make sure that main entity grids respect "Display in Grid" setting

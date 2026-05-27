@@ -229,6 +229,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('oro_api.max_related_entities', $config['max_related_entities']);
         $container->setParameter('oro_api.max_delete_entities', $config['max_delete_entities']);
         $container->setParameter('oro_api.use_absolute_urls_for_api', $config['use_absolute_urls_for_api']);
+        $container->setParameter('oro_api.ext_id_entities', $config['ext_id_entities']);
 
         $configFiles = [];
         foreach ($config['config_files'] as $configKey => $fileConfig) {

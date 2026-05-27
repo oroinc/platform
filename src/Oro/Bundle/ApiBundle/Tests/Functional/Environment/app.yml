@@ -78,6 +78,13 @@ oro_api:
                 scale: 3
                 rounding_mode: 0 # ROUND_CEILING
 
+    ext_id_entities:
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment: externalId
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestPerson: externalId
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget: externalId
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner: external_id
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity: external_id
+
 oro_entity_extend:
     custom_entities:
         - Extend\Entity\TestApiE1

@@ -350,7 +350,7 @@ class QueryBuilderUtil
             return $join->getJoin();
         }
 
-        $fromParts = $qb->getDqlPart('from');
+        $fromParts = $qb->getDQLPart('from');
         $aliasToClassMap = [];
         foreach ($fromParts as $from) {
             $aliasToClassMap[$from->getAlias()] = $from->getFrom();

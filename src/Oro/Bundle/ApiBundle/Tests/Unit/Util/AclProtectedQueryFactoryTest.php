@@ -78,7 +78,12 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             ->willReturn($query);
         $this->queryModifier->expects(self::once())
             ->method('modifyQuery')
-            ->with(self::identicalTo($qb), false, $requestType, ['resourceClass' => 'Test\Class']);
+            ->with(
+                self::identicalTo($qb),
+                false,
+                $requestType,
+                ['config' => $config, 'resourceClass' => 'Test\Class']
+            );
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
@@ -114,7 +119,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             ->willReturn($query);
         $this->queryModifier->expects(self::once())
             ->method('modifyQuery')
-            ->with(self::identicalTo($qb), false, $requestType, []);
+            ->with(self::identicalTo($qb), false, $requestType, ['config' => $config]);
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
@@ -154,7 +159,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             ->willReturn($query);
         $this->queryModifier->expects(self::once())
             ->method('modifyQuery')
-            ->with(self::identicalTo($qb), true, $requestType, []);
+            ->with(self::identicalTo($qb), true, $requestType, ['config' => $config]);
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
@@ -182,7 +187,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             ->willReturn($query);
         $this->queryModifier->expects(self::once())
             ->method('modifyQuery')
-            ->with(self::identicalTo($qb), true, $requestType, []);
+            ->with(self::identicalTo($qb), true, $requestType, ['config' => $config]);
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')

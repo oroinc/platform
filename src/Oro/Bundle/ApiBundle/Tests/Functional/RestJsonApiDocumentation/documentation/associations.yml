@@ -8,6 +8,10 @@ parameters:
         dataType: 'string'
         required: true
         actualType: 'string'
+    externalId:
+        dataType: 'string'
+        required: false
+        actualType: 'string'
     activityEmails:
         dataType: 'integer'
         required: false
@@ -42,6 +46,10 @@ response:
     title:
         dataType: 'string'
         required: true
+        actualType: 'string'
+    externalId:
+        dataType: 'string'
+        required: false
         actualType: 'string'
     activityEmails:
         dataType: 'integer'

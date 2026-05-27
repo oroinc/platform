@@ -3,6 +3,7 @@ parameters:
     doctrine.class: Oro\Bundle\EntityBundle\ORM\Registry
     # override Doctrine event manager
     doctrine.dbal.connection.event_manager.class: Oro\Bundle\EntityBundle\Event\OroEventManager
+    doctrine.orm.entity_listener_resolver.class: Oro\Bundle\EntityBundle\Event\OroEntityListenerResolver
     # override Doctrine MappingDriverChain
     doctrine.orm.metadata.driver_chain.class: Oro\Bundle\EntityBundle\ORM\MappingDriverChain
 
@@ -719,6 +720,14 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@property_accessor'
+
+    oro_entity.event_listener.default_preloading.all:
+        class: Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@property_accessor'
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.preload_entity, method: onPreload }
 
     Oro\Bundle\EntityBundle\EntityConfig\EntityEntityConfiguration:
         tags:

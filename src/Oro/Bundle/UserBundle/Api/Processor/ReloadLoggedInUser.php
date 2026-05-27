@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
@@ -34,7 +35,7 @@ class ReloadLoggedInUser implements ProcessorInterface
         /** @var CustomizeFormDataContext $context */
 
         $form = $context->getForm();
-        if (!$form->isSubmitted() || $form->isValid()) {
+        if (FormUtil::isNotSubmittedOrSubmittedAndValid($form)) {
             return;
         }
 

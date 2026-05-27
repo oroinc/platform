@@ -59,18 +59,21 @@ const IntegrationConnectionCheckerComponent = BaseComponent.extend({
 
     checkConnection: function() {
         const self = this;
-        let data = this.$form.serialize();
+        const form = this.$form[0];
+        const formData = new FormData(form);
 
         const organizationId = systemAccessModeOrganizationProvider.getOrganizationId();
 
         if (organizationId) {
-            data += '&_sa_org_id=' + organizationId;
+            formData.append('_sa_org_id', organizationId);
         }
 
         $.ajax({
             url: this.backendUrl,
             type: 'POST',
-            data: data,
+            data: formData,
+            processData: false,
+            contentType: false,
             beforeSend: function() {
                 self.loadingMaskView.show();
             },

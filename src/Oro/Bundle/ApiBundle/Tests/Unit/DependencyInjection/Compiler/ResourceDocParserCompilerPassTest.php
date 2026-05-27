@@ -138,7 +138,7 @@ class ResourceDocParserCompilerPassTest extends TestCase
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                'parser1'                                    =>
+                'parser1' =>
                     new ServiceClosureArgument(new Reference('parser1')),
                 'oro_api.resource_doc_parser.template.view1' =>
                     new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1'))
@@ -165,7 +165,7 @@ class ResourceDocParserCompilerPassTest extends TestCase
         $parser1->setShared(false);
         $parser1->addTag(
             'oro.api.resource_doc_parser',
-            ['requestType' => 'rest&json_api']
+            ['requestType' => 'rest&json_api', 'priority' => -10]
         );
 
         $this->compiler->process($this->container);
@@ -184,7 +184,7 @@ class ResourceDocParserCompilerPassTest extends TestCase
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                'parser1'                                    =>
+                'parser1' =>
                     new ServiceClosureArgument(new Reference('parser1')),
                 'oro_api.resource_doc_parser.template.view1' =>
                     new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1'))
@@ -230,7 +230,7 @@ class ResourceDocParserCompilerPassTest extends TestCase
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                'parser1'                                    =>
+                'parser1' =>
                     new ServiceClosureArgument(new Reference('parser1')),
                 'oro_api.resource_doc_parser.template.view1' =>
                     new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1'))
@@ -282,12 +282,85 @@ class ResourceDocParserCompilerPassTest extends TestCase
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                'parser1'                                    =>
+                'parser1' =>
                     new ServiceClosureArgument(new Reference('parser1')),
                 'oro_api.resource_doc_parser.template.view1' =>
                     new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1')),
                 'oro_api.resource_doc_parser.template.view2' =>
                     new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view2'))
+            ],
+            $serviceLocatorDef->getArgument(0)
+        );
+    }
+
+    public function testProcessWithCustomResourceDocParsers(): void
+    {
+        $config = [
+            'api_doc_views' => [
+                'view1' => [
+                    'request_type' => ['rest', 'json_api', 'api_1']
+                ],
+                'view2' => [
+                    'request_type' => ['rest', 'json_api', 'api_2']
+                ],
+                'view3' => [
+                    'request_type' => ['rest', 'json_api', 'api_3']
+                ],
+                'view4' => [
+                    'request_type' => ['json_api', 'rest']
+                ]
+            ]
+        ];
+        $this->container->setParameter('oro_api.bundle_config', $config);
+
+        $parser1 = $this->container->setDefinition('oro_api.resource_doc_parser.default', new Definition());
+        $parser1->setShared(false);
+        $parser1->addTag(
+            'oro.api.resource_doc_parser',
+            ['requestType' => 'rest&json_api', 'priority' => -10]
+        );
+        $parser2 = $this->container->setDefinition('oro_api.resource_doc_parser.view1', new Definition());
+        $parser2->setShared(false);
+        $parser2->addTag(
+            'oro.api.resource_doc_parser',
+            ['requestType' => 'rest&json_api&api_1']
+        );
+        $parser3 = $this->container->setDefinition('oro_api.resource_doc_parser.view2', new Definition());
+        $parser3->setShared(false);
+        $parser3->addTag(
+            'oro.api.resource_doc_parser',
+            ['requestType' => 'json_api&api_2']
+        );
+
+        $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                ['oro_api.resource_doc_parser.view1', 'rest&json_api&api_1'],
+                ['oro_api.resource_doc_parser.view2', 'json_api&api_2'],
+                ['oro_api.resource_doc_parser.template.view2', 'rest&json_api&api_2'],
+                ['oro_api.resource_doc_parser.template.view3', 'rest&json_api&api_3'],
+                ['oro_api.resource_doc_parser.default', 'rest&json_api']
+            ],
+            $this->registry->getArgument('$parsers')
+        );
+
+        $serviceLocatorReference = $this->registry->getArgument('$container');
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'oro_api.resource_doc_parser.default' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.default')),
+                'oro_api.resource_doc_parser.view1' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.view1')),
+                'oro_api.resource_doc_parser.view2' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.view2')),
+                'oro_api.resource_doc_parser.template.view2' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view2')),
+                'oro_api.resource_doc_parser.template.view3' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view3'))
             ],
             $serviceLocatorDef->getArgument(0)
         );

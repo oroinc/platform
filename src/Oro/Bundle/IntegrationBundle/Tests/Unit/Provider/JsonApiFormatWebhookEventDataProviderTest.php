@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class JsonApiFormatWebhookEventDataProviderTest extends TestCase
 {
@@ -66,6 +67,10 @@ class JsonApiFormatWebhookEventDataProviderTest extends TestCase
         $result = $this->provider->getEventData($entityClass, $entityId);
 
         self::assertEquals($expectedData, $result);
+
+        // Check cached call
+        $cachedResult = $this->provider->getEventData($entityClass, $entityId);
+        self::assertSame($result, $cachedResult);
     }
 
     public function successfulEventDataProvider(): array
@@ -367,6 +372,85 @@ class JsonApiFormatWebhookEventDataProviderTest extends TestCase
         $result = $this->provider->getEventData($entityClass, $entityId);
 
         self::assertEquals(['data' => ['type' => $entityClass, 'id' => $entityId]], $result);
+    }
+
+
+    public function testGetEventDataDoesNotShareCacheBetweenDifferentEntities(): void
+    {
+        $entityClass = 'Test\Entity';
+        $entityId1 = 1;
+        $entityId2 = 2;
+        $data1 = ['data' => ['type' => 'test', 'id' => $entityId1]];
+        $data2 = ['data' => ['type' => 'test', 'id' => $entityId2]];
+
+        $this->actionProcessorBag->expects(self::exactly(2))
+            ->method('getProcessor')
+            ->willReturn($this->actionProcessor);
+
+        $context2 = $this->createMock(GetContext::class);
+
+        $this->actionProcessor->expects(self::exactly(2))
+            ->method('createContext')
+            ->willReturnOnConsecutiveCalls($this->context, $context2);
+
+        foreach ([$this->context, $context2] as $ctx) {
+            $requestType = $this->createMock(RequestType::class);
+            $ctx->expects(self::any())
+                ->method('getRequestType')
+                ->willReturn($requestType);
+            $requestType->expects(self::any())
+                ->method('add');
+            $ctx->expects(self::any())
+                ->method('setMainRequest');
+            $ctx->expects(self::any())
+                ->method('setClassName');
+            $ctx->expects(self::any())
+                ->method('setId');
+        }
+
+        $this->entityConfigManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturn(false);
+
+        $this->context->expects(self::once())
+            ->method('getResponseStatusCode')
+            ->willReturn(Response::HTTP_OK);
+        $this->context->expects(self::once())
+            ->method('getResult')
+            ->willReturn($data1);
+
+        $context2->expects(self::once())
+            ->method('getResponseStatusCode')
+            ->willReturn(Response::HTTP_OK);
+        $context2->expects(self::once())
+            ->method('getResult')
+            ->willReturn($data2);
+
+        $this->actionProcessor->expects(self::exactly(2))
+            ->method('process');
+
+        self::assertEquals($data1, $this->provider->getEventData($entityClass, $entityId1));
+        self::assertEquals($data2, $this->provider->getEventData($entityClass, $entityId2));
+    }
+
+    public function testSetCacheReplacesInternalCache(): void
+    {
+        $entityClass = 'Test\Entity';
+        $entityId = 55;
+        $preloadedData = ['data' => ['type' => 'orders', 'id' => (string) $entityId]];
+
+        $cache = $this->createMock(CacheInterface::class);
+        $cache->expects(self::once())
+            ->method('get')
+            ->willReturn($preloadedData);
+
+        $this->provider->setCache($cache);
+
+        $this->actionProcessorBag->expects(self::never())
+            ->method('getProcessor');
+
+        $result = $this->provider->getEventData($entityClass, $entityId);
+        self::assertEquals($preloadedData, $result);
     }
 
     private function setupProcessorMocks(string $entityClass, int|string $entityId): void

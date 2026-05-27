@@ -1352,6 +1352,8 @@ class OroApiExtensionTest extends TestCase
         self::assertSame(-1, $container->getParameter('oro_api.max_entities'));
         self::assertSame(1000, $container->getParameter('oro_api.max_related_entities'));
         self::assertSame(100, $container->getParameter('oro_api.max_delete_entities'));
+        self::assertFalse($container->getParameter('oro_api.use_absolute_urls_for_api'));
+        self::assertSame([], $container->getParameter('oro_api.ext_id_entities'));
 
         self::assertServiceExists($container, 'oro_api.config_extension_registry');
         self::assertSame(3, $container->getDefinition('oro_api.config_extension_registry')->getArgument(0));
@@ -1372,29 +1374,34 @@ class OroApiExtensionTest extends TestCase
 
         $config = [
             'config_max_nesting_level' => 2,
-            'default_page_size'        => 11,
-            'max_entities'             => 101,
-            'max_related_entities'     => 102,
-            'max_delete_entities'      => 103,
-            'config_files'             => [
-                'first'  => [
-                    'file_name'    => 'api_first.yml',
+            'default_page_size' => 11,
+            'max_entities' => 101,
+            'max_related_entities' => 102,
+            'max_delete_entities' => 103,
+            'use_absolute_urls_for_api' => true,
+            'config_files' => [
+                'first' => [
+                    'file_name' => 'api_first.yml',
                     'request_type' => ['first']
                 ],
                 'second' => [
-                    'file_name'    => ['api_second.yml', 'api_first.yml'],
+                    'file_name' => ['api_second.yml', 'api_first.yml'],
                     'request_type' => ['second']
                 ]
             ],
-            'api_doc_views'            => [
-                'view_1'       => [
-                    'label'        => 'View 1',
+            'api_doc_views' => [
+                'view_1' => [
+                    'label' => 'View 1',
                     'request_type' => ['first', 'rest']
                 ],
                 'default_view' => [
-                    'label'   => 'Default View',
+                    'label' => 'Default View',
                     'default' => true
                 ]
+            ],
+            'ext_id_entities' => [
+                'Test\Entity1' => 'externalId',
+                'Test\Entity2' => 'anotherId'
             ]
         ];
 
@@ -1408,6 +1415,11 @@ class OroApiExtensionTest extends TestCase
         self::assertSame(101, $container->getParameter('oro_api.max_entities'));
         self::assertSame(102, $container->getParameter('oro_api.max_related_entities'));
         self::assertSame(103, $container->getParameter('oro_api.max_delete_entities'));
+        self::assertTrue($container->getParameter('oro_api.use_absolute_urls_for_api'));
+        self::assertSame(
+            ['Test\Entity1' => 'externalId', 'Test\Entity2' => 'anotherId'],
+            $container->getParameter('oro_api.ext_id_entities')
+        );
 
         self::assertServiceExists($container, 'oro_api.config_extension_registry');
         self::assertSame(2, $container->getDefinition('oro_api.config_extension_registry')->getArgument(0));
@@ -1976,5 +1988,81 @@ class OroApiExtensionTest extends TestCase
 
         $frameworkConfigs = $container->getExtensionConfig('framework');
         self::assertEquals('dsn', $frameworkConfigs[0]['lock']['batch_api']);
+    }
+
+    public function testExtIdEntitiesConfigurationWhenIdentifierFieldIsNotSpecified(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The path "oro_api.ext_id_entities.Test\Entity1" cannot contain an empty value, but got null.'
+        );
+
+        $container = $this->getContainer();
+
+        $config = [
+            'ext_id_entities' => [
+                'Test\Entity1' => null
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
+    }
+
+    public function testExtIdEntitiesConfigurationWhenEntityClassIsNotSpecified(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for path "oro_api.ext_id_entities":'
+            . ' The entity class should be a non empty string, but got 0.'
+        );
+
+        $container = $this->getContainer();
+
+        $config = [
+            'ext_id_entities' => [
+                'externalId'
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
+    }
+
+    public function testExtIdEntitiesConfigurationWhenEntityClassIsEmpty(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for path "oro_api.ext_id_entities":'
+            . ' The entity class should be a non empty string, but got "".'
+        );
+
+        $container = $this->getContainer();
+
+        $config = [
+            'ext_id_entities' => [
+                '' => 'externalId'
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
+    }
+
+    public function testExtIdEntitiesConfigurationWhenItIsNotArray(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid type for path "oro_api.ext_id_entities". Expected "array", but got "int"'
+        );
+
+        $container = $this->getContainer();
+
+        $config = [
+            'ext_id_entities' => 123
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load([$config], $container);
     }
 }

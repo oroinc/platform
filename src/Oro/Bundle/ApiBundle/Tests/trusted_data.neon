@@ -34,6 +34,9 @@ trusted_data:
         Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandAssociatedEntities:
             loadAssociationData:
                 idPropertyName: true
+        Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Loader\MultiTargetAssociationDataLoader:
+            loadExpandedDataForManageableEntities:
+                idPropertyName: true
         Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CustomAssociationCompleter:
             completeEnumAssociation:
                 propertyName: true
@@ -52,6 +55,10 @@ trusted_data:
         Oro\Bundle\ApiBundle\Util\CriteriaConnector:
             processOrderings:
                 sort: true
+        Oro\Bundle\ApiBundle\Util\NullableIdQueryModifier:
+            getIsNotNullExpr:
+                alias: true
+                fieldName: true
 
     safe_methods:
         Oro\Bundle\ApiBundle\Util\DoctrineHelper:
@@ -68,6 +75,8 @@ trusted_data:
             getIdentifierFieldNames: true
         Oro\Bundle\ApiBundle\Util\WhereExpressionModifier:
             processWhereExpression: true
+        Oro\Bundle\ApiBundle\Util\NullableIdQueryModifier:
+            getIsNotNullExpr: true
         Oro\Bundle\ApiBundle\Datagrid\OpenApiSpecificationStatusFilter:
             getPublishedExpr: true
             getNotPublishedExpr: true

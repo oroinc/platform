@@ -15,7 +15,7 @@ use Symfony\Requirements\RequirementCollection;
  */
 class RedisRequirementsProvider extends AbstractRequirementsProvider
 {
-    public const REQUIRED_VERSION = '5.0';
+    public const REQUIRED_VERSION = '7.4';
 
     /**
      * @var Client[]|null[]

@@ -6,9 +6,12 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Converted entity to the event data (array) applicable for the webhook notification.
@@ -20,9 +23,18 @@ abstract class AbstractWebhookEventDataProvider implements WebhookEventDataProvi
 {
     use LoggerAwareTrait;
 
+    protected CacheInterface $cache;
+
     public function __construct(
-        private ActionProcessorBagInterface $actionProcessorBag
+        protected ActionProcessorBagInterface $actionProcessorBag
     ) {
+        // By default, use unserialized array cache to prevent duplicate response constructions for a given entity
+        $this->cache = new ArrayAdapter(0, false);
+    }
+
+    public function setCache(CacheInterface $cache): void
+    {
+        $this->cache = $cache;
     }
 
     abstract protected function getRequestTypes(): array;
@@ -30,27 +42,31 @@ abstract class AbstractWebhookEventDataProvider implements WebhookEventDataProvi
 
     public function getEventData(string $entityClass, int|string $entityId): array
     {
-        try {
-            $processor = $this->actionProcessorBag->getProcessor(ApiAction::GET);
-            /** @var GetContext $context */
-            $context = $processor->createContext();
-            $this->prepareContext($context, $entityClass, $entityId);
+        $cacheKey = UniversalCacheKeyGenerator::normalizeCacheKey($entityClass . '|' . $entityId);
 
-            $processor->process($context);
+        return $this->cache->get($cacheKey, function () use ($entityClass, $entityId): array {
+            try {
+                $processor = $this->actionProcessorBag->getProcessor(ApiAction::GET);
+                /** @var GetContext $context */
+                $context = $processor->createContext();
+                $this->prepareContext($context, $entityClass, $entityId);
 
-            return $this->buildResponse($context);
-        } catch (\Throwable $e) {
-            $this->logger?->error(
-                'Failed to serialize entity for webhook',
-                [
-                    'exception' => $e,
-                    'entity_class' => $entityClass,
-                    'entity_id' => $entityId
-                ]
-            );
+                $processor->process($context);
 
-            return $this->getFallbackData($entityClass, $entityId);
-        }
+                return $this->buildResponse($context);
+            } catch (\Throwable $e) {
+                $this->logger?->error(
+                    'Failed to serialize entity for webhook',
+                    [
+                        'exception' => $e,
+                        'entity_class' => $entityClass,
+                        'entity_id' => $entityId
+                    ]
+                );
+
+                return $this->getFallbackData($entityClass, $entityId);
+            }
+        });
     }
 
     protected function prepareContext(Context $context, string $entityClass, int|string $entityId): void

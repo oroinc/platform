@@ -165,17 +165,39 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $updates = new \SplObjectStorage();
         $scheduledUpdates = $uow->getScheduledEntityUpdates();
         foreach ($scheduledUpdates as $entity) {
-            if (!$this->auditConfigProvider->isAuditableEntity(ClassUtils::getClass($entity))) {
+            $entityClass = ClassUtils::getClass($entity);
+            if (!$this->auditConfigProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
 
-            $changeSet = $uow->getEntityChangeSet($entity);
+            $changeSet = $this->filterAuditableFields($uow->getEntityChangeSet($entity), $entityClass);
             if (!empty($changeSet) || $this->hasAssociationUpdates($em, $entity)) {
                 $updates[$entity] = $changeSet;
             }
         }
 
         $this->saveChanges($this->allUpdates, $em, $updates);
+    }
+
+    /**
+     * Filters out non-auditable fields from the change set to avoid sending unnecessary audit messages.
+     */
+    private function filterAuditableFields(array $changeSet, string $entityClass): array
+    {
+        if (empty($changeSet)) {
+            return $changeSet;
+        }
+
+        $nonAuditableFields = $this->auditConfigProvider->getNonAuditableFields($entityClass);
+        if (empty($nonAuditableFields)) {
+            return $changeSet;
+        }
+
+        foreach ($nonAuditableFields as $field) {
+            unset($changeSet[$field]);
+        }
+
+        return $changeSet;
     }
 
     private function hasAssociationUpdates(EntityManagerInterface $em, object $entity): bool

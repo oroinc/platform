@@ -440,19 +440,71 @@ class CompleteEntityDefinitionHelper
         RequestType $requestType,
         array $extras
     ): void {
-        $this->associationHelper->completeAssociation(
-            $field,
-            $this->resolveAssociationEntityClass($associationMapping['targetEntity'], $entityOverrideProvider),
-            $version,
-            $requestType,
-            $extras
-        );
+        $associationTargetClass = $associationMapping['targetEntity'];
+        // use EntityIdentifier as a target class for associations based on Doctrine's inheritance mapping
+        $isInheritanceMappingTargetEntity = !$this->doctrineHelper
+            ->getEntityMetadataForClass($associationTargetClass)
+            ->isInheritanceTypeNone();
+        $targetClass = $isInheritanceMappingTargetEntity
+            ? EntityIdentifier::class
+            : $this->resolveEntityClass($associationTargetClass, $entityOverrideProvider);
+        $this->associationHelper->completeAssociation($field, $targetClass, $version, $requestType, $extras);
         if ($field->getTargetClass()) {
             $field->setTargetType(
                 $this->associationHelper->getAssociationTargetType(
                     !($associationMapping['type'] & ClassMetadata::TO_ONE)
                 )
             );
+            if ($isInheritanceMappingTargetEntity) {
+                $this->completeInheritanceMappingEntityAssociation(
+                    $entityOverrideProvider,
+                    $field,
+                    $associationTargetClass,
+                    $version,
+                    $requestType
+                );
+            }
+        }
+    }
+
+    private function completeInheritanceMappingEntityAssociation(
+        EntityOverrideProviderInterface $entityOverrideProvider,
+        EntityDefinitionFieldConfig $field,
+        string $targetClass,
+        string $version,
+        RequestType $requestType
+    ): void {
+        $targetEntity = $field->getTargetEntity();
+        if (null === $targetEntity) {
+            return;
+        }
+
+        $resourceClass = $this->resolveEntityClass($targetClass, $entityOverrideProvider);
+        $targetEntity->setResourceClass($resourceClass);
+
+        $targetIdFieldNames = $targetEntity->getIdentifierFieldNames();
+        if (\count($targetIdFieldNames) !== 1) {
+            return;
+        }
+
+        $resourceDefinition = $this->associationHelper->loadDefinition(
+            $resourceClass,
+            $version,
+            $requestType,
+            [new FilterIdentifierFieldsConfigExtra()]
+        );
+        if (null === $resourceDefinition) {
+            return;
+        }
+
+        $resourceIdFieldNames = $resourceDefinition->getIdentifierFieldNames();
+        if (\count($resourceIdFieldNames) !== 1) {
+            return;
+        }
+
+        $idFieldPropertyPath = $resourceDefinition->getField($resourceIdFieldNames[0])->getPropertyPath();
+        if ($idFieldPropertyPath) {
+            $targetEntity->getField($targetIdFieldNames[0])->setPropertyPath($idFieldPropertyPath);
         }
     }
 
@@ -688,19 +740,6 @@ class CompleteEntityDefinitionHelper
         }
 
         return $definition;
-    }
-
-    private function resolveAssociationEntityClass(
-        string $entityClass,
-        EntityOverrideProviderInterface $entityOverrideProvider
-    ): string {
-        // use EntityIdentifier as a target class for associations based on Doctrine's inheritance mapping
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        if (!$metadata->isInheritanceTypeNone()) {
-            return EntityIdentifier::class;
-        }
-
-        return $this->resolveEntityClass($entityClass, $entityOverrideProvider);
     }
 
     private function resolveEntityClass(

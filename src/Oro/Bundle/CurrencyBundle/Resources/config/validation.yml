@@ -9,13 +9,17 @@ Oro\Bundle\CurrencyBundle\Entity\Price:
             - Type:
                 groups: [Default, Optional]
                 type: numeric
+                message: 'oro.currency.price.value.invalid'
             - Range:
                 groups: [Default, Optional]
+                minMessage: 'oro.currency.price.value.min'
                 min: 0
         currency:
-            - NotBlank: ~
+            - NotBlank:
+                message: 'oro.currency.price.currency.blank'
             - Currency:
                 groups: [Default, Optional]
+                message: 'oro.currency.price.currency.invalid'
 
 Oro\Bundle\CurrencyBundle\Entity\MultiCurrency:
     properties:

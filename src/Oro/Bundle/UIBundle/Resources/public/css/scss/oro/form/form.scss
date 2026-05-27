@@ -295,12 +295,12 @@ select[multiple] {
             border-radius: $add-on-only-child-border-radius;
         }
 
-        &:disabled {
-            border-color: $add-on-disabled-border-color;
-            background-color: $add-on-disabled-background-color;
-            color: $add-on-disabled-color;
-            // color, background and border are already matching to a disabled control, no need for extra opacity
-            opacity: 1;
+        &:disabled,
+        &.disabled {
+            color: $add-on-append-disabled-color;
+            background-color: $add-on-append-disabled-background;
+            border-color: $add-on-append-disabled-border;
+            opacity: $add-on-append-disabled-opacity;
         }
     }
 

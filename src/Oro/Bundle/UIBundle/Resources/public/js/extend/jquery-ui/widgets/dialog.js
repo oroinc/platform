@@ -22,7 +22,7 @@ $.widget('ui.dialog', $.ui.dialog, {
             title.hide();
         }
 
-        title.append(
+        title.empty().append(
             this._renderIcon(),
             $('<span/>', {'class': 'ui-dialog-title__inner'}).text(titleText)
         );

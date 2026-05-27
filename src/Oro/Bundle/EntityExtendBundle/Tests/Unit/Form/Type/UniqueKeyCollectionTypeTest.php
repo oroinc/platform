@@ -19,12 +19,12 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
 {
-    private const ENTITY = 'Namespace\Entity';
-
     private ConfigProvider&MockObject $provider;
+    private TranslatorInterface&MockObject $translator;
     private UniqueKeyCollectionType $type;
 
     #[\Override]
@@ -33,6 +33,7 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
         parent::setUp();
 
         $this->provider = $this->createMock(ConfigProvider::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $validator = new RecursiveValidator(
             new ExecutionContextFactory(new IdentityTranslator()),
@@ -40,7 +41,7 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
             new ConstraintValidatorFactory()
         );
 
-        $this->type = new UniqueKeyCollectionType($this->provider);
+        $this->type = new UniqueKeyCollectionType($this->provider, $this->translator);
 
         $this->factory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new DataBlockExtension())
@@ -49,27 +50,39 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
             ->getFormFactory();
     }
 
-    public function testType()
+    public function testType(): void
     {
-        $this->provider->expects($this->once())
+        $this->provider->expects(self::once())
             ->method('getIds')
-            ->willReturn(
-                [
-                    new FieldConfigId('entity', User::class, 'firstName', 'string'),
-                    new FieldConfigId('entity', User::class, 'lastName', 'string'),
-                    new FieldConfigId('entity', User::class, 'email', 'string'),
-                ]
-            );
+            ->willReturn([
+                new FieldConfigId('entity', User::class, 'firstName', 'string'),
+                new FieldConfigId('entity', User::class, 'lastName', 'string'),
+                new FieldConfigId('entity', User::class, 'email', 'string'),
+            ]);
 
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects($this->exactly(3))
+        $firstNameConfig = $this->createMock(ConfigInterface::class);
+        $lastNameConfig = $this->createMock(ConfigInterface::class);
+        $emailConfig = $this->createMock(ConfigInterface::class);
+        $this->provider->expects(self::exactly(3))
+            ->method('getConfig')
+            ->willReturnOnConsecutiveCalls($firstNameConfig, $lastNameConfig, $emailConfig);
+        $firstNameConfig->expects(self::once())
             ->method('get')
             ->with('label')
-            ->willReturn('label');
-
-        $this->provider->expects($this->exactly(3))
-            ->method('getConfig')
-            ->willReturn($config);
+            ->willReturn('label.first_name');
+        $lastNameConfig->expects(self::once())
+            ->method('get')
+            ->with('label')
+            ->willReturn('label.last_name');
+        $emailConfig->expects(self::once())
+            ->method('get')
+            ->with('label')
+            ->willReturn(null);
+        $this->translator->expects(self::exactly(2))
+            ->method('trans')
+            ->willReturnCallback(function ($id) {
+                return $id . ' (translated)';
+            });
 
         $formData = [
             'keys' => [
@@ -84,17 +97,28 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
             ]
         ];
 
-        $form = $this->factory->create(UniqueKeyCollectionType::class, null, ['className' => self::ENTITY]);
+        $form = $this->factory->create(UniqueKeyCollectionType::class, null, ['className' => 'Test\Entity']);
         $form->submit($formData);
 
-        $this->assertTrue($form->isSynchronized());
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
 
-        $this->assertEquals($formData, $form->getData());
+        self::assertEquals($formData, $form->getData());
+        self::assertEquals(
+            [
+                'key_choices' => [
+                    'label.first_name (translated)' => 'firstName',
+                    'label.last_name (translated)' => 'lastName',
+                    'email' => 'email'
+                ],
+                'block_name' => 'entry'
+            ],
+            $form->get('keys')->getConfig()->getOption('entry_options')
+        );
     }
 
-    public function testNames()
+    public function testNames(): void
     {
-        $this->assertEquals('oro_entity_extend_unique_key_collection_type', $this->type->getName());
+        self::assertEquals('oro_entity_extend_unique_key_collection_type', $this->type->getName());
     }
 }

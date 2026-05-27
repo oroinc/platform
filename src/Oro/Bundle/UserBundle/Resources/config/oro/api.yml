@@ -48,6 +48,12 @@ api:
                         mapped: false
                 emailOrigins:
                     exclude: true
+                externalId:
+                    property_path: external_id
+            filters:
+                fields:
+                    externalId:
+                        allow_array: true
             actions:
                 create:
                     fields:

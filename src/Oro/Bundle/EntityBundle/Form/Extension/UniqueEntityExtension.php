@@ -12,7 +12,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Adds UniqueEntity constraint to the class metadata.
+ * Adds UniqueEntity validation constraint to the entity validation metadata
+ * if the entity has configured unique keys.
  */
 class UniqueEntityExtension extends AbstractTypeExtension
 {
@@ -43,34 +44,29 @@ class UniqueEntityExtension extends AbstractTypeExtension
         }
 
         $uniqueKeys = $this->extendConfigProvider->getConfig($className)->get('unique_key');
-        if (empty($uniqueKeys)) {
+        if (!$uniqueKeys) {
             return;
         }
 
         $validatorMetadata = $this->validator->getMetadataFor($className);
-
         foreach ($uniqueKeys['keys'] as $uniqueKey) {
             $fields = $uniqueKey['key'];
-
             $labels = array_map(
-                fn (string $fieldName): string => $this->translator->trans(
-                    (string) $this->entityConfigProvider
-                        ->getConfig($className, $fieldName)
-                        ->get('label')
-                ),
+                function ($fieldName) use ($className) {
+                    $fieldLabel = $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
+
+                    return $fieldLabel ? $this->translator->trans($fieldLabel) : $fieldName;
+                },
                 $fields
             );
-
-            $constraint = new UniqueEntity(
+            $validatorMetadata->addConstraint(new UniqueEntity(
                 fields: $fields,
                 message: $this->translator->trans(
                     'oro.entity.validation.unique_field',
                     ['%count%' => \count($fields), '%field%' => implode(', ', $labels)]
                 ),
                 errorPath: ''
-            );
-
-            $validatorMetadata->addConstraint($constraint);
+            ));
         }
     }
 }

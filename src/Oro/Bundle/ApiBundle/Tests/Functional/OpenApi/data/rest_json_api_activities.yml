@@ -27,6 +27,16 @@ paths:
         -
           $ref: '#/components/parameters/filterActivityTargetsTypeNeqOrNull'
         -
+          $ref: '#/components/parameters/filterExternalId'
+        -
+          $ref: '#/components/parameters/filterExternalIdEq'
+        -
+          $ref: '#/components/parameters/filterExternalIdNeq'
+        -
+          $ref: '#/components/parameters/filterExternalIdExists'
+        -
+          $ref: '#/components/parameters/filterExternalIdNeqOrNull'
+        -
           $ref: '#/components/parameters/filterId'
         -
           $ref: '#/components/parameters/filterIdEq'
@@ -42,6 +52,8 @@ paths:
           $ref: '#/components/parameters/filterIdGte'
         -
           $ref: '#/components/parameters/fieldsTestapiactivities'
+        -
+          $ref: '#/components/parameters/fieldsTestapiactivitytargets'
         -
           $ref: '#/components/parameters/fieldsTestapiowners'
         -
@@ -115,6 +127,16 @@ paths:
         -
           $ref: '#/components/parameters/filterActivityTargetsTypeNeqOrNull'
         -
+          $ref: '#/components/parameters/filterExternalId'
+        -
+          $ref: '#/components/parameters/filterExternalIdEq'
+        -
+          $ref: '#/components/parameters/filterExternalIdNeq'
+        -
+          $ref: '#/components/parameters/filterExternalIdExists'
+        -
+          $ref: '#/components/parameters/filterExternalIdNeqOrNull'
+        -
           $ref: '#/components/parameters/filterId'
         -
           $ref: '#/components/parameters/filterIdEq'
@@ -169,6 +191,8 @@ paths:
           $ref: '#/components/parameters/id'
         -
           $ref: '#/components/parameters/fieldsTestapiactivities'
+        -
+          $ref: '#/components/parameters/fieldsTestapiactivitytargets'
         -
           $ref: '#/components/parameters/fieldsTestapiowners'
         -
@@ -346,7 +370,7 @@ paths:
       tags:
         - testapiactivities
       summary: 'Add members to "activity targets" relationship'
-      description: "<p>Associate records with a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiowners\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
+      description: "<p>Associate records with a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiactivitytargets\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
       operationId: testapiactivities-id-relationships-activityTargets-post
       parameters:
         -
@@ -368,7 +392,7 @@ paths:
       tags:
         - testapiactivities
       summary: 'Delete members from "activity targets" relationship'
-      description: "<p>Remove an association between records and a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiowners\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
+      description: "<p>Remove an association between records and a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiactivitytargets\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
       operationId: testapiactivities-id-relationships-activityTargets-delete
       parameters:
         -
@@ -410,7 +434,7 @@ paths:
       tags:
         - testapiactivities
       summary: 'Replace "activity targets" relationship'
-      description: "<p>Replace records that are associated with a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiowners\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
+      description: "<p>Replace records that are associated with a specific test activity record.</p><p>\nExample:</p><pre><code class=\"JSON\">{\n  \"data\": [\n    {\n      \"type\": \"testapiactivitytargets\",\n      \"id\": \"1\"\n    }\n  ]\n}\n</code></pre><p></p>"
       operationId: testapiactivities-id-relationships-activityTargets-patch
       parameters:
         -
@@ -958,6 +982,36 @@ components:
       description: "Filter records by 'activityTargets' relationship."
       schema:
         $ref: '#/components/schemas/integerUnionArrayRange'
+    filterExternalId:
+      name: 'filter[externalId]'
+      in: query
+      description: "Filter records by 'externalId' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterExternalIdEq:
+      name: 'filter[externalId][eq]'
+      in: query
+      description: "Filter records by 'externalId' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterExternalIdNeq:
+      name: 'filter[externalId][neq]'
+      in: query
+      description: "Filter records by 'externalId' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterExternalIdExists:
+      name: 'filter[externalId][exists]'
+      in: query
+      description: "Filter records by 'externalId' field."
+      schema:
+        type: boolean
+    filterExternalIdNeqOrNull:
+      name: 'filter[externalId][neq_or_null]'
+      in: query
+      description: "Filter records by 'externalId' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
     filterId:
       name: 'filter[id]'
       in: query
@@ -1006,6 +1060,12 @@ components:
       description: "A list of fields of 'testapiactivities' entity that will be returned in the response."
       schema:
         type: string
+    fieldsTestapiactivitytargets:
+      name: 'fields[testapiactivitytargets]'
+      in: query
+      description: "A list of fields of 'testapiactivitytargets' entity that will be returned in the response."
+      schema:
+        type: string
     fieldsTestapiowners:
       name: 'fields[testapiowners]'
       in: query
@@ -1046,7 +1106,7 @@ components:
     sort:
       name: sort
       in: query
-      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id."
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: externalId, id."
       schema:
         $ref: '#/components/schemas/orderBy_id'
     contentType:

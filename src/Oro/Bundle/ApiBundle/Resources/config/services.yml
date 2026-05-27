@@ -25,6 +25,14 @@ parameters:
     # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
     oro_api.max_delete_entities: ~
 
+    # Whether absolute URLs for assets should be used in API responses.
+    # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.use_absolute_urls_for_api: ~
+
+    # The identifier field names for API resources in "JSON:API EXT ID" API.
+    # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.ext_id_entities: ~
+
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -541,6 +549,13 @@ services:
             - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
+    oro_api.query_modifier.nullable_id:
+        class: Oro\Bundle\ApiBundle\Util\NullableIdQueryModifier
+        arguments:
+            - '@oro_api.entity_serializer.doctrine_helper'
+        tags:
+            - { name: oro.api.query_modifier }
+
     oro_api.entity_serializer.field_accessor:
         class: Oro\Bundle\ApiBundle\Util\FieldAccessor
         arguments:
@@ -1006,6 +1021,16 @@ services:
         tags:
             - { name: oro.api.resource_doc_parser, requestType: rest&json_api, priority: -10 }
             - { name: oro.api.resource_doc_parser, requestType: rest, priority: -20 }
+
+    oro_api.resource_doc_parser.ext_id_rest_json_api:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ExtIdJsonApiMarkdownApiDocParser
+        arguments:
+            - '@oro_api.resource_doc_parser.default'
+            - '%oro_api.ext_id_entities%'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.resource_doc_parser, requestType: rest&json_api&ext_id }
 
     oro_api.constraint_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor

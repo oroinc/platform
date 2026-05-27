@@ -1,12 +1,12 @@
 /* @theme: admin.oro; */
 
-$form-horizontal-control-label-width: 182px !default;
+$form-horizontal-control-label-width: var(--form-horizontal-control-label-width, 182px) !default;
 $form-horizontal-control-label-offset: 6px !default;
 $form-horizontal-control-label-line-height: 20px !default;
 $form-horizontal-control-html-content-offset: 5px !default;
 $form-horizontal-widget-control-label-width: auto !default;
 
-$form-horizontal-control-margin-start: 24px !default;
+$form-horizontal-control-margin-start: var(--form-horizontal-control-margin-start, 24px) !default;
 $form-container-control-row-space: $content-padding-medium !default;
 
 $form-container-column-max-width: 480px !default;

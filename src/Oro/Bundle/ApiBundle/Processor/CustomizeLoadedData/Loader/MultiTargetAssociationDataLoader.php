@@ -8,8 +8,10 @@ use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 
@@ -23,19 +25,22 @@ class MultiTargetAssociationDataLoader
     private SerializationHelper $serializationHelper;
     private DoctrineHelper $doctrineHelper;
     private ResourcesProvider $resourcesProvider;
+    private DataAccessorInterface $dataAccessor;
 
     public function __construct(
         ConfigProvider $configProvider,
         EntitySerializer $entitySerializer,
         SerializationHelper $serializationHelper,
         DoctrineHelper $doctrineHelper,
-        ResourcesProvider $resourcesProvider
+        ResourcesProvider $resourcesProvider,
+        DataAccessorInterface $dataAccessor
     ) {
         $this->configProvider = $configProvider;
         $this->entitySerializer = $entitySerializer;
         $this->serializationHelper = $serializationHelper;
         $this->doctrineHelper = $doctrineHelper;
         $this->resourcesProvider = $resourcesProvider;
+        $this->dataAccessor = $dataAccessor;
     }
 
     /**
@@ -69,12 +74,21 @@ class MultiTargetAssociationDataLoader
         }
 
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $items = $this->loadExpandedDataForManageableEntities(
-                $entityClass,
-                $entityIds,
-                $entityConfig,
-                $context->getNormalizationContext()
-            );
+            if (DataType::isNestedAssociation($this->getAssociationDataType($context, $associationPath))) {
+                $items = $this->loadExpandedDataForManageableEntitiesWhenDatabaseIdentifierShouldBeUsed(
+                    $entityClass,
+                    $entityIds,
+                    $entityConfig,
+                    $context->getNormalizationContext()
+                );
+            } else {
+                $items = $this->loadExpandedDataForManageableEntities(
+                    $entityClass,
+                    $entityIds,
+                    $entityConfig,
+                    $context->getNormalizationContext()
+                );
+            }
         } else {
             $items = $this->loadExpandedDataForNotManageableEntities(
                 $entityClass,
@@ -97,6 +111,38 @@ class MultiTargetAssociationDataLoader
      * @return array [entity id => entity data, ...]
      */
     private function loadExpandedDataForManageableEntities(
+        string $entityClass,
+        array $entityIds,
+        EntityDefinitionConfig $entityConfig,
+        array $normalizationContext
+    ): array {
+        $idFieldNames = $entityConfig->getIdentifierFieldNames();
+        if (!$idFieldNames || \count($idFieldNames) !== 1) {
+            throw new \LogicException(\sprintf(
+                'Only single identifier entities are supported. Entity: %s.',
+                $entityClass
+            ));
+        }
+        $idFieldName = reset($idFieldNames);
+        $idPropertyName = $entityConfig->getField($idFieldName)->getPropertyPath($idFieldName);
+        $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'e')
+            ->where(\sprintf('e.%s IN (:ids)', $idPropertyName))
+            ->setParameter('ids', $entityIds);
+
+        $entities = $this->entitySerializer->serialize($qb, $entityConfig, $normalizationContext);
+
+        $result = [];
+        foreach ($entities as $entity) {
+            $result[$this->dataAccessor->getValue($entity, $idFieldName)] = $entity;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array [entity id => entity data, ...]
+     */
+    private function loadExpandedDataForManageableEntitiesWhenDatabaseIdentifierShouldBeUsed(
         string $entityClass,
         array $entityIds,
         EntityDefinitionConfig $entityConfig,
@@ -151,5 +197,19 @@ class MultiTargetAssociationDataLoader
         }
 
         return false;
+    }
+
+    private function getAssociationDataType(CustomizeLoadedDataContext $context, ?string $associationPath): ?string
+    {
+        if (!$associationPath) {
+            return null;
+        }
+
+        $lastDelimiterPos = strrpos($associationPath, ConfigUtil::PATH_DELIMITER);
+        $associationName = false !== $lastDelimiterPos
+            ? substr($associationPath, $lastDelimiterPos + 1)
+            : $associationPath;
+
+        return $context->getConfig()->getField($associationName)->getDataType();
     }
 }

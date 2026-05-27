@@ -11,6 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Enables/disables the monolog handler responsible for logging in console as soon as websocket server starts.
+ * @property SymfonyConsoleHandler $handler
  */
 class WebsocketServerConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
 {
@@ -40,7 +41,7 @@ class WebsocketServerConsoleHandler extends HandlerWrapper implements EventSubsc
     {
         $this->commandNestedLevel--;
         if (0 === $this->commandNestedLevel && $this->isApplicable($event->getCommand())) {
-            $this->handler->onTerminate($event);
+            $this->handler->close();
         }
     }
 

@@ -149,8 +149,7 @@ HELP
 
             if ($user->getAuthStatus() && $user->getAuthStatus()->getInternalId() !== UserManager::STATUS_ACTIVE) {
                 $io->warning([
-                    \sprintf('The user\'s auth status is "%s".', $user->getAuthStatus()->getName()),
-                    'You will not be able to login as this user until the auth status is changed to "Active".',
+                    \sprintf('The user\'s auth status is "%s".', $user->getAuthStatus()->getName())
                 ]);
             }
         } catch (\Exception $e) {

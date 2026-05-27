@@ -37,10 +37,43 @@ class UserTest extends RestJsonApiTestCase
     {
         $response = $this->cget(
             ['entity' => 'users'],
-            ['filter[email]' => LoadUserData::SIMPLE_USER_EMAIL]
+            [
+                'filter[id]' => implode(',', [
+                    $this->getReference(LoadUserData::SIMPLE_USER)->getId(),
+                    $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN)->getId()
+                ])
+            ]
         );
 
         $this->assertResponseContains('cget_user.yml', $response);
+    }
+
+    public function testGetListFilteredByExternalId()
+    {
+        $response = $this->cget(
+            ['entity' => 'users'],
+            [
+                'filter[externalId]' => implode(',', [
+                    'ext_' . LoadUserData::SIMPLE_USER,
+                    'ext_' . LoadUserData::USER_WITH_CONFIRMATION_TOKEN
+                ])
+            ]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => 'users',
+                        'id' => '<toString(@simple_user->id)>',
+                        'attributes' => [
+                            'externalId' => 'ext_' . LoadUserData::SIMPLE_USER
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
     }
 
     public function testGet()
@@ -284,6 +317,26 @@ class UserTest extends RestJsonApiTestCase
         );
     }
 
+    public function testTryToCreateWithExternalIdWhenThereIsAnotherUserWithThisExternalId()
+    {
+        $data = $this->getRequestData('create_user_min.yml');
+        $data['data']['attributes']['externalId'] = 'ext_' . LoadUserData::SIMPLE_USER_2;
+        $response = $this->post(
+            ['entity' => 'users'],
+            $data,
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'unique entity constraint',
+                'detail' => 'Value for field "External ID" must be unique'
+            ],
+            $response
+        );
+    }
+
     public function testUpdate()
     {
         $userId = $this->getReference(LoadUserData::SIMPLE_USER)->getId();
@@ -315,6 +368,32 @@ class UserTest extends RestJsonApiTestCase
         $user = $this->getEntityManager()->find(User::class, $userId);
         self::assertEquals('Updated First Name', $user->getFirstName());
         self::assertNotNull($user->getOwner());
+    }
+
+    public function testTryToUpdateExternalIdWhenThereIsAnotherUserWithThisExternalId()
+    {
+        $response = $this->patch(
+            ['entity' => 'users', 'id' => '<toString(@simple_user->id)>'],
+            [
+                'data' => [
+                    'type' => 'users',
+                    'id' => '<toString(@simple_user->id)>',
+                    'attributes' => [
+                        'externalId' => 'ext_' . LoadUserData::SIMPLE_USER_2
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'unique entity constraint',
+                'detail' => 'Value for field "External ID" must be unique'
+            ],
+            $response
+        );
     }
 
     public function testTryToUpdateCurrentLoggedInUserWhenDataAreInvalid()

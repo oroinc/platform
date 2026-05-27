@@ -3,10 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\EntitySerializer\EntityConfigInterface;
 
 /**
  * Tries to rename fields if they are equal to reserved words or not conform JSON:API specification.
@@ -27,37 +30,31 @@ class FixFieldNaming implements ProcessorInterface
             return;
         }
 
+        $renamedFields = [];
         $entityClass = $context->getClassName();
-        // process "type" field
         if ($definition->hasField(JsonApiDoc::TYPE)) {
-            $this->renameReservedField($definition, $entityClass, JsonApiDoc::TYPE);
+            $this->renameReservedField($renamedFields, $definition, $entityClass, JsonApiDoc::TYPE);
         }
-        // process "id" field
-        $idFieldNames = $definition->getIdentifierFieldNames();
-        $numberOfIdFields = \count($idFieldNames);
-        if ($numberOfIdFields === 1) {
-            $idFieldName = reset($idFieldNames);
-            if (JsonApiDoc::ID !== $idFieldName) {
-                if ($definition->hasField(JsonApiDoc::ID)) {
-                    $this->renameReservedField($definition, $entityClass, JsonApiDoc::ID);
-                }
-                $this->renameIdField($definition, $idFieldName, JsonApiDoc::ID);
+        $this->processIdField($renamedFields, $definition, $entityClass);
+        if ($renamedFields) {
+            if ($context->hasExtra(FiltersConfigExtra::NAME)) {
+                $this->renameFields($renamedFields, $context->getFilters());
             }
-        } elseif ($numberOfIdFields > 1) {
-            if ($definition->hasField(JsonApiDoc::ID)) {
-                $this->renameReservedField($definition, $entityClass, JsonApiDoc::ID);
+            if ($context->hasExtra(SortersConfigExtra::NAME)) {
+                $this->renameFields($renamedFields, $context->getSorters());
             }
         }
     }
 
     private function renameReservedField(
+        array &$renamedFields,
         EntityDefinitionConfig $definition,
         ?string $entityClass,
         string $fieldName
     ): void {
         $newFieldName = lcfirst($this->getShortClassName($entityClass)) . ucfirst($fieldName);
         if ($definition->hasField($newFieldName)) {
-            throw new \RuntimeException(sprintf(
+            throw new \RuntimeException(\sprintf(
                 'The "%s" reserved word cannot be used as a field name'
                 . ' and it cannot be renamed to "%s" because a field with this name already exists.',
                 $fieldName,
@@ -79,16 +76,56 @@ class FixFieldNaming implements ProcessorInterface
             $idFieldNames[$idFieldNameIndex] = $newFieldName;
             $definition->setIdentifierFieldNames($idFieldNames);
         }
+        $renamedFields[$fieldName] = $newFieldName;
     }
 
-    private function renameIdField(EntityDefinitionConfig $definition, string $fieldName, string $newFieldName): void
+    private function processIdField(
+        array &$renamedFields,
+        EntityDefinitionConfig $definition,
+        string $entityClass
+    ): void {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        $numberOfIdFields = \count($idFieldNames);
+        if ($numberOfIdFields === 1) {
+            $idFieldName = reset($idFieldNames);
+            if (JsonApiDoc::ID !== $idFieldName) {
+                if ($definition->hasField(JsonApiDoc::ID)) {
+                    $this->renameReservedField($renamedFields, $definition, $entityClass, JsonApiDoc::ID);
+                }
+                $this->renameIdField($renamedFields, $definition, $idFieldName);
+            }
+        } elseif ($numberOfIdFields > 1) {
+            if ($definition->hasField(JsonApiDoc::ID)) {
+                $this->renameReservedField($renamedFields, $definition, $entityClass, JsonApiDoc::ID);
+            }
+        }
+    }
+
+    private function renameIdField(array &$renamedFields, EntityDefinitionConfig $definition, string $fieldName): void
     {
         $field = $definition->getField($fieldName);
-        if (null !== $field && !$field->hasPropertyPath()) {
+        if (null !== $field) {
+            $fieldPropertyPath = $field->getPropertyPath($fieldName);
             $definition->removeField($fieldName);
-            $field->setPropertyPath($fieldName);
-            $definition->addField($newFieldName, $field);
-            $definition->setIdentifierFieldNames([$newFieldName]);
+            $field->setPropertyPath($fieldPropertyPath);
+            $definition->addField(JsonApiDoc::ID, $field);
+            $definition->setIdentifierFieldNames([JsonApiDoc::ID]);
+            $renamedFields[$fieldName] = JsonApiDoc::ID;
+        }
+    }
+
+    private function renameFields(array $renamedFields, ?EntityConfigInterface $fields): void
+    {
+        if (null === $fields || !$fields->hasFields()) {
+            return;
+        }
+
+        foreach ($renamedFields as $oldFieldName => $newFieldName) {
+            if ($fields->hasField($oldFieldName)) {
+                $field = $fields->getField($oldFieldName);
+                $fields->removeField($oldFieldName);
+                $fields->addField($newFieldName, $field);
+            }
         }
     }
 

@@ -698,4 +698,40 @@ TEXT;
         $constraint->useStartsWithComparison('key2.key22.key221');
         $constraint->evaluate($actual);
     }
+
+    public function testUseStartsWithComparisonWithEmptyStringExpectedValue()
+    {
+        $expected = [
+            'key1' => '',
+            'key2' => [
+                'key21' => '',
+                'key22' => [
+                    ['key221' => '']
+                ]
+            ]
+        ];
+        $actual = [
+            'key1' => 'value 1',
+            'key2' => [
+                'key21' => '',
+                'key22' => [
+                    ['key221' => 'value 2 2 1']
+                ]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "key1". Error: Failed asserting that 'value 1' is identical to ''.
+Path: "key2.key22.0.key221". Error: Failed asserting that 'value 2 2 1' is identical to ''.
+TEXT;
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected);
+        $constraint->useStartsWithComparison('key1');
+        $constraint->useStartsWithComparison('key2.key22.key221');
+        $constraint->evaluate($actual);
+    }
 }

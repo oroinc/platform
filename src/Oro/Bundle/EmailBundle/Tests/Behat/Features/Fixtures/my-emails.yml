@@ -59,7 +59,7 @@ Oro\Bundle\EmailBundle\Entity\Email:
     fromName: '@adminEmailAddress'
     fromEmailAddress: '@adminEmailAddress'
     internalDate: '<(new DateTime("2010-11-01"))>'
-    messageId: fsdfasdf
+    messageId: fsdfasdf1
     emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser2 ]))>'
 
 Oro\Bundle\EmailBundle\Entity\EmailUser:

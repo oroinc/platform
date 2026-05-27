@@ -1936,20 +1936,24 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Click on first row action.
      * Example: And click "view" on first row in grid
      *
-     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in grid$/
-     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[^"]+)" grid$/
-     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[^"]+)"$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on (?P<rowNumber>[^"]*) row in grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on (?P<rowNumber>[^"]*) row in "(?P<gridName>[^"]+)" grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on (?P<rowNumber>[^"]*) row in "(?P<gridName>[^"]+)"$/
      *
      * @param string $action
      * @param string $gridName
      */
-    public function clickActionOnFirstRow($action, $gridName = null)
+    public function clickActionOnNRow($action, $rowNumber, $gridName = null)
     {
+        $position = $this->oroMainContext->getPosition($rowNumber);
+
         $grid = $this->getGrid($gridName);
-        if (!empty($grid->getRows()[0])) {
-            $row = $grid->getRows()[0];
+        if (!empty($grid->getRows()[$position])) {
+            $row = $grid->getRows()[$position];
             $link = $row->getActionLink($action);
             $link->click();
+        } else {
+            self::fail('Row number #' . $position . ' is not found');
         }
     }
 

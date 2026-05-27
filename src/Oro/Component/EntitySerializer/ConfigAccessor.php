@@ -34,11 +34,6 @@ class ConfigAccessor
 
     public function getAssociationQuery(EntityConfig $config, string $fieldName): ?AssociationQuery
     {
-        $fieldConfig = $config->getField($fieldName);
-        if (null === $fieldConfig) {
-            return null;
-        }
-
-        return $fieldConfig->get(ConfigUtil::ASSOCIATION_QUERY);
+        return $config->getField($fieldName)?->get(ConfigUtil::ASSOCIATION_QUERY);
     }
 }

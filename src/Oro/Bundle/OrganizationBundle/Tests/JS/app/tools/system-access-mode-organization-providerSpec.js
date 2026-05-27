@@ -21,7 +21,7 @@ const data = [
             'redirectData%5Broute%5D=oro_config_configuration_system&' +
             'redirectData%5Bparameters%5D%5BactiveGroup%5D=platform&' +
             'redirectData%5Bparameters%5D%5BactiveSubGroup%5D=email_configuration',
-        expectedResult: undefined
+        expectedResult: null
     }
 ];
 

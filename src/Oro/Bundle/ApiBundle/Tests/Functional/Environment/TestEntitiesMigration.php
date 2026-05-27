@@ -6,7 +6,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
@@ -67,10 +70,12 @@ class TestEntitiesMigration implements
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_75FB65965E237E06');
         $table->addIndex(['business_unit_owner_id']);
         $table->addIndex(['organization_id']);
+        $table->addUniqueIndex(['external_id'], 'test_api_department_external_id_idx');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_business_unit'),
             ['business_unit_owner_id'],
@@ -104,10 +109,12 @@ class TestEntitiesMigration implements
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('position', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['department_id']);
         $table->addIndex(['business_unit_owner_id']);
         $table->addIndex(['organization_id']);
+        $table->addUniqueIndex(['external_id'], 'test_api_person_external_id_idx');
         $table->addForeignKeyConstraint(
             $schema->getTable('test_api_department'),
             ['department_id'],
@@ -482,20 +489,16 @@ class TestEntitiesMigration implements
         }
 
         $t = $this->extendExtension->createCustomEntityTable($schema, 'TestApiE3');
-        $t->addColumn('name', 'string', [
-            'length'        => 255,
-            OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
-        ]);
-        $t->addColumn('title', 'string', [
-            'length'        => 255,
-            OroOptions::KEY => [
-                'extend' => [
-                    'owner'      => ExtendScope::OWNER_CUSTOM,
-                    'is_deleted' => true,
-                    'state'      => ExtendScope::STATE_DELETE
-                ]
+        $t->addColumn('name', 'string', ['length' => 255, OroOptions::KEY => [
+            'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
+        ]]);
+        $t->addColumn('title', 'string', ['length' => 255, OroOptions::KEY => [
+            'extend' => [
+                'owner' => ExtendScope::OWNER_CUSTOM,
+                'is_deleted' => true,
+                'state' => ExtendScope::STATE_DELETE
             ]
-        ]);
+        ]]);
 
         $tt = $schema->getTable('oro_ext_testapie2');
         $deleted = ['extend' => ['is_deleted' => true, 'state' => ExtendScope::STATE_DELETE]];
@@ -629,6 +632,7 @@ class TestEntitiesMigration implements
      * Create the following tables:
      * * test_api_owner
      * * test_api_target
+     * * test_api_activity_target
      * * test_api_activity
      */
     private function createTestEntityTables(Schema $schema): void
@@ -636,32 +640,39 @@ class TestEntitiesMigration implements
         if (
             $schema->hasTable('test_api_owner')
             || $schema->hasTable('test_api_target')
+            || $schema->hasTable('test_api_activity_target')
             || $schema->hasTable('test_api_activity')
         ) {
             return;
         }
 
         $ownerTable = $schema->createTable('test_api_owner');
+        $ownerTable->addOption(OroOptions::KEY, [
+            'extend' => ['unique_key' => ['keys' => [['name' => 'external_id', 'key' => ['external_id']]]]]
+        ]);
         $ownerTable->addColumn('id', 'integer', ['autoincrement' => true]);
         $ownerTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $ownerTable->addColumn('target_id', 'integer', ['notnull' => false]);
-        $ownerTable->addColumn(
-            'extend_description',
-            'text',
-            [
-                'oro_options' => [
-                    'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM]
-                ]
-            ]
-        );
+        $ownerTable->addColumn('extend_description', 'text', [OroOptions::KEY => [
+            'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM]
+        ]]);
+        $ownerTable->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false, OroOptions::KEY => [
+            ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
+            'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_HIDDEN],
+            'importexport' => ['excluded' => true],
+            'dataaudit' => ['auditable' => true]
+        ]]);
         $ownerTable->setPrimaryKey(['id']);
         $ownerTable->addIndex(['target_id']);
 
         $targetTable = $schema->createTable('test_api_target');
         $targetTable->addColumn('id', 'integer', ['autoincrement' => true]);
         $targetTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $targetTable->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false]);
         $targetTable->setPrimaryKey(['id']);
         $targetTable->addIndex(['name'], 'test_api_t_name_idx');
+        $targetTable->addUniqueIndex(['external_id'], 'test_api_t_external_id_idx');
 
         $ownerTable->addForeignKeyConstraint(
             $targetTable,
@@ -678,9 +689,25 @@ class TestEntitiesMigration implements
         $targetsRelTable->addForeignKeyConstraint($ownerTable, ['owner_id'], ['id']);
         $targetsRelTable->addForeignKeyConstraint($targetTable, ['target_id'], ['id']);
 
+        $activityTargetTable = $schema->createTable('test_api_activity_target');
+        $activityTargetTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $activityTargetTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $activityTargetTable->setPrimaryKey(['id']);
+        $activityTargetTable->addIndex(['name'], 'test_api_at_name_idx');
+
         $activityTable = $schema->createTable('test_api_activity');
+        $activityTable->addOption(OroOptions::KEY, [
+            'extend' => ['unique_key' => ['keys' => [['name' => 'external_id', 'key' => ['external_id']]]]]
+        ]);
         $activityTable->addColumn('id', 'integer', ['autoincrement' => true]);
         $activityTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $activityTable->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false, OroOptions::KEY => [
+            ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
+            'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_HIDDEN],
+            'importexport' => ['excluded' => true],
+            'dataaudit' => ['auditable' => true]
+        ]]);
         $activityTable->setPrimaryKey(['id']);
         $this->activityExtension->addActivityAssociation(
             $schema,
@@ -692,6 +719,12 @@ class TestEntitiesMigration implements
             $schema,
             $activityTable->getName(),
             $targetTable->getName(),
+            true
+        );
+        $this->activityExtension->addActivityAssociation(
+            $schema,
+            $activityTable->getName(),
+            $activityTargetTable->getName(),
             true
         );
     }

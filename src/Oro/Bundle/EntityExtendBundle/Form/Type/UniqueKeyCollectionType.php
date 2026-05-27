@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form type for managing unique key constraints on extended entities.
@@ -22,55 +23,42 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UniqueKeyCollectionType extends AbstractType
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $entityProvider;
-
-    public function __construct(ConfigProvider $entityProvider)
-    {
-        $this->entityProvider = $entityProvider;
+    public function __construct(
+        private readonly ConfigProvider $entityProvider,
+        private readonly TranslatorInterface $translator
+    ) {
     }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $fields         = [];
-        $className      = $options['className'];
+        $fields = [];
+        $className = $options['className'];
+        /** @var FieldConfigId[] $fieldConfigIds */
         $fieldConfigIds = $this->entityProvider->getIds($className);
-
-        /** @var FieldConfigId $fieldConfigId */
         foreach ($fieldConfigIds as $fieldConfigId) {
             if ($fieldConfigId->getFieldType() === RelationTypeBase::TO_MANY) {
                 continue;
             }
 
             $fieldName = $fieldConfigId->getFieldName();
-            $fieldLabel = $this
-                ->entityProvider
-                ->getConfig($className, $fieldName)
-                ->get('label', false, ucfirst($fieldName));
+            $fieldLabel = $this->entityProvider->getConfig($className, $fieldName)->get('label');
+            $fieldLabel = $fieldLabel ? $this->translator->trans($fieldLabel) : $fieldName;
 
-            $fields[$fieldLabel] =  $fieldName;
+            $fields[$fieldLabel] = $fieldName;
         }
 
-        $builder->add(
-            'keys',
-            CollectionType::class,
-            array(
-                'required'       => true,
-                'entry_type'           => UniqueKeyType::class,
-                'entry_options'        => [
-                    'key_choices' => $fields
-                ],
-                'allow_add'      => true,
-                'allow_delete'   => true,
-                'prototype'      => true,
-                'prototype_name' => 'tag__name__',
-                'label'          => false,
-                'constraints'    => [new UniqueKeys()]
-            )
-        );
+        $builder->add('keys', CollectionType::class, [
+            'required' => true,
+            'entry_type' => UniqueKeyType::class,
+            'entry_options' => ['key_choices' => $fields],
+            'allow_add' => true,
+            'allow_delete' => true,
+            'prototype' => true,
+            'prototype_name' => 'tag__name__',
+            'label' => false,
+            'constraints' => [new UniqueKeys()]
+        ]);
     }
 
     #[\Override]
