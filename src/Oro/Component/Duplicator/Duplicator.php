@@ -8,6 +8,7 @@ use DeepCopy\DeepCopy;
 use DeepCopy\Filter\Filter;
 use DeepCopy\Matcher\Matcher;
 use Oro\Component\Duplicator\Filter\FilterFactory;
+use Oro\Component\Duplicator\Filter\SourceEntityAwareFilterInterface;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
 
 /**
@@ -31,14 +32,24 @@ class Duplicator implements DuplicatorInterface
             $matcherArguments = $option[1];
 
             $filter = $this->getFilter($filterOptions);
+            $this->injectSourceEntity($filter, $object);
             $deepCopy->addFilter($filter, $this->getMatcher($matcherArguments));
         }
 
         foreach ($this->defaultRules as $rule) {
-            $deepCopy->addFilter($this->getFilter($rule[0]), $this->getMatcher($rule[1]));
+            $filter = $this->getFilter($rule[0]);
+            $this->injectSourceEntity($filter, $object);
+            $deepCopy->addFilter($filter, $this->getMatcher($rule[1]));
         }
 
         return $deepCopy->copy($object);
+    }
+
+    private function injectSourceEntity(Filter $filter, mixed $sourceEntity): void
+    {
+        if (is_object($sourceEntity) && $filter instanceof SourceEntityAwareFilterInterface) {
+            $filter->setSourceEntity($sourceEntity);
+        }
     }
 
     /**
