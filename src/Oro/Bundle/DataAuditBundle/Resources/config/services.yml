@@ -222,6 +222,7 @@ services:
             - '@oro_message_queue.job.runner'
             - '@oro_dataaudit.audit_config_provider'
         calls:
+            - ['setProducer', ['@oro_message_queue.client.message_producer']]
             - ['setLogger', ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
