@@ -465,6 +465,8 @@ class File implements FileExtensionInterface, ExtendEntityInterface
         $this->parentEntityClass = null;
         $this->parentEntityFieldName = null;
         $this->parentEntityId = null;
+
+        $this->cloneExtendEntityStorage();
     }
 
     public function __serialize(): array
