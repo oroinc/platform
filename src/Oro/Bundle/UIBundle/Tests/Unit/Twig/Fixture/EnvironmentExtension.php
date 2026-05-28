@@ -4,6 +4,8 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture;
 
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
+use Twig\Node\Expression\Binary\AndBinary;
+use Twig\Node\Expression\Unary\NegUnary;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
@@ -13,6 +15,9 @@ use Twig\TwigTest;
  */
 class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
 {
+    /**
+     * @inheritdoc
+     */
     public function getTokenParsers()
     {
         return [
@@ -20,6 +25,9 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getNodeVisitors()
     {
         return [
@@ -27,6 +35,9 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getFilters()
     {
         return [
@@ -34,6 +45,9 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getTests()
     {
         return [
@@ -41,6 +55,9 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getFunctions()
     {
         return [
@@ -48,14 +65,20 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getOperators()
     {
         return [
-            ['foo_unary' => []],
-            ['foo_binary' => []],
+            ['foo_unary' => ['precedence' => 500, 'class' => NegUnary::class]],
+            ['foo_binary' => ['precedence' => 10, 'class' => AndBinary::class, 'associativity' => 1]],
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getGlobals(): array
     {
         return [

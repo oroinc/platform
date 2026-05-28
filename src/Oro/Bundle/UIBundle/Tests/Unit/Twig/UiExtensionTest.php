@@ -41,6 +41,9 @@ class UiExtensionTest extends TestCase
 
     private UiExtension $extension;
 
+    /**
+     * @inheritdoc
+     */
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
@@ -107,9 +110,8 @@ class UiExtensionTest extends TestCase
             ->willReturn(new TemplateWrapper($this->environment, $template));
 
         $this->environment->expects(self::once())
-            ->method('mergeGlobals')
-            ->with(['key' => 'value', 'extraKey' => 'value'])
-            ->willReturn(['key' => 'value', 'extraKey' => 'value']);
+            ->method('getGlobals')
+            ->willReturn([]);
 
         $template->expects(self::once())
             ->method('renderBlock')
@@ -325,7 +327,7 @@ class UiExtensionTest extends TestCase
     /**
      * @dataProvider addUrlQueryProvider
      */
-    public function testAddUrlQuery($expected, $source, array $query = null): void
+    public function testAddUrlQuery($expected, $source, ?array $query = null): void
     {
         $request = new Request($query ?? []);
 

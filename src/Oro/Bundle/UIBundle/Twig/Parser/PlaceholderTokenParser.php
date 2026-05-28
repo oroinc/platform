@@ -5,7 +5,7 @@ namespace Oro\Bundle\UIBundle\Twig\Parser;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\Filter\DefaultFilter;
 use Twig\Node\Expression\FunctionExpression;
-use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Node;
 use Twig\Node\PrintNode;
 use Twig\Token;
@@ -25,8 +25,7 @@ class PlaceholderTokenParser extends AbstractTokenParser
      */
     public function parse(Token $token)
     {
-        $stream           = $this->parser->getStream();
-        $expressionParser = $this->parser->getExpressionParser();
+        $stream = $this->parser->getStream();
 
         if ($stream->test(Token::NAME_TYPE)) {
             $currentToken = $stream->getCurrent();
@@ -35,8 +34,11 @@ class PlaceholderTokenParser extends AbstractTokenParser
 
             // Creates expression: placeholder_name|default('placeholder_name')
             // To parse either variable value or name
+            $contextVar = new ContextVariable($currentValue, $currentLine);
+            $contextVar->setAttribute('ignore_strict_check', true);
+
             $name = new DefaultFilter(
-                new NameExpression($currentValue, $currentLine),
+                $contextVar,
                 new ConstantExpression('default', $currentLine),
                 new Node(
                     array(
@@ -53,11 +55,11 @@ class PlaceholderTokenParser extends AbstractTokenParser
 
             $stream->next();
         } else {
-            $name = $expressionParser->parseExpression();
+            $name = $this->parser->parseExpression();
         }
 
         if ($stream->nextIf(Token::NAME_TYPE, 'with')) {
-            $variables = $expressionParser->parseExpression();
+            $variables = $this->parser->parseExpression();
         } else {
             $variables = new ConstantExpression(array(), $token->getLine());
         }
@@ -76,7 +78,7 @@ class PlaceholderTokenParser extends AbstractTokenParser
             $token->getLine()
         );
 
-        return new PrintNode($expr, $token->getLine(), $this->getTag());
+        return new PrintNode($expr, $token->getLine());
     }
 
     /**

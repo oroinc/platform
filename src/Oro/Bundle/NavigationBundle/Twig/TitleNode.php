@@ -33,27 +33,14 @@ class TitleNode extends Node
     {
         $node = $this->getNode('expr');
 
-        $arguments = null;
-
-        $nodes = $node->getIterator();
-
-        // take first argument array node
-        foreach ($nodes as $childNode) {
-            if ($childNode instanceof ArrayExpression) {
-                $arguments = $childNode;
-
-                break;
-            }
-        }
-
-        if ($arguments === null) {
+        if (!$node instanceof ArrayExpression) {
             throw new SyntaxError('Function oro_title_set expected argument: array');
         }
 
         $compiler
             ->raw("\n")
             ->write(sprintf('$this->env->getExtension("%s")->set(', TitleExtension::class))
-            ->subcompile($arguments)
+            ->subcompile($node)
             ->raw(");\n");
     }
 }

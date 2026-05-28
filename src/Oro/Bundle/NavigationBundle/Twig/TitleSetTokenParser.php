@@ -21,8 +21,9 @@ class TitleSetTokenParser extends AbstractTokenParser
     {
         $lineno = $token->getLine();
 
-        $expr = $this->parser->getExpressionParser()->parseArguments();
-        $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
+        $expr = $this->parser->parseExpression();
+        $this->parser->getStream()
+            ->expect(Token::BLOCK_END_TYPE);
 
         return new TitleNode($expr, $lineno);
     }

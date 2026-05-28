@@ -6,7 +6,7 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitObjectExtension;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\Test\TestLogger;
+use Oro\Component\Testing\Logger\TestLogger;
 
 class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
 {

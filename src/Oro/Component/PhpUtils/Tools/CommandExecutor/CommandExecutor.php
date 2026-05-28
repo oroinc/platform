@@ -67,6 +67,15 @@ class CommandExecutor extends AbstractCommandExecutor implements CommandExecutor
 
         $process = new Process($processArguments);
 
+        // SymfonyRuntime CVE-2024-50340 Patch Bypass
+        $process->setEnv([
+            'QUERY_STRING' => false,
+            'REQUEST_METHOD' => false,
+            'REQUEST_URI' => false,
+            'REQUEST_TIME' => false,
+            'REQUEST_TIME_FLOAT' => false,
+        ]);
+
         if ($processTimeout !== null) {
             $process->setTimeout($processTimeout);
         }

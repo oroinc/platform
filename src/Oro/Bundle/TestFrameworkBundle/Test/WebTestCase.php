@@ -132,6 +132,15 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * In order to disable kernel shutdown
+     * @see \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::tearDownAfterClass
+     */
+    #[\Override]
+    public static function tearDownAfterClass(): void
+    {
+    }
+
+    /**
      * @after
      * @internal
      */
