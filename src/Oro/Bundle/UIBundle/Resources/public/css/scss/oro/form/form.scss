@@ -264,8 +264,8 @@ select[multiple] {
         border: $add-on-border;
         background-color: $add-on-background-color;
         color: $primary;
-        height: $add-on-height;
-        width: $add-on-height;
+        height: $add-on-size;
+        width: $add-on-size;
         line-height: $add-on-line-height;
         text-align: center;
         padding: $add-on-inner-offset;
@@ -438,8 +438,12 @@ select[multiple] {
 
     .control-group,
     .control-group-container {
-        &:not(:last-of-type) {
-            margin-bottom: $form-container-control-row-space;
+        padding: $form-container-control-group-offset;
+        border-bottom: $form-container-control-group-border-bottom;
+
+        .control-group {
+            padding: 0;
+            border-bottom: 0;
         }
 
         &--column:not(:last-of-type) {

@@ -244,6 +244,14 @@
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
 
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if translatable_label is defined and not translatable_label -%}
+                {{ label }}
+            {%- elseif raw_label is defined and raw_label -%}
+                {{ label|raw }}
+            {%- else -%}
+                {{ label|trans({}, translation_domain) }}
+            {%- endif -%}
+             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
             {%- if warning is defined and warning -%}
                 {% import '@OroUI/macros.html.twig' as ui -%}
                 {{ ui.tooltip(warning, {}, null, false, null, null, true, 'warning') }}
@@ -259,14 +267,6 @@
                     tooltip_details_anchor|default(null)
                 ) }}
             {%- endif -%}
-            {%- if translatable_label is defined and not translatable_label -%}
-                {{ label }}
-            {%- elseif raw_label is defined and raw_label -%}
-                {{ label|raw }}
-            {%- else -%}
-                {{ label|trans({}, translation_domain) }}
-            {%- endif -%}
-             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {%- endif -%}
     {% endapply %}

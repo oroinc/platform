@@ -15,11 +15,17 @@ $select2-container-box-sizing: border-box !default;
 $select2-container-font-size: $base-font-size !default;
 $select2-container-height: 32px !default;
 
-$select2-container-horizontal-width: var(--select2-container-horizontal-width, 294px) !default;
-$select2-container-horizontal-max-width: var(--select2-container-horizontal-max-width, 294px) !default;
+$select2-container-horizontal-width: var(--select2-container-horizontal-width, 300px) !default;
+$select2-container-horizontal-max-width: var(--select2-container-horizontal-max-width, 300px) !default;
 
-$select2-container-input-append-width: 264px !default;
-$select2-container-input-append-max-width: 264px !default;
+$select2-container-input-append-width: 270px !default;
+$select2-container-input-append-max-width: 270px !default;
+$select2-container-input-append-create-enabled-width:
+        $select2-container-input-append-max-width - $add-on-append-outer-offset-left -
+        $add-on-size - (2 * $select2-container-border-width) !default;
+$select2-container-input-append--create-enabled-max-width:
+        $select2-container-input-append-max-width - $add-on-append-outer-offset-left -
+        $add-on-size - (2 * $select2-container-border-width) !default;
 
 $select2-container-active-border-color: $secondary-focus !default;
 $select2-container-active-box-shadow: inset 0 0 0 1px $secondary-focus !default;

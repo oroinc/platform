@@ -32,7 +32,7 @@ $fallback-item-border: 1px solid $primary-860 !default;
 
 $fallback-item-top-offset: 10px 0 !default;
 $fallback-item-value-top-inner-offset-top: 5px !default;
-$fallback-item-label-max-width: 294px !default;
+$fallback-item-label-max-width: 300px !default;
 $fallback-item-label-offset: 10px 0 !default;
 
 $fallback-item-fallback-line-offset: 10px 0 !default;
@@ -53,6 +53,8 @@ $fallback-item-value--first-width: auto !default;
 $fallback-item-value--first-validation-width: 100% !default;
 $fallback-item-value--first-validation-order: 1 !default;
 
-$fallback-item-value--first-input-group-offset-end: 4px !default;
+$fallback-item-value--first-input-group-offset-end: 12px !default;
+$fallback-item-value--first-input-width: $fallback-item-label-max-width -
+                                         $fallback-item-value--first-input-group-offset-end - $add-on-size !default;
 
 $fallback-item-use-fallback-oro-checkbox-view-display: inline-block !default;

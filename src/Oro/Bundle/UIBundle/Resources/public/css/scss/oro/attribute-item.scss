@@ -2,7 +2,8 @@
 
 .attribute-item {
     display: $attribute-item-display;
-    margin: $attribute-item-offset;
+    padding: $attribute-item-offset;
+    border-bottom: $attribute-item-border-bottom;
 
     &__term {
         width: $attribute-item-term-width;

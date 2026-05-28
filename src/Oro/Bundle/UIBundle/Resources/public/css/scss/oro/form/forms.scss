@@ -39,7 +39,7 @@
         > .control-label {
             width: $form-horizontal-control-label-width;
             font-weight: font-weight('light');
-            text-align: var(--form-horizontal-control-label-text-align, right);
+            text-align: var(--form-horizontal-control-label-text-align, left);
             flex-shrink: 0;
 
             .ui-dialog-content &,
@@ -58,7 +58,7 @@
 
         .control-label {
             .tooltip-icon {
-                margin-right: $content-padding-small;
+                margin-left: $content-padding-small;
             }
 
             label {
@@ -301,13 +301,11 @@ input[type='checkbox'] + label {
 
 label {
     &.required {
-        position: relative;
 
         em {
             color: $secondary-secondary-3;
-            font-size: 21px;
+            font-size: 14px;
             font-style: normal;
-            position: absolute;
 
             margin-top: -2px;
             margin-left: 4px;
