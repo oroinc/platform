@@ -12,7 +12,8 @@ import BaseView from 'oroui/js/app/views/base/view';
 const PageStateView = BaseView.extend({
     IGNORE: ':input[type=button], :input[type=submit], :input[type=reset], ' +
         ':input[type=password], :input[type=file], :input[name$="[_token]"], ' +
-        '[data-ignore-form-state-change] :input, :input[name^=temp-validation-name]',
+        ':input[data-ignore-form-state-change], [data-ignore-form-state-change] :input, ' +
+        ':input[name^=temp-validation-name]',
 
     listen: {
         'change:data model': '_saveModel',

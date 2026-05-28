@@ -19,6 +19,10 @@ class OroSelenium2Factory extends Selenium2Factory
             'setSessionHolder',
             [new Reference('oro_test.behat.watch_mode.session_holder')]
         );
+        $definition->addMethodCall(
+            'setScreenshotGenerator',
+            [new Reference('oro_test.artifacts.screenshot_generator')]
+        );
 
         return $definition;
     }

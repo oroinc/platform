@@ -166,7 +166,7 @@ class WebhookNotifierTest extends TestCase
 
         $this->expectRepositoryCheck($topic, true);
 
-        $this->messageProducer->expects(self::once())
+        $this->messageProducer->expects(self::exactly(2))
             ->method('send')
             ->with(
                 SendWebhookNotificationTopic::getName(),
@@ -182,7 +182,7 @@ class WebhookNotifierTest extends TestCase
                 })
             );
 
-        $this->logger->expects(self::once())
+        $this->logger->expects(self::exactly(2))
             ->method('debug')
             ->with(
                 'Webhook notification queued for async processing',
@@ -194,6 +194,8 @@ class WebhookNotifierTest extends TestCase
                 })
             );
 
+        $this->notifier->sendNotification($topic, $eventData);
+        // Second call added to check that repository check for hasActiveWebhooks is called only once
         $this->notifier->sendNotification($topic, $eventData);
     }
 

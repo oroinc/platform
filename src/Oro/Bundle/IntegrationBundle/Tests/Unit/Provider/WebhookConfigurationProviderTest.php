@@ -63,12 +63,12 @@ class WebhookConfigurationProviderTest extends TestCase
             ['label' => 'entity3.label', 'icon' => 'fa-entity3']
         );
 
-        $this->entityConfigManager->expects(self::once())
+        $this->entityConfigManager->expects(self::any())
             ->method('getConfigs')
             ->with(WebhookConfigurationProvider::ENTITY_CONFIG_SCOPE)
             ->willReturn([$integrationConfig1, $integrationConfig2, $integrationConfig3]);
 
-        $this->entityConfigManager->expects(self::exactly(2))
+        $this->entityConfigManager->expects(self::any())
             ->method('getEntityConfig')
             ->willReturnMap([
                 ['entity', 'Test\Entity1', $entityConfig1],
@@ -352,5 +352,40 @@ class WebhookConfigurationProviderTest extends TestCase
             'Test_Entity1.test',
             $this->provider->getTopicNameByEntityClassAndEvent($entityClass, 'test')
         );
+    }
+
+    public function testGetIconReturnsEntityIcon(): void
+    {
+        $entityClass = 'Test\Entity1';
+        $icon = 'fa-shopping-cart';
+
+        $entityConfig = new Config(
+            new EntityConfigId('entity', $entityClass),
+            ['icon' => $icon]
+        );
+
+        $this->entityConfigManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('entity', $entityClass)
+            ->willReturn($entityConfig);
+
+        self::assertSame($icon, $this->provider->getIcon($entityClass));
+    }
+
+    public function testGetIconReturnsDefaultIconWhenEntityHasNone(): void
+    {
+        $entityClass = 'Test\Entity1';
+
+        $entityConfig = new Config(
+            new EntityConfigId('entity', $entityClass),
+            []
+        );
+
+        $this->entityConfigManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('entity', $entityClass)
+            ->willReturn($entityConfig);
+
+        self::assertSame('fa-podcast', $this->provider->getIcon($entityClass));
     }
 }
