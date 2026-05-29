@@ -6,6 +6,8 @@ namespace Oro\Bundle\LocaleBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -29,11 +31,17 @@ class UpdateLocalizationCommand extends Command
     protected static $defaultName = 'oro:localization:update';
 
     private ManagerRegistry $doctrine;
+    private ?ConfigManager $configManager = null;
 
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
         parent::__construct();
+    }
+
+    public function setConfigManager(ConfigManager $configManager): void
+    {
+        $this->configManager = $configManager;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -84,25 +92,16 @@ HELP
         $languageCode = (string)$input->getOption('language');
         $formattingCode = (string)$input->getOption('formatting-code');
 
-        if ($languageCode === Translator::DEFAULT_LOCALE && $formattingCode === Translator::DEFAULT_LOCALE) {
-            return Command::SUCCESS;
-        }
-
-        /** @var LocalizationRepository $localizationRepository */
-        $localizationRepository = $this->getManager(Localization::class)->getRepository(Localization::class);
-        $localization = $localizationRepository
-            ->findOneByLanguageCodeAndFormattingCode(Translator::DEFAULT_LOCALE, Translator::DEFAULT_LOCALE);
-
-        // Try to fetch localization for en_US default formatting code. Should be removed in scope of #BAP-19605
-        if (!$localization) {
-            $localization = $localizationRepository
-                ->findOneByLanguageCodeAndFormattingCode(Translator::DEFAULT_LOCALE, 'en_US');
-        }
+        $localization = $this->findDefaultLocalization();
 
         if ($localization) {
             $language = $localization->getLanguage();
             if ($language->getCode() !== $languageCode) {
-                $language = $this->createLanguage($language, $languageCode);
+                $existingLanguage = $this->getManager(Language::class)
+                    ->getRepository(Language::class)
+                    ->findOneBy(['code' => $languageCode]);
+
+                $language = $existingLanguage ?: $this->createLanguage($language, $languageCode);
             }
 
             $this->updateLocalization($localization, $language, $formattingCode);
@@ -111,6 +110,24 @@ HELP
         }
 
         return Command::SUCCESS;
+    }
+
+    private function findDefaultLocalization(): ?Localization
+    {
+        /** @var LocalizationRepository $localizationRepository */
+        $localizationRepository = $this->getManager(Localization::class)
+            ->getRepository(Localization::class);
+
+        $defaultLocalizationId = $this->configManager?->get(
+            Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION)
+        );
+
+        return $defaultLocalizationId
+            ? $localizationRepository->find($defaultLocalizationId)
+            : $localizationRepository->findOneByLanguageCodeAndFormattingCode(
+                Configuration::DEFAULT_LANGUAGE,
+                Configuration::DEFAULT_LOCALE
+            );
     }
 
     private function createLanguage(Language $defaultLanguage, string $languageCode): Language
