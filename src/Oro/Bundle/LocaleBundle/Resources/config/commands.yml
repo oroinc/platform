@@ -13,6 +13,7 @@ services:
     Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand:
         arguments:
             - '@doctrine'
+            - '@oro_config.global'
         tags:
             - { name: console.command }
 
