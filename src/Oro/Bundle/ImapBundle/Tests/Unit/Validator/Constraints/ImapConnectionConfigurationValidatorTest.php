@@ -41,14 +41,14 @@ class ImapConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         return $value;
     }
 
-    public function testUnexpectedConstraint()
+    public function testUnexpectedConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
         $this->validator->validate($this->createMock(UserEmailOrigin::class), $this->createMock(Constraint::class));
     }
 
-    public function testValidateWithoutUserEmailOrigin()
+    public function testValidateWithoutUserEmailOrigin(): void
     {
         $constraint = new ImapConnectionConfiguration();
         $this->validator->validate(new \stdClass(), $constraint);
@@ -56,11 +56,13 @@ class ImapConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         $this->assertNoViolation();
     }
 
-    public function testValidateImapNotConfigured()
+    public function testValidateWhenNoDataToCheckConnection(): void
     {
         $value = $this->createUserEmailOrigin();
         $value->setImapHost('');
-        $this->checker->expects($this->never())
+        $value->setImapPort(0);
+
+        $this->checker->expects(self::never())
             ->method('checkConnection');
 
         $constraint = new ImapConnectionConfiguration();
@@ -69,10 +71,26 @@ class ImapConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         $this->assertNoViolation();
     }
 
-    public function testValidateFailedConnection()
+    public function testValidateWhenNoDataToValidateConnection(): void
     {
         $value = $this->createUserEmailOrigin();
-        $this->checker->expects($this->once())
+        $value->setImapHost('');
+
+        $this->checker->expects(self::never())
+            ->method('checkConnection');
+
+        $constraint = new ImapConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
+    }
+
+    public function testValidateFailedConnection(): void
+    {
+        $value = $this->createUserEmailOrigin();
+
+        $this->checker->expects(self::once())
             ->method('checkConnection')
             ->with($value)
             ->willReturn(false);
@@ -84,10 +102,11 @@ class ImapConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
             ->assertRaised();
     }
 
-    public function testValidateSuccessfullyConnection()
+    public function testValidateSuccessfullyConnection(): void
     {
         $value = $this->createUserEmailOrigin();
-        $this->checker->expects($this->once())
+
+        $this->checker->expects(self::once())
             ->method('checkConnection')
             ->with($value)
             ->willReturn(true);

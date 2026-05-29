@@ -4,11 +4,6 @@ namespace Oro\Bundle\ImapBundle\Connector;
 
 /**
  * Encapsulates IMAP server connection configuration parameters.
- *
- * This class holds all the necessary configuration details required to establish a connection
- * to an IMAP server, including host, port, SSL/TLS settings, user credentials, and OAuth2 access tokens.
- * It provides a clean interface for managing and retrieving these configuration values throughout
- * the IMAP connector lifecycle.
  */
 class ImapConfig
 {
@@ -41,6 +36,8 @@ class ImapConfig
      * @var string
      */
     private $accessToken;
+
+    private ?int $connectionTimeout = null;
 
     /**
      * @param string $host The host name of IMAP server
@@ -180,5 +177,22 @@ class ImapConfig
     public function setAccessToken($accessToken)
     {
         $this->accessToken = $accessToken;
+    }
+
+    /**
+     * Gets the connection timeout in seconds.
+     */
+    public function getConnectionTimeout(): ?int
+    {
+        return $this->connectionTimeout;
+    }
+
+    /**
+     * Sets the connection timeout in seconds.
+     * To reset the timeout to the default value, pass null or 0.
+     */
+    public function setConnectionTimeout(?int $timeoutInSeconds): void
+    {
+        $this->connectionTimeout = $timeoutInSeconds;
     }
 }

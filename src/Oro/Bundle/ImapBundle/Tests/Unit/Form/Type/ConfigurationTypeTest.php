@@ -115,8 +115,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     public function testBindValidDataShouldBindCorrectDataExceptPassword(): void
     {
-        $formData =
-        [
+        $formData = [
             'imapHost' => 'someHost',
             'imapPort' => '123',
             'smtpHost' => '',

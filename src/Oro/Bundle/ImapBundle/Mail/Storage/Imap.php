@@ -127,19 +127,22 @@ class Imap extends \Laminas\Mail\Storage\Imap
 
         try {
             $this->protocol = new ProtocolImap();
+            if (isset($params->connectionTimeout) && $params->connectionTimeout > 0) {
+                $this->protocol->setConnectionTimeout($params->connectionTimeout);
+            }
             $this->protocol->connect($host, $port, $ssl);
         } catch (\Exception $e) {
             throw new ConnectionException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($params->accessToken === null) {
+        if (isset($params->accessToken) && null !== $params->accessToken) {
+            $this->oauth2Authenticate($params->user, $params->accessToken);
+        } else {
             $response = $this->protocol->login($params->user, $password);
             if (!$response) {
                 throw new InvalidCredentialsException('Cannot login. User or password is incorrect.');
             }
             $this->checkAndSetCapability($response);
-        } else {
-            $this->oauth2Authenticate($params->user, $params->accessToken);
         }
 
         $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
