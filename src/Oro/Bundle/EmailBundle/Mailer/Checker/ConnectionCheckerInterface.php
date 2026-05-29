@@ -11,12 +11,8 @@ interface ConnectionCheckerInterface
 {
     /**
      * Checks connection for the specified DSN.
-     *
-     * @param Dsn $dsn DSN to check connection for.
-     * @param string|null $error Error that occurred during check.
-     * @return bool True on success.
      */
-    public function checkConnection(Dsn $dsn, ?string &$error = null): bool;
+    public function checkConnection(Dsn $dsn): bool;
 
     /**
      * Checks if connection can be checked for the specified DSN.

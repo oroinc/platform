@@ -73,15 +73,11 @@ class SmtpSettingsCheckerTest extends TestCase
         $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->with($dsn)
-            ->willReturnCallback(static function (Dsn $dsn, ?string &$error = null) {
-                $error = 'Test exception message';
-
-                return false;
-            });
+            ->willReturn(false);
 
         $result = $this->smtpSettingsChecker->checkConnection($smtpSettings, $error);
 
         self::assertFalse($result);
-        self::assertEquals('Test exception message', $error);
+        self::assertEquals('A connection could not be established', $error);
     }
 }
