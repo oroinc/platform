@@ -78,7 +78,7 @@ define(function(require) {
             $.ajax({
                 type: 'POST',
                 url: this.getUrl(),
-                data: $.param(this.prepareData(data)),
+                data: this.prepareData(data),
                 success: response => {
                     if (response.imap) {
                         this.showMessage('success', 'oro.imap.connection.imap.success', $messageContainer);
@@ -91,8 +91,11 @@ define(function(require) {
                 },
                 errorHandlerMessage: false,
                 error: response => {
-                    const responseJSON = response.responseJSON;
-                    _.each(responseJSON.errors, function(errorMessage) {
+                    const errors = 'responseJSON' in response ? response.responseJSON.errors : [];
+                    if (!errors.length) {
+                        errors.push(__('oro.ui.unexpected_error'));
+                    }
+                    _.each(errors, function(errorMessage) {
                         messenger.notificationFlashMessage('error', errorMessage, {
                             container: $messageContainer,
                             delay: 0
@@ -114,19 +117,20 @@ define(function(require) {
         },
 
         prepareData: function(data) {
-            const result = [];
+            const result = {};
             const start = this.formPrefix.length;
             if (start > 0) {
                 _.each(data, item => {
                     if (item.name.indexOf(this.formPrefix) === 0) {
                         item.name = this.requestPrefix + item.name.substr(start);
-                        result.push(item);
+                        result[item.name] = item.value;
                     }
                 });
-                return result;
             } else {
-                return data;
+                result = data;
             }
+
+            return result;
         },
 
         getUrl: function() {

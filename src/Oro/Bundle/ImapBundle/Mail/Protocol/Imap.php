@@ -6,11 +6,37 @@ use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 
 /**
+ * - add possibility to change connection timeout
  * - adds PEEK capability to Laminas Imap Protocol
  * - fixes the parsing of double quotes in labels
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Imap extends \Laminas\Mail\Protocol\Imap
 {
+    private ?int $connectionTimeout = null;
+
+    /**
+     * Gets the connection timeout in seconds.
+     */
+    public function getConnectionTimeout(): ?int
+    {
+        return $this->connectionTimeout;
+    }
+
+    /**
+     * Sets the connection timeout in seconds.
+     * To reset the timeout to the default value, pass null or 0.
+     */
+    public function setConnectionTimeout(?int $timeoutInSeconds): void
+    {
+        if (null !== $timeoutInSeconds && $timeoutInSeconds < 0) {
+            throw new \InvalidArgumentException('The timeout cannot be a negative number.');
+        }
+        $this->connectionTimeout = $timeoutInSeconds > 0 && $timeoutInSeconds !== static::TIMEOUT_CONNECTION
+            ? $timeoutInSeconds
+            : null;
+    }
+
     /**
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -98,6 +124,12 @@ class Imap extends \Laminas\Mail\Protocol\Imap
 
         // Server configuration should decide, which timeout value has to be used.
         stream_set_timeout($this->socket, ini_get('default_socket_timeout'));
+    }
+
+    #[\Override]
+    protected function setupSocket(string $transport, string $host, ?int $port, int $timeout)
+    {
+        return parent::setupSocket($transport, $host, $port, $this->connectionTimeout ?? $timeout);
     }
 
     // @codingStandardsIgnoreStart
