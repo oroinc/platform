@@ -216,3 +216,8 @@ services:
             - '@oro_config.cache'
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: -256 }
+
+    oro_config.outbound_connection_validator:
+        class: Oro\Bundle\ConfigBundle\Validator\OutboundConnectionValidator
+        arguments:
+            - '%permitted_outbound_connections%'

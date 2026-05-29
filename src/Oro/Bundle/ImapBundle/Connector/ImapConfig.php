@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Connector;
 
+/**
+ * Encapsulates IMAP server connection configuration parameters.
+ */
 class ImapConfig
 {
     /**
@@ -33,6 +36,8 @@ class ImapConfig
      * @var string
      */
     private $accessToken;
+
+    private ?int $connectionTimeout = null;
 
     /**
      * @param string $host The host name of IMAP server
@@ -172,5 +177,22 @@ class ImapConfig
     public function setAccessToken($accessToken)
     {
         $this->accessToken = $accessToken;
+    }
+
+    /**
+     * Gets the connection timeout in seconds.
+     */
+    public function getConnectionTimeout(): ?int
+    {
+        return $this->connectionTimeout;
+    }
+
+    /**
+     * Sets the connection timeout in seconds.
+     * To reset the timeout to the default value, pass null or 0.
+     */
+    public function setConnectionTimeout(?int $timeoutInSeconds): void
+    {
+        $this->connectionTimeout = $timeoutInSeconds;
     }
 }

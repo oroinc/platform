@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * The constraint checks that SMTP connection can be established with provided configuration parameters
+ * The constraint to check that SMTP connection can be established with provided configuration parameters.
  */
 class SmtpConnectionConfiguration extends Constraint
 {

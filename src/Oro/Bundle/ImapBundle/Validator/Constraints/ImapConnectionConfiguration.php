@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImapBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * The constraint validates that IMAP connection can be established
+ * The constraint to check that IMAP connection can be established with parameters from UserEmailOrigin.
  */
 class ImapConnectionConfiguration extends Constraint
 {
