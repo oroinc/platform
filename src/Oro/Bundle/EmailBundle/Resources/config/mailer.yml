@@ -23,9 +23,6 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
-    Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker:
-        alias: 'oro_email.mailer.checker.smtp_settings'
-
     oro_email.mailer.checker.smtp_settings:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
         arguments:
@@ -34,6 +31,11 @@ services:
 
     oro_email.mailer.checker.smtp_connection_checker:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpConnectionChecker
+        arguments:
+            - '@logger'
+        calls:
+            - [setConnectionCheckDuration, ['%outbound_connection_check_duration%']]
+            - [setConnectionValidator, ['@oro_config.outbound_connection_validator']]
         tags:
             - { name: oro_email.mailer.connection_checker }
 

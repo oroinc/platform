@@ -36,7 +36,7 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         );
     }
 
-    public function testUnexpectedConstraint()
+    public function testUnexpectedConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
@@ -51,7 +51,22 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         $this->assertNoViolation();
     }
 
-    public function testValidateSmtpNotConfigured(): void
+    public function testValidateWhenNoDataToValidateConnection(): void
+    {
+        $value = $this->createUserEmailOrigin();
+        $value->setSmtpHost('');
+        $value->setSmtpPort(0);
+
+        $this->checker->expects(self::never())
+            ->method('checkConnection');
+
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateWhenNoDataToCheckConnection(): void
     {
         $value = $this->createUserEmailOrigin();
         $value->setSmtpHost('');
@@ -62,7 +77,8 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         $constraint = new SmtpConnectionConfiguration();
         $this->validator->validate($value, $constraint);
 
-        $this->assertNoViolation();
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
     public function testValidateFailedConnection(): void
@@ -84,6 +100,7 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
     public function testValidateSuccessfulConnection(): void
     {
         $value = $this->createUserEmailOrigin();
+
         $this->checker->expects(self::once())
             ->method('checkConnection')
             ->with($this->createSmtpSettingsByUserEmailOrigin($value))
