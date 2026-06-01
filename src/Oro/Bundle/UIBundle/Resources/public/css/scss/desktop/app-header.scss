@@ -51,6 +51,10 @@
         .app-logo {
             display: none;
         }
+
+        .organization-logo-wrapper {
+            margin-left: 0;
+        }
     }
 
     .organization-logo-wrapper {
@@ -58,6 +62,7 @@
         align-items: center;
         grid-area: start;
         height: 100%;
+        margin-left: $app-header-think-margin-left;
     }
 
     .app-logo {

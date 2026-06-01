@@ -4,6 +4,8 @@
 
 body {
     background: $primary-background;
+
+    @include font-smoothing();
 }
 
 @mixin responsive-inline-position() {

@@ -19,38 +19,50 @@
 {%- endblock -%}
 
 {%- block item -%}
-    {%- if item.hasChildren and item.displayChildren -%}
-        {%- set classes = classes|merge(['dropdown', 'dropdown-level-' ~ item.level]) %}
-        {%- set childrenClasses = childrenClasses|merge(['dropdown-menu', 'dropdown-menu-level-' ~ item.level]) %}
+    {%- set hasDisplayableChildren = item.hasChildren and item.displayChildren -%}
+
+    {%- if hasDisplayableChildren -%}
+        {%- set classes = classes|merge(['dropdown', 'dropdown-level-' ~ item.level]) -%}
+        {%- set childrenClasses = childrenClasses|merge(['dropdown-menu', 'dropdown-menu-level-' ~ item.level]) -%}
+        {%- if item.level > 1 -%}
+            {%- set isLastLevel = true -%}
+            {%- for sub_item in item -%}
+                {%- if sub_item.hasChildren and sub_item.displayChildren -%}
+                    {%- set isLastLevel = false -%}
+                {%- endif -%}
+            {%- endfor -%}
+            {%- if isLastLevel -%}
+                {%- set childrenClasses = childrenClasses|merge(['dropdown-menu-level-last']) -%}
+            {%- endif -%}
+        {%- endif -%}
     {%- else -%}
-        {%- set classes = classes|merge(['dropdown-menu-single-item', 'dropdown-level-' ~ item.level]) %}
+        {%- set classes = classes|merge(['dropdown-menu-single-item', 'dropdown-level-' ~ item.level]) -%}
     {%- endif -%}
-    {%- if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined -%}
-        {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}
+
+    {%- if item.extras.routes is defined and item.extras.routes[0] is defined -%}
+        {%- set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]}) -%}
         {%- if item.extras.routes|length > 1 -%}
-            {% set itemAttributes = itemAttributes|merge({'data-routes': item.extras.routes|slice(1)|json_encode })%}
+            {%- set itemAttributes = itemAttributes|merge({'data-routes': item.extras.routes|slice(1)|json_encode}) -%}
         {%- endif -%}
     {%- endif -%}
 
-    {% if item.level == 1 %}
-        {% set hasValidChildren = false %}
-
-        {% for sub_item in item %}
-            {% if not hasValidChildren %}
+    {%- if item.level == 1 -%}
+        {%- set hasValidChildren = false -%}
+        {%- for sub_item in item -%}
+            {%- if not hasValidChildren -%}
                 {%- set showNonAuthorized = sub_item.extras.show_non_authorized is defined and sub_item.extras.show_non_authorized -%}
-                {%- set displayable = sub_item.extras.isAllowed or showNonAuthorized -%}
-                {% if sub_item.displayed and displayable and not sub_item.getExtra('divider') %}
-                    {% set hasValidChildren = true %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
+                {%- if sub_item.displayed and (sub_item.extras.isAllowed or showNonAuthorized) and not sub_item.getExtra('divider') -%}
+                    {%- set hasValidChildren = true -%}
+                {%- endif -%}
+            {%- endif -%}
+        {%- endfor -%}
 
-        {% if (item.uri is empty or item.uri != '#') or (item.hasChildren and item.displayChildren and hasValidChildren) %}
+        {%- if (item.uri is empty or item.uri != '#') or (hasDisplayableChildren and hasValidChildren) -%}
             {{ block('item_renderer') }}
-        {% endif %}
-    {% else %}
+        {%- endif -%}
+    {%- else -%}
         {{ block('item_renderer') }}
-    {% endif %}
+    {%- endif -%}
 {%- endblock -%}
 
 {% block linkElement %}

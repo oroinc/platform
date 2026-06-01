@@ -4,8 +4,10 @@ $menu-animation: all 200ms linear !default;
 $menu-background-color: $neutral-white !default;
 $menu-box-shadow: $primary-box-shadow !default;
 $menu-font-size: $base-font-size !default;
-$menu-background-color-hover: $primary-main-light !default;
-$menu-background-color-active: $secondary-secondary-6 !default;
+$menu-item-divider-color: $primary-800 !default;
+$menu-background-hover: $primary-accent-background !default;
+$menu-background-active: $primary-accent-background !default;
+
 $menu-header-height: 48px !default;
 
 $menu-icon: var(--fa-var-angle-right) !default;
@@ -14,7 +16,6 @@ $menu-icon-down: $fa-var-angle-down !default;
 $menu-icon-toggler: var(--fa-var-arrow-left) !default;
 $menu-placeholder-size: 17px !default;
 
-$menu-top-icon-start: var(--fa-var-angle-left) !default;
 $menu-top-icon-end: var(--fa-var-angle-right) !default;
 
 $menu-close-botton-background-color: rgba($primary, .55) !default;
@@ -23,17 +24,21 @@ $menu-close-button-color: $primary-inverse !default;
 $menu-full-screen-button-color: $primary-750 !default;
 $menu-full-screen-title-color: $primary-200 !default;
 // Main menu side view
-$menu-side-width: 230px !default;
+$menu-side-width: 293px !default;
 $menu-side-width-minimized: 80px !default;
 // Main menu dropdown
 $menu-header-background-color: transparent !default;
 $menu-dropdown-background-color: $neutral-grey-2 !default;
 $menu-dropdown-border-color: $neutral-grey-3 !default;
-$menu-dropdown-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
-$menu-dropdown-background-color-active: $neutral-grey-1 !default;
+$menu-dropdown-box-shadow: 0 0 3px 1px rgba(42, 42, 42, .24), 1px 3px 8px 8px rgba(10, 13, 18, .05) !default;
+$menu-dropdown-scrolable-box-shadow: $primary-box-shadow !default;
+$menu-dropdown-border-radius: 0 0 10px 10px !default;
+$menu-dropdown-dropdown-menu-level-2-border-radius: 10px !default;
+$menu-dropdown-background-color-active: $neutral-grey-2 !default;
 $menu-dropdown-border-color-active: $neutral-grey-3 !default;
 $menu-dropdown-background-color-light-active: $primary-700 !default;
-
+$menu-dropdown-accordion-body-collapse-border-bottom: 1px solid $neutral-grey-3 !default;
+$menu-dropdown-accordion-a-unclickable-outline-focus: none !default;
 // Mobile main menu
 $menu-mobile-box-shadow: 0 2px 10px 0 rgba(0 0 0 / 19%) !default;
 
@@ -43,12 +48,94 @@ $menu-accordion-icon-color: $primary-550 !default;
 $menu-item-first-level-text-color: $text-primary !default;
 $menu-item-first-level-icon-color: $primary-accent !default;
 $menu-item-first-level-text-color-active: $text-primary !default;
-$menu-item-text-color: $primary-300 !default;
+$menu-item-text-color: $text-primary !default;
 $menu-item-text-highlight-color: $primary-accent-extra-light !default;
-$menu-item-offset: 9px 18px 9px 16px !default;
-$menu-item-divider-color: $primary-800 !default;
-$menu-item-line-height: 18px !default;
-$menu-minimized-item-first-level-text-color-active: $text-primary !default;
+$menu-item-offset: 12px 16px !default;
+$menu-item-line-height: 16px !default;
+$menu-item-font-size: 13px !default;
+$menu-item-first-level-font-size: 14px !default;
+$menu-item-minimized-font-size: 11px !default;
+$menu-item-minimized-line-height: 1.2 !default;
+$menu-item-title-level-offset-step: 24px !default;
+
+// Menu item font weights
+$menu-accordion-icon-font-weight: font-weight('light') !default;
+$menu-item-title-font-weight: font-weight('normal') !default;
+$menu-item-collapsed-font-weight: font-weight('normal') !default;
+$menu-item-active-font-weight: font-weight('semi-bold') !default;
+$menu-item-active-collapsed-font-weight: font-weight('normal') !default;
+$menu-item-first-level-font-weight: font-weight('semi-bold') !default;
+$menu-item-first-level-collapsed-font-weight: font-weight('medium') !default;
+$menu-item-minimized-font-weight: font-weight('medium') !default;
+$menu-top-first-level-font-weight: font-weight('medium') !default;
+$menu-top-first-level-active-font-weight: font-weight('semi-bold') !default;
+
+// Background reset
+$menu-item-reset-background: transparent !default;
+
+// Menu icon
+$menu-icon-font-size: 24px !default;
+$menu-icon-size: 24px !default;
+$menu-icon-margin-inline-end: 12px !default;
+$menu-icon-narrow-font-size: 21px !default;
+$menu-icon-narrow-margin-bottom: 4px !default;
+
+$menu-accordion-icon-height: 16px !default;
+$menu-accordion-icon-min-width: 16px !default;
+$menu-accordion-icon-margin-right: 8px !default;
+$menu-accordion-icon-line-height: 1 !default;
+$menu-accordion-icon-text-align: center !default;
+$menu-accordion-icon-vertical-align: bottom !default;
+
+$menu-icon-text-align: center !default;
+$menu-icon-vertical-align: bottom !default;
+
+// Main menu sided
+$menu-sided-title-letter-spacing: .2px !default;
+$menu-sided-item-padding: 12px 15px !default;
+$menu-sided-item-line-height: normal !default;
+$menu-sided-first-level-collapsed-border-color: transparent !default;
+$menu-sided-item-level-base-padding: 39px !default;
+$menu-sided-first-level-padding: 15px 24px !default;
+$menu-sided-minimized-title-padding: 16px 4px !default;
+$menu-sided-minimized-icon-margin: 0 0 5px !default;
+
+// Main menu top
+$menu-top-dropdown-background-color: $neutral-grey-2 !default;
+$menu-top-dropdown-background-color-active: $neutral-grey-2 !default;
+$menu-top-dropdown-min-width: 175px !default;
+$menu-top-dropdown-padding: 0 !default;
+$menu-top-dropdown-level-last-border-radius: 10px !default;
+$menu-top-dropdown-first-last-item-border-radius: 10px !default;
+$menu-top-first-level-padding: 16px !default;
+$menu-top-first-level-line-height: 24px !default;
+$menu-top-main-menu-padding-left: 24px !default;
+$menu-top-dropdown-border: 0 !default;
+$menu-top-dropdown-cover-height: 6px !default;
+$menu-top-dropdown-level-last-overflow: hidden !default;
+$menu-top-align-menu-line-height: 1 !default;
+$menu-top-narrow-title-padding: 6px 12px !default;
+$menu-top-narrow-title-max-width: 100px !default;
+$menu-top-narrow-title-line-height: 1 !default;
+$menu-top-align-menu-margin: 10px !default;
+$menu-top-align-end-menu-icon-offset: 24px !default;
+$menu-top-align-end-menu-title-padding: 42px !default;
+$menu-top-align-start-menu-icon-offset: 4px !default;
+$menu-top-align-start-menu-title-padding: 16px !default;
+$menu-top-dropdown-background-color: $neutral-grey-1 !default;
+$menu-top-border-top: 1px solid transparent !default;
+$menu-top-border-image: linear-gradient(
+                        to right, transparent 25px,
+                        $neutral-grey-3 25px calc(100% - 25px),
+                        transparent calc(100% - 25px)
+                        ) 1 !default;
+// Mobile main menu
+$menu-mobile-close-button-top: 5px !default;
+$menu-mobile-close-button-size: 32px !default;
+$menu-mobile-item-padding: 10px 15px !default;
+$menu-mobile-item-level-base-padding: 28px !default;
+$menu-mobile-first-level-padding: 14px 22px 14px 24px !default;
+
 // Main menu toggler
 $menu-toggler-font-size: 16px !default;
 $menu-toggler-color: $primary-main !default;
@@ -56,15 +143,52 @@ $menu-icon-toggler-transform: 0 !default;
 $menu-icon-toggler-transform-active: 180deg !default;
 
 // Main menu overlay
-$side-menu-fill-blur-width: 36px !default;
+$side-menu-fill-blur-width: 16px !default;
 
-$side-menu-overlay-header-height: 108px !default;
-$side-menu-overlay-title-font-size: 21px !default;
+$side-menu-overlay-header-height: 130px !default;
+$side-menu-overlay-title-font-size: 20px !default;
+$side-menu-overlay-title-letter-spacing: .2px !default;
 $side-menu-overlay-button-font-size: 18px !default;
-$side-menu-overlay-button-offset: null !default;
+$side-menu-overlay-button-offset: -13px !default;
 
 $side-menu-overlay-ui-helper-text-align: right !default;
 $side-menu-overlay-ui-fill-transform: translate(-100%) !default;
 $side-menu-overlay-ui-fill-width: 300% !default;
 $side-menu-overlay-ui-fill-background-color: rgba(178, 183, 188, .3) !default;
 $side-menu-overlay-ui-fill-blur-box-shadow: 2px 2px 2px 0 rgba(0 0 0 / 19%) !default;
+
+$side-menu-overlay-transition: opacity 150ms linear !default;
+$side-menu-overlay-header-offset-start: 24px !default;
+$side-menu-overlay-header-offset-end: 24px !default;
+$side-menu-overlay-menu-item-width: 284px !default;
+$side-menu-overlay-content-padding-bottom: 16px !default;
+
+$side-menu-overlay-title-line-height: 25px !default;
+$side-menu-overlay-title-font-weight: font-weight('medium') !default;
+$side-menu-overlay-title-margin-bottom: 24px !default;
+
+$side-menu-overlay-search-icon-right: 8px !default;
+$side-menu-overlay-search-icon-padding: 4px !default;
+$side-menu-overlay-field-padding-right: 24px !default;
+
+$side-menu-overlay-button-top: 12px !default;
+
+$side-menu-overlay-menu-min-height: 340px !default;
+$side-menu-overlay-menu-item-padding: 0 24px !default;
+$side-menu-overlay-menu-item-line-height: 20px !default;
+$side-menu-overlay-menu-item-divider-bottom: -500px !default;
+
+$side-menu-overlay-title-level-2-font-size: 16px !default;
+$side-menu-overlay-title-level-2-padding: 8px 6px 8px 16px !default;
+$side-menu-overlay-title-level-2-margin: 2px !default;
+$side-menu-overlay-title-level-3-font-weight: font-weight('medium') !default;
+$side-menu-overlay-title-level-4-color: $text-secondary !default;
+$side-menu-overlay-item-font-size: $menu-item-font-size !default;
+$side-menu-overlay-item-level-offset: 8px !default;
+$side-menu-overlay-item-level-offset-step: 16px !default;
+$side-menu-overlay-item-padding: 6px 6px 6px 16px !default;
+$side-menu-overlay-title-inline-gap: 8px !default;
+$side-menu-overlay-fill-blur-gap: 10px !default;
+$side-menu-overlay-button-hover: $neutral-dark !default;
+$side-menu-overlay-tree-boundary-border-bottom: 1px dashed $neutral-grey-3 !default;
+$side-menu-overlay-last-item-in-group-padding-bottom: 2px !default;
