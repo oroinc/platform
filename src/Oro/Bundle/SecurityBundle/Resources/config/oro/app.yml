@@ -20,7 +20,6 @@ oro_security:
         directives:
             accelerometer: deny
             autoplay: allow_self
-            battery: deny
             camera: deny
             fullscreen: allow_self
             gamepad: deny
@@ -36,8 +35,11 @@ oro_security:
             usb: deny
             window-management: deny
 #            ambient-light-sensor: deny
+#            aria-notify: deny
 #            attribution-reporting: deny
+#            bluetooth: deny
 #            browsing-topics: deny
+#            captured-surface-control: deny
 #            ch-device-memory: deny
 #            ch-downlink: deny
 #            ch-dpr: deny
@@ -47,23 +49,27 @@ oro_security:
 #            ch-prefers-reduced-transparency: deny
 #            ch-rtt: deny
 #            ch-save-data: deny
+#            ch-ua: deny
 #            ch-ua-arch: deny
 #            ch-ua-bitness: deny
 #            ch-ua-form-factor: deny
-#            ch-ua-full-version-list: deny
 #            ch-ua-full-version: deny
+#            ch-ua-full-version-list: deny
+#            ch-ua-high-entropy-values: deny
 #            ch-ua-mobile: deny
 #            ch-ua-model: deny
-#            ch-ua-platform-version: deny
 #            ch-ua-platform: deny
+#            ch-ua-platform-version: deny
 #            ch-ua-wow64: deny
-#            ch-ua: deny
 #            ch-viewport-height: deny
 #            ch-viewport-width: deny
 #            ch-width: deny
 #            clipboard-read: allow_self
 #            clipboard-write: allow_self
+#            compute-pressure: deny
 #            cross-origin-isolated: deny
+#            deferred-fetch: deny
+#            deferred-fetch-minimal: deny
 #            display-capture: deny
 #            document-domain: deny
 #            encrypted-media: deny
@@ -74,6 +80,8 @@ oro_security:
 #            interest-cohort: deny
 #            join-ad-interest-group: deny
 #            keyboard-map: deny
+#            language-detector: deny
+#            on-device-speech-recognition: deny
 #            otp-credentials: deny
 #            payment: deny
 #            picture-in-picture: deny
@@ -83,11 +91,13 @@ oro_security:
 #            publickey-credentials-create: deny
 #            publickey-credentials-get: deny
 #            run-ad-auction: deny
-#            shared-storage-select-url: deny
 #            shared-storage: deny
+#            shared-storage-select-url: deny
 #            speaker-selection: deny
 #            storage-access: deny
+#            summarizer: deny
 #            sync-xhr: deny
+#            translator: deny
 #            unload: deny
 #            web-share: deny
 #            xr-spatial-tracking: deny
