@@ -117,6 +117,7 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->booleanNode('enable')->defaultFalse()->end()
                     ->arrayNode('directives')
+                        ->normalizeKeys(false)
                         ->useAttributeAsKey('name')
                         ->prototype('variable')
                             ->beforeNormalization()->castToArray()->end()
