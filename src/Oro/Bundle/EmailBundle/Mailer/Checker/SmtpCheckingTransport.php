@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer\Checker;
 
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Oro\Bundle\ConfigBundle\Validator\OutboundConnectionValidatorInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
@@ -61,7 +63,10 @@ class SmtpCheckingTransport extends EsmtpTransport
             return $this->checkConnection();
         }
 
-        $duration = $this->connectionCheckDuration * (random_int(95, 105) / 100.0);
+        $randomFactor = BigDecimal::of(random_int(95, 105))->dividedBy(100, 2, RoundingMode::HALF_UP);
+        $duration = BigDecimal::of($this->connectionCheckDuration)
+            ->multipliedBy($randomFactor)
+            ->toFloat();
         $startTime = microtime(true);
         $initialTimeout = $stream->getTimeout();
         $stream->setTimeout((float)$this->connectionCheckDuration);
@@ -72,7 +77,12 @@ class SmtpCheckingTransport extends EsmtpTransport
         }
         $elapsed = microtime(true) - $startTime;
         if ($elapsed < $duration) {
-            usleep((int)(($duration - $elapsed) * 1000000));
+            $sleepDuration = BigDecimal::of($duration)
+                ->minus(BigDecimal::of($elapsed))
+                ->multipliedBy(1000000)
+                ->toScale(0, RoundingMode::DOWN)
+                ->toInt();
+            usleep($sleepDuration);
         }
 
         return $isSuccessful;
