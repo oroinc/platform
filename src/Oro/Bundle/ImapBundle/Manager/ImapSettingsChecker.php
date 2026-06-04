@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Oro\Bundle\ConfigBundle\Validator\OutboundConnectionValidatorInterface;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
@@ -87,12 +89,20 @@ class ImapSettingsChecker
             return $this->doCheckConnection($value);
         }
 
-        $duration = $this->connectionCheckDuration * (random_int(95, 105) / 100.0);
+        $randomFactor = BigDecimal::of(random_int(95, 105))->dividedBy(100, 2, RoundingMode::HALF_UP);
+        $duration = BigDecimal::of($this->connectionCheckDuration)
+            ->multipliedBy($randomFactor)
+            ->toFloat();
         $startTime = microtime(true);
         $isSuccessful = $this->doCheckConnection($value, $this->connectionCheckDuration);
         $elapsed = microtime(true) - $startTime;
         if ($elapsed < $duration) {
-            usleep((int)(($duration - $elapsed) * 1000000));
+            $sleepDuration = BigDecimal::of($duration)
+                ->minus(BigDecimal::of($elapsed))
+                ->multipliedBy(1000000)
+                ->toScale(0, RoundingMode::DOWN)
+                ->toInt();
+            usleep($sleepDuration);
         }
 
         return $isSuccessful;
