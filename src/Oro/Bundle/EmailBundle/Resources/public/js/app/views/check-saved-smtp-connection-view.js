@@ -24,18 +24,11 @@ define(function(require) {
 
         checkSmtpConnection: function(event) {
             const $messageContainer = this.$el.find('.check-smtp-connection-messages');
-            const $settingsForm = this.$el.closest('form');
             mediator.execute('showLoading');
 
             $.ajax({
-                type: 'GET',
-                url: routing.generate(
-                    this.route,
-                    {
-                        scopeClass: $settingsForm.data('scope-class'),
-                        scopeId: $settingsForm.data('scope-id')
-                    }
-                ),
+                type: 'POST',
+                url: this.getUrl(),
                 success: response => {
                     if (response) {
                         this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
@@ -59,6 +52,15 @@ define(function(require) {
             messenger.notificationFlashMessage(type, __(message), {
                 container: container,
                 delay: 5000
+            });
+        },
+
+        getUrl: function() {
+            const $settingsForm = this.$el.closest('form');
+
+            return routing.generate(this.route, {
+                scopeClass: $settingsForm.data('scope-class'),
+                scopeId: $settingsForm.data('scope-id')
             });
         }
     });

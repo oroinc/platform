@@ -53,18 +53,16 @@ class ImapServicesFactory
 
         $foundItem = $this->findImapServicesConfig($defaultImapStorage->capability());
 
-        $imapStorageClass =
-            ($foundItem === null || strcmp($foundItem[0], get_class($defaultImapStorage)) === 0)
-                ? null
-                : $foundItem[0];
-        $searchStringBuilderClass =
-            $foundItem === null
-                ? $this->defaultImapServices[1]
-                : $foundItem[1];
+        $imapStorageClass = null !== $foundItem && strcmp($foundItem[0], \get_class($defaultImapStorage)) !== 0
+            ? $foundItem[0]
+            : null;
+        $searchStringBuilderClass = null !== $foundItem
+            ? $foundItem[1]
+            : $this->defaultImapServices[1];
 
-        $imapStorage = $imapStorageClass === null
-            ? $defaultImapStorage
-            : new $imapStorageClass($defaultImapStorage);
+        $imapStorage = null !== $imapStorageClass
+            ? new $imapStorageClass($defaultImapStorage)
+            : $defaultImapStorage;
 
         return new ImapServices(
             $imapStorage,
@@ -78,14 +76,15 @@ class ImapServicesFactory
      */
     protected function getDefaultImapStorage(ImapConfig $config)
     {
-        $params = array(
+        $params = [
             'host' => $config->getHost(),
             'port' => $config->getPort(),
             'ssl' => $config->getSsl(),
             'user' => $config->getUser(),
             'password' => $config->getPassword(),
-            'accessToken' => $config->getAccessToken()
-        );
+            'accessToken' => $config->getAccessToken(),
+            'connectionTimeout' => $config->getConnectionTimeout()
+        ];
 
         $defaultImapStorageClass = $this->defaultImapServices[0];
 

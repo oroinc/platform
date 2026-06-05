@@ -82,11 +82,17 @@ define(function(require) {
                     result[item.name] = item.value;
                 }
             });
+
             return result;
         },
 
         getUrl: function() {
-            return routing.generate(this.route);
+            const $settingsForm = this.$el.closest('form');
+
+            return routing.generate(this.route, {
+                scopeClass: $settingsForm.data('scope-class'),
+                scopeId: $settingsForm.data('scope-id')
+            });
         },
 
         clear: function() {

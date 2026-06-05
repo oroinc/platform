@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Checker;
 
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpConnectionChecker;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 class SmtpConnectionCheckerTest extends \PHPUnit\Framework\TestCase
@@ -12,7 +13,9 @@ class SmtpConnectionCheckerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupports(string $dsn, bool $expected): void
     {
-        self::assertSame($expected, (new SmtpConnectionChecker())->supports(Dsn::fromString($dsn)));
+        $checker = new SmtpConnectionChecker();
+        $checker->setLogger($this->createMock(LoggerInterface::class));
+        self::assertSame($expected, $checker->supports(Dsn::fromString($dsn)));
     }
 
     public function supportsDataProvider(): array

@@ -310,61 +310,34 @@ class UserEmailOrigin extends EmailOrigin
         return $this;
     }
 
-    /**
-     * Returns type.
-     */
     public function getAccountType(): ?string
     {
         return $this->accountType;
     }
 
-    /**
-     * Sets type
-     */
     public function setAccountType(string $accountType): UserEmailOrigin
     {
         $this->accountType = $accountType;
+
         return $this;
     }
 
-    /**
-     * Check is configured smtp.
-     *
-     * @return bool
-     */
-    public function isSmtpConfigured()
+    public function isSmtpConfigured(): bool
     {
-        $smtpHost = $this->getSmtpHost();
-        $smtpPort = $this->getSmtpPort();
-        $user = $this->getUser();
-        $password = $this->getPassword();
-        $token = $this->getAccessToken();
-
-        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && (!empty($password) || !empty($token))) {
-            return true;
-        }
-
-        return false;
+        return
+            $this->getSmtpHost()
+            && $this->getSmtpPort() > 0
+            && $this->getUser()
+            && ($this->getPassword() || $this->getAccessToken());
     }
 
-    /**
-     * Check is configured imap.
-     *
-     * @return bool
-     */
-    public function isImapConfigured()
+    public function isImapConfigured(): bool
     {
-        $imapHost = $this->getImapHost();
-        $imapPort = $this->getImapPort();
-        $user = $this->getUser();
-        $password = $this->getPassword();
-        $token = $this->getAccessToken();
-
-        if (!empty($imapHost) && $imapPort > 0 && !empty($user) && (!empty($password) || !empty($token))) {
-            return true;
-        }
-
-        return false;
+        return
+            $this->getImapHost()
+            && $this->getImapPort() > 0
+            && $this->getUser()
+            && ($this->getPassword() || $this->getAccessToken());
     }
 
     /**
