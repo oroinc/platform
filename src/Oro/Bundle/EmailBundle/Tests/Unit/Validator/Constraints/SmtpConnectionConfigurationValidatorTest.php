@@ -42,7 +42,7 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         );
     }
 
-    public function testUnexpectedConstraint()
+    public function testUnexpectedConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
@@ -57,15 +57,43 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         $this->assertNoViolation();
     }
 
+    public function testValidateWhenNoDataToValidateConnection(): void
+    {
+        $value = [];
+
+        $this->checker->expects(self::never())
+            ->method('checkConnection');
+
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateWhenNoDataToCheckConnection(): void
+    {
+        $encryptedPassword = 'encrypted_password';
+        $value = $this->getConfiguredSettings($encryptedPassword);
+        $value[$this->getConfigKeyByName(Configuration::KEY_SMTP_SETTINGS_HOST)][ConfigManager::VALUE_KEY] = '';
+
+        $this->checker->expects(self::never())
+            ->method('checkConnection');
+
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
+    }
+
     public function testValidateFailedConnection(): void
     {
         $encryptedPassword = 'encrypted_password';
         $value = $this->getConfiguredSettings($encryptedPassword);
-        $smtpSettings = $this->getSmtpSettings($encryptedPassword);
 
         $this->checker->expects(self::once())
             ->method('checkConnection')
-            ->with($smtpSettings)
+            ->with($this->getSmtpSettings($encryptedPassword))
             ->willReturn(false);
 
         $constraint = new SmtpConnectionConfiguration();
@@ -79,11 +107,10 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
     {
         $encryptedPassword = 'encrypted_password';
         $value = $this->getConfiguredSettings($encryptedPassword);
-        $smtpSettings = $this->getSmtpSettings($encryptedPassword);
 
         $this->checker->expects(self::once())
             ->method('checkConnection')
-            ->with($smtpSettings)
+            ->with($this->getSmtpSettings($encryptedPassword))
             ->willReturn(true);
 
         $constraint = new SmtpConnectionConfiguration();
@@ -95,26 +122,21 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
     private function getConfiguredSettings(string $encryptedPassword): array
     {
         return [
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_HOST,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 'smtp.host'],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_PORT,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 123],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_ENC,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 'ssl'],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_USER,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 'user'],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_PASS,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => $encryptedPassword]
+            $this->getConfigKeyByName(Configuration::KEY_SMTP_SETTINGS_HOST) => [
+                ConfigManager::VALUE_KEY => 'smtp.host'
+            ],
+            $this->getConfigKeyByName(Configuration::KEY_SMTP_SETTINGS_PORT) => [
+                ConfigManager::VALUE_KEY => 123
+            ],
+            $this->getConfigKeyByName(Configuration::KEY_SMTP_SETTINGS_ENC) => [
+                ConfigManager::VALUE_KEY => 'ssl'
+            ],
+            $this->getConfigKeyByName(Configuration::KEY_SMTP_SETTINGS_USER) => [
+                ConfigManager::VALUE_KEY => 'user'
+            ],
+            $this->getConfigKeyByName(Configuration::KEY_SMTP_SETTINGS_PASS) => [
+                ConfigManager::VALUE_KEY => $encryptedPassword
+            ]
         ];
     }
 
@@ -139,5 +161,10 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
             ->willReturn($smtpSettings);
 
         return $smtpSettings;
+    }
+
+    private function getConfigKeyByName(string $name): mixed
+    {
+        return Configuration::getConfigKeyByName($name, ConfigManager::SECTION_VIEW_SEPARATOR);
     }
 }

@@ -22,6 +22,7 @@ class ImapConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user, $obj->getUser());
         $this->assertEquals($password, $obj->getPassword());
         $this->assertEquals($token, $obj->getAccessToken());
+        $this->assertNull($obj->getConnectionTimeout());
     }
 
     public function testSettersAndGetters()
@@ -34,6 +35,7 @@ class ImapConfigTest extends \PHPUnit\Framework\TestCase
         $user = 'testUser';
         $password = 'testPwd';
         $token = 'testToken';
+        $connectionTimeout = 123;
 
         $obj->setHost($host);
         $obj->setPort($port);
@@ -41,6 +43,7 @@ class ImapConfigTest extends \PHPUnit\Framework\TestCase
         $obj->setUser($user);
         $obj->setPassword($password);
         $obj->setAccessToken($token);
+        $obj->setConnectionTimeout($connectionTimeout);
 
         $this->assertEquals($host, $obj->getHost());
         $this->assertEquals($port, $obj->getPort());
@@ -48,5 +51,9 @@ class ImapConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user, $obj->getUser());
         $this->assertEquals($password, $obj->getPassword());
         $this->assertEquals($token, $obj->getAccessToken());
+        $this->assertEquals($connectionTimeout, $obj->getConnectionTimeout());
+
+        $obj->setConnectionTimeout(null);
+        $this->assertNull($obj->getConnectionTimeout());
     }
 }
