@@ -152,9 +152,9 @@ class OAuthAuthenticatorTest extends TestCase
             ->with(null);
 
         $httpUtilsMock->expects($this->once())
-            ->method('createRequest')
+            ->method('generateUri')
             ->with($request, $checkPath)
-            ->willReturn(Request::create($checkUri));
+            ->willReturn($checkUri);
 
         $resourceOwnerMock->expects($this->once())
             ->method('getAccessToken')
