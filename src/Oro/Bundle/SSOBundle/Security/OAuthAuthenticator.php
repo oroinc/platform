@@ -169,7 +169,7 @@ class OAuthAuthenticator implements
 
         $accessToken = $resourceOwner->getAccessToken(
             $request,
-            $this->httpUtils->createRequest($request, $checkPath)->getUri()
+            $this->httpUtils->generateUri($request, $checkPath)
         );
 
         $token = $this->tokenFactory->create($accessToken);
