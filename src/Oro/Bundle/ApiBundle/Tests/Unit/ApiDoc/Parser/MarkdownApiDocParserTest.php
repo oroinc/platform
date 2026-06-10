@@ -13,17 +13,12 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 {
     private function loadDocument(): MarkdownApiDocParser
     {
-        $fixturesDir = __DIR__ . '/Fixtures';
-
         $fileLocator = $this->createMock(FileLocator::class);
+        $fixturesDir = __DIR__ . '/Fixtures';
         $fileLocator->expects(self::any())
             ->method('locate')
             ->willReturnCallback(function ($resource) use ($fixturesDir) {
-                return str_replace(
-                    '@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures',
-                    $fixturesDir,
-                    $resource
-                );
+                return str_replace('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures', $fixturesDir, $resource);
             });
 
         $apiDocParser = new MarkdownApiDocParser($fileLocator);
@@ -34,27 +29,9 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         return $apiDocParser;
     }
 
-    /**
-     * Assert loaded data in markdown parser
-     *
-     * In the PHP >= 7.3 updated DOM component.
-     * Now DOMDocument::saveHTML return html in different formatting than PHP < 7.3.
-     * We remove new lines in actual parsed data so that check to work on all supported PHP versions.
-     */
     private function assertLoadedData(array $expected, MarkdownApiDocParser $apiDocParser): void
     {
-        $actualValue = ReflectionUtil::getPropertyValue($apiDocParser, 'loadedData');
-
-        $normalizer = static function (&$val): void {
-            if (\is_string($val)) {
-                $val = str_replace("\n", '', $val);
-            }
-        };
-
-        array_walk_recursive($expected, $normalizer);
-        array_walk_recursive($actualValue, $normalizer);
-
-        self::assertEquals($expected, $actualValue);
+        self::assertEquals($expected, ReflectionUtil::getPropertyValue($apiDocParser, 'loadedData'));
     }
 
     public function testRegisterDocumentationResourceForUnsupportedFile()
@@ -96,6 +73,50 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/replace.yml'));
 
         $this->assertLoadedData($expected, $apiDocParser);
+    }
+
+    public function testRegisterDocumentationResourceCache(): void
+    {
+        $resource1 = '@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/apidoc.md';
+        $resource2 = 'apidoc.md';
+        $resource3 = '@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/replace.md';
+
+        $fileLocator = $this->createMock(FileLocator::class);
+        $fixturesDir = __DIR__ . '/Fixtures';
+        $fileLocator->expects(self::exactly(3))
+            ->method('locate')
+            ->willReturnCallback(function ($resource) use ($fixturesDir) {
+                return str_starts_with($resource, '@')
+                    ? str_replace('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures', $fixturesDir, $resource)
+                    : $fixturesDir . '/' . $resource;
+            });
+
+        $apiDocParser = new MarkdownApiDocParser($fileLocator);
+
+        self::assertTrue($apiDocParser->registerDocumentationResource($resource1));
+        self::assertTrue($apiDocParser->registerDocumentationResource($resource2));
+        self::assertTrue($apiDocParser->registerDocumentationResource($resource3));
+        self::assertEquals(
+            '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>',
+            $apiDocParser->getActionDocumentation(Entity\Account::class, 'get_list')
+        );
+        self::assertEquals(
+            '<p>New description for GET action.</p>',
+            $apiDocParser->getActionDocumentation(Entity\Account::class, 'get')
+        );
+
+        // test caches, both $locatedFiles and $parsedFiles
+        self::assertTrue($apiDocParser->registerDocumentationResource($resource1));
+        self::assertTrue($apiDocParser->registerDocumentationResource($resource2));
+        self::assertTrue($apiDocParser->registerDocumentationResource($resource3));
+        self::assertEquals(
+            '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>',
+            $apiDocParser->getActionDocumentation(Entity\Account::class, 'get_list')
+        );
+        self::assertEquals(
+            '<p>New description for GET action.</p>',
+            $apiDocParser->getActionDocumentation(Entity\Account::class, 'get')
+        );
     }
 
     /**
