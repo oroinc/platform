@@ -248,6 +248,8 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
                         $expected
                     ));
                 }
+            } elseif (is_float($expected)) {
+                \PHPUnit\Framework\Assert::assertEqualsWithDelta($expected, $actual, 0.0000001);
             } else {
                 \PHPUnit\Framework\Assert::assertSame($expected, $actual);
             }
