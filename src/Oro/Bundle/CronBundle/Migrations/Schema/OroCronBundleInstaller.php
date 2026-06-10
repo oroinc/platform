@@ -11,7 +11,7 @@ class OroCronBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v2_1';
+        return 'v7_0_3_0';
     }
 
     #[\Override]

@@ -40,9 +40,10 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
             'route' => 'oro_email_activity_view',
             'acl' => 'oro_email_email_view',
             'action_button_widget' => 'oro_send_email_button',
-            'action_link_widget' => 'oro_send_email_link'
+            'action_link_widget' => 'oro_send_email_link',
         ],
-        'grid' => ['default' => 'email-grid', 'context' => 'email-for-context-grid']
+        'grid' => ['default' => 'email-grid', 'context' => 'email-for-context-grid'],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Email implements ActivityInterface, ExtendEntityInterface
@@ -50,30 +51,37 @@ class Email implements ActivityInterface, ExtendEntityInterface
     use ExtendActivity;
     use ExtendEntityTrait;
 
-    public const LOW_IMPORTANCE    = -1;
+    public const LOW_IMPORTANCE = -1;
     public const NORMAL_IMPORTANCE = 0;
-    public const HIGH_IMPORTANCE   = 1;
+    public const HIGH_IMPORTANCE = 1;
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'created', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $created = null;
 
     /**
      * Max length is 998 see RFC 2822, section 2.1.1 (https://tools.ietf.org/html/rfc2822#section-2.1.1)
      */
     #[ORM\Column(name: 'subject', type: Types::STRING, length: 998)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $subject = null;
 
     #[ORM\Column(name: 'from_name', type: Types::STRING, length: 320)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $fromName = null;
 
     #[ORM\ManyToOne(targetEntity: EmailAddress::class, cascade: ['persist'], fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'from_email_address_id', referencedColumnName: 'id', nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?EmailAddress $fromEmailAddress = null;
 
     /**
@@ -85,53 +93,68 @@ class Email implements ActivityInterface, ExtendEntityInterface
         cascade: ['persist', 'remove'],
         orphanRemoval: true
     )]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $recipients = null;
 
     #[ORM\Column(name: 'sent', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?\DateTimeInterface $sentAt = null;
 
     #[ORM\Column(name: 'importance', type: Types::INTEGER)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $importance = null;
 
     #[ORM\Column(name: 'internaldate', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?\DateTimeInterface $internalDate = null;
 
     #[ORM\Column(name: 'is_head', type: Types::BOOLEAN, options: ['default' => true])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?bool $head = true;
 
     #[ORM\Column(name: 'message_id', type: Types::STRING, length: 512)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $messageId = null;
 
     #[ORM\Column(name: 'multi_message_id', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $multiMessageId = null;
 
     #[ORM\Column(name: 'x_message_id', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $xMessageId = null;
 
     #[ORM\ManyToOne(targetEntity: EmailThread::class, fetch: 'EAGER', inversedBy: 'emails')]
     #[ORM\JoinColumn(name: 'thread_id', referencedColumnName: 'id', nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?EmailThread $thread = null;
 
     #[ORM\Column(name: 'x_thread_id', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $xThreadId = null;
 
     #[ORM\Column(name: 'refs', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $refs = null;
 
     #[ORM\OneToOne(inversedBy: 'email', targetEntity: EmailBody::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'email_body_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?EmailBody $emailBody = null;
 
     /**
      * @var Collection<int, EmailUser>
      */
     #[ORM\OneToMany(mappedBy: 'email', targetEntity: EmailUser::class, cascade: ['remove'], orphanRemoval: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $emailUsers = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $acceptLanguageHeader = null;
 
     #[ORM\Column(name: 'body_synced', type: Types::BOOLEAN, nullable: true, options: ['default' => false])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?bool $bodySynced = false;
 
     public function __construct()
@@ -654,6 +677,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
                     return $folder === $emailFolder;
                 }
             }
+
             return false;
         });
         if ($emailUsers != null && count($emailUsers) > 0) {

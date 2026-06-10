@@ -25,27 +25,39 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'label', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 10]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 10], 'email' => ['available_in_template' => true]])]
     protected ?string $label = null;
 
     #[ORM\Column(name: 'street', type: Types::STRING, length: 500, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 80, 'identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['order' => 80, 'identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $street = null;
 
     #[ORM\Column(name: 'street2', type: Types::STRING, length: 500, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 90]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 90], 'email' => ['available_in_template' => true]])]
     protected ?string $street2 = null;
 
     #[ORM\Column(name: 'city', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 110, 'identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['order' => 110, 'identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $city = null;
 
     #[ORM\Column(name: 'postal_code', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 100, 'identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['order' => 100, 'identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $postalCode = null;
 
     /**
@@ -53,7 +65,10 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     #[ORM\ManyToOne(targetEntity: Country::class)]
     #[ORM\JoinColumn(name: 'country_code', referencedColumnName: 'iso2_code')]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 140, 'short' => true, 'identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['order' => 140, 'short' => true, 'identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected $country;
 
     /**
@@ -61,46 +76,57 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     #[ORM\ManyToOne(targetEntity: Region::class)]
     #[ORM\JoinColumn(name: 'region_code', referencedColumnName: 'combined_code')]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 130, 'short' => true, 'identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['order' => 130, 'short' => true, 'identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected $region;
 
     #[ORM\Column(name: 'organization', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 20]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 20], 'email' => ['available_in_template' => true]])]
     protected ?string $organization = null;
 
     #[ORM\Column(name: 'region_text', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 120]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 120], 'email' => ['available_in_template' => true]])]
     protected ?string $regionText = null;
 
     #[ORM\Column(name: 'name_prefix', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 30]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 30], 'email' => ['available_in_template' => true]])]
     protected ?string $namePrefix = null;
 
     #[ORM\Column(name: 'first_name', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 40]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 40], 'email' => ['available_in_template' => true]])]
     protected ?string $firstName = null;
 
     #[ORM\Column(name: 'middle_name', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 50]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 50], 'email' => ['available_in_template' => true]])]
     protected ?string $middleName = null;
 
     #[ORM\Column(name: 'last_name', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 60]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 60], 'email' => ['available_in_template' => true]])]
     protected ?string $lastName = null;
 
     #[ORM\Column(name: 'name_suffix', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['order' => 70]])]
+    #[ConfigField(defaultValues: ['importexport' => ['order' => 70], 'email' => ['available_in_template' => true]])]
     protected ?string $nameSuffix = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[ConfigField(
-        defaultValues: ['entity' => ['label' => 'oro.ui.created_at'], 'importexport' => ['excluded' => true]]
+        defaultValues: [
+            'entity' => ['label' => 'oro.ui.created_at'],
+            'importexport' => ['excluded' => true],
+            'email' => ['available_in_template' => true],
+        ],
     )]
     protected ?\DateTimeInterface $created = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[ConfigField(
-        defaultValues: ['entity' => ['label' => 'oro.ui.updated_at'], 'importexport' => ['excluded' => true]]
+        defaultValues: [
+            'entity' => ['label' => 'oro.ui.updated_at'],
+            'importexport' => ['excluded' => true],
+            'email' => ['available_in_template' => true],
+        ],
     )]
     protected ?\DateTimeInterface $updated = null;
 
@@ -287,6 +313,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
         if (!empty($this->regionText)) {
             return $this->regionText;
         }
+
         return $this->region;
     }
 

@@ -29,8 +29,46 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### EmailBundle
+* Added `email.available_in_template` entity config option that controls whether an entity can be selected when creating email templates. Defaults to false.
+* Added `oro:debug:email:template:entities` command to show the list of entity classes available when creating email templates.
+* Added `oro:debug:email:tags`, `oro:debug:email:functions`, `oro:debug:email:filters` commands to show the list of allowed Twig tags, functions, and filters correspondingly in email templates.
+* Added `oro:email:template:security-policy-check` command to check email template security policy against an email template(s).
+* Added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` instead of the deprecated `\Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator`.
+* Added `\Oro\Bundle\EmailBundle\Twig\SecurityPolicy\EmailTemplateSecurityPolicyChecker` as the main entry point of checking email template security policy against an email template.
+* Added `\Oro\Bundle\EmailBundle\SecurityPolicyInspector\EmailTemplateSecurityPolicyInspector` to check multiple email templates, and loading email templates via loader notation (e.g. `@db:website=101/sample_template_name`).
+* Added `\Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy` validation constraint and validator classes to bring early security policy checking to the email template create/update page.
+* Added `\Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension`, `\Oro\Bundle\EmailBundle\Twig\NodeVisitor\SafeGetAttrNodeVisitor`, and `\Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode` to enable more graceful handling of non-allowed properties and methods in email templates by replacing them with `null`.
+
+#### EntityBundle
+* Added `\Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessAnalyzer` introducing the mechanism of static analysis of a Twig template to extract all property and method accesses on typed variables.
+* Added `\Oro\Bundle\EntityBundle\Twig\SecurityPolicy\TemplateSecurityPolicyChecker` introducing the mechanism of checking a Twig template against a security policy based on the results of static analysis.
+
 #### FormBundle
 * Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
+
+### Changed
+
+#### EmailBundle
+* Updated entity field config setting `email.available_in_template` to allow it for `toMany` associations.
+* Updated `\Oro\Bundle\EmailBundle\DependencyInjection\Compiler\AbstractTwigSandboxConfigurationPass` so it makes use the calls `setAllowedFunctions`, `setAllowedFilters`, `setAllowedTags` instead of constructor arguments on email templates security policy service `oro_email.twig.email_security_policy`.
+* Updated `\Oro\Bundle\EmailBundle\EventListener\EntityConfigListener` so it accepts an instance of `\Oro\Component\Config\Cache\ClearableConfigCacheInterface` instead of `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface`.
+* Updated validation constraint configuration for `\Oro\Bundle\EmailBundle\Entity\EmailTemplate` with `Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy` constraint.
+
+#### EntityBundle
+* Updated `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider` so it implements `\Oro\Component\Config\Cache\ClearableConfigCacheInterface`.
+
+#### UserBundle
+* Updated `invite_user` email template to use `system.appURL` system variable.
+
+### Removed
+
+#### EmailBundle
+* Deprecated `\Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator`, added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` instead.
+* Removed `oro_config_value` Twig function from email templates rendering sandbox.
+
+#### UserBundle
+* Removed unused Twig templates `@OroUser/Email/invite.html.twig`, `@OroUser/Email/layout.html.twig`, `@OroUser/Email/reset.html.twig`.
 
 ## 7.0.0 (2026-03-31)
 [Show detailed list of changes](incompatibilities-7-0.md)

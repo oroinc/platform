@@ -43,7 +43,7 @@ class OroUserBundleInstaller implements
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v2_15';
+        return 'v7_0_3_0';
     }
 
     #[\Override]
@@ -133,7 +133,8 @@ class OroUserBundleInstaller implements
         $table->addColumn('email_lowercase', 'string', ['length' => 255]);
         $table->addColumn('phone', 'string', ['length' => 255, OroOptions::KEY => [
             'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM],
-            'dataaudit' => ['auditable' => true]
+            'dataaudit' => ['auditable' => true],
+            'email' => ['available_in_template' => true],
         ]]);
         $table->addColumn('name_prefix', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
         $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255, 'precision' => 0]);
@@ -153,7 +154,8 @@ class OroUserBundleInstaller implements
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addColumn('title', 'string', ['length' => 255, OroOptions::KEY => [
             'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
-            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
+            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+            'email' => ['available_in_template' => true],
         ]]);
         $table->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false, OroOptions::KEY => [
             ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
@@ -172,7 +174,15 @@ class OroUserBundleInstaller implements
         $table->addIndex(['organization_id'], 'IDX_F82840BC32C8A3DE');
         $table->addIndex(['first_name', 'last_name'], 'user_first_name_last_name_idx');
 
-        $this->attachmentExtension->addImageRelation($schema, 'oro_user', 'avatar', [], 2, 58, 58);
+        $this->attachmentExtension->addImageRelation(
+            $schema,
+            'oro_user',
+            'avatar',
+            ['email' => ['available_in_template' => true]],
+            2,
+            58,
+            58
+        );
     }
 
     /**
