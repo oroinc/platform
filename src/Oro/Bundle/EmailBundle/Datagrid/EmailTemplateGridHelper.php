@@ -28,6 +28,14 @@ class EmailTemplateGridHelper extends BaseGridHelper
     }
 
     /**
+     * @bc-layer This method exists for BC reasons.
+     */
+    public function setEntityProvider(EntityProvider $entityProvider): void
+    {
+        $this->entityProvider = $entityProvider;
+    }
+
+    /**
      * Returns callback for configuration of grid/actions visibility per row
      *
      * @return callable

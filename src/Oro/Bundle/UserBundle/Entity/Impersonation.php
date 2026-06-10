@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Store user impersonations
@@ -26,6 +27,7 @@ class Impersonation
     protected ?User $user = null;
 
     #[ORM\Column(type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $token = null;
 
     #[ORM\Column(type: Types::BOOLEAN, nullable: false, options: ['default' => false])]

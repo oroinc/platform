@@ -1,12 +1,27 @@
 entity_config:
     email:
+        entity:
+            items:
+                available_in_template:
+                    options:
+                        value_type: boolean
+                    form:
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
+                        options:
+                            choices:
+                                No: false
+                                Yes: true
+                            placeholder: false
+                            block: other
+                            label: oro.email.entity_config.email.entity.items.available_in_template.label
+                            tooltip: oro.email.entity_config.email.entity.items.available_in_template.tooltip
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#email
         field:
             items:
                 available_in_template:
                     options:
                         value_type:         boolean
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, multiFile, multiImage, ref-one, manyToOne, simple_array, guid]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, multiFile, multiImage, ref-one, manyToOne, simple_array, guid, ref-many, manyToMany, oneToMany]
                     form:
                         type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:

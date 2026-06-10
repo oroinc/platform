@@ -24,21 +24,28 @@ class Region implements Translatable
 
     #[ORM\Id]
     #[ORM\Column(name: 'combined_code', type: Types::STRING, length: 16)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $combinedCode = null;
 
     #[ORM\ManyToOne(targetEntity: Country::class, cascade: ['persist'], inversedBy: 'regions')]
     #[ORM\JoinColumn(name: 'country_code', referencedColumnName: 'iso2_code')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Country $country = null;
 
     #[ORM\Column(name: 'code', type: Types::STRING, length: 32)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $code = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
     #[Gedmo\Translatable]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $name = null;
 
     #[ORM\Column(name: 'deleted', type: Types::BOOLEAN, options: ['default' => false])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected bool $deleted = false;
 
     #[Gedmo\Locale]

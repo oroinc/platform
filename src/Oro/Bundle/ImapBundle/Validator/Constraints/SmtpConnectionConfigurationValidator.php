@@ -10,7 +10,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates that an SMTP connection can be established with SMTP parameters from UserEmailOrigin
+ * Validates that SMTP connection can be established with parameters from UserEmailOrigin.
  */
 class SmtpConnectionConfigurationValidator extends ConstraintValidator
 {
@@ -30,12 +30,34 @@ class SmtpConnectionConfigurationValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, SmtpConnectionConfiguration::class);
         }
 
-        if ($value instanceof UserEmailOrigin && $value->isSmtpConfigured() === true) {
-            $smtpSettings = $this->smtpSettingsFactory->createFromUserEmailOrigin($value);
-            if (!$this->checker->checkConnection($smtpSettings)) {
-                $this->context->buildViolation($constraint->message)
-                    ->addViolation();
-            }
+        if (!$value instanceof UserEmailOrigin) {
+            return;
         }
+
+        if (!$this->hasDataToValidateConnection($value)) {
+            return;
+        }
+
+        if (!$this->hasDataToCheckConnection($value) || !$this->checkConnection($value)) {
+            $this->context->buildViolation($constraint->message)
+                ->addViolation();
+        }
+    }
+
+    private function hasDataToValidateConnection(UserEmailOrigin $value): bool
+    {
+        return
+            $value->getSmtpHost()
+            || $value->getSmtpPort() > 0;
+    }
+
+    private function hasDataToCheckConnection(UserEmailOrigin $value): bool
+    {
+        return $value->isSmtpConfigured();
+    }
+
+    private function checkConnection(UserEmailOrigin $value): bool
+    {
+        return $this->checker->checkConnection($this->smtpSettingsFactory->createFromUserEmailOrigin($value));
     }
 }

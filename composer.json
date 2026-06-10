@@ -81,7 +81,7 @@
         "symfony/security-acl": "~3.3.4",
         "symfony/acl-bundle": "~2.4.0",
         "symfony/flex": "2.10.*",
-        "twig/twig": "~v3.26.0",
+        "twig/twig": "~v3.27.0",
         "doctrine/orm": "2.20.10",
         "doctrine/doctrine-bundle": "~2.18.0",
         "doctrine/dbal": "~3.10.2",
@@ -133,6 +133,7 @@
         "gotenberg/gotenberg-php": "~2.12.0"
     },
     "require-dev": {
+        "composer/composer": "~2.9.8",
         "behat/behat": "~3.29.0",
         "behat/gherkin": "~4.16.0",
         "behat/mink": "~1.12.0",

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
@@ -35,12 +36,12 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProviderInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterBag;
 use Oro\Bundle\ImapBundle\Provider\ImapEmailAttachmentLoader;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
@@ -56,6 +57,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -74,6 +76,13 @@ class EmailController extends AbstractController
     #[CsrfProtection()]
     public function checkSmtpConnectionAction(Request $request): JsonResponse
     {
+        $scopeClass = $this->getScopeClass($request);
+        $scopeIdentifier = $this->getScopeIdentifier($scopeClass, $this->getScopeId($request));
+        if (!$this->isConnectionCheckingGranted($scopeClass, $scopeIdentifier)) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $error = null;
         $this->getSmtpSettingsChecker()->checkConnection(
             SmtpSettingsFactory::createFromRequest($request),
             $error
@@ -82,12 +91,19 @@ class EmailController extends AbstractController
         return new JsonResponse($error ?? '');
     }
 
-    #[Route(path: '/check-saved-smtp-connection', name: 'oro_email_check_saved_smtp_connection', methods: ['GET'])]
+    #[Route(path: '/check-saved-smtp-connection', name: 'oro_email_check_saved_smtp_connection', methods: ['POST'])]
     #[CsrfProtection()]
     public function checkSavedSmtpConnectionAction(Request $request): JsonResponse
     {
+        $scopeClass = $this->getScopeClass($request);
+        $scopeIdentifier = $this->getScopeIdentifier($scopeClass, $this->getScopeId($request));
+        if (!$this->isConnectionCheckingGranted($scopeClass, $scopeIdentifier)) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $error = null;
         $this->getSmtpSettingsChecker()->checkConnection(
-            $this->getSmtpSettingsProvider()->getSmtpSettings($this->getScopeIdentifier($request)),
+            $this->getSmtpSettingsProvider()->getSmtpSettings($scopeIdentifier),
             $error
         );
 
@@ -230,10 +246,7 @@ class EmailController extends AbstractController
         if ($request->get('showSingleEmail', false)) {
             $emails[] = $entity;
         } else {
-            $emails = $this->getEmailThreadProvider()->getThreadEmails(
-                $this->container->get(ManagerRegistry::class)->getManager(),
-                $entity
-            );
+            $emails = $this->getEmailThreadProvider()->getThreadEmails($this->getEntityManager(Email::class), $entity);
             $targetActivityClass = $request->get('targetActivityClass');
             $targetActivityId = $request->get('targetActivityId');
             if ($targetActivityClass && $targetActivityId) {
@@ -297,7 +310,7 @@ class EmailController extends AbstractController
             $emails[] = $entity;
         } else {
             $emails = $this->getEmailThreadProvider()->getUserThreadEmails(
-                $this->container->get(ManagerRegistry::class)->getManager(),
+                $this->getEntityManager(Email::class),
                 $entity,
                 $this->getUser(),
                 $this->container->get(MailboxManager::class)->findAvailableMailboxes(
@@ -334,7 +347,7 @@ class EmailController extends AbstractController
         $emails = [];
         $ids = $this->prepareArrayParam($request, 'ids');
         if (count($ids) !== 0) {
-            $emails = $this->container->get(ManagerRegistry::class)
+            $emails = $this->getEntityManager(Email::class)
                 ->getRepository(Email::class)
                 ->findEmailsByIds($ids);
         }
@@ -845,8 +858,7 @@ class EmailController extends AbstractController
             $entityClass = $request->get('entityClass');
             $entityId = $request->get('entityId');
             if ($entityClass && $entityId) {
-                $em = $this->container->get(ManagerRegistry::class)->getManagerForClass($entityClass);
-                $relatedEntity = $em->getReference($entityClass, $entityId);
+                $relatedEntity = $this->getEntityManager($entityClass)->getReference($entityClass, $entityId);
                 if ($relatedEntity === $this->getUser()) {
                     $relatedEntity = null;
                 }
@@ -906,7 +918,7 @@ class EmailController extends AbstractController
 
     protected function getOrganizationRepository(): EntityRepository
     {
-        return $this->container->get(ManagerRegistry::class)->getRepository(Organization::class);
+        return $this->getEntityManager(Organization::class)->getRepository(Organization::class);
     }
 
     private function getMessageProducer(): MessageProducerInterface
@@ -972,6 +984,16 @@ class EmailController extends AbstractController
     private function getEmailHandler(): EmailHandler
     {
         return $this->container->get(EmailHandler::class);
+    }
+
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
+    {
+        return $this->container->get(AuthorizationCheckerInterface::class);
+    }
+
+    private function getEntityManager(string $entityClass): EntityManagerInterface
+    {
+        return $this->container->get(ManagerRegistry::class)->getManagerForClass($entityClass);
     }
 
     protected function process(EmailModel $emailModel): array
@@ -1073,6 +1095,17 @@ class EmailController extends AbstractController
         return $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
     }
 
+    private function isConnectionCheckingGranted(?string $scopeClass, ?object $scopeIdentifier): bool
+    {
+        if (null === $scopeClass) {
+            return $this->getAuthorizationChecker()->isGranted('oro_config_system');
+        }
+        if ($scopeIdentifier instanceof Organization) {
+            return $this->getAuthorizationChecker()->isGranted(BasicPermission::EDIT, $scopeIdentifier);
+        }
+        throw new \LogicException(\sprintf('Unsupported scope: %s.', $scopeClass));
+    }
+
     protected function isAttachmentCreationGranted(Request $request): bool
     {
         $enabledAttachment = false;
@@ -1093,15 +1126,33 @@ class EmailController extends AbstractController
             );
     }
 
-    private function getScopeIdentifier(Request $request): ?object
+    private function getScopeClass(Request $request): ?string
     {
         $scopeClass = $request->get('scopeClass');
-        $scopeId = $request->get('scopeId');
-        if (!$scopeClass || !$scopeId) {
+        if (!$scopeClass) {
             return null;
         }
 
-        return $this->container->get(DoctrineHelper::class)->getEntity($scopeClass, $scopeId);
+        return $scopeClass;
+    }
+
+    private function getScopeId(Request $request): ?int
+    {
+        $scopeId = $request->get('scopeId');
+        if (!$scopeId || !is_numeric($scopeId)) {
+            return null;
+        }
+
+        return (int)$scopeId;
+    }
+
+    private function getScopeIdentifier(?string $scopeClass, ?int $scopeId): ?object
+    {
+        if (null === $scopeClass || null === $scopeId) {
+            return null;
+        }
+
+        return $this->getEntityManager($scopeClass)->find($scopeClass, $scopeId);
     }
 
     #[\Override]
@@ -1126,7 +1177,6 @@ class EmailController extends AbstractController
                 EmailSynchronizationManager::class,
                 EmailGridHelper::class,
                 MessageProducerInterface::class,
-                DoctrineHelper::class,
                 MailboxManager::class,
                 FilterBag::class,
                 MassActionDispatcher::class,
@@ -1136,6 +1186,7 @@ class EmailController extends AbstractController
                 EmailManager::class,
                 ImapEmailAttachmentLoader::class,
                 TokenStorageInterface::class,
+                AuthorizationCheckerInterface::class,
                 ManagerRegistry::class,
                 'oro_config.user' => ConfigManager::class,
                 'oro_entity_config.provider.attachment' => ConfigProvider::class,

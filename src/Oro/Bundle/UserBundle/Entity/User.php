@@ -60,7 +60,8 @@ use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
         'form' => ['form_type' => UserSelectType::class, 'grid_name' => 'users-select-grid'],
         'grid' => ['default' => 'users-grid', 'context' => 'users-for-context-grid'],
-        'tag' => ['enabled' => true]
+        'tag' => ['enabled' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class User extends AbstractUser implements
@@ -78,48 +79,61 @@ class User extends AbstractUser implements
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'dataaudit' => ['auditable' => true],
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $username = null;
 
     #[ORM\Column(name: 'username_lowercase', type: Types::STRING, length: 255)]
     #[ConfigField(
-        defaultValues: ['dataaudit' => ['auditable' => false], 'importexport' => ['excluded' => true]],
-        mode: 'hidden'
+        defaultValues: [
+            'dataaudit' => ['auditable' => false],
+            'importexport' => ['excluded' => true],
+            'email' => ['available_in_template' => false],
+        ],
+        mode: 'hidden',
     )]
     protected ?string $usernameLowercase = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?string $email = null;
 
     #[ORM\Column(name: 'email_lowercase', type: Types::STRING, length: 255)]
     #[ConfigField(
-        defaultValues: ['dataaudit' => ['auditable' => false], 'importexport' => ['excluded' => true]],
-        mode: 'hidden'
+        defaultValues: [
+            'dataaudit' => ['auditable' => false],
+            'importexport' => ['excluded' => true],
+            'email' => ['available_in_template' => false],
+        ],
+        mode: 'hidden',
     )]
     protected ?string $emailLowercase = null;
 
     #[ORM\Column(name: 'name_prefix', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?string $namePrefix = null;
 
     #[ORM\Column(name: 'first_name', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?string $firstName = null;
 
     #[ORM\Column(name: 'middle_name', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?string $middleName = null;
 
     #[ORM\Column(name: 'last_name', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?string $lastName = null;
 
     #[ORM\Column(name: 'name_suffix', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?string $nameSuffix = null;
 
     /**
@@ -129,31 +143,37 @@ class User extends AbstractUser implements
     #[ORM\JoinTable(name: 'oro_user_access_group')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?Collection $groups = null;
 
     #[ORM\Column(name: 'birthday', type: Types::DATE_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?\DateTimeInterface $birthday = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?bool $enabled = true;
 
     #[ORM\Column(name: 'last_login', type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $lastLogin = null;
 
     #[ORM\ManyToOne(targetEntity: BusinessUnit::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?BusinessUnit $owner = null;
 
     /**
      * @var Collection<int, Email>
      */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Email::class, cascade: ['persist'], orphanRemoval: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?Collection $emails = null;
 
     /**
@@ -163,7 +183,7 @@ class User extends AbstractUser implements
     #[ORM\JoinTable(name: 'oro_user_business_unit')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'business_unit_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?Collection $businessUnits = null;
 
     /**
@@ -173,7 +193,10 @@ class User extends AbstractUser implements
     protected ?Collection $emailOrigins = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     /**
@@ -182,7 +205,10 @@ class User extends AbstractUser implements
     protected $imapAccountType;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     /**

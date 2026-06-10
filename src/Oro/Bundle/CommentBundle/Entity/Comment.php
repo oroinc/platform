@@ -28,7 +28,8 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
             'organization_column_name' => 'organization_id'
         ],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
-        'activity' => ['immutable' => true]
+        'activity' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Comment extends BaseComment implements ExtendEntityInterface
