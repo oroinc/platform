@@ -30,7 +30,7 @@ class TestTemplateStub extends Template
     /**
      * {@inheritdoc}
      */
-    public function getTemplateName()
+    public function getTemplateName(): string
     {
         return $this->name;
     }
@@ -38,7 +38,7 @@ class TestTemplateStub extends Template
     /**
      * {@inheritdoc}
      */
-    protected function doDisplay(array $context, array $blocks = [])
+    protected function doDisplay(array $context, array $blocks = []): iterable
     {
         yield $this->template;
     }
@@ -46,7 +46,7 @@ class TestTemplateStub extends Template
     /**
      * {@inheritdoc}
      */
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [];
     }
@@ -54,7 +54,7 @@ class TestTemplateStub extends Template
     /**
      * {@inheritdoc}
      */
-    public function getSourceContext()
+    public function getSourceContext(): Source
     {
         return new Source('stub', 'stub');
     }

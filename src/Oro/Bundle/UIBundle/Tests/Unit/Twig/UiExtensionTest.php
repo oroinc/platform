@@ -104,10 +104,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             ->with($testTemplate)
             ->willReturn(new TemplateWrapper($this->environment, $template));
 
-        $this->environment->expects(self::once())
+        $this->environment->expects(self::never())
             ->method('mergeGlobals')
-            ->with(['key' => 'value', 'extraKey' => 'value'])
-            ->willReturn(['key' => 'value', 'extraKey' => 'value']);
+            ->with(['key' => 'value', 'extraKey' => 'value']);
 
         $template->expects(self::once())
             ->method('renderBlock')

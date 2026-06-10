@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\Test\TestLogger;
+use Oro\Component\Testing\Logger\TestLogger;
 
 class MessageProcessorRouterExtensionTest extends \PHPUnit\Framework\TestCase
 {

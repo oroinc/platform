@@ -87,11 +87,26 @@ class MigrationContainer extends DependencyInjectionContainer
     }
 
     /**
+     * Static flag to prevent recursive container resets during migrations
+     * This prevents infinite loops when services trigger migration events during reset
+     */
+    private static bool $isResetting = false;
+
+    /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
-        $this->publicContainer->reset();
+        if (self::$isResetting) {
+            return;
+        }
+
+        self::$isResetting = true;
+        try {
+            $this->publicContainer->reset();
+        } finally {
+            self::$isResetting = false;
+        }
     }
 
     /**

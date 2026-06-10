@@ -93,6 +93,14 @@ class AuditFieldTypeRegistry
      */
     public static function addType($doctrineType, $auditType)
     {
+        /**
+         * Allow idempotent re-registration with the same value
+         * {@see \Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer::warmUp}
+         */
+        if (isset(static::$typeMap[$doctrineType]) && static::$typeMap[$doctrineType] === $auditType) {
+            return;
+        }
+
         static::validateType($doctrineType);
 
         static::$typeMap[$doctrineType] = $auditType;

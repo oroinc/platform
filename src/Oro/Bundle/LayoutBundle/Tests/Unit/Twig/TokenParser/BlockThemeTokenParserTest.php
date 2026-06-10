@@ -8,7 +8,7 @@ use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Twig\Environment;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
-use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Parser;
 use Twig\Source;
 
@@ -36,7 +36,7 @@ class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
     {
         $sourceBlockThemeNodeTpl1 = new Source('{% block_theme layout "tpl1" %}', 'index');
         $blockThemeNodeTpl1 = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),
@@ -45,13 +45,13 @@ class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
                 1
             ),
             1,
-            'block_theme'
         );
         $blockThemeNodeTpl1->setSourceContext($sourceBlockThemeNodeTpl1);
+        $blockThemeNodeTpl1->setNodeTag('block_theme');
 
         $sourceBlockThemeNodeTpl1Tpl2 = new Source('{% block_theme layout "tpl1" "tpl2" %}', 'index');
         $blockThemeNodeTpl1Tpl2 = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),
@@ -62,23 +62,23 @@ class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
                 1
             ),
             1,
-            'block_theme'
         );
 
         $blockThemeNodeTpl1Tpl2->setSourceContext($sourceBlockThemeNodeTpl1Tpl2);
+        $blockThemeNodeTpl1Tpl2->setNodeTag('block_theme');
 
         $sourceBlockThemeNodeWithTpl1 = new Source('{% block_theme layout with "tpl1" %}', 'index');
         $blockThemeNodeWithTpl1 = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ConstantExpression('tpl1', 1),
             1,
-            'block_theme'
         );
         $blockThemeNodeWithTpl1->setSourceContext($sourceBlockThemeNodeWithTpl1);
+        $blockThemeNodeWithTpl1->setNodeTag('block_theme');
 
         $sourceBlockThemeNodeWithTpl1Array = new Source('{% block_theme layout with ["tpl1"] %}', 'index');
         $blockThemeNodeWithTpl1Array = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),
@@ -87,13 +87,13 @@ class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
                 1
             ),
             1,
-            'block_theme'
         );
         $blockThemeNodeWithTpl1Array->setSourceContext($sourceBlockThemeNodeWithTpl1Array);
+        $blockThemeNodeWithTpl1Array->setNodeTag('block_theme');
 
         $sourceBlockThemeNodeWithTpl1Tpl2Array = new Source('{% block_theme layout with ["tpl1", "tpl2"] %}', 'index');
         $blockThemeNodeWithTpl1Tpl2Array = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),
@@ -104,9 +104,9 @@ class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
                 1
             ),
             1,
-            'block_theme'
         );
         $blockThemeNodeWithTpl1Tpl2Array->setSourceContext($sourceBlockThemeNodeWithTpl1Tpl2Array);
+        $blockThemeNodeWithTpl1Tpl2Array->setNodeTag('block_theme');
 
         return [
             [

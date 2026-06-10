@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
-use Psr\Log\Test\TestLogger as BaseTestLogger;
+use Oro\Component\Testing\Logger\TestLogger as BaseTestLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
