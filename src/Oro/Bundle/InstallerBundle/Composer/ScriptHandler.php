@@ -68,34 +68,18 @@ class ScriptHandler
         $workDir = $isDev ? self::DEV_ASSETS_DIR : '';
 
         $filesystem = static::getFilesystem();
-
-        if ($filesystem->exists($pkgPath)) {
-            $packageJson = static::getPackageJsonContent($pkgPath, false);
-            $packageJson->dependencies = $npmAssets;
-        } else {
-            // File package.json with actual dependencies is required for correct work of npm.
-            $packageJson = [
-                'description' =>
-                    'THE FILE IS GENERATED PROGRAMMATICALLY, ALL MANUAL CHANGES IN DEPENDENCIES SECTION WILL BE LOST',
-                'homepage' => 'https://doc.oroinc.com/master/frontend/javascript/composer-js-dependencies/',
-                'dependencies' => $npmAssets,
-                'private' => true,
-            ];
-        }
-        $filesystem
-            ->dumpFile($pkgPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+        $name = self::writeNpmPackageJson($filesystem, $pkgPath, $npmAssets);
 
         $isVerbose = $event->getIO()->isVerbose();
-        if (!$filesystem->exists($lockPath)) {
-            // Creates lock file, installs assets.
+        $hasMonorepoWorkspace = $filesystem->exists('../../' . self::PNPM_WORKSPACE);
+
+        if (!$filesystem->exists($lockPath) && !($isDev && $hasMonorepoWorkspace)) {
             self::pnpmInstall($event->getIO(), $options['process-timeout'], $isVerbose, $workDir);
 
             return;
         }
 
-        if ($filesystem->exists('../../' . self::PNPM_WORKSPACE)) {
-            // In case of monorepo we need to run pnpm install in the monorepo root
-            $name = is_object($packageJson) ? ($packageJson->name ?? '') : ($packageJson['name'] ?? '');
+        if ($hasMonorepoWorkspace) {
             self::pnpmInstallMonorepo(
                 $event->getIO(),
                 $options['process-timeout'],
@@ -109,6 +93,29 @@ class ScriptHandler
 
         // Installs assets using lock file.
         self::pnpmCi($event->getIO(), $options['process-timeout'], $isVerbose, $workDir);
+    }
+
+    private static function writeNpmPackageJson(Filesystem $filesystem, string $pkgPath, array $npmAssets): string
+    {
+        if ($filesystem->exists($pkgPath)) {
+            $packageJson = static::getPackageJsonContent($pkgPath, false);
+            $packageJson->dependencies = $npmAssets;
+            $name = $packageJson->name ?? '';
+        } else {
+            // File package.json with actual dependencies is required for correct work of npm.
+            $packageJson = [
+                'description' =>
+                    'THE FILE IS GENERATED PROGRAMMATICALLY, ALL MANUAL CHANGES IN DEPENDENCIES SECTION WILL BE LOST',
+                'homepage' => 'https://doc.oroinc.com/master/frontend/javascript/composer-js-dependencies/',
+                'dependencies' => $npmAssets,
+                'private' => true,
+            ];
+            $name = '';
+        }
+        $filesystem
+            ->dumpFile($pkgPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+
+        return $name;
     }
 
     /**
@@ -327,9 +334,11 @@ class ScriptHandler
     /**
      * Runs "pnpm install" and "pnpm run build" in the monorepo root.
      *
-     * In dev.json mode the install uses --modules-dir to keep the node_modules layout webpack
-     * expects, but that layout skips the npm-package members' build devDependencies — so the
-     * build is preceded by a second, --modules-dir-free install of those members.
+     * In dev.json mode this is two-phase: (1) copy npm-package into dev/ and build those members
+     * there in isolation (own node_modules, so vite & co. link correctly), then (2) install the
+     * app with --dir dev + --modules-dir so node_modules lands in the app (webpack layout) and the
+     * members link to the dev/npm-package copy. In composer.json mode it is a single install
+     * followed by the sub-dependency build.
      */
     private static function pnpmInstallMonorepo(
         IOInterface $inputOutput,
@@ -339,6 +348,13 @@ class ScriptHandler
         string $workDir = ''
     ): void {
         $logLevel = $verbose ? 'info' : 'error';
+        $monorepoRoot = dirname(getcwd(), 2);
+
+        $devDir = getcwd() . DIRECTORY_SEPARATOR . $workDir;
+
+        if ($packageName !== '' && $workDir !== '') {
+            self::installDevNpmPackageMembers($inputOutput, $timeout, $logLevel, $packageName, $devDir, $monorepoRoot);
+        }
 
         $pnpmInstallCmd = ['pnpm', 'install', '--prefer-offline', '--ignore-script', '--loglevel', $logLevel];
 
@@ -352,60 +368,85 @@ class ScriptHandler
         }
 
         if ($workDir !== '') {
-            // dev.json: hoist node_modules to the composer cwd (webpack layout) and pin the
-            // lockfile to dev/.
+            // dev.json phase 2: run the install as if started in dev/ (--dir) so --modules-dir
+            // ../node_modules resolves inside the app (app/node_modules, the webpack layout)
+            // rather than the repository parent, and pin the lockfile to dev/. codemirror & co.
+            // link to the dev/npm-package copy built in phase 1.
             $pnpmInstallCmd[] = '--modules-dir';
             $pnpmInstallCmd[] = '../node_modules';
             $pnpmInstallCmd[] = '--lockfile-dir';
-            $pnpmInstallCmd[] = getcwd() . DIRECTORY_SEPARATOR . $workDir;
+            $pnpmInstallCmd[] = $devDir;
+            $pnpmInstallCmd[] = '--dir';
+            $pnpmInstallCmd[] = $devDir;
         }
 
-        $monorepoRoot = dirname(getcwd(), 2);
         if (static::runProcess($inputOutput, $pnpmInstallCmd, $timeout, $monorepoRoot) !== 0) {
             throw new \RuntimeException('Failed to install pnpm assets in monorepo');
         }
 
-        if ($packageName !== '') {
-            if ($workDir !== '') {
-                // dev.json: re-install the workspace deps without --modules-dir so the
-                // npm-package members get their own node_modules (incl. build tooling like vite).
-                $depsInstallCmd = [
-                    'pnpm',
-                    'install',
-                    '--prefer-offline',
-                    '--ignore-script',
-                    '--loglevel',
-                    $logLevel,
-                    '--filter',
-                    $packageName . '^...',
-                    '--lockfile-dir',
-                    getcwd() . DIRECTORY_SEPARATOR . $workDir,
-                ];
+        if ($workDir !== '') {
+            // dev.json: npm-package members were already built in phase 1.
+            return;
+        }
 
-                if (static::runProcess($inputOutput, $depsInstallCmd, $timeout, $monorepoRoot) !== 0) {
-                    throw new \RuntimeException('Failed to install build dependencies for npm-package members');
-                }
-            }
+        self::buildApplicationSubDependencies($inputOutput, $timeout, $logLevel, $packageName, $monorepoRoot);
+    }
 
-            /**
-             * When a package name is provided, this command builds only the dependencies
-             * of the specified application, excluding the application itself
-             */
-            $pnpmBuildDepsCmd = [
-                'pnpm',
-                '-r',
-                '--loglevel',
-                $logLevel,
-                '--filter',
-                $packageName . '^...',
-                '--if-present',
-                'run',
-                'build',
-            ];
+    private static function buildApplicationSubDependencies(
+        IOInterface $inputOutput,
+        int $timeout,
+        string $logLevel,
+        string $packageName,
+        string $monorepoRoot
+    ): void {
+        if ($packageName === '') {
+            return;
+        }
 
-            if (static::runProcess($inputOutput, $pnpmBuildDepsCmd, $timeout, $monorepoRoot) !== 0) {
-                throw new \RuntimeException('Failed to build sub dependencies for application');
-            }
+        $pnpmBuildDepsCmd = [
+            'pnpm',
+            '-r',
+            '--loglevel',
+            $logLevel,
+            '--filter',
+            $packageName . '^...',
+            '--if-present',
+            'run',
+            'build',
+        ];
+
+        if (static::runProcess($inputOutput, $pnpmBuildDepsCmd, $timeout, $monorepoRoot) !== 0) {
+            throw new \RuntimeException('Failed to build sub dependencies for application');
+        }
+    }
+
+    private static function installDevNpmPackageMembers(
+        IOInterface $inputOutput,
+        int $timeout,
+        string $logLevel,
+        string $packageName,
+        string $devDir,
+        string $monorepoRoot
+    ): void {
+        $devNpmPackage = $devDir . DIRECTORY_SEPARATOR . 'npm-package';
+        $filesystem = static::getFilesystem();
+        $filesystem->remove($devNpmPackage);
+        $filesystem->mirror($monorepoRoot . DIRECTORY_SEPARATOR . 'npm-package', $devNpmPackage);
+
+        $membersInstallCmd = [
+            'pnpm', 'install', '--prefer-offline', '--ignore-script', '--loglevel', $logLevel,
+            '--filter', $packageName . '^...', '--dir', $devDir, '--lockfile-dir', $devDir,
+        ];
+        if (static::runProcess($inputOutput, $membersInstallCmd, $timeout, $monorepoRoot) !== 0) {
+            throw new \RuntimeException('Failed to install npm-package members');
+        }
+
+        $membersBuildCmd = [
+            'pnpm', '--dir', $devDir, '-r', '--loglevel', $logLevel,
+            '--filter', $packageName . '^...', '--if-present', 'run', 'build',
+        ];
+        if (static::runProcess($inputOutput, $membersBuildCmd, $timeout, $monorepoRoot) !== 0) {
+            throw new \RuntimeException('Failed to build npm-package members');
         }
     }
 

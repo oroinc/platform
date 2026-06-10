@@ -157,6 +157,16 @@ class ScriptHandlerTest extends TestCase
                 'expectedCmds' => [$noFrozen],
                 'expectedCwdTokens' => [null],
             ],
+            // prod safety: a missing lock is generated with the plain install even when the
+            // monorepo workspace is present — only the dev manifest diverts generation to the
+            // monorepo path, so composer.json behaviour is unchanged.
+            'pkg + no lock + ws → pnpmInstall (prod: ws does not divert generation)' => [
+                'pkgExists' => true,
+                'lockExists' => false,
+                'wsExists' => true,
+                'expectedCmds' => [$noFrozen],
+                'expectedCwdTokens' => [null],
+            ],
             'no pkg + lock + ws → monorepo install only (no name → no filter, build skipped)' => [
                 'pkgExists' => false,
                 'lockExists' => true,
@@ -221,8 +231,36 @@ class ScriptHandlerTest extends TestCase
         $ll = 'error';
         $devLockDir = 'PROJECT_DEV';  // resolved to $this->projectDir . '/dev' at runtime
 
-        // pnpmInstallMonorepo for dev:
-        //   --filter <name>... --modules-dir ../node_modules --lockfile-dir <abs(dev)>
+        // pnpmInstallMonorepo for dev — phase 1: install the dev/npm-package copy's members
+        // (no --modules-dir). The copy itself is made via Filesystem (not a recorded process).
+        $monorepoDevMembersInstall = [
+            ...self::PNPM_BASE,
+            '--prefer-offline',
+            '--ignore-script',
+            '--loglevel',
+            $ll,
+            '--filter',
+            self::DEV_PKG_NAME . '^...',
+            '--dir',
+            $devLockDir,
+            '--lockfile-dir',
+            $devLockDir,
+        ];
+        // phase 1: build the copied npm-package members from source (in dev/)
+        $monorepoDevMembersBuild = [
+            'pnpm',
+            '--dir',
+            $devLockDir,
+            '-r',
+            '--loglevel',
+            $ll,
+            '--filter',
+            self::DEV_PKG_NAME . '^...',
+            '--if-present',
+            'run',
+            'build',
+        ];
+        // phase 2: app install with the webpack layout (--modules-dir) and --dir dev
         $monorepoDev = [
             ...self::PNPM_BASE,
             '--prefer-offline',
@@ -235,8 +273,10 @@ class ScriptHandlerTest extends TestCase
             '../node_modules',
             '--lockfile-dir',
             $devLockDir,
+            '--dir',
+            $devLockDir,
         ];
-        // dev-no-pkg → minimal pkg (no name) → no --filter, build skipped (no name)
+        // dev-no-pkg → minimal pkg (no name) → no --filter, build skipped
         $monorepoDevNoName = [
             ...self::PNPM_BASE,
             '--prefer-offline',
@@ -247,31 +287,8 @@ class ScriptHandlerTest extends TestCase
             '../node_modules',
             '--lockfile-dir',
             $devLockDir,
-        ];
-        // dev.json phase 2: re-install the app's workspace deps WITHOUT --modules-dir so the
-        // npm-package members get their own node_modules (incl. build devDeps like vite)
-        $monorepoDevDepsInstall = [
-            ...self::PNPM_BASE,
-            '--prefer-offline',
-            '--ignore-script',
-            '--loglevel',
-            $ll,
-            '--filter',
-            self::DEV_PKG_NAME . '^...',
-            '--lockfile-dir',
+            '--dir',
             $devLockDir,
-        ];
-        // build of sub-dependencies runs in dev too (filtered by the dev package name)
-        $monorepoDevBuild = [
-            'pnpm',
-            '-r',
-            '--loglevel',
-            $ll,
-            '--filter',
-            self::DEV_PKG_NAME . '^...',
-            '--if-present',
-            'run',
-            'build',
         ];
         // pnpmCi for dev: --frozen-lockfile --dir dev --lockfile-dir dev --modules-dir ../node_modules
         $frozenDev = [
@@ -302,11 +319,11 @@ class ScriptHandlerTest extends TestCase
         ];
 
         return [
-            'dev pkg + lock + ws → monorepo install + deps install + build' => [
+            'dev pkg + lock + ws → monorepo members install + build + app install' => [
                 'pkgExists' => true,
                 'lockExists' => true,
                 'wsExists' => true,
-                'expectedCmds' => [$monorepoDev, $monorepoDevDepsInstall, $monorepoDevBuild],
+                'expectedCmds' => [$monorepoDevMembersInstall, $monorepoDevMembersBuild, $monorepoDev],
                 'expectedCwdTokens' => ['MONOREPO_ROOT', 'MONOREPO_ROOT', 'MONOREPO_ROOT'],
             ],
             'dev pkg + lock + no ws → pnpmCi(dev)' => [
@@ -322,6 +339,16 @@ class ScriptHandlerTest extends TestCase
                 'wsExists' => false,
                 'expectedCmds' => [$noFrozenDev],
                 'expectedCwdTokens' => [null],
+            ],
+            // The fix: with the monorepo workspace present, a missing dev lock is generated
+            // through the SAME copy/two-phase pipeline that the frozen install later consumes,
+            // so the generated lock carries the workspace importers and frozen does not fail.
+            'dev pkg + no lock + ws → monorepo generates lock (gen == consume)' => [
+                'pkgExists' => true,
+                'lockExists' => false,
+                'wsExists' => true,
+                'expectedCmds' => [$monorepoDevMembersInstall, $monorepoDevMembersBuild, $monorepoDev],
+                'expectedCwdTokens' => ['MONOREPO_ROOT', 'MONOREPO_ROOT', 'MONOREPO_ROOT'],
             ],
             'no dev pkg + lock + ws → monorepo without --filter' => [
                 'pkgExists' => false,
