@@ -2,6 +2,7 @@
 
 .grid-views {
     display: flex;
+    gap: $oro-datagrid-inner-grid-views-gap;
 
     .inner-grid & {
         margin: $oro-datagrid-inner-grid-views-offset;
@@ -9,6 +10,7 @@
 
     .grid-views-toogler {
         display: flex;
+        align-items: $oro-datagrid-grid-views-toogler-align-items;
     }
 
     .grid-view-title {
@@ -17,6 +19,7 @@
         font-size: $oro-datagrid-grid-views-title-font-size;
         font-weight: $oro-datagrid-grid-views-title-font-weight;
         line-height: $oro-datagrid-grid-views-title-line-height;
+        letter-spacing: $oro-datagrid-grid-views-title-letter-spacing;
     }
 
     .edited-label {
@@ -32,11 +35,16 @@
         font-weight: $oro-datagrid-grid-view-btn-font-weight;
         padding: $oro-datagrid-grid-view-btn-inner-offset;
         text-transform: $oro-datagrid-grid-view-btn-text-transform;
+        line-height: $oro-datagrid-grid-views-actions-line-height;
     }
 
     .actions-group,
     .views-group {
         position: relative;
+    }
+
+    .actions-group {
+        line-height: $oro-datagrid-grid-views-actions-line-height;
     }
 
     .views-group {
