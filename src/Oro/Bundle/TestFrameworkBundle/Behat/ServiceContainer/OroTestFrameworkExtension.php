@@ -338,8 +338,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             'oro_behat_services',
             new NullCumulativeFileLoader('Tests/Behat/services.yml')
         );
-        $resources = array_reverse($configLoader->load());
-        foreach ($resources as $resource) {
+        foreach ($configLoader->load() as $resource) {
             $loader = new YamlFileLoader($container, new FileLocator(rtrim($resource->path, 'services.yml')));
             $loader->load('services.yml');
         }

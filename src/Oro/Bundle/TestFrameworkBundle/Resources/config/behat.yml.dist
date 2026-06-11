@@ -3,30 +3,57 @@ default: &default
     extensions:
         Behat\MinkExtension:
             browser_name: chrome
-            base_url: 'http://localhost.com/'
+            base_url: '%env(default:oro_test.behat.base_url:ORO_BEHAT_BASE_URL)%'
             default_session: 'first_session'
             sessions:
                 second_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
-                first_session:
-                    oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
-                system_session:
-                    oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
-                375_session:
-                    oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
-                640_session:
-                    oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
-                mobile_session:
-                    oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
+                        wd_host: '%env(default:oro_test.behat.selenium_url:ORO_SELENIUM_URL)%'
                         capabilities:
                             extra_capabilities:
                                 chromeOptions:
+                                    args:
+                                        - "--guest"
+                first_session:
+                    oroSelenium2:
+                        wd_host: '%env(default:oro_test.behat.selenium_url:ORO_SELENIUM_URL)%'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--guest"
+                system_session:
+                    oroSelenium2:
+                        wd_host: '%env(default:oro_test.behat.selenium_url:ORO_SELENIUM_URL)%'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--guest"
+                375_session:
+                    oroSelenium2:
+                        wd_host: '%env(default:oro_test.behat.selenium_url:ORO_SELENIUM_URL)%'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--guest"
+                640_session:
+                    oroSelenium2:
+                        wd_host: '%env(default:oro_test.behat.selenium_url:ORO_SELENIUM_URL)%'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--guest"
+                mobile_session:
+                    oroSelenium2:
+                        wd_host: '%env(default:oro_test.behat.selenium_url:ORO_SELENIUM_URL)%'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--guest"
                                     mobileEmulation:
                                         deviceName: "iPhone 12 Pro"
         FriendsOfBehat\SymfonyExtension:
@@ -61,7 +88,7 @@ chromedriver:
             sessions:
                 second_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:9515'
+                        wd_host: '%env(default:oro_test.behat.chromedriver_url:ORO_CHROMEDRIVER_URL)%'
                         capabilities:
                             extra_capabilities:
                                 chromeOptions:
@@ -69,6 +96,7 @@ chromedriver:
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
+                                        - "--remote-debugging-pipe"
                                         - "--no-first-run"
                                         - "--disable-gpu"
                                         - "--headless"
@@ -77,9 +105,10 @@ chromedriver:
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--guest"
                 first_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:9515'
+                        wd_host: '%env(default:oro_test.behat.chromedriver_url:ORO_CHROMEDRIVER_URL)%'
                         capabilities:
                             extra_capabilities:
                                 chromeOptions:
@@ -87,6 +116,7 @@ chromedriver:
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
+                                        - "--remote-debugging-pipe"
                                         - "--no-first-run"
                                         - "--disable-gpu"
                                         - "--headless"
@@ -95,9 +125,10 @@ chromedriver:
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--guest"
                 system_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:9515'
+                        wd_host: '%env(default:oro_test.behat.chromedriver_url:ORO_CHROMEDRIVER_URL)%'
                         capabilities:
                             extra_capabilities:
                                 chromeOptions:
@@ -105,6 +136,7 @@ chromedriver:
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
+                                        - "--remote-debugging-pipe"
                                         - "--no-first-run"
                                         - "--disable-gpu"
                                         - "--headless"
@@ -113,9 +145,10 @@ chromedriver:
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--guest"
                 375_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:9515'
+                        wd_host: '%env(default:oro_test.behat.chromedriver_url:ORO_CHROMEDRIVER_URL)%'
                         capabilities:
                             extra_capabilities:
                                 chromeOptions:
@@ -123,6 +156,7 @@ chromedriver:
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
+                                        - "--remote-debugging-pipe"
                                         - "--no-first-run"
                                         - "--disable-gpu"
                                         - "--headless"
@@ -131,10 +165,11 @@ chromedriver:
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--guest"
 
                 640_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:9515'
+                        wd_host: '%env(default:oro_test.behat.chromedriver_url:ORO_CHROMEDRIVER_URL)%'
                         capabilities:
                             extra_capabilities:
                                 chromeOptions:
@@ -142,6 +177,7 @@ chromedriver:
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
+                                        - "--remote-debugging-pipe"
                                         - "--no-first-run"
                                         - "--disable-gpu"
                                         - "--headless"
@@ -150,10 +186,11 @@ chromedriver:
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--guest"
 
                 mobile_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:9515'
+                        wd_host: '%env(default:oro_test.behat.chromedriver_url:ORO_CHROMEDRIVER_URL)%'
                         capabilities:
                             extra_capabilities:
                                 chromeOptions:
@@ -161,6 +198,7 @@ chromedriver:
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
+                                        - "--remote-debugging-pipe"
                                         - "--no-first-run"
                                         - "--disable-gpu"
                                         - "--headless"
@@ -168,5 +206,6 @@ chromedriver:
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--guest"
                                     mobileEmulation:
                                         deviceName: "iPhone 12 Pro"
