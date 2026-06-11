@@ -7,14 +7,9 @@
     max-width: 100%;
     margin-bottom: $table-offset-bottom;
 
+    &.table-outlined,
     &.unit-table {
-        min-width: $table-offset-bottom;
-
-        td {
-            &:first-child {
-                font-weight: $table-unit-table-td-first-child-font-weight;
-            }
-        }
+        @include table-outlined();
     }
 
     td,

@@ -1,8 +1,6 @@
 /* @theme: admin.oro; */
 
 $table-offset-bottom: 0 !default;
-$table-unit-table-min-width: 300px !default;
-$table-unit-table-td-first-child-font-weight: font-weight('bold') !default;
 
 $table-td-first-child-inner-offset: $content-padding-medium !default;
 $table-td-first-child-text-align: left !default;
@@ -126,3 +124,32 @@ $table-open-tr-open-row-background-position: 0 -13px !default;
 
 $sub-table-border-radius: 4px !default;
 $table-thead-th-background: $primary-200 !default;
+
+$table-outlined-border-radius: 4px !default;
+$table-outlined-border-spacing: 0 !default;
+$table-outlined-border-collapse: separate !default;
+$table-outlined-border: 1px solid $neutral-grey-3 !default;
+
+$table-outlined-thead-th-padding: 8px 8px 4px !default;
+$table-outlined-thead-th-font-size: 12px !default;
+$table-outlined-thead-th-font-weight: font-weight('normal') !default;
+$table-outlined-thead-th-text-transform: capitalize !default;
+$table-outlined-thead-th-letter-spacing: .024px !default;
+$table-outlined-thead-th-border-bottom: 1px solid $neutral-grey-3 !default;
+$table-outlined-thead-th-background: none !default;
+$table-outlined-thead-th-span-text-transform: none !default;
+
+$table-outlined-tbody-td-padding: 8px !default;
+$table-outlined-tbody-td-font-size: 12px !default;
+$table-outlined-tbody-td-letter-spacing: .2px !default;
+$table-outlined-tbody-td-font-weight: font-weight('medium') !default;
+$table-outlined-tbody-td-border-top: 0 !default;
+$table-outlined-tbody-td-border-bottom: 1px solid $neutral-grey-3 !default;
+
+$table-outlined-tbody-td-first-child-font-weight: font-weight('normal') !default;
+$table-outlined-tbody-td-first-child-border-image: linear-gradient(to right, transparent 8px, $neutral-grey-3 8px)
+        1 !default;
+$table-outlined-tbody-td-last-child-border-image: linear-gradient(to left, transparent 8px, $neutral-grey-3 8px)
+        1 !default;
+
+$table-outlined-tbody-tr-last-child-td-border-bottom: 0 !default;
