@@ -1,3 +1,8 @@
+parameters:
+    oro_test.behat.base_url: 'http://localhost'
+    oro_test.behat.selenium_url: 'http://localhost:4444/wd/hub'
+    oro_test.behat.chromedriver_url: 'http://localhost:9515'
+
 services:
     oro_test.filesystem:
         class: Symfony\Component\Filesystem\Filesystem
