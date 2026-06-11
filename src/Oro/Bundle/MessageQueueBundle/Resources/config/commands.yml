@@ -15,6 +15,9 @@ services:
             - '@oro_message_queue.log.consumer_state'
             - '@monolog.logger.consumer'
             - '@oro_message_queue.job.manager'
+        calls:
+            - [ 'setQueueIteratorFactoryRegistry', [ '@oro_message_queue.consumption.queue_iterator.factory_registry' ] ]
+            - [ 'setQueueOptionValueParser', [ '@oro.message_queue.consumption.queue_option_value_parser' ] ]
         tags:
             - { name: console.command }
 
@@ -27,10 +30,18 @@ services:
         tags:
             - { name: console.command }
 
+    oro.message_queue.consumption.queue_option_value_parser:
+        class: Oro\Component\MessageQueue\Consumption\QueueOptionValueParser
+
     Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand:
         arguments:
             - '@oro_message_queue.consumption.queue_consumer'
             - '@oro_message_queue.log.consumer_state'
             - '@monolog.logger.consumer'
+        calls:
+            - [ 'setJobManager', [ '@oro_message_queue.job.manager' ] ]
+            - [ 'setEventDispatcher', [ '@event_dispatcher' ] ]
+            - [ 'setQueueIteratorFactoryRegistry', [ '@oro_message_queue.consumption.queue_iterator.factory_registry' ] ]
+            - [ 'setQueueOptionValueParser', [ '@oro.message_queue.consumption.queue_option_value_parser' ] ]
         tags:
             - { name: console.command }

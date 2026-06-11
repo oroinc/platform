@@ -39,7 +39,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         );
 
         self::getConsumer()
-            ->bind('oro.default')
+            ->bindQueue('oro.default')
             ->consume(new ChainExtension([new LimitConsumedMessagesExtension(2)]));
 
         $this->assertInterruptionMessage(
@@ -59,7 +59,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         );
 
         self::getConsumer()
-            ->bind('oro.default')
+            ->bindQueue('oro.default')
             ->consume(new ChainExtension([new LimitConsumedMessagesExtension(2)]));
 
         $this->assertInterruptionMessage(

@@ -62,6 +62,29 @@ The current file describes significant changes in the code that may affect the u
 * Added `\Oro\Bundle\DataGridBundle\Extension\Action\DataGridActionConfiguratorInterface` as general interface for action configurators.
 * Added OroPdfGeneratorBundle that provides a functionality to generate PDF documents from TWIG templates using Gotenberg.
 
+#### MessageQueue Component
+* Added pluggable consumption modes for the message queue consumer — the consumer now supports multiple queue iteration strategies that control the order in which queues are polled. The active mode is selected via the `--mode` option on the consume commands or the `ORO_MQ_CONSUMPTION_MODE` environment variable.
+    * Added `\Oro\Component\MessageQueue\Consumption\QueueIterator\QueueIteratorInterface` — interface for queue iterators that determine queue visitation order during consumption.
+    * Added `\Oro\Component\MessageQueue\Consumption\QueueIterator\QueueIteratorFactoryInterface` — interface for factories that create queue iterators for a specific consumption mode.
+    * Added `\Oro\Component\MessageQueue\Consumption\QueueIterator\QueueIteratorFactoryRegistry` — registry mapping consumption mode names to their factory implementations, backed by a tagged service locator.
+    * Added `\Oro\Component\MessageQueue\Consumption\QueueIterator\ChainQueueIteratorFactory` — delegates to the correct factory from the registry based on the active consumption mode.
+    * Added `\Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableQueueIteratorInterface` — extended iterator interface with message-received/idle notification callbacks for feedback-driven modes.
+    * Added `\Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableQueueIteratorRegistry` — tracks notifiable iterators and forwards notifications.
+    * Added `\Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableConsumptionExtension` — consumption extension that bridges MQ events to the notifiable iterator registry.
+* Added five built-in consumption modes:
+    * `default` — `DefaultQueueIterator` / `DefaultQueueIteratorFactory`: fixed round-robin order, one poll per queue.
+    * `sequential-exhaustive` — `SequentialExhaustiveQueueIterator` / `SequentialExhaustiveQueueIteratorFactory`: drains each queue fully before advancing.
+    * `strict-priority-interleaving` — `StrictPriorityInterleavingQueueIterator` / `StrictPriorityInterleavingQueueIteratorFactory`: drains high-priority queue, interleaves one poll per lower-priority queue.
+    * `hierarchical-strict-priority-interleaving` — `HierarchicalStrictPriorityInterleavingQueueIterator` / `HierarchicalStrictPriorityInterleavingQueueIteratorFactory`: a fully recursive version of `strict-priority-interleaving`. The sub-pattern of higher-priority queues is repeated until idle before a single poll of the next lower-priority queue.
+    * `weighted-round-robin` — `WeightedRoundRobinQueueIterator` / `WeightedRoundRobinQueueIteratorFactory`: per-queue weight support, advances on weight exhaustion or idle.
+* Updated `oro:message-queue:consume` and `oro:message-queue:transport:consume` commands — added `--mode` option to select the consumption mode and `--queue` option (repeatable, key=value format) for per-queue settings. The `queue` positional argument now supports multiple comma-separated queue names.
+* Added `\Oro\Component\MessageQueue\Consumption\QueueOptionValueParser` for parsing `--queue` option values into queue name and settings.
+
+#### MessageQueueBundle
+* Added `\Oro\Bundle\MessageQueueBundle\Event\TransportConsumeMessagesCommandConsoleEvent` — dispatched during transport consume command initialization to allow event listeners to modify input.
+* Added `\Oro\Bundle\MessageQueueBundle\EventListener\ConsumptionModeFromEnvListener` — sets the `--mode` option from the `ORO_MQ_CONSUMPTION_MODE` environment variable if not explicitly provided.
+* Added `\Oro\Bundle\MessageQueueBundle\EventListener\ConsumptionGroupsFromEnvListener` — expands a consumption group name into `--queue` options using the `ORO_MQ_CONSUMPTION_GROUPS` environment variable (JSON-encoded map).
+
 ### Changed
 
 #### ActionBundle

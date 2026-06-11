@@ -13,12 +13,17 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Processes messages from the message-queue.
+ * Processes messages from the specified client-level queue(s), e.g. "default".
  */
+#[AsCommand(
+    name: 'oro:message-queue:consume',
+    description: 'Processes messages from the specified client-level queue(s), e.g. "default".'
+)]
 class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
 {
     /** @var string */
@@ -35,7 +40,10 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
         LoggerInterface $logger,
         JobManager $jobManager
     ) {
-        parent::__construct($queueConsumer, $destinationMetaRegistry);
+        parent::__construct(
+            $queueConsumer,
+            $destinationMetaRegistry,
+        );
 
         $this->consumerState = $consumerState;
         $this->logger = $logger;

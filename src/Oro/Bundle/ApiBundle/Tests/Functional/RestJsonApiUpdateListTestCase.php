@@ -310,28 +310,23 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         $tokenStorage = $this->getTokenStorage();
         $token = $this->getTokenStorage()->getToken();
 
-        $this->consumeMessages();
+        $this->consumeAllMessages();
 
         //refresh token after resetting in consumer
         $tokenStorage->setToken($token);
-        $this->consumeMessages();
 
-        $this->consumeMessages();
-
-        $this->consumeMessages();
+        $this->consumeAllMessages();
 
         $tokenStorage = $this->getTokenStorage();
         $token = $this->getTokenStorage()->getToken();
 
-        $this->consumeMessages();
+        $this->consumeAllMessages();
 
         //refresh token after resetting in consumer
         $tokenStorage->setToken($token);
-        $this->consumeMessages();
 
-        $this->consumeMessages();
+        $this->consumeAllMessages();
 
-        $this->consumeMessages();
         if ($assertValid) {
             $this->assertAsyncOperationErrors([], $operationId);
         }
