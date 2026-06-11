@@ -14,6 +14,8 @@ class SearchBundleWebTestCase extends WebTestCase
     /** @var array */
     protected static $entitiesToClear = [];
 
+    private static $searchIndexReset = false;
+
     /**
      * For InnoDB, all DML operations (INSERT, UPDATE, DELETE) involving columns with full-text indexes are
      * processed at transaction commit time. For example, for an INSERT operation, an inserted string
@@ -64,6 +66,12 @@ class SearchBundleWebTestCase extends WebTestCase
 
     protected function loadFixture(string $entityClass, string $fixtureClass, int $expectedCount): void
     {
+        if (!static::$searchIndexReset) {
+            // Reset all search indices on first reindex to prevent cross-test contamination.
+            static::getSearchIndexer()->resetIndex();
+            static::$searchIndexReset = true;
+        }
+
         $doReindex = static::isDbIsolationPerTest() || !$this->isLoadedFixture($fixtureClass);
 
         $this->loadFixtures([$fixtureClass]);
@@ -93,5 +101,6 @@ class SearchBundleWebTestCase extends WebTestCase
         }
 
         static::$entitiesToClear = [];
+        static::$searchIndexReset = false;
     }
 }

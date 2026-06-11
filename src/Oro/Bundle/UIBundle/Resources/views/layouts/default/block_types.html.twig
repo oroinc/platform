@@ -96,6 +96,8 @@
     {% set src = src|default(asset('bundles/orofrontend/default/images/logo/demob2b-logo.svg')) %}
     {% set srcSmall = logo_small|default(asset('bundles/orofrontend/default/images/logo/demob2b-logo-small.svg')) %}
 
+    {% set fetchpriority = fetchpriority|default('high') %}
+
     {% set attr_img_small = attr_img|default({}) %}
     {% set attr_img_small = layout_attr_defaults(attr_img_small, {
         'srcset': srcSmall,
@@ -108,7 +110,7 @@
         'src': src,
         '~class': ' logo-img',
         'alt': 'oro_frontend.logo.alt.label'|trans,
-        'fetchpriority': 'high'
+        'fetchpriority': fetchpriority
     }) %}
 
     {% if width is defined and width is not null %}

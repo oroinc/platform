@@ -10,16 +10,10 @@ use Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory;
  */
 class SmtpSettingsChecker
 {
-    private DsnFromSmtpSettingsFactory $dsnFromSmtpSettingsFactory;
-
-    private ConnectionCheckerInterface $smtpConnectionChecker;
-
     public function __construct(
-        DsnFromSmtpSettingsFactory $dsnFromSmtpSettingsFactory,
-        ConnectionCheckerInterface $smtpConnectionChecker
+        private readonly DsnFromSmtpSettingsFactory $dsnFromSmtpSettingsFactory,
+        private readonly ConnectionCheckerInterface $connectionChecker
     ) {
-        $this->dsnFromSmtpSettingsFactory = $dsnFromSmtpSettingsFactory;
-        $this->smtpConnectionChecker = $smtpConnectionChecker;
     }
 
     public function checkConnection(SmtpSettings $smtpSettings, ?string &$error = null): bool
@@ -30,8 +24,12 @@ class SmtpSettingsChecker
             return false;
         }
 
-        $dsn = $this->dsnFromSmtpSettingsFactory->create($smtpSettings);
+        if (!$this->connectionChecker->checkConnection($this->dsnFromSmtpSettingsFactory->create($smtpSettings))) {
+            $error = 'A connection could not be established';
 
-        return $this->smtpConnectionChecker->checkConnection($dsn, $error);
+            return false;
+        }
+
+        return true;
     }
 }

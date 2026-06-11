@@ -49,6 +49,9 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
      * ]
      */
     private array $loadedData = [];
+    /** @var array<string, string> [resource => file path, ...] */
+    private array $locatedFiles = [];
+    /** @var array<string, bool> [file path => true, ...] */
     private array $parsedFiles = [];
 
     public function __construct(FileLocatorInterface $fileLocator)
@@ -94,17 +97,20 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
             return false;
         }
 
-        try {
-            /** @var string $filePath */
-            $filePath = $this->fileLocator->locate($resource);
-        } catch (\Exception $e) {
-            // Convert any FileLocator exception to FileLocatorFileNotFoundException for consistent handling.
-            // This ensures that all path-related errors (invalid bundle notation, missing files,
-            // permission issues, malformed paths, etc.) are handled uniformly by calling code.
-            // The original exception is preserved as previous exception for debugging purposes.
-            throw new FileLocatorFileNotFoundException($e->getMessage(), $e->getCode(), $e);
+        if (!isset($this->locatedFiles[$resource])) {
+            try {
+                $this->locatedFiles[$resource] = $this->fileLocator->locate($resource);
+            } catch (\Exception $e) {
+                // Convert any FileLocator exception to FileLocatorFileNotFoundException for consistent handling.
+                // This ensures that all path-related errors (invalid bundle notation, missing files,
+                // permission issues, malformed paths, etc.) are handled uniformly by calling code.
+                // The original exception is preserved as previous exception for debugging purposes.
+                throw new FileLocatorFileNotFoundException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
+        /** @var string $filePath */
+        $filePath = $this->locatedFiles[$resource];
         if (!isset($this->parsedFiles[$filePath])) {
             $existingData = $this->loadedData;
             $this->loadedData = [];

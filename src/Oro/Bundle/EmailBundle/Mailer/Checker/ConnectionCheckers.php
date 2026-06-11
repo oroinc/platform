@@ -30,10 +30,10 @@ class ConnectionCheckers implements ConnectionCheckerInterface
     }
 
     #[\Override]
-    public function checkConnection(Dsn $dsn, ?string &$error = null): bool
+    public function checkConnection(Dsn $dsn): bool
     {
         foreach ($this->connectionCheckers as $connectionChecker) {
-            if ($connectionChecker->supports($dsn) && $connectionChecker->checkConnection($dsn, $error)) {
+            if ($connectionChecker->supports($dsn) && $connectionChecker->checkConnection($dsn)) {
                 return true;
             }
         }

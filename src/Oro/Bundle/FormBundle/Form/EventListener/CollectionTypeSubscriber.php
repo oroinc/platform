@@ -67,7 +67,10 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
         $notEmptyItems = [];
         $hasPrimary = false;
         foreach ($items as $index => $item) {
-            if (!$this->isArrayEmpty($item)) {
+            if (
+                (is_array($item) && !$this->isArrayEmpty($item))
+                || (null === $item)
+            ) {
                 $notEmptyItems[$index] = $item;
                 if (!$hasPrimary && \array_key_exists('primary', $item) && $item['primary']) {
                     $hasPrimary = true;

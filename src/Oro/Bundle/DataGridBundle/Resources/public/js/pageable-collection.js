@@ -704,8 +704,9 @@ const PageableCollection = BackbonePageableCollection.extend({
 
         if (options.waitForPromises.length) {
             const deferredFetch = $.Deferred();
+            let xhr = null;
             $.when(...options.waitForPromises).done((...args) => {
-                this._fetch(options)
+                xhr = this._fetch(options)
                     .done(function() {
                         deferredFetch.resolveWith(this, args);
                     })
@@ -716,7 +717,13 @@ const PageableCollection = BackbonePageableCollection.extend({
                 deferredFetch.rejectWith(this, args);
             });
 
-            return deferredFetch.promise();
+            return deferredFetch.promise({
+                abort() {
+                    if (xhr) {
+                        xhr.abort();
+                    }
+                }
+            });
         } else {
             return this._fetch(options);
         }

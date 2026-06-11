@@ -4,181 +4,133 @@ namespace Oro\Bundle\ImapBundle\Connector;
 
 /**
  * Encapsulates IMAP server connection configuration parameters.
- *
- * This class holds all the necessary configuration details required to establish a connection
- * to an IMAP server, including host, port, SSL/TLS settings, user credentials, and OAuth2 access tokens.
- * It provides a clean interface for managing and retrieving these configuration values throughout
- * the IMAP connector lifecycle.
  */
 class ImapConfig
 {
-    /**
-     * @var string
-     */
-    private $host;
+    private ?int $connectionTimeout = null;
 
-    /**
-     * @var string
-     */
-    private $port;
-
-    /**
-     * @var string
-     */
-    private $ssl;
-
-    /**
-     * @var string
-     */
-    private $user;
-
-    /**
-     * @var string
-     */
-    private $password;
-
-    /**
-     * @var string
-     */
-    private $accessToken;
-
-    /**
-     * @param string $host The host name of IMAP server
-     * @param string $port The port of IMAP server
-     * @param string $ssl The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tls'
-     * @param string $user The user name
-     * @param string $password The user password
-     * @param string $accessToken The Access Token for authenticating to Gmail with OAuth2
-     */
     public function __construct(
-        $host = null,
-        $port = null,
-        $ssl = null,
-        $user = null,
-        $password = null,
-        $accessToken = null
+        private ?string $host = null,
+        private ?int $port = null,
+        private ?string $ssl = null,
+        private ?string $user = null,
+        private ?string $password = null,
+        private ?string $accessToken = null
     ) {
-        $this->host = $host;
-        $this->port = $port;
-        $this->ssl = $ssl;
-        $this->user = $user;
-        $this->password = $password;
-        $this->accessToken = $accessToken;
     }
 
     /**
-     * Gets the host name of IMAP server
-     *
-     * @return string
+     * Gets the host name of IMAP server.
      */
-    public function getHost()
+    public function getHost(): ?string
     {
         return $this->host;
     }
 
     /**
-     * Sets the host name of IMAP server
-     *
-     * @param string $host
+     * Sets the host name of IMAP server.
      */
-    public function setHost($host)
+    public function setHost(?string $host): void
     {
         $this->host = $host;
     }
 
     /**
-     * Gets the port of IMAP server
-     *
-     * @return string
+     * Gets the port of IMAP server.
      */
-    public function getPort()
+    public function getPort(): ?int
     {
         return $this->port;
     }
 
     /**
-     * Sets the port of IMAP server
-     *
-     * @param string $port
+     * Sets the port of IMAP server.
      */
-    public function setPort($port)
+    public function setPort(?int $port): void
     {
         $this->port = $port;
     }
 
     /**
-     * Gets the SSL type to be used to connect to IMAP server
-     *
-     * @return string
+     * Gets the encryption type to be used to connect to IMAP server.
+     * Can be null, empty string, "ssl" or "tls".
      */
-    public function getSsl()
+    public function getSsl(): ?string
     {
         return $this->ssl;
     }
 
     /**
-     * Sets the SSL type to be used to connect to IMAP server
-     *
-     * @param string $ssl Can be empty string, 'ssl' or 'tls'
+     * Sets the encryption type to be used to connect to IMAP server.
+     * Can be null, empty string, "ssl" or "tls".
      */
-    public function setSsl($ssl)
+    public function setSsl(?string $ssl): void
     {
         $this->ssl = $ssl;
     }
 
     /**
-     * Gets the user name
-     *
-     * @return string
+     * Gets the username.
      */
-    public function getUser()
+    public function getUser(): ?string
     {
         return $this->user;
     }
 
     /**
-     * Sets the user name
-     *
-     * @param string $user
+     * Sets the username.
      */
-    public function setUser($user)
+    public function setUser(?string $user): void
     {
         $this->user = $user;
     }
 
     /**
-     * Gets the user password
-     *
-     * @return string
+     * Gets the user password.
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
     /**
-     * Sets the user password
-     *
-     * @param string $password
+     * Sets the user password.
      */
-    public function setPassword($password)
+    public function setPassword(?string $password): void
     {
         $this->password = $password;
     }
 
     /**
-     * @return string
+     * Gets user OAuth2 access token.
      */
-    public function getAccessToken()
+    public function getAccessToken(): ?string
     {
         return $this->accessToken;
     }
 
     /**
-     * @param string $accessToken
+     * Sets user OAuth2 access token.
      */
-    public function setAccessToken($accessToken)
+    public function setAccessToken(?string $accessToken): void
     {
         $this->accessToken = $accessToken;
+    }
+
+    /**
+     * Gets the connection timeout in seconds.
+     */
+    public function getConnectionTimeout(): ?int
+    {
+        return $this->connectionTimeout;
+    }
+
+    /**
+     * Sets the connection timeout in seconds.
+     * To reset the timeout to the default value, pass null or 0.
+     */
+    public function setConnectionTimeout(?int $timeoutInSeconds): void
+    {
+        $this->connectionTimeout = $timeoutInSeconds;
     }
 }

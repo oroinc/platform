@@ -10,21 +10,12 @@ use Symfony\Component\Mailer\Transport\Dsn;
  */
 class SystemConfigConnectionChecker implements ConnectionCheckerInterface
 {
-    private ConnectionCheckerInterface $connectionCheckers;
-
-    private SystemConfigTransportRealDsnProvider $systemConfigTransportRealDsnProvider;
-
     public function __construct(
-        ConnectionCheckerInterface $connectionCheckers,
-        SystemConfigTransportRealDsnProvider $systemConfigTransportRealDsnProvider
+        private readonly ConnectionCheckerInterface $connectionCheckers,
+        private readonly SystemConfigTransportRealDsnProvider $systemConfigTransportRealDsnProvider
     ) {
-        $this->connectionCheckers = $connectionCheckers;
-        $this->systemConfigTransportRealDsnProvider = $systemConfigTransportRealDsnProvider;
     }
 
-    /**
-     * Checks that dsn is "oro://system-config".
-     */
     #[\Override]
     public function supports(Dsn $dsn): bool
     {
@@ -32,10 +23,10 @@ class SystemConfigConnectionChecker implements ConnectionCheckerInterface
     }
 
     #[\Override]
-    public function checkConnection(Dsn $dsn, ?string &$error = null): bool
+    public function checkConnection(Dsn $dsn): bool
     {
-        $realDsn = $this->systemConfigTransportRealDsnProvider->getRealDsn($dsn);
-
-        return $this->connectionCheckers->checkConnection($realDsn, $error);
+        return $this->connectionCheckers->checkConnection(
+            $this->systemConfigTransportRealDsnProvider->getRealDsn($dsn)
+        );
     }
 }

@@ -35,16 +35,23 @@ trait AuditChangedEntitiesExtensionTrait
 
     private function assertStoredAuditCount($expected): void
     {
-        $auditFields = $this->getEntityManager()->getRepository(AuditField::class)->findAll();
-        self::assertCount(
-            $expected,
-            $this->getEntityManager()->getRepository(Audit::class)->findAll(),
-            sprintf(
-                'Failed asserting that there are %d audit records. Changed fields: %s',
-                $expected,
-                json_encode($auditFields, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES, 2)
-            )
-        );
+        $audits = $this->getEntityManager()->getRepository(Audit::class)->findAll();
+        if (\count($audits) !== $expected) {
+            self::fail(
+                \sprintf('Failed asserting that there are %d audit records. Changed fields:', $expected)
+                . "\n"
+                . implode("\n", array_map(function (AuditField $auditField) {
+                    return \sprintf(
+                        '{id: %d, class: %s, field: %s, old value: %s, new value: %s}',
+                        $auditField->getId(),
+                        $auditField->getAudit()->getObjectClass(),
+                        $auditField->getField(),
+                        json_encode($auditField->getOldValue(), JSON_THROW_ON_ERROR, 2),
+                        json_encode($auditField->getNewValue(), JSON_THROW_ON_ERROR, 2)
+                    );
+                }, $this->getEntityManager()->getRepository(AuditField::class)->findAll()))
+            );
+        }
     }
 
     private function findLastStoredAudit(): Audit

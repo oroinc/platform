@@ -4,11 +4,9 @@ layout:
             id: logo
             parentId: middle_bar_logo
             blockType: logo
-
-        - '@appendOption':
-            id: logo
-            optionName: vars.logo_small
-            optionValue: '=data["asset"].getUrl(data["theme"].getLogoSmall(context["theme"]))'
+            options:
+                vars:
+                    logo_small: '=data["asset"].getUrl(data["theme"].getLogoSmall(context["theme"]))'
 
         - '@add':
             id: logo_print
@@ -19,3 +17,6 @@ layout:
                 attr:
                     class: 'logo--print-only'
                 renderLink: false
+                vars:
+                    logo_small: '=data["asset"].getUrl(data["theme"].getLogoSmall(context["theme"]))'
+                    fetchpriority: 'low'

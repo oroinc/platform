@@ -15,8 +15,7 @@ class ConnectionCheckersTest extends TestCase
 
     public function testCheckConnectionWhenNoCheckers(): void
     {
-        self::assertFalse((new ConnectionCheckers([]))->checkConnection(Dsn::fromString('null://null'), $error));
-        self::assertEquals('', $error);
+        self::assertFalse((new ConnectionCheckers([]))->checkConnection(Dsn::fromString('null://null')));
     }
 
     public function testSupports(): void
