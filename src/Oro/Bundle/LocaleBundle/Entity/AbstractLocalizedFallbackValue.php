@@ -17,22 +17,37 @@ abstract class AbstractLocalizedFallbackValue
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'fallback', type: Types::STRING, length: 64, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => false]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => false],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $fallback = null;
 
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => false]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => false],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $string = null;
 
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => false]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => false],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $text = null;
 
     #[ORM\ManyToOne(targetEntity: Localization::class)]
     #[ORM\JoinColumn(name: 'localization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?Localization $localization = null;
 
     /**

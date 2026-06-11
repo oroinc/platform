@@ -14,7 +14,7 @@ class OroDataAuditBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v6_1_0_1';
+        return 'v6_1_9_0';
     }
 
     #[\Override]

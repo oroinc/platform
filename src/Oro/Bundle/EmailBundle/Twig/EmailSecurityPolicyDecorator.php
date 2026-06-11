@@ -7,6 +7,8 @@ use Twig\Sandbox\SecurityPolicyInterface;
 
 /**
  * Decorates SecurityPolicy to override checkMethodAllowed to process entity classes.
+ *
+ * @bc-layer This class is retained for BC reasons, use {@see EmailTemplateSecurityPolicy} instead.
  */
 class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
 {
@@ -34,15 +36,10 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
     #[\Override]
     public function checkMethodAllowed($obj, $method): void
     {
-        $isEntityObject = str_contains($obj::class, '\Entity\\');
-        $isAllowedMethods  = str_starts_with($method, 'get') ||
-            str_starts_with($method, 'is') ||
-            str_starts_with($method, 'has');
-
-        if (($isEntityObject && $isAllowedMethods) || strtolower($method) === '__tostring') {
+        // __toString is a PHP string-coercion magic method, not an entity field accessor.
+        if (strtolower($method) === '__tostring') {
             return;
         }
-
         $this->ensureInitialized();
 
         $this->securityPolicy->checkMethodAllowed($obj, $method);
@@ -65,6 +62,8 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
 
     private function initialize(): void
     {
+        $this->initialized = true;
+
         $configuration = $this->templateRendererConfigProvider->getConfiguration();
 
         $this->securityPolicy->setAllowedMethods($configuration[TemplateRendererConfigProviderInterface::METHODS]);

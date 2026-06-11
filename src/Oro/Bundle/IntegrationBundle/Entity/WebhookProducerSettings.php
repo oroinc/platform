@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\WebhookProducerSettingsRepository;
@@ -50,24 +51,31 @@ class WebhookProducerSettings implements DatesAwareInterface, ExtendEntityInterf
     private ?string $id = null;
 
     #[ORM\Column(name: 'notification_url', type: Types::STRING, length: 2048, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     private ?string $notificationUrl = null;
 
     #[ORM\Column(name: 'topic', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     private ?string $topic = null;
 
     #[ORM\Column(name: 'secret', type: CryptedStringType::TYPE, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     private ?string $secret = null;
 
     #[ORM\Column(name: 'enabled', type: Types::BOOLEAN, nullable: false, options: ['default' => true])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     private bool $enabled = true;
 
     #[ORM\Column(name: 'verify_ssl', type: Types::BOOLEAN, nullable: false, options: ['default' => true])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     private bool $verifySsl = true;
 
     #[ORM\Column(name: 'format', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     private ?string $format = null;
 
     #[ORM\Column(name: 'is_system', type: Types::BOOLEAN, nullable: false, options: ['default' => false])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     private bool $system = false;
 
     public function getId(): ?string

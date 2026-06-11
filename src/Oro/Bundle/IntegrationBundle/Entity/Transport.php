@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
@@ -25,9 +26,11 @@ abstract class Transport
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\OneToOne(mappedBy: 'transport', targetEntity: Channel::class)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Channel $channel = null;
 
     /**

@@ -274,13 +274,13 @@ class GetAttrNode extends GetAttrExpression
         // object property
         if (/* Template::METHOD_CALL */ 'method' !== $type) {
             if (isset($object->$item) || \array_key_exists((string)$item, (array)$object)) {
-                if ($isDefinedTest) {
-                    return true;
-                }
-
                 if ($sandboxed) {
                     $env->getExtension(SandboxExtension::class)
                         ->checkPropertyAllowed($object, $item, $lineno, $source);
+                }
+
+                if ($isDefinedTest) {
+                    return true;
                 }
 
                 return $object->$item;
@@ -354,11 +354,11 @@ class GetAttrNode extends GetAttrExpression
 
             throw new RuntimeError(sprintf($format, $item, $class), $lineno, $source);
         }
-        if ($isDefinedTest) {
-            return true;
-        }
         if ($sandboxed) {
             $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
+        }
+        if ($isDefinedTest) {
+            return true;
         }
         // Some objects throw exceptions when they have __call, and the method we try
         // to call is not supported. If ignoreStrictCheck is true, we should return null.

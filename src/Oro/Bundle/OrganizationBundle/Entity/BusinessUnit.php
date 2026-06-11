@@ -34,10 +34,11 @@ use Oro\Bundle\UserBundle\Entity\User;
             'owner_field_name' => 'owner',
             'owner_column_name' => 'business_unit_owner_id',
             'organization_field_name' => 'organization',
-            'organization_column_name' => 'organization_id'
+            'organization_column_name' => 'organization_id',
         ],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
-        'grid' => ['default' => 'business-unit-grid']
+        'grid' => ['default' => 'business-unit-grid'],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class BusinessUnit implements
@@ -50,44 +51,61 @@ class BusinessUnit implements
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class, inversedBy: 'businessUnits')]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     #[ORM\Column(name: 'phone', type: Types::STRING, length: 100, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $phone = null;
 
     #[ORM\Column(name: 'website', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $website = null;
 
     #[ORM\Column(name: 'email', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $email = null;
 
     #[ORM\Column(name: 'fax', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $fax = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'businessUnits')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $users = null;
 
     #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
     #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?BusinessUnit $owner = null;
 
     /**
@@ -318,7 +336,7 @@ class BusinessUnit implements
     }
 
     /**
-     * @param  User $user
+     * @param User $user
      *
      * @return BusinessUnit
      */
@@ -332,7 +350,7 @@ class BusinessUnit implements
     }
 
     /**
-     * @param  User $user
+     * @param User $user
      *
      * @return BusinessUnit
      */
