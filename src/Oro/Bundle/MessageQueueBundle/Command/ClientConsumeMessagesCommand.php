@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Processes messages from the message-queue.
+ * Processes messages from the specified client-level queue(s), e.g. "default".
  */
 class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
 {
@@ -29,19 +29,23 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
     protected JobManager $jobManager;
 
     public function __construct(
-        QueueConsumer           $queueConsumer,
+        QueueConsumer $queueConsumer,
         DestinationMetaRegistry $destinationMetaRegistry,
-        ConsumerState           $consumerState,
-        LoggerInterface         $logger,
-        JobManager              $jobManager
+        ConsumerState $consumerState,
+        LoggerInterface $logger,
+        JobManager $jobManager
     ) {
-        parent::__construct($queueConsumer, $destinationMetaRegistry);
+        parent::__construct(
+            $queueConsumer,
+            $destinationMetaRegistry,
+        );
 
         $this->consumerState = $consumerState;
         $this->logger = $logger;
         $this->jobManager = $jobManager;
     }
 
+    #[\Override]
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
     {
         $this->consumerState->startConsumption();
@@ -53,6 +57,7 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function getConsumerExtension(array $extensions): ExtensionInterface
     {
         return new ChainExtension($extensions, $this->consumerState);
@@ -62,6 +67,7 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension($this->logger);

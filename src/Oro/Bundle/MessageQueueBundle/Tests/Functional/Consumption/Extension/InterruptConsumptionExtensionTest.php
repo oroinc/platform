@@ -13,6 +13,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -20,6 +21,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         self::purgeMessageQueue();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         self::purgeMessageQueue();
@@ -37,7 +39,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         );
 
         self::getConsumer()
-            ->bind('oro.default')
+            ->bindQueue('oro.default')
             ->consume(new ChainExtension([new LimitConsumedMessagesExtension(2)]));
 
         $this->assertInterruptionMessage(
@@ -57,7 +59,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         );
 
         self::getConsumer()
-            ->bind('oro.default')
+            ->bindQueue('oro.default')
             ->consume(new ChainExtension([new LimitConsumedMessagesExtension(2)]));
 
         $this->assertInterruptionMessage(

@@ -138,6 +138,8 @@ services:
             - '@oro_message_queue.consumption.extensions'
             - '@oro_message_queue.log.consumer_state'
             - '@oro_message_queue.client.message_processor_registry'
+        calls:
+            - [ 'setQueueIteratorFactory', [ '@oro_message_queue.consumption.queue_iterator.chain_factory' ] ]
 
     oro_message_queue.client.created_queues:
         class: 'Oro\Component\MessageQueue\Transport\QueueCollection'

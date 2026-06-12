@@ -19,6 +19,10 @@ doctrine:
 oro_message_queue:
     persistent_services:
         - 'kernel'
+        - 'oro_message_queue.consumption.queue_iterator.strict_priority_interleaving_registry'
+        - 'oro_message_queue.consumption.queue_iterator.hierarchical_strict_priority_interleaving_registry'
+        - 'oro_message_queue.consumption.queue_iterator.sequential_exhaustive_registry'
+        - 'oro_message_queue.consumption.queue_iterator.weighted_round_robin_registry'
         - 'oro_message_queue.client.message_processor_registry'
         - 'oro_message_queue.client.noop_message_processor'
         - 'oro_message_queue.client.config'
