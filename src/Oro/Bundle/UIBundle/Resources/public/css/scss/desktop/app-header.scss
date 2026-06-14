@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 /* @theme: admin.oro; */
 
 /* stylelint-disable no-descending-specificity */
@@ -30,7 +32,7 @@
     }
 
     &__container-panel {
-        padding: $content-padding / 2 $content-padding;
+        padding: math.div($content-padding, 2) $content-padding;
         display: grid;
         grid-template-areas: 'start center end';
         grid-template-columns: auto auto 1fr;
