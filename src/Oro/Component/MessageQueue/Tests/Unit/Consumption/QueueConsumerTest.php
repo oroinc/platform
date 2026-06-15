@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Oro\Component\MessageQueue\Consumption\QueueIterator\DefaultQueueIterator;
+use Oro\Component\MessageQueue\Consumption\QueueIterator\QueueIteratorFactoryInterface;
+use Oro\Component\MessageQueue\Consumption\QueueIterator\StrictPriorityInterleavingQueueIterator;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock\BreakCycleExtension;
@@ -28,8 +34,8 @@ use Psr\Log\NullLogger;
  */
 class QueueConsumerTest extends TestCase
 {
-    private const MESSAGE_PROCESSOR_NAME = 'sample_processor';
-    private const QUEUE_NAME = 'sample_queue';
+    private const string MESSAGE_PROCESSOR_NAME = 'sample_processor';
+    private const string QUEUE_NAME = 'sample_queue';
 
     private SessionInterface&MockObject $session;
     private ConnectionInterface&MockObject $connection;
@@ -37,6 +43,7 @@ class QueueConsumerTest extends TestCase
     private MessageProcessorRegistryInterface&MockObject $messageProcessorRegistry;
     private MessageProcessorInterface&MockObject $messageProcessor;
     private MessageConsumerInterface&MockObject $messageConsumer;
+    private QueueIteratorFactoryInterface&MockObject $queueIteratorFactory;
     private Message $message;
 
     #[\Override]
@@ -50,6 +57,7 @@ class QueueConsumerTest extends TestCase
 
         $this->connection = $this->createConnection($this->session);
         $this->consumerState = $this->createMock(ConsumerState::class);
+
         $this->messageProcessorRegistry = $this->createMock(MessageProcessorRegistryInterface::class);
         $this->messageProcessor = $this->createMock(MessageProcessorInterface::class);
         $this->messageProcessorRegistry->expects(self::any())
@@ -57,6 +65,11 @@ class QueueConsumerTest extends TestCase
             ->willReturnMap([
                 [self::MESSAGE_PROCESSOR_NAME, $this->messageProcessor],
             ]);
+
+        $this->queueIteratorFactory = $this->createMock(QueueIteratorFactoryInterface::class);
+        $this->queueIteratorFactory->expects(self::any())
+            ->method('createQueueIterator')
+            ->willReturnCallback(fn (array $boundQueues) => new DefaultQueueIterator($boundQueues));
 
         $this->message = new Message();
     }
@@ -68,27 +81,35 @@ class QueueConsumerTest extends TestCase
 
     public function testThrowIfQueueNameEmptyOnBind(): void
     {
-        $this->expectExceptionObject(new \LogicException('The queue name must be not empty.'));
+        $this->expectExceptionObject(new \LogicException('The queue name must not be empty.'));
 
-        $this->createQueueConsumer()->bind('');
+        $this->createQueueConsumer()->bindQueue('');
     }
 
     public function testThrowIfQueueAlreadyBoundToMessageProcessorOnBind(): void
     {
         $consumer = $this->createQueueConsumer();
-        $consumer->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME);
+        $consumer->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME]);
 
         $this->expectExceptionObject(
             new \LogicException(sprintf('The queue was already bound. Queue: %s', self::QUEUE_NAME))
         );
 
-        $consumer->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME);
+        $consumer->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME]);
     }
 
     public function testShouldReturnSelfOnBind(): void
     {
         $consumer = $this->createQueueConsumer();
-        self::assertSame($consumer, $consumer->bind(self::QUEUE_NAME));
+        self::assertSame($consumer, $consumer->bindQueue(self::QUEUE_NAME));
+    }
+
+    public function testConsumeThrowsWhenNoQueuesBound(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('No queues have been bound to consume.');
+
+        $this->createQueueConsumer()->consume();
     }
 
     public function testShouldSubscribeToGivenQueueAndQuitAfterFifthIdleCycle(): void
@@ -101,7 +122,7 @@ class QueueConsumerTest extends TestCase
             ->method('process');
 
         $this->createQueueConsumer(null, new BreakCycleExtension(5))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -116,7 +137,7 @@ class QueueConsumerTest extends TestCase
             ->willReturn(MessageProcessorInterface::ACK);
 
         $this->createQueueConsumer(null, new BreakCycleExtension(5))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -134,7 +155,7 @@ class QueueConsumerTest extends TestCase
         $this->expectExceptionMessage('Stale Jobs cannot be run');
 
         $this->createQueueConsumer()
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -154,7 +175,7 @@ class QueueConsumerTest extends TestCase
             ->willReturn(MessageProcessorInterface::ACK);
 
         $this->createQueueConsumer()
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -173,7 +194,7 @@ class QueueConsumerTest extends TestCase
         $this->expectExceptionMessage('Status is not supported');
 
         $this->createQueueConsumer()
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -193,7 +214,7 @@ class QueueConsumerTest extends TestCase
             ->willReturn(MessageProcessorInterface::REJECT);
 
         $this->createQueueConsumer()
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -213,7 +234,7 @@ class QueueConsumerTest extends TestCase
             ->willReturn(MessageProcessorInterface::REQUEUE);
 
         $this->createQueueConsumer()
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -231,7 +252,7 @@ class QueueConsumerTest extends TestCase
         $this->expectExceptionObject(new \LogicException('Status is not supported: invalidStatus'));
 
         $this->createQueueConsumer()
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -253,7 +274,7 @@ class QueueConsumerTest extends TestCase
             ->method('process');
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -276,7 +297,7 @@ class QueueConsumerTest extends TestCase
             });
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -301,7 +322,7 @@ class QueueConsumerTest extends TestCase
             ->willReturn(null);
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -332,7 +353,7 @@ class QueueConsumerTest extends TestCase
             ->willReturn(MessageProcessorInterface::ACK);
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -375,7 +396,7 @@ class QueueConsumerTest extends TestCase
             ->willReturn(MessageProcessorInterface::ACK);
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -403,7 +424,7 @@ class QueueConsumerTest extends TestCase
             });
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -430,7 +451,7 @@ class QueueConsumerTest extends TestCase
             ->method('close');
 
         $this->createQueueConsumer($connection, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -447,7 +468,7 @@ class QueueConsumerTest extends TestCase
 
         try {
             $this->createQueueConsumer()
-                ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+                ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
                 ->consume();
         } catch (\Exception $e) {
             self::assertSame($expectedException, $e);
@@ -479,7 +500,7 @@ class QueueConsumerTest extends TestCase
 
         try {
             $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-                ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+                ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
                 ->consume();
         } catch (\Exception $e) {
             self::assertSame($expectedException, $e);
@@ -523,7 +544,7 @@ class QueueConsumerTest extends TestCase
             });
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -559,7 +580,7 @@ class QueueConsumerTest extends TestCase
             });
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -593,7 +614,7 @@ class QueueConsumerTest extends TestCase
         $this->expectExceptionMessage('Process failed');
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -622,7 +643,7 @@ class QueueConsumerTest extends TestCase
             ->with(self::isInstanceOf(Context::class));
 
         $this->createQueueConsumer()
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
             ->consume(new ChainExtension([$runtimeExtension]));
     }
 
@@ -659,7 +680,7 @@ class QueueConsumerTest extends TestCase
             });
 
         $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
 
@@ -703,24 +724,61 @@ class QueueConsumerTest extends TestCase
             ]);
 
         $this->createQueueConsumer(null, new BreakCycleExtension(2), null, $messageProcessorRegistry)
-            ->bind(self::QUEUE_NAME, self::MESSAGE_PROCESSOR_NAME)
-            ->bind('another_queue', 'another_processor')
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
+            ->bindQueue('another_queue', ['processor' => 'another_processor'])
             ->consume(new ChainExtension([$extension]));
+    }
+
+    public function testShouldUseDefaultIteratorModeByDefault(): void
+    {
+        $boundQueues = [self::QUEUE_NAME => ['processor' => self::MESSAGE_PROCESSOR_NAME]];
+        $queueIteratorFactory = $this->createMock(QueueIteratorFactoryInterface::class);
+        $queueIteratorFactory->expects(self::once())
+            ->method('createQueueIterator')
+            ->with($boundQueues, DefaultQueueIterator::NAME)
+            ->willReturn(new DefaultQueueIterator($boundQueues));
+
+        $consumer = $this->createQueueConsumer(null, new BreakCycleExtension(1), null, null, $queueIteratorFactory);
+        $consumer->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME]);
+
+        $consumer->consume();
+    }
+
+    public function testShouldPassConsumptionModeToFactory(): void
+    {
+        $boundQueues = [self::QUEUE_NAME => ['processor' => self::MESSAGE_PROCESSOR_NAME]];
+
+        $queueIteratorFactory = $this->createMock(QueueIteratorFactoryInterface::class);
+        $consumptionMode = StrictPriorityInterleavingQueueIterator::NAME;
+        $queueIteratorFactory->expects(self::once())
+            ->method('createQueueIterator')
+            ->with($boundQueues, $consumptionMode)
+            ->willReturn(new StrictPriorityInterleavingQueueIterator($boundQueues));
+
+        $consumer = $this->createQueueConsumer(null, new BreakCycleExtension(1), null, null, $queueIteratorFactory);
+        $consumer->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME]);
+        $consumer->setConsumptionMode($consumptionMode);
+
+        $consumer->consume();
     }
 
     private function createQueueConsumer(
         ?ConnectionInterface $connection = null,
         ?ExtensionInterface $extension = null,
         ?ConsumerState $consumerState = null,
-        ?MessageProcessorRegistryInterface $messageProcessorRegistry = null
+        ?MessageProcessorRegistryInterface $messageProcessorRegistry = null,
+        ?QueueIteratorFactoryInterface $queueIteratorFactory = null
     ): QueueConsumer {
-        return new QueueConsumer(
+        $consumer = new QueueConsumer(
             $connection ?? $this->connection,
             $extension ?? new BreakCycleExtension(1),
             $consumerState ?? $this->consumerState,
             $messageProcessorRegistry ?? $this->messageProcessorRegistry,
             0
         );
+        $consumer->setQueueIteratorFactory($queueIteratorFactory ?? $this->queueIteratorFactory);
+
+        return $consumer;
     }
 
     private function createSession(): SessionInterface&MockObject

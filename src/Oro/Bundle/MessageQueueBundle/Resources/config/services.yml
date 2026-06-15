@@ -1,5 +1,7 @@
 parameters:
     oro_message_queue.maintenance.idle_time: 5
+    oro_message_queue.consumption_mode: '%env(default::ORO_MQ_CONSUMPTION_MODE)%'
+    oro_message_queue.consumption_groups: '%env(default::ORO_MQ_CONSUMPTION_GROUPS)%'
 
 services:
     oro_message_queue.consumption.extensions:
@@ -107,6 +109,108 @@ services:
         tags:
             - { name: oro_message_queue.consumption.clearer, priority: -255 }
 
+    oro_message_queue.consumption.queue_iterator.default_factory:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\DefaultQueueIteratorFactory
+        calls:
+            - [ 'setLogger', [ '@logger' ]]
+        tags:
+            - { name: oro_message_queue.consumption.queue_iterator_factory, consumption_mode: default }
+            - { name: monolog.logger, channel: 'consumer' }
+
+    oro_message_queue.consumption.queue_iterator.strict_priority_interleaving_registry:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableQueueIteratorRegistry
+
+    oro_message_queue.consumption.queue_iterator.strict_priority_interleaving_factory:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\StrictPriorityInterleavingQueueIteratorFactory
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.strict_priority_interleaving_registry'
+        calls:
+            - [ 'setLogger', [ '@logger' ]]
+        tags:
+            - { name: oro_message_queue.consumption.queue_iterator_factory, consumption_mode: strict-priority-interleaving }
+            - { name: monolog.logger, channel: 'consumer' }
+
+    oro_message_queue.consumption.queue_iterator.strict_priority_interleaving_extension:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableConsumptionExtension
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.strict_priority_interleaving_registry'
+        tags:
+            - { name: oro_message_queue.consumption.extension, persistent: true }
+
+    oro_message_queue.consumption.queue_iterator.hierarchical_strict_priority_interleaving_registry:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableQueueIteratorRegistry
+
+    oro_message_queue.consumption.queue_iterator.hierarchical_strict_priority_interleaving_factory:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\HierarchicalStrictPriorityInterleavingQueueIteratorFactory
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.hierarchical_strict_priority_interleaving_registry'
+        calls:
+            - [ 'setLogger', [ '@logger' ]]
+        tags:
+            - { name: oro_message_queue.consumption.queue_iterator_factory, consumption_mode: hierarchical-strict-priority-interleaving }
+            - { name: monolog.logger, channel: 'consumer' }
+
+    oro_message_queue.consumption.queue_iterator.hierarchical_strict_priority_interleaving_extension:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableConsumptionExtension
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.hierarchical_strict_priority_interleaving_registry'
+        tags:
+            - { name: oro_message_queue.consumption.extension, persistent: true }
+
+    oro_message_queue.consumption.queue_iterator.sequential_exhaustive_registry:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableQueueIteratorRegistry
+
+    oro_message_queue.consumption.queue_iterator.sequential_exhaustive_factory:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\SequentialExhaustiveQueueIteratorFactory
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.sequential_exhaustive_registry'
+        calls:
+            - [ 'setLogger', [ '@logger' ] ]
+        tags:
+            - { name: oro_message_queue.consumption.queue_iterator_factory, consumption_mode: sequential-exhaustive }
+            - { name: monolog.logger, channel: 'consumer' }
+
+    oro_message_queue.consumption.queue_iterator.sequential_exhaustive_extension:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableConsumptionExtension
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.sequential_exhaustive_registry'
+        tags:
+            - { name: oro_message_queue.consumption.extension, persistent: true }
+
+    oro_message_queue.consumption.queue_iterator.weighted_round_robin_registry:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableQueueIteratorRegistry
+
+    oro_message_queue.consumption.queue_iterator.weighted_round_robin_factory:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\WeightedRoundRobinQueueIteratorFactory
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.weighted_round_robin_registry'
+        calls:
+            - [ 'setLogger', [ '@logger' ] ]
+        tags:
+            - { name: oro_message_queue.consumption.queue_iterator_factory, consumption_mode: weighted-round-robin }
+            - { name: monolog.logger, channel: 'consumer' }
+
+    oro_message_queue.consumption.queue_iterator.weighted_round_robin_extension:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\NotifiableConsumptionExtension
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.weighted_round_robin_registry'
+        tags:
+            - { name: oro_message_queue.consumption.extension, persistent: true }
+
+    oro_message_queue.consumption.queue_iterator.factory_registry:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\QueueIteratorFactoryRegistry
+        arguments:
+            - !tagged_locator { tag: oro_message_queue.consumption.queue_iterator_factory, index_by: consumption_mode }
+
+    oro_message_queue.consumption.queue_iterator.chain_factory:
+        class: Oro\Component\MessageQueue\Consumption\QueueIterator\ChainQueueIteratorFactory
+        arguments:
+            - '@oro_message_queue.consumption.queue_iterator.factory_registry'
+        calls:
+            - [ 'setLogger', [ '@logger' ]]
+        tags:
+            - { name: monolog.logger, channel: 'consumer' }
+
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:
@@ -114,6 +218,8 @@ services:
             - '@oro_message_queue.consumption.extensions'
             - '@oro_message_queue.log.consumer_state'
             - '@oro_message_queue.client.message_processor_registry'
+        calls:
+            - [ 'setQueueIteratorFactory', [ '@oro_message_queue.consumption.queue_iterator.chain_factory' ] ]
 
     oro_message_queue.listener.update_schema:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
@@ -163,6 +269,20 @@ services:
             - '@monolog.logger.consumer'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_message_queue.listener.consumption_mode_from_env:
+        class: Oro\Bundle\MessageQueueBundle\EventListener\ConsumptionModeFromEnvListener
+        arguments:
+            - '%oro_message_queue.consumption_mode%'
+        tags:
+            - { name: kernel.event_listener, event: 'Oro\Bundle\MessageQueueBundle\Event\TransportConsumeMessagesCommandConsoleEvent', method: onConsoleCommand }
+
+    oro_message_queue.listener.consumption_groups_from_env:
+        class: Oro\Bundle\MessageQueueBundle\EventListener\ConsumptionGroupsFromEnvListener
+        arguments:
+            - '%oro_message_queue.consumption_groups%'
+        tags:
+            - { name: kernel.event_listener, event: 'Oro\Bundle\MessageQueueBundle\Event\TransportConsumeMessagesCommandConsoleEvent', method: onConsoleCommand }
 
     oro_message_queue.topic.message_queue_heartbeat:
         class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic

@@ -174,6 +174,36 @@ services:
         tags:
             - { name: nelmio_alice.faker.provider }
 
+    oro_test.async.topic.priority_high:
+        class: Oro\Bundle\TestFrameworkBundle\Test\Async\Topic\PriorityHighTestTopic
+        tags:
+            - { name: oro_message_queue.topic }
+
+    oro_test.async.topic.priority_medium:
+        class: Oro\Bundle\TestFrameworkBundle\Test\Async\Topic\PriorityMediumTestTopic
+        tags:
+            - { name: oro_message_queue.topic }
+
+    oro_test.async.topic.priority_low:
+        class: Oro\Bundle\TestFrameworkBundle\Test\Async\Topic\PriorityLowTestTopic
+        tags:
+            - { name: oro_message_queue.topic }
+
+    oro_test.async.processor.priority_high:
+        class: Oro\Bundle\TestFrameworkBundle\Test\Async\PriorityHighTestProcessor
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_test.async.processor.priority_medium:
+        class: Oro\Bundle\TestFrameworkBundle\Test\Async\PriorityMediumTestProcessor
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_test.async.processor.priority_low:
+        class: Oro\Bundle\TestFrameworkBundle\Test\Async\PriorityLowTestProcessor
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
     oro_test.datagrid.filter.action_filter:
         class: Oro\Bundle\TestFrameworkBundle\Datagrid\Filter\ActionFilter
         public: true
