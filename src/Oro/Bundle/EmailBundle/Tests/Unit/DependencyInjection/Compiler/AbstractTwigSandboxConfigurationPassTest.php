@@ -39,6 +39,7 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
         $container = new ContainerBuilder();
         $container->register('oro_email.twig.email_security_policy')
             ->setArguments([[], [], [], [], []]);
+        $container->register('oro_email.twig.email_template_security_policy');
 
         $this->compiler->process($container);
     }
@@ -48,6 +49,10 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
         $container = new ContainerBuilder();
         $securityPolicyDef = $container->register('oro_email.twig.email_security_policy')
             ->setArguments([['some_existing_tag'], ['some_existing_filter'], [], [], ['some_existing_function']]);
+        $templateSecurityPolicyDef = $container->register('oro_email.twig.email_template_security_policy')
+            ->addMethodCall('setAllowedTags', [['some_existing_tag']])
+            ->addMethodCall('setAllowedFunctions', [['some_existing_function']])
+            ->addMethodCall('setAllowedFilters', [['some_existing_filter']]);
         $rendererDef = $container->register('oro_email.twig.email_environment');
 
         $this->compiler->process($container);
@@ -61,6 +66,14 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
                 ['some_existing_function', 'function1', 'function2']
             ],
             $securityPolicyDef->getArguments()
+        );
+        self::assertEquals(
+            [
+                ['setAllowedTags', [['some_existing_tag', 'tag1', 'tag2']]],
+                ['setAllowedFunctions', [['some_existing_function', 'function1', 'function2']]],
+                ['setAllowedFilters', [['some_existing_filter', 'filter1', 'filter2']]],
+            ],
+            $templateSecurityPolicyDef->getMethodCalls()
         );
         self::assertEquals(
             [

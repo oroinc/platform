@@ -8,14 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
+class EntityConfigListenerTest extends TestCase
 {
-    /** @var TemplateRendererConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailRendererConfigProvider;
-
-    /** @var EntityConfigListener */
-    private $listener;
+    private TemplateRendererConfigProviderInterface&MockObject $emailRendererConfigProvider;
+    private EntityConfigListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -31,8 +30,8 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
     public function testPreFlush(
         string $scope,
         array $changeSet,
-        bool $shouldClearCache,
-        ?int $modelId = null
+        ?int $modelId = null,
+        bool $shouldClearCache
     ): void {
         $className = 'Test\Entity';
         $fieldName = 'testField';
@@ -68,26 +67,26 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             'email config changed'     => [
                 'scope'            => 'email',
                 'change'           => ['available_in_template' => [true, false]],
-                'shouldClearCache' => true,
                 'id'               => 1,
+                'shouldClearCache' => true
             ],
             'email config not changed' => [
                 'scope'            => 'email',
                 'change'           => [],
-                'shouldClearCache' => false,
                 'id'               => 1,
+                'shouldClearCache' => false
             ],
             'not email config'         => [
                 'scope'            => 'someConfigScope',
                 'change'           => [],
-                'shouldClearCache' => false,
                 'id'               => 1,
+                'shouldClearCache' => false
             ],
             'new email config'     => [
                 'scope'            => 'email',
                 'change'           => [],
-                'shouldClearCache' => true,
                 'id'               => null,
+                'shouldClearCache' => true
             ],
         ];
     }

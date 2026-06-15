@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -57,47 +58,59 @@ abstract class AbstractAudit
     protected ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 8, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $action = null;
 
     #[ORM\Column(name: 'logged_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?\DateTimeInterface $loggedAt = null;
 
     #[ORM\Column(name: 'object_id', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $objectId = null;
 
     #[ORM\Column(name: 'object_class', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $objectClass = null;
 
     #[ORM\Column(name: 'object_name', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $objectName = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?int $version = null;
 
     /**
      * @var Collection<int, AuditField>
      */
     #[ORM\OneToMany(mappedBy: 'audit', targetEntity: AuditField::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?Collection $fields = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     #[ORM\ManyToOne(targetEntity: Impersonation::class)]
     #[ORM\JoinColumn(name: 'impersonation_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?Impersonation $impersonation = null;
 
     #[ORM\Column(name: 'transaction_id', type: Types::STRING, length: 36)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $transactionId = null;
 
     #[ORM\Column(name: 'owner_description', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $ownerDescription = null;
 
     /**
      * @var array $additionalFields
      */
     #[ORM\Column(name: 'additional_fields', type: Types::ARRAY, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected $additionalFields = [];
 
     /**
