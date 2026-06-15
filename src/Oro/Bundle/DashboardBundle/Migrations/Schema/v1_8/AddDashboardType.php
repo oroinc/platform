@@ -40,7 +40,8 @@ class AddDashboardType implements Migration, ExtendExtensionAwareInterface
                 'form'      => ['is_enabled' => false],
                 'view'      => ['is_displayable' => false],
                 'merge'     => ['display' => false],
-                'dataaudit' => ['auditable' => false]
+                'dataaudit' => ['auditable' => false],
+                'email' => ['available_in_template' => true],
             ]
         );
 

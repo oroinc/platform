@@ -34,11 +34,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             'owner_field_name' => 'owner',
             'owner_column_name' => 'owner_id',
             'organization_field_name' => 'organization',
-            'organization_column_name' => 'organization_id'
+            'organization_column_name' => 'organization_id',
         ],
         'security' => ['type' => 'ACL', 'category' => 'account_management'],
         'comment' => ['immutable' => true],
-        'activity' => ['immutable' => true]
+        'activity' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Attachment implements ExtendEntityInterface
@@ -48,30 +49,41 @@ class Attachment implements ExtendEntityInterface
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(name: 'owner_user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?UserInterface $owner = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class, inversedBy: 'businessUnits')]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     #[ORM\Column(name: 'comment', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $comment = null;
 
     #[Assert\Valid]
     #[ORM\ManyToOne(targetEntity: File::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'file_id', referencedColumnName: 'id')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?File $file = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     /**

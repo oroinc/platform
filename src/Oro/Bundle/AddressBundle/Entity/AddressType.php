@@ -19,16 +19,20 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 #[Config(defaultValues: ['grouping' => ['groups' => ['dictionary']]])]
 class AddressType implements Translatable
 {
-    const TYPE_BILLING  = 'billing';
-    const TYPE_SHIPPING = 'shipping';
+    public const TYPE_BILLING = 'billing';
+    public const TYPE_SHIPPING = 'shipping';
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 16)]
     #[ORM\Id]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $name = null;
 
     #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
     #[Gedmo\Translatable]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $label = null;
 
     #[Gedmo\Locale]

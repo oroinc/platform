@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -47,17 +48,21 @@ class TestActivity implements
     protected ?int $id = null;
 
     #[ORM\Column(name: 'message', type: Types::TEXT)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $message = null;
 
     #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?User $owner = null;
 
     /**

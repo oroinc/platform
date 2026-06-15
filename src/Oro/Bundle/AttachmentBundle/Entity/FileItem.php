@@ -18,7 +18,11 @@ use Oro\Bundle\FormBundle\Entity\EmptyItem;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'oro_attachment_file_item')]
-#[Config]
+#[Config(
+    defaultValues: [
+        'email' => ['available_in_template' => true],
+    ]
+)]
 class FileItem implements EmptyItem, ExtendEntityInterface
 {
     use ExtendEntityTrait;
@@ -26,14 +30,19 @@ class FileItem implements EmptyItem, ExtendEntityInterface
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?int $id = null;
 
     #[ORM\OneToOne(targetEntity: File::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\JoinColumn(name: 'file_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?File $file = null;
 
     #[ORM\Column(name: 'sort_order', type: Types::INTEGER, options: ['default' => 0])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $sortOrder = 0;
 
     public function __toString(): string

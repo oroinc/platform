@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -21,18 +22,23 @@ class Audit extends AbstractAudit
     protected ?int $id = null;
 
     #[ORM\Column(name: 'logged_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?\DateTimeInterface $loggedAt = null;
 
     #[ORM\Column(name: 'object_id', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $objectId = null;
 
     #[ORM\Column(name: 'object_class', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $objectClass = null;
 
     #[ORM\Column(name: 'object_name', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $objectName = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?int $version = null;
 
     /**
@@ -42,9 +48,11 @@ class Audit extends AbstractAudit
 
     #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?User $user = null;
 
     #[ORM\Column(name: 'owner_description', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $ownerDescription = null;
 
     /**

@@ -12,7 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 trait UpdatedAtAwareTrait
 {
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     /**

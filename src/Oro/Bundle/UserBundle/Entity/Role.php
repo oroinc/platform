@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroUserBundle_Entity_Role;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
@@ -29,7 +30,8 @@ use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
     defaultValues: [
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
         'activity' => ['immutable' => true],
-        'attachment' => ['immutable' => true]
+        'attachment' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Role extends AbstractRole implements ExtendEntityInterface
@@ -41,18 +43,22 @@ class Role extends AbstractRole implements ExtendEntityInterface
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 30, unique: true, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $role = null;
 
     #[ORM\Column(type: Types::STRING, length: 30)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $label = null;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userRoles')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $users = null;
 
     /**

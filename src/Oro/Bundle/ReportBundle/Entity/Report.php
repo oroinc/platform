@@ -35,7 +35,8 @@ use Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository;
         ],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
         'activity' => ['immutable' => true],
-        'attachment' => ['immutable' => true]
+        'attachment' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface, ExtendEntityInterface
@@ -47,26 +48,33 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $name = null;
 
     #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: ReportType::class)]
     #[ORM\JoinColumn(name: 'type', referencedColumnName: 'name')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?ReportType $type = null;
 
     #[ORM\Column(name: 'entity', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $entity = null;
 
     #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
     #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?BusinessUnit $owner = null;
 
     #[ORM\Column(name: 'definition', type: Types::TEXT)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $definition = null;
 
     /**
@@ -76,15 +84,22 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
     protected $chartOptions;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     public function __clone()

@@ -26,10 +26,18 @@ class LocalizedFallbackValue extends AbstractLocalizedFallbackValue implements E
     use ExtendEntityTrait;
 
     #[ORM\Column(name: 'string', type: Types::STRING, length: 255, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['excluded' => false]])]
+    #[ConfigField(defaultValues: [
+        'dataaudit' => ['auditable' => true],
+        'importexport' => ['excluded' => false],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $string = null;
 
     #[ORM\Column(name: 'text', type: Types::TEXT, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['excluded' => false]])]
+    #[ConfigField(defaultValues: [
+        'dataaudit' => ['auditable' => true],
+        'importexport' => ['excluded' => false],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $text = null;
 }

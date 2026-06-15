@@ -33,7 +33,15 @@ class OroUserBundle implements
     public function up(Schema $schema, QueryBag $queries): void
     {
         //add attachment extend field
-        $this->attachmentExtension->addImageRelation($schema, 'oro_user', 'avatar', [], 2, 58, 58);
+        $this->attachmentExtension->addImageRelation(
+            $schema,
+            'oro_user',
+            'avatar',
+            ['email' => ['available_in_template' => true]],
+            2,
+            58,
+            58
+        );
         $this->addOwnerToAttachmentFileTable($schema);
 
         //save old avatars to new place

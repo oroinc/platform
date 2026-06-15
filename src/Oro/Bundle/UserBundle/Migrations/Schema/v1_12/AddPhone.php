@@ -22,7 +22,8 @@ class AddPhone implements Migration
                 'length'      => 255,
                 'oro_options' => [
                     'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM],
-                    'dataaudit' => ['auditable' => true]
+                    'dataaudit' => ['auditable' => true],
+                    'email' => ['available_in_template' => true],
                 ]
             ]
         );

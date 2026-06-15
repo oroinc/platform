@@ -90,6 +90,29 @@ class TranslatedEmailTemplateProviderTest extends TestCase
         );
     }
 
+    public function testGetTranslatedEmailTemplateWhenOneTranslationAndNotFallbackAndNullField(): void
+    {
+        $localization42 = $this->createLocalization(42);
+        $emailTemplateTranslation1 = (new EmailTemplateTranslation())
+            ->setLocalization($localization42)
+            ->setSubjectFallback(false)
+            ->setContentFallback(false);
+
+        $emailTemplateEntity = (new EmailTemplateEntity())
+            ->setSubject('Sample default subject')
+            ->setContent('Sample default content')
+            ->addTranslation($emailTemplateTranslation1);
+
+        $emailTemplateModel = (new EmailTemplateModel())
+            ->setSubject('')
+            ->setContent('');
+
+        self::assertEquals(
+            $emailTemplateModel,
+            $this->provider->getTranslatedEmailTemplate($emailTemplateEntity, $localization42)
+        );
+    }
+
     public function testGetTranslatedEmailTemplateWhenTwoTranslationsAndFirstFallback(): void
     {
         $localization42 = $this->createLocalization(42);

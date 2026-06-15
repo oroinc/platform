@@ -3,6 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Entity\Ownership;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 /**
@@ -14,6 +15,7 @@ trait BusinessUnitAwareTrait
 
     #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
     #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?BusinessUnit $owner = null;
 
     /**

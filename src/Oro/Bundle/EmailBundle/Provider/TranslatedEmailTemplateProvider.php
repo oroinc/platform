@@ -73,7 +73,7 @@ class TranslatedEmailTemplateProvider
         while ($templateTranslation = $this->findTranslation($templateTranslationsByLocalization, $localization)) {
             // For current attribute not enabled fallback to parent localizations
             if (!$this->propertyAccessor->getValue($templateTranslation, $attributeFallback)) {
-                return $this->propertyAccessor->getValue($templateTranslation, $fieldName);
+                return (string) ($this->propertyAccessor->getValue($templateTranslation, $fieldName) ?? '');
             }
 
             // Find next available localized template by localization tree
@@ -81,7 +81,7 @@ class TranslatedEmailTemplateProvider
         }
 
         // Fallback to default when template for localization not found
-        return $this->propertyAccessor->getValue($emailTemplateEntity, $fieldName);
+        return (string) ($this->propertyAccessor->getValue($emailTemplateEntity, $fieldName) ?? '');
     }
 
     private function findTranslation(

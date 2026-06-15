@@ -35,8 +35,8 @@ use Oro\Bundle\UserBundle\Entity\User;
             'owner_field_name' => 'owner',
             'owner_column_name' => 'user_owner_id',
             'organization_field_name' => 'organization',
-            'organization_column_name' => 'organization_id'
-        ]
+            'organization_column_name' => 'organization_id',
+        ],
     ]
 )]
 class EmailUser
@@ -44,32 +44,42 @@ class EmailUser
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?User $owner = null;
 
     #[ORM\ManyToOne(targetEntity: Mailbox::class, inversedBy: 'emailUsers')]
     #[ORM\JoinColumn(name: 'mailbox_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Mailbox $mailboxOwner = null;
 
     #[ORM\Column(name: 'received', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?\DateTimeInterface $receivedAt = null;
 
     #[ORM\Column(name: 'is_seen', type: Types::BOOLEAN, options: ['default' => true])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?bool $seen = false;
 
     #[ORM\ManyToOne(targetEntity: EmailOrigin::class, inversedBy: 'emailUsers')]
     #[ORM\JoinColumn(name: 'origin_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?EmailOrigin $origin = null;
 
     /**
@@ -83,12 +93,15 @@ class EmailUser
 
     #[ORM\ManyToOne(targetEntity: Email::class, cascade: ['persist'], inversedBy: 'emailUsers')]
     #[ORM\JoinColumn(name: 'email_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Email $email = null;
 
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $unsyncedFlagCount = 0;
 
     #[ORM\Column(name: 'is_private', type: Types::BOOLEAN, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?bool $isEmailPrivate = false;
 
     public function __construct()

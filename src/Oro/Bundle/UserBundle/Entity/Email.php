@@ -20,14 +20,20 @@ class Email implements EmailInterface
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'emails')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?User $user = null;
 
     #[ORM\Column(type: Types::STRING, length: 255)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true], 'dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'dataaudit' => ['auditable' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $email = null;
 
     /**

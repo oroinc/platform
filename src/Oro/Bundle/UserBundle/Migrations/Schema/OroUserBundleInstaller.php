@@ -46,7 +46,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion(): string
     {
-        return 'v2_11_1';
+        return 'v6_0_10_0';
     }
 
     /**
@@ -158,7 +158,8 @@ class OroUserBundleInstaller implements
                 'length'      => 255,
                 'oro_options' => [
                     'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM],
-                    'dataaudit' => ['auditable' => true]
+                    'dataaudit' => ['auditable' => true],
+                    'email' => ['available_in_template' => true],
                 ]
             ]
         );
@@ -185,7 +186,8 @@ class OroUserBundleInstaller implements
                 'length'      => 255,
                 'oro_options' => [
                     'extend'   => ['owner' => ExtendScope::OWNER_CUSTOM],
-                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
+                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                    'email' => ['available_in_template' => true],
                 ]
             ]
         );
@@ -199,7 +201,15 @@ class OroUserBundleInstaller implements
         $table->addIndex(['organization_id'], 'IDX_F82840BC32C8A3DE');
         $table->addIndex(['first_name', 'last_name'], 'user_first_name_last_name_idx');
 
-        $this->attachmentExtension->addImageRelation($schema, 'oro_user', 'avatar', [], 2, 58, 58);
+        $this->attachmentExtension->addImageRelation(
+            $schema,
+            'oro_user',
+            'avatar',
+            ['email' => ['available_in_template' => true]],
+            2,
+            58,
+            58
+        );
     }
 
     /**

@@ -34,7 +34,8 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
     defaultValues: [
         'entity' => ['icon' => 'fa-list'],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
-        'form' => ['form_type' => LocalizationSelectType::class, 'grid_name' => 'oro-locale-localizations-select-grid']
+        'form' => ['form_type' => LocalizationSelectType::class, 'grid_name' => 'oro-locale-localizations-select-grid'],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Localization implements DatesAwareInterface, ExtendEntityInterface
@@ -47,10 +48,14 @@ class Localization implements DatesAwareInterface, ExtendEntityInterface
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true, nullable: false)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $name = null;
 
     /**
@@ -60,26 +65,32 @@ class Localization implements DatesAwareInterface, ExtendEntityInterface
     #[ORM\JoinTable(name: 'oro_localization_title')]
     #[ORM\JoinColumn(name: 'localization_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'localized_value_id', referencedColumnName: 'id', unique: true, onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $titles = null;
 
     #[ORM\ManyToOne(targetEntity: Language::class)]
     #[ORM\JoinColumn(name: 'language_id', referencedColumnName: 'id', nullable: false, onDelete: 'RESTRICT')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Language $language = null;
 
     #[ORM\Column(name: 'formatting_code', type: Types::STRING, length: 16, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $formattingCode = null;
 
     #[ORM\Column(name: 'rtl_mode', type: Types::BOOLEAN, options: ['default' => false])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?bool $rtlMode = false;
 
     #[ORM\ManyToOne(targetEntity: Localization::class, inversedBy: 'childLocalizations')]
     #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Localization $parentLocalization = null;
 
     /**
      * @var Collection<int, Localization>
      */
     #[ORM\OneToMany(mappedBy: 'parentLocalization', targetEntity: Localization::class)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $childLocalizations = null;
 
     /**

@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Grid\GridHelper as BaseGridHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Adds the ability to sort by  email template-enabled entities.
+ */
 class EmailTemplateGridHelper extends BaseGridHelper
 {
     /** @var TranslatorInterface */
@@ -19,6 +22,14 @@ class EmailTemplateGridHelper extends BaseGridHelper
     {
         parent::__construct($entityProvider);
         $this->translator = $translator;
+    }
+
+    /**
+     * @bc-layer This method exists for BC reasons.
+     */
+    public function setEntityProvider(EntityProvider $entityProvider): void
+    {
+        $this->entityProvider = $entityProvider;
     }
 
     /**

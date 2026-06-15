@@ -13,7 +13,7 @@ class OroCronBundleInstaller implements Installation
      */
     public function getMigrationVersion(): string
     {
-        return 'v2_1';
+        return 'v6_0_10_0';
     }
 
     /**
