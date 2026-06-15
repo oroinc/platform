@@ -50,7 +50,7 @@ Feature: Email template field availability
     And click view "admin@example.com" in grid
     And click "More actions"
     And click "Send email"
-    And I fill "Send Email Form" with:
+    And I fill "Email Form" with:
       | To             | admin@example.com   |
       | Apply template | Test Allowed Fields |
     And I click "Yes, Proceed" in confirmation dialogue
@@ -74,7 +74,7 @@ Feature: Email template field availability
     Given I proceed as the Admin1
     When I click "More actions"
     And I click "Send email"
-    And I fill "Send Email Form" with:
+    And I fill "Email Form" with:
       | To             | admin@example.com   |
       | Apply template | Test Allowed Fields |
     And I click "Yes, Proceed" in confirmation dialogue
