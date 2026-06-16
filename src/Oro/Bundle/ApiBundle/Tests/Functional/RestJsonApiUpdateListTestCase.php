@@ -238,31 +238,8 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
+        $this->consumeAllMessages();
 
-        $this->consumeMessages();
-
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
-        $this->consumeMessages();
-
-        $this->consumeMessages();
-
-        $this->consumeMessages();
-
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
-
-        $this->consumeMessages();
-
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
-        $this->consumeMessages();
-
-        $this->consumeMessages();
-
-        $this->consumeMessages();
         if ($assertNoErrors) {
             $this->assertAsyncOperationErrors([], $operationId);
         }
@@ -284,9 +261,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     ): int {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
-
         $this->consumeMessages();
 
         if ($failedGroupName) {
@@ -296,9 +270,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         if ($entityConfig) {
             $this->appendEntityConfig($entityClass, $entityConfig);
         }
-
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
 
         $processedUpdateListChunkMessages = $this->consumeAllMessages(
             UpdateListProcessChunkTopic::getName()

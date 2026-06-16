@@ -74,7 +74,7 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
                 E_PARSE => [$this->logger, LogLevel::CRITICAL],
                 E_ERROR => [$this->logger, LogLevel::CRITICAL],
                 E_CORE_ERROR => [$this->logger, LogLevel::CRITICAL],
-                E_STRICT => [null, LogLevel::WARNING],
+                E_STRICT => [null, LogLevel::WARNING]
             ],
             $this->handler->setLoggers([])
         );
@@ -102,7 +102,7 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
                 E_PARSE => [null, LogLevel::CRITICAL],
                 E_ERROR => [null, LogLevel::CRITICAL],
                 E_CORE_ERROR => [null, LogLevel::CRITICAL],
-                E_STRICT => [null, LogLevel::WARNING],
+                E_STRICT => [null, LogLevel::WARNING]
             ],
             $this->handler->setLoggers([])
         );

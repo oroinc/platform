@@ -530,9 +530,6 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ]
         ]);
 
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
-
         $this->consumeMessages();
 
         $this->appendEntityConfig(
@@ -548,8 +545,6 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ]
         );
 
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
         $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(

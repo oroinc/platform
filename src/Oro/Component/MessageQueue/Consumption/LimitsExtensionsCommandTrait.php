@@ -114,7 +114,7 @@ HELP
             $extensions[] = new LimitGarbageCollectionExtension($garbageCollectionLimit);
         }
 
-        if ($input->getOption('stop-when-unique-jobs-processed')) {
+        if (isset($this->jobManager) && $input->getOption('stop-when-unique-jobs-processed')) {
             $extensions[] = new UniqueJobsProcessedExtension($this->jobManager);
         }
 

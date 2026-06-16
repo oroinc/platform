@@ -624,15 +624,7 @@ class CustomizeFormDataExtendabilityTest extends RestJsonApiUpdateListTestCase
             ]
         ]);
 
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
-
-        $this->consumeMessages();
-
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
-
-        $this->consumeMessages();
+        $this->consumeAllMessages();
 
         $this->assertAsyncOperationErrors([], $operationId);
 

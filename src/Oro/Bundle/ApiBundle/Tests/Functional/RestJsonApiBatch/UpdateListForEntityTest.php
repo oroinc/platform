@@ -256,9 +256,6 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             ]
         ]);
 
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
-
         $this->consumeMessages();
 
         $this->appendEntityConfig(
@@ -267,8 +264,6 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             true
         );
 
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
         $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(
@@ -579,9 +574,6 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             ]
         ]);
 
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
-
         $this->consumeMessages();
 
         $this->appendEntityConfig(
@@ -590,8 +582,6 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             true
         );
 
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
         $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(
@@ -621,9 +611,6 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             ]
         ]);
 
-        $tokenStorage = $this->getTokenStorage();
-        $token = $this->getTokenStorage()->getToken();
-
         $this->consumeMessages();
 
         $this->appendEntityConfig(
@@ -632,8 +619,6 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             true
         );
 
-        //refresh token after resetting in consumer
-        $tokenStorage->setToken($token);
         $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(

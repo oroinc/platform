@@ -12,7 +12,7 @@ class MakeMessageQueueCollectorPersistentPass extends RegisterPersistentServices
 {
     private const PERSISTENT_SERVICES = [
         'oro_message_queue.test.async.extension.consumed_messages_collector',
-        'oro_message_queue.test.driver.message_collector',
+        'oro_message_queue.test.sent_messages_storage',
     ];
 
     public function process(ContainerBuilder $container): void
