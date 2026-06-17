@@ -325,7 +325,7 @@ const Grid = Backgrid.Grid.extend({
         const bodyOptions = Object.assign({}, filteredOptions);
         this.columns.trigger('configureInitializeOptions', this.body, bodyOptions);
 
-        this.footer = options.footer || this.footer;
+        this.footer = (options.themeOptions && options.themeOptions.footerView) || options.footer || this.footer;
         const footerOptions = Object.assign({}, filteredOptions);
         this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
         if (footerOptions.themeOptions.hide) {
