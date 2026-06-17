@@ -6,7 +6,11 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\SingleObjectIterableResultDecorator;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Getting iterator trait for metadata class
+ */
 trait BatchIteratorTrait
 {
     /**
@@ -18,6 +22,7 @@ trait BatchIteratorTrait
         $qb = $this->createQueryBuilder('t');
 
         foreach ($this->getClassMetadata()->getIdentifierFieldNames() as $fieldName) {
+            QueryBuilderUtil::checkIdentifier($fieldName);
             $qb->orderBy('t.' . $fieldName);
         }
 

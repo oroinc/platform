@@ -45,6 +45,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *              "acl"="oro_note_view",
  *              "action_button_widget"="oro_add_note_button",
  *              "action_link_widget"="oro_add_note_link"
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

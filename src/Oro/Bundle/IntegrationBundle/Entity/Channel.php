@@ -40,6 +40,9 @@ use Oro\Component\Config\Common\ConfigObject;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

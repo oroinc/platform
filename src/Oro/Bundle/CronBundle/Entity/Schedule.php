@@ -4,6 +4,7 @@ namespace Oro\Bundle\CronBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Represents a table with CRON jobs schedules.
@@ -39,6 +40,14 @@ class Schedule
      * @var string
      *
      * @ORM\Column(name="command", type="string", length=255)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $command;
 
@@ -46,6 +55,14 @@ class Schedule
      * @var array
      *
      * @ORM\Column(name="args", type = "json_array")
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $arguments;
 
@@ -53,6 +70,14 @@ class Schedule
      * @var string
      *
      * @ORM\Column(name="args_hash", type="string", length=32)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $argumentsHash;
 
@@ -60,6 +85,14 @@ class Schedule
      * @var string
      *
      * @ORM\Column(name="definition", type="string", length=100, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $definition;
 

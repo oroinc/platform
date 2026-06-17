@@ -35,6 +35,9 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
  *              "form_type"="Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType",
  *              "grid_name"="oro-locale-localizations-select-grid",
  *          },
+ *          "email"={
+ *              "available_in_template"=true
+ *          }
  *      }
  * )
  * @method LocalizedFallbackValue getTitle(Localization $localization = null)

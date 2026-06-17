@@ -177,6 +177,14 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
      * @var string
      *
      * @ORM\Column(name="data", type="text", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $serializedData;
 

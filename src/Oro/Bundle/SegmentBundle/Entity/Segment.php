@@ -38,6 +38,9 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

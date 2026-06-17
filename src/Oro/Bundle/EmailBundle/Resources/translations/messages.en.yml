@@ -365,6 +365,11 @@ oro:
 
         entity_config:
             email:
+                entity:
+                    items:
+                        available_in_template:
+                            label: Available in email templates
+                            tooltip: If enabled, this entity will be available when creating email templates.
                 field:
                     items:
                         available_in_template: Available in email templates

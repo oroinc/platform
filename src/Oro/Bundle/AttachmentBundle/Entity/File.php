@@ -36,6 +36,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          },
  *          "entity_management"={
  *              "enabled"=false
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

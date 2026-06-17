@@ -35,9 +35,6 @@ class EmailSecurityPolicyDecoratorTest extends TestCase
     public function getMethodAndObjectDataProvider(): array
     {
         return [
-            [new Email(), 'getSentAs'],
-            [new Email(), 'hasSome'],
-            [new Email(), 'isSome'],
             [new Email(), '__toString'],
         ];
     }

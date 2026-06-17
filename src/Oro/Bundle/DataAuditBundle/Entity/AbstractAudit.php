@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
@@ -75,6 +76,14 @@ abstract class AbstractAudit
      * @var string $action
      *
      * @ORM\Column(type="string", length=8, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $action;
 
@@ -82,6 +91,14 @@ abstract class AbstractAudit
      * @var string $loggedAt
      *
      * @ORM\Column(name="logged_at", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $loggedAt;
 
@@ -89,6 +106,14 @@ abstract class AbstractAudit
      * @var string $objectId
      *
      * @ORM\Column(name="object_id", type="string", length=255, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $objectId;
 
@@ -96,6 +121,14 @@ abstract class AbstractAudit
      * @var string $objectClass
      *
      * @ORM\Column(name="object_class", type="string", length=255)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $objectClass;
 
@@ -103,6 +136,14 @@ abstract class AbstractAudit
      * @var string $objectName
      *
      * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $objectName;
 
@@ -110,6 +151,14 @@ abstract class AbstractAudit
      * @var integer $version
      *
      * @ORM\Column(type="integer", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $version;
 
@@ -122,6 +171,14 @@ abstract class AbstractAudit
      *     orphanRemoval=true,
      *     cascade={"persist"}
      * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $fields;
 
@@ -130,6 +187,14 @@ abstract class AbstractAudit
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $organization;
 
@@ -138,6 +203,14 @@ abstract class AbstractAudit
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\Impersonation")
      * @ORM\JoinColumn(name="impersonation_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $impersonation;
 
@@ -145,6 +218,14 @@ abstract class AbstractAudit
      * @var string $transactionId
      *
      * @ORM\Column(name="transaction_id", type="string", length=36)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $transactionId;
 
@@ -152,6 +233,14 @@ abstract class AbstractAudit
      * @var string
      *
      * @ORM\Column(name="owner_description", type="string", length=255, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $ownerDescription;
 
@@ -159,6 +248,14 @@ abstract class AbstractAudit
      * @var array $additionalFields
      *
      * @ORM\Column(name="additional_fields", type="array", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $additionalFields = [];
 

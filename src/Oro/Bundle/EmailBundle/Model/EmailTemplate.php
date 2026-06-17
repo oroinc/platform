@@ -11,9 +11,19 @@ class EmailTemplate implements EmailTemplateInterface
     public const CONTENT_TYPE_TEXT = 'text/plain';
 
     /**
+     * @var string|null
+     */
+    private $name;
+
+    /**
      * @var string
      */
     private $type;
+
+    /**
+     * @var string|null
+     */
+    private $entityName;
 
     /**
      * @var string
@@ -25,12 +35,22 @@ class EmailTemplate implements EmailTemplateInterface
      */
     private $content;
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
     /**
      * @inheritdoc
      */
     public function getType()
     {
         return $this->type;
+    }
+
+    public function getEntityName(): ?string
+    {
+        return $this->entityName;
     }
 
     /**
@@ -49,6 +69,13 @@ class EmailTemplate implements EmailTemplateInterface
         return $this->content;
     }
 
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     /**
      * @param string $type
      * @return EmailTemplate
@@ -56,6 +83,13 @@ class EmailTemplate implements EmailTemplateInterface
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function setEntityName(?string $entityName): self
+    {
+        $this->entityName = $entityName;
 
         return $this;
     }

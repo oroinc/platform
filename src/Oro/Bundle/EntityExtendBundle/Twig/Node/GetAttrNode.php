@@ -31,6 +31,10 @@ class GetAttrNode extends GetAttrExpression
     {
         // Skip parent::__construct()
         Node::__construct($nodes, $attributes, $lineno, $tag);
+
+        if ($attributes['is_defined_test'] ?? false) {
+            $this->enableDefinedTest();
+        }
     }
 
     /**
@@ -43,7 +47,7 @@ class GetAttrNode extends GetAttrExpression
         // optimize array calls
         if ($this->getAttribute('optimizable')
             && (!$env->isStrictVariables() || $this->getAttribute('ignore_strict_check'))
-            && !$this->getAttribute('is_defined_test')
+            && !$this->isDefinedTestEnabled()
             && Template::ARRAY_CALL === $this->getAttribute('type')
         ) {
             $var = '$' . $compiler->getVarName();
@@ -85,7 +89,7 @@ class GetAttrNode extends GetAttrExpression
 
         $compiler->raw(', ')
             ->repr($this->getAttribute('type'))
-            ->raw(', ')->repr($this->getAttribute('is_defined_test'))
+            ->raw(', ')->repr($this->isDefinedTestEnabled())
             ->raw(', ')->repr($this->getAttribute('ignore_strict_check'))
             ->raw(', ')->repr($env->hasExtension(SandboxExtension::class))
             ->raw(', ')->repr($this->getNode('node')->getTemplateLine())
@@ -275,13 +279,13 @@ class GetAttrNode extends GetAttrExpression
         // object property
         if (/* Template::METHOD_CALL */ 'method' !== $type) {
             if (isset($object->$item) || \array_key_exists((string)$item, (array)$object)) {
-                if ($isDefinedTest) {
-                    return true;
-                }
-
                 if ($sandboxed) {
                     $env->getExtension(SandboxExtension::class)
                         ->checkPropertyAllowed($object, $item, $lineno, $source);
+                }
+
+                if ($isDefinedTest) {
+                    return true;
                 }
 
                 return $object->$item;
@@ -355,11 +359,11 @@ class GetAttrNode extends GetAttrExpression
 
             throw new RuntimeError(sprintf($format, $item, $class), $lineno, $source);
         }
-        if ($isDefinedTest) {
-            return true;
-        }
         if ($sandboxed) {
             $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
+        }
+        if ($isDefinedTest) {
+            return true;
         }
         // Some objects throw exceptions when they have __call, and the method we try
         // to call is not supported. If ignoreStrictCheck is true, we should return null.
@@ -377,8 +381,8 @@ class GetAttrNode extends GetAttrExpression
 
     private static function isMethodWithPrefixExists(
         object|string $objectOrClass,
-        string        $prefix,
-        string        $methodCandidate
+        string $prefix,
+        string $methodCandidate
     ): bool {
         if (!str_starts_with($methodCandidate, $prefix)) {
             $methodCandidate = self::getInflector()->camelize($prefix . ucfirst($methodCandidate));

@@ -33,6 +33,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          "dataaudit"={
  *              "auditable"=true
  *          },
+ *          "email"={
+ *              "available_in_template"=true
+ *          }
  *      }
  * )
  */

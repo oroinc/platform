@@ -28,6 +28,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *             "group_name"="",
  *             "category"="",
  *             "permissions"="VIEW;CREATE;EDIT;DELETE"
+ *         },
+ *         "email"={
+ *             "available_in_template"=true
  *         }
  *     }
  * )

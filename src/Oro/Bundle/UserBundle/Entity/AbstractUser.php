@@ -68,7 +68,8 @@ abstract class AbstractUser implements
      *              "excluded"=true
      *          },
      *          "email"={
-     *              "available_in_template"=false
+     *              "available_in_template"=false,
+     *              "immutable"=true
      *          }
      *      }
      * )
@@ -94,7 +95,8 @@ abstract class AbstractUser implements
      *              "excluded"=true
      *          },
      *          "email"={
-     *              "available_in_template"=false
+     *              "available_in_template"=false,
+     *               "immutable"=true
      *          }
      *      }
      * )

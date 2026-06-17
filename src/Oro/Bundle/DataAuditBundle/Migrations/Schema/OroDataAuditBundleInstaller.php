@@ -18,7 +18,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_8';
+        return 'v5_1_17_0';
     }
 
     /**

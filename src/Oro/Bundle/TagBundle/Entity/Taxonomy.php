@@ -63,6 +63,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "form_type"="Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType",
  *              "grid_name"="taxonomy-select-grid",
  *          },
+ *          "email"={
+ *              "available_in_template"=true
+ *          }
  *      }
  * )
  */

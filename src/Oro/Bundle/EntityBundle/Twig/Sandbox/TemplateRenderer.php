@@ -3,8 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
 use Doctrine\Inflector\Inflector;
+use Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface as ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Twig\GetAttributeNodeExtension;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\SandboxExtension;
@@ -14,8 +18,10 @@ use Twig\Source;
 /**
  * The base class to render TWIG templates in a sandboxed environment.
  */
-abstract class TemplateRenderer
+abstract class TemplateRenderer implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private const PATH_SEPARATOR   = '.';
     private const SYSTEM_SECTION   = 'system';
     private const ENTITY_SECTION   = 'entity';
@@ -57,6 +63,7 @@ abstract class TemplateRenderer
             $this->entityDataAccessor
         );
         $this->inflector = $inflector;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -131,6 +138,9 @@ abstract class TemplateRenderer
         $this->environment->addExtension($formatExtension);
         $getAttrNodeExtension = new GetAttributeNodeExtension();
         $this->environment->addExtension($getAttrNodeExtension);
+        $safeGetAttrNodeExtension = new SafeGetAttributeNodeExtension();
+        $safeGetAttrNodeExtension->setLogger($this->logger);
+        $this->environment->addExtension($safeGetAttrNodeExtension);
     }
 
     private function enableToStringMethod(array $configMethods): array

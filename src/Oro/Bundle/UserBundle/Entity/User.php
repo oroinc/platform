@@ -77,6 +77,9 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          },
  *          "tag"={
  *              "enabled"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )
