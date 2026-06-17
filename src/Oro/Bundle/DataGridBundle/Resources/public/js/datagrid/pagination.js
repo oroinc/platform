@@ -117,6 +117,17 @@ define([
         },
 
         /**
+         * Animates scroll to the saved position when it is defined.
+         *
+         * @protected
+         */
+        scrollToSavedPosition: function() {
+            if (this.scrollToPosition) {
+                $('body,html').stop().animate({scrollTop: this.scrollToPosition.top}, '500', 'swing');
+            }
+        },
+
+        /**
          * jQuery event handler for the page handlers. Goes to the right page upon clicking.
          *
          * @param {Event} e
@@ -141,9 +152,7 @@ define([
             const collection = this.collection;
             const state = collection.state;
 
-            if (this.scrollToPosition) {
-                $('body,html').stop().animate({scrollTop: this.scrollToPosition.top}, '500', 'swing');
-            }
+            this.scrollToSavedPosition();
 
             if (ffConfig) {
                 const prevDirection = _.has(ffConfig.prev, 'direction') ? ffConfig.prev.direction : undefined;
