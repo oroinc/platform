@@ -95,6 +95,9 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
+          Entity Name:
+            type: 'css'
+            locator: '[data-name="field__entity-name"]'
           Subject:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject"]'

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
 use Doctrine\Common\Cache\Cache;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 
 /**
  * The base class to provides cached configuration for the sandboxed TWIG templates renderer.
  */
-class TemplateRendererConfigProvider implements TemplateRendererConfigProviderInterface
+class TemplateRendererConfigProvider implements TemplateRendererConfigProviderInterface, ClearableConfigCacheInterface
 {
     private const PROPERTY_PATH     = 'property_path';
     private const DEFAULT_FORMATTER = 'default_formatter';
@@ -111,6 +112,9 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
                 } elseif (\is_string($getter)) {
                     $methods[] = $getter;
                     $accessors[$varName] = $getter;
+                    if (is_string($varName)) {
+                        $properties[] = $varName;
+                    }
                 } else {
                     if (empty($getter[self::PROPERTY_PATH])) {
                         $properties[] = $varName;
@@ -118,6 +122,9 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
                     } else {
                         $methods[] = $getter[self::PROPERTY_PATH];
                         $accessors[$varName] = $getter[self::PROPERTY_PATH];
+                        if (is_string($varName)) {
+                            $properties[] = $varName;
+                        }
                     }
                     if (!empty($getter[self::DEFAULT_FORMATTER])) {
                         $defaultFormatters[$varName] = $getter[self::DEFAULT_FORMATTER];

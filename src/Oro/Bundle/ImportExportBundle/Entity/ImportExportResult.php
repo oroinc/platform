@@ -26,6 +26,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "security"={
  *              "type"="ACL"
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *     }
  * )

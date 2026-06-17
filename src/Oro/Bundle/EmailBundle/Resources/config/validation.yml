@@ -4,6 +4,7 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
               fields:     [ name, entityName ]
               ignoreNull: false
         - Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax: ~
+        - Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy: ~
     properties:
         name:
             - NotBlank: ~

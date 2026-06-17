@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Store user impersonations
@@ -29,6 +30,14 @@ class Impersonation
      * @var User
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $user;
 
@@ -36,6 +45,14 @@ class Impersonation
      * @var string
      *
      * @ORM\Column(type="string", length=255)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $token;
 
@@ -43,6 +60,14 @@ class Impersonation
      * @var bool
      *
      * @ORM\Column(type="boolean", nullable=false, options={"default": false})
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $notify;
 
@@ -50,6 +75,14 @@ class Impersonation
      * @var \DateTime
      *
      * @ORM\Column(name="expire_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $expireAt;
 
@@ -57,6 +90,14 @@ class Impersonation
      * @var \DateTime
      *
      * @ORM\Column(name="login_at", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $loginAt;
 
@@ -64,6 +105,14 @@ class Impersonation
      * @var string $ipAddress
      *
      * @ORM\Column(name="ip_address", type="string", length=255, nullable=false, options={"default": "127.0.0.1"})
+     * @ConfigField(
+     *      defaultValues={
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
+     *          }
+     *      }
+     * )
      */
     protected $ipAddress;
 

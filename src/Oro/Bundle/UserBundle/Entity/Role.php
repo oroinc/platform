@@ -28,6 +28,9 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

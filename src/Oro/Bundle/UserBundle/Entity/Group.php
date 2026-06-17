@@ -39,6 +39,9 @@ use Oro\Bundle\UserBundle\Model\ExtendGroup;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

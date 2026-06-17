@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * Entity class that represents calendar_date table
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository")
  * @ORM\Table("oro_calendar_date")
  * @Config(mode="hidden")

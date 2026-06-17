@@ -41,6 +41,9 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
  *          "grid"={
  *              "default"="email-grid",
  *              "context"="email-for-context-grid"
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )
