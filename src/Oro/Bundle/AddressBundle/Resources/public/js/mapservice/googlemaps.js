@@ -22,8 +22,7 @@ const GoogleMapsView = BaseView.extend({
             zoomControl: true
         },
         apiVersion: '3.exp',
-        apiKey: null,
-        showWeather: true
+        apiKey: null
     },
 
     mapLocationCache: {},
@@ -86,8 +85,6 @@ const GoogleMapsView = BaseView.extend({
     },
 
     _initMap: function(location) {
-        let weatherLayer;
-        let cloudLayer;
         this.removeErrorMessage();
         this._initMapOptions();
         this.map = new google.maps.Map(
@@ -100,19 +97,6 @@ const GoogleMapsView = BaseView.extend({
             map: this.map,
             position: location
         });
-
-        if (this.options.showWeather) {
-            const temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
-            const windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
-            weatherLayer = new google.maps.weather.WeatherLayer({
-                temperatureUnits: google.maps.weather.TemperatureUnit[temperatureUnitKey],
-                windSpeedUnits: google.maps.weather.WindSpeedUnit[windSpeedUnitKey]
-            });
-            weatherLayer.setMap(this.map);
-
-            cloudLayer = new google.maps.weather.CloudLayer();
-            cloudLayer.setMap(this.map);
-        }
 
         this.loadingMask.hide();
     },
@@ -133,10 +117,6 @@ const GoogleMapsView = BaseView.extend({
             this.addErrorMessage();
             this.loadingMask.hide();
             return;
-        }
-
-        if (this.options.showWeather) {
-            data.libraries = 'weather';
         }
 
         $.ajax({
