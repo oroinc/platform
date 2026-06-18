@@ -9,7 +9,6 @@ $navbar-active-a-font-weight: font-weight('semi-bold') !default;
 $navbar-active-a-hover-color: $primary-200 !default;
 
 $nav-tabs-border-width: 1px;
-$nav-tabs-link-active-border-color: $neutral-grey-3;
 $nav-tabs-border-color: $neutral-grey-3;
 $nav-tabs-active-border-color: $primary-main !default;
 
@@ -18,7 +17,7 @@ $nav-tabs-column-inverse-border-color: $primary-inverse !default;
 $nav-tabs-dropdown-toggle-caret-color: $primary-200 !default;
 
 $nav-tabs-offset-bottom: 0 !default;
-$nav-tabs-inner-offset-left: $nav-tabs-border-width !default;
+$nav-tabs-inner-offset-left: 0 !default;
 $nav-tabs-display: flex !default;
 $nav-tabs-flex-wrap: wrap !default;
 $nav-tabs-responsive-flex-wrap: nowrap !default;
@@ -26,27 +25,33 @@ $nav-tabs-responsive-flex-wrap: nowrap !default;
 $nav-item-float: none !default;
 $nav-item-offset-bottom: -$nav-tabs-border-width !default;
 
-$nav-link-background: $neutral-grey-2 !default;
+$nav-link-border-color: $neutral-grey-3 !default;
+$nav-link-border: none !default;
+$nav-link-background: linear-gradient($nav-link-border-color, $nav-link-border-color)
+                      bottom / 100% 1px no-repeat, $neutral-grey-2 !default;
 $nav-link-font-weight: font-weight('normal') !default;
 $nav-link-color: $text-secondary !default;
-$nav-link-border: $nav-tabs-border-width solid $nav-tabs-border-color !default;
-$nav-link-border-radius: 4px !default;
-$nav-link-offset: 0 0 0 -#{$nav-tabs-border-width} !default;
+$nav-link-letter-spacing: .2px !default;
+$nav-link-border-radius: 0 !default;
+$nav-link-padding: 6px 16px !default;
+$nav-link-offset: 0 !default;
 
-$nav-link-hover-background: $neutral-grey-2 !default;
+$nav-link-hover-background: $nav-link-background !default;
 $nav-link-hover-color: $primary-200 !default;
 $nav-link-hover-outline: none !default;
 
-$nav-link-active-background: $text-inverse !default;
+$nav-link-active-background: linear-gradient($nav-link-border-color, $nav-link-border-color) left / 1px 100% no-repeat,
+                             linear-gradient($nav-link-border-color, $nav-link-border-color) right / 1px 100% no-repeat,
+                             linear-gradient($neutral-white, $neutral-white) bottom / 100% 2px no-repeat !default;
 $nav-link-active-font-weight: font-weight('semi-bold') !default;
 $nav-link-active-color: $text-primary !default;
 $nav-link-active-position: relative !default;
 $nav-link-active-border-top-color: $secondary-secondary-4 !default;
-$nav-link-active-border-bottom-color: $text-inverse !default;
+$nav-link-active-border-bottom-color: transparent !default;
 
 $nav-link-active-before-content: '' !default;
 $nav-link-active-before-background: $nav-link-active-border-top-color !default;
-$nav-link-active-before-height: 1px !default;
+$nav-link-active-before-height: 2px !default;
 $nav-link-active-before-position: absolute !default;
 $nav-link-active-before-inset: 0 0 auto !default;
 

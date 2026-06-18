@@ -99,10 +99,12 @@
     .nav-link {
         background: $nav-link-background;
         font-weight: $nav-link-font-weight;
+        letter-spacing: $nav-link-letter-spacing;
         color: $nav-link-color;
         border: $nav-link-border;
         margin: $nav-link-offset;
-        border-radius: 0;
+        border-radius: $nav-link-border-radius;
+        padding: $nav-link-padding;
 
         &:hover,
         &:active,
