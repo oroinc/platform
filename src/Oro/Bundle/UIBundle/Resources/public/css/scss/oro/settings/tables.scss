@@ -21,18 +21,17 @@ $table-td-nowrap-ellipsis-div-text-overflow: ellipsis !default;
 $table-td-nowrap-ellipsis-div-width: 100% !default;
 
 $table-thead-th-background: $neutral-grey-2 !default;
-$table-thead-th-font-size: $base-font-size--xs !default;
+$table-thead-th-border-bottom: 1px solid $neutral-grey-3 !default;
+$table-thead-th-font-size: 12px !default;
 $table-thead-th-color: $text-secondary !default;
 $table-thead-th-padding: 11px 8px !default;
 $table-thead-th-white-space: nowrap !default;
 $table-thead-th-vertical-align: top !default;
 $table-thead-th-text-transform: uppercase !default;
-$table-bordered-thead-th-border-color: $primary-200 !default;
 
 $table-thead-th-a-color: inherit !default;
 $table-thead-th-a-display: block !default;
-$table-thead-th-a-line-height: 11px !default;
-$table-thead-th-a-inner-offset: 7px 0 5px !default;
+$table-thead-th-a-line-height: 18px !default;
 $table-thead-th-a-text-transform: uppercase !default;
 
 $table-thead-th-a-focus-outline: none !default;
@@ -65,7 +64,7 @@ $table-tbody-row-selected-hover-background: $row-selected-background !default;
 $table-tbody-row-selected-hover-td-background: inherit !default;
 
 $table-tbody-td-border-top: 1px solid var(--table-tbody-tr-border-color, #{$primary-860}) !default;
-$table-tbody-td-border-bottom: 1px solid var(--table-tbody-tr-border-color, #{$primary-860}) !default;
+$table-tbody-td-border-bottom: 1px solid $neutral-grey-3 !default;
 $table-tbody-td-offset: $content-padding-small !default;
 
 $table-tfoot-th-background: $primary-200 !default;

@@ -100,9 +100,9 @@ $multi-checkbox-control-item-offset: 0 4px 0 0 !default;
 $multi-checkbox-control-input-offset-top: -2px !default;
 
 $section-content-offset-top: -20px !default;
-$section-content-inner-offset-top: 28px !default;
-$section-content-inner-offset-bottom: 20px !default;
+$section-content-inner-offset-top: $content-padding-medium !default;
+$section-content-inner-offset-bottom: $content-padding-xl !default;
 
-$row-fluid-inner-offset: 4px 0 12px !default;
+$row-fluid-inner-offset: 0 !default;
 
 $floating-error-message-line-height: 1.2 !default;

@@ -125,16 +125,11 @@ body {
         &:not(.responsive-small) {
             .responsive-cell {
                 &:nth-child(2n - 1) {
-                    padding-right: $horizontal-padding;
+                    padding-right: $content-padding-xl;
                 }
 
                 &:nth-child(2n) {
-                    padding-left: $horizontal-padding;
-                }
-
-                &:not(:first-child),
-                &:not(:nth-child(2)) {
-                    padding-top: $vertical-padding;
+                    padding-left: $content-padding-xl;
                 }
 
                 &:only-child {
@@ -167,10 +162,6 @@ body {
         &.responsive-small {
             .responsive-cell {
                 padding-right: 0;
-
-                &:not(:last-child) {
-                    margin-bottom: 16px;
-                }
             }
         }
 

@@ -8,6 +8,10 @@
         margin: $oro-datagrid-inner-grid-views-offset;
     }
 
+    .buttons-row + .inner-grid & {
+        margin-bottom: $content-padding;
+    }
+
     .grid-views-toogler {
         display: flex;
         align-items: $oro-datagrid-grid-views-toogler-align-items;

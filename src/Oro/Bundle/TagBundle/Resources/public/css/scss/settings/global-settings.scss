@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 $tag-selector-min-width: 100px !default;
 // stylelint-disable-next-line declaration-no-important
 $tag-selector-items-width: 100% !important;
@@ -47,11 +49,12 @@ $tag-selector-action-height: $select2-search-field-line-height + ($tag-selector-
 $tag-selector-action-width: $tag-selector-action-height !default;
 
 $tag-cell-container-height-delta: $tag-item-height - $oro-datagrid-editable-cell-line-height;
-$tag-cell-container-inner-offset-top: $oro-datagrid-body-cell-inner-top -
+$tag-cell-container-inner-offset-top: $oro-datagrid-body-cell-inner-vertical -
     $tag-cell-container-height-delta !default;
-$tag-cell-container-inner-offset-bottom: $oro-datagrid-body-cell-inner-bottom -
-    $tag-item-offset-vertical -
-    $tag-cell-container-height-delta !default;
+$tag-cell-container-inner-offset-bottom: math.max(
+    2px,
+    $oro-datagrid-body-cell-inner-vertical - $tag-item-offset-vertical - $tag-cell-container-height-delta
+) !default;
 $tag-cell-container-inner-offset:
         $tag-cell-container-inner-offset-top
         $oro-datagrid-editable-cell-offset

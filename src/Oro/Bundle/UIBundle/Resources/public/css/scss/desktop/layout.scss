@@ -326,7 +326,7 @@ form > .layout-content {
                 'footer footer';
                 grid-template-columns: minmax(0, 1fr) auto;
             }
-    
+
             &:has(.app-page__left-panel) {
                 grid-template-areas:
                 'header header'
@@ -335,7 +335,7 @@ form > .layout-content {
                 'footer footer';
                 grid-template-columns: auto minmax(0, 1fr);
             }
-    
+
             &:has(.app-page__left-panel):has(.app-page__right-panel) {
                 grid-template-areas:
                 'header header header'

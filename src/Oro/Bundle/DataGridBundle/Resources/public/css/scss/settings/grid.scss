@@ -13,7 +13,8 @@ $oro-datagrid-action-cell-color: $primary-400 !default;
 $oro-datagrid-action-cell-color-hover: $text-primary !default;
 
 $oro-datagrid-label-offset: 10px !default;
-$oro-datagrid-label-line-height: 25px !default;
+$oro-datagrid-label-font-size: 12px !default;
+$oro-datagrid-label-line-height: 1.28 !default;
 $oro-datagrid-label-color: $text-primary !default;
 $oro-datagrid-label-active-color: $primary-main !default;
 
@@ -22,31 +23,31 @@ $oro-datagrid-cell-background-hover: $neutral-grey-1 !default;
 
 $oro-datagrid-header-background: $neutral-grey-2 !default;
 $oro-datagrid-header-cell-highlight: $neutral-grey-3 !default;
-$oro-datagrid-header-cell-inner-offset: 11px 8px !default;
+$oro-datagrid-header-cell-inner-offset: 12px 8px !default;
+$oro-datagrid-header-cell-border-bottom: 1px solid $neutral-grey-3 !default;
 $oro-datagrid-header-cell-radius: 2px !default;
+$oro-datagrid-header-cell-line-height: 1 !default;
 
-$oro-datagrid-body-cell-inner-top: 11px !default;
-$oro-datagrid-body-cell-inner-bottom: 11px !default;
+$oro-datagrid-body-cell-inner-vertical: 8px !default;
 $oro-datagrid-body-cell-inner-horizontal: 8px !default;
 $oro-datagrid-body-cell-inner-offset:
-    $oro-datagrid-body-cell-inner-top
-    $oro-datagrid-body-cell-inner-horizontal
-    $oro-datagrid-body-cell-inner-bottom !default;
+        $oro-datagrid-body-cell-inner-vertical
+        $oro-datagrid-body-cell-inner-horizontal !default;
 
 $oro-datagrid-body-cell-wide-inner-offset:
-    ($oro-datagrid-body-cell-inner-top - 2px)
+    ($oro-datagrid-body-cell-inner-vertical - 2px)
     $oro-datagrid-body-cell-inner-horizontal
-    ($oro-datagrid-body-cell-inner-bottom - 6px) !default;
+    ($oro-datagrid-body-cell-inner-vertical - 6px) !default;
 
 $oro-datagrid-body-editing-cell-inner-offset:
-    ($oro-datagrid-body-cell-inner-top - 6px)
+    ($oro-datagrid-body-cell-inner-vertical - 6px)
     $oro-datagrid-body-cell-inner-horizontal
-    ($oro-datagrid-body-cell-inner-bottom - 6px) !default;
+    ($oro-datagrid-body-cell-inner-vertical - 6px) !default;
 
 $oro-datagrid-body-cell-border-width: 1px !default;
 $oro-datagrid-body-cell-border-bottom: $oro-datagrid-body-cell-border-width
     solid $oro-datagrid-cell-border-color !default;
-$oro-datagrid-body-cell-line-height: 1.6 !default;
+$oro-datagrid-body-cell-line-height: 1.28 !default;
 
 $oro-datagrid-footer-cell-font-weight: font-weight('bold') !default;
 $oro-datagrid-footer-cell-numeric-font-size: $base-font-size !default;
@@ -58,18 +59,18 @@ $oro-datagrid-footer-cell-outer-inner-offset: 8px !default;
 $oro-datagrid-row-selected: $primary-accent-extra-light !default;
 $oro-datagrid-row-disabled-opacity: .4 !default;
 
-$oro-datagrid-action-inner-offset: 8px 18px 7px 8px !default;
+$oro-datagrid-action-inner-offset: 6px 18px 6px 8px !default;
 $oro-datagrid-action-color: $text-primary !default;
 $oro-datagrid-action-active-bg-color: $secondary-secondary-4 !default;
 $oro-datagrid-action-active-color: $primary-inverse !default;
-$oro-datagrid-action-size: 32px !default;
+$oro-datagrid-action-size: 35px !default;
 $oro-datagrid-action-min-size: 16px !default;
 $oro-datagrid-action-font-size: 16px !default;
 $oro-datagrid-action-column-radius: $border-radius !default;
 $oro-datagrid-action-cell-offset: 0 18px 0 8px !default;
 
 $oro-datagrid-font-size: 14px !default;
-$oro-datagrid-header-font-size: 11px !default;
+$oro-datagrid-header-font-size: 14px !default;
 
 $oro-datagrid-all-header-cell-width: 63px !default;
 $oro-datagrid-all-header-cell-offset: 8px !default;
@@ -130,21 +131,22 @@ $oro-datagrid-loader-width: 2px !default;
 // Edit mode
 $oro-datagrid-editable-action-inner-offset: 2px !default;
 $oro-datagrid-editable-action-offset-end: $oro-datagrid-body-cell-inner-horizontal !default;
-$oro-datagrid-editable-action-offset-top: $oro-datagrid-body-cell-inner-top -
+$oro-datagrid-editable-action-offset-top: $oro-datagrid-body-cell-inner-vertical -
     $oro-datagrid-editable-action-inner-offset;
 $oro-datagrid-editable-cell-offset: 34px !default;
 $oro-datagrid-editable-error: $error !default;
 
 $oro-datagrid-editable-loader-size: 14px !default;
 $oro-datagrid-editable-loader-width: 2px !default;
-$oro-datagrid-editable-loader-top: $oro-datagrid-body-cell-inner-top +
+$oro-datagrid-editable-loader-top: $oro-datagrid-body-cell-inner-vertical +
     (absolute-line-height($oro-datagrid-font-size, $oro-datagrid-body-cell-line-height) -
     $oro-datagrid-editable-loader-size) * .5;
 $oro-datagrid-editable-loader-end: $oro-datagrid-body-cell-inner-horizontal;
 
 $oro-datagrid-editable-action-offset: $input-border-width 6px !default;
-$oro-datagrid-editable-action-item-inner-offset-top: $oro-datagrid-body-cell-inner-top - $input-border-width !default;
-$oro-datagrid-editable-action-item-inner-offset-bottom: $oro-datagrid-body-cell-inner-bottom -
+$oro-datagrid-editable-action-item-inner-offset-top: $oro-datagrid-body-cell-inner-vertical -
+    $input-border-width !default;
+$oro-datagrid-editable-action-item-inner-offset-bottom: $oro-datagrid-body-cell-inner-vertical -
     $input-border-width !default;
 $oro-datagrid-editable-action-item-inner-offset-horizontal: 6px;
 $oro-datagrid-editable-action-item-inner-offset:
@@ -152,9 +154,9 @@ $oro-datagrid-editable-action-item-inner-offset:
     $oro-datagrid-editable-action-item-inner-offset-horizontal
     $oro-datagrid-editable-action-item-inner-offset-bottom !default;
 $oro-datagrid-editable-action-input-offset:
-    $oro-datagrid-body-cell-inner-top - $input-border-width
+        $oro-datagrid-body-cell-inner-vertical - $input-border-width
     $oro-datagrid-body-cell-inner-horizontal - $input-border-width
-    $oro-datagrid-body-cell-inner-bottom - $input-border-width !default;
+        $oro-datagrid-body-cell-inner-vertical - $input-border-width !default;
 $oro-datagrid-editable-action-input-last-offset: 64px !default;
 $oro-datagrid-editable-action-item-line-height: $oro-datagrid-body-cell-line-height !default;
 $oro-datagrid-editable-cell-line-height: absolute-line-height(
@@ -162,9 +164,9 @@ $oro-datagrid-editable-cell-line-height: absolute-line-height(
     $oro-datagrid-body-cell-line-height
 ) !default;
 $oro-datagrid-editable-action-item-size: (
-    $oro-datagrid-body-cell-inner-top +
+        $oro-datagrid-body-cell-inner-vertical +
     $oro-datagrid-editable-cell-line-height +
-    $oro-datagrid-body-cell-inner-bottom
+    $oro-datagrid-body-cell-inner-vertical
 ) !default;
 $oro-datagrid-editable-action-width: (
     $oro-datagrid-action-font-size +
@@ -176,8 +178,8 @@ $oro-datagrid-editable-action-height: (
     $oro-datagrid-editable-action-item-inner-offset-bottom
 ) !default;
 $oro-datagrid-editable-cell-min-height: (
-    $oro-datagrid-body-cell-inner-top +
-    $oro-datagrid-body-cell-inner-bottom +
+    $oro-datagrid-body-cell-inner-vertical +
+    $oro-datagrid-body-cell-inner-vertical +
     $oro-datagrid-editable-cell-line-height
 ) !default;
 $oro-datagrid-editable-inner-offset: -(
@@ -192,14 +194,14 @@ $oro-datagrid-select-container-border-radius: 0 !default;
 $oro-datagrid-select-inner-offset-end: 32px !default;
 $oro-datagrid-select-inner-offset-allow-clear-end: 56px !default;
 $oro-datagrid-select-inner-offset:
-    $oro-datagrid-body-cell-inner-top - $input-border-width
+    $oro-datagrid-body-cell-inner-vertical - $input-border-width
     $oro-datagrid-select-inner-offset-end
-    $oro-datagrid-body-cell-inner-bottom - $input-border-width
+    $oro-datagrid-body-cell-inner-vertical - $input-border-width
     $oro-datagrid-body-cell-inner-horizontal - $input-border-width !default;
 $oro-datagrid-select-chosen-height: auto !default;
 $oro-datagrid-select-chosen-min-height: (
-    $oro-datagrid-body-cell-inner-top +
-    $oro-datagrid-body-cell-inner-bottom +
+    $oro-datagrid-body-cell-inner-vertical +
+    $oro-datagrid-body-cell-inner-vertical +
     (-2 * $input-border-width)
     + $oro-datagrid-editable-cell-line-height
 ) !default;

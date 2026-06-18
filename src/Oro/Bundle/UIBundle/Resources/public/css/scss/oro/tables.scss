@@ -67,6 +67,7 @@
     thead {
         th {
             background: $table-thead-th-background;
+            border-bottom: $table-thead-th-border-bottom;
             font-size: $table-thead-th-font-size;
             color: $table-thead-th-color;
             padding: $table-thead-th-padding;
@@ -82,7 +83,6 @@
             > span {
                 display: $table-thead-th-a-display;
                 line-height: $table-thead-th-a-line-height;
-                padding: $table-thead-th-a-inner-offset;
                 text-transform: $table-thead-th-a-text-transform;
 
                 &:focus {
@@ -151,7 +151,6 @@
         }
 
         td {
-            border-top: $table-tbody-td-border-top;
             border-bottom: $table-tbody-td-border-bottom;
             padding: $table-tbody-td-offset;
         }
@@ -325,10 +324,6 @@
         border-radius: $table-border-radius;
 
         thead {
-            th {
-                border-color: $table-bordered-thead-th-border-color;
-            }
-
             &:first-child {
                 tr {
                     &:first-child {
