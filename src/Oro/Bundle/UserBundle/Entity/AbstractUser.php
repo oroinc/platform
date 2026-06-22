@@ -45,7 +45,10 @@ abstract class AbstractUser implements
      */
     #[ORM\Column(type: Types::STRING)]
     #[ConfigField(
-        defaultValues: ['importexport' => ['excluded' => true], 'email' => ['available_in_template' => false]]
+        defaultValues: [
+            'importexport' => ['excluded' => true],
+            'email' => ['available_in_template' => false, 'immutable' => true],
+        ]
     )]
     protected ?string $password = null;
 
@@ -61,19 +64,26 @@ abstract class AbstractUser implements
      */
     #[ORM\Column(type: Types::STRING)]
     #[ConfigField(
-        defaultValues: ['importexport' => ['excluded' => true], 'email' => ['available_in_template' => false]]
+        defaultValues: [
+            'importexport' => ['excluded' => true],
+            'email' => ['available_in_template' => false, 'immutable' => true],
+        ]
     )]
     protected ?string $salt = null;
 
     #[ORM\Column(name: 'last_login', type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $lastLogin = null;
 
     #[ORM\Column(name: 'login_count', type: Types::INTEGER, options: ['default' => 0, 'unsigned' => true])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $loginCount = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?bool $enabled = true;
 
     /**
@@ -87,7 +97,8 @@ abstract class AbstractUser implements
         defaultValues: [
             'entity' => ['label' => 'oro.user.roles.label', 'description' => 'oro.user.roles.description'],
             'dataaudit' => ['auditable' => true],
-            'importexport' => ['excluded' => true]
+            'importexport' => ['excluded' => true],
+            'email' => ['available_in_template' => true]
         ]
     )]
     protected ?Collection $userRoles = null;
@@ -96,19 +107,29 @@ abstract class AbstractUser implements
      * Random string sent to the user email address in order to verify it
      */
     #[ORM\Column(name: 'confirmation_token', type: Types::STRING, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $confirmationToken = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     #[ORM\Column(name: 'password_requested', type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $passwordRequestedAt = null;
 
     #[ORM\Column(name: 'password_changed', type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $passwordChangedAt = null;
 
     public function __construct()

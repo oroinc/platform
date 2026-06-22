@@ -40,12 +40,12 @@ use Oro\Bundle\UserBundle\Entity\User;
         'ownership' => [
             'owner_type' => 'ORGANIZATION',
             'owner_field_name' => 'organization',
-            'owner_column_name' => 'organization_id'
+            'owner_column_name' => 'organization_id',
         ],
         'comment' => ['immutable' => true],
         'activity' => ['immutable' => true],
         'attachment' => ['immutable' => true],
-        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management']
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
     ]
 )]
 class ActivityList implements
@@ -61,10 +61,12 @@ class ActivityList implements
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?User $owner = null;
 
     /**
@@ -72,33 +74,46 @@ class ActivityList implements
      */
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_editor_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?User $editor = null;
 
     #[ORM\Column(name: 'verb', type: Types::STRING, length: 32)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $verb = null;
 
     #[ORM\Column(name: 'subject', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $subject = null;
 
     #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $description = null;
 
     #[ORM\Column(name: 'related_activity_class', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $relatedActivityClass = null;
 
     #[ORM\Column(name: 'related_activity_id', type: Types::INTEGER, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $relatedActivityId = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     /**

@@ -17,7 +17,7 @@ class OroIntegrationBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_17';
+        return 'v7_1_0_0';
     }
 
     #[\Override]

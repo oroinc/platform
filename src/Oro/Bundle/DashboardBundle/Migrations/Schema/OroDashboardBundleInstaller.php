@@ -208,7 +208,8 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
                 'form'      => ['is_enabled' => false],
                 'view'      => ['is_displayable' => false],
                 'merge'     => ['display' => false],
-                'dataaudit' => ['auditable' => false]
+                'dataaudit' => ['auditable' => false],
+                'email' => ['available_in_template' => true],
             ]
         );
         $enumOptionIds = [ExtendHelper::buildEnumOptionId('dashboard_type', 'widgets')];
