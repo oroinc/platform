@@ -211,3 +211,8 @@ services:
         public: true
         arguments:
             - "@oro_config.user"
+
+    oro_config.outbound_connection_validator:
+        class: Oro\Bundle\ConfigBundle\Validator\OutboundConnectionValidator
+        arguments:
+            - '%permitted_outbound_connections%'

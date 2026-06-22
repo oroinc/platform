@@ -10,7 +10,7 @@ class TestTemplate extends Template
     /**
      * {@inheritdoc}
      */
-    public function getTemplateName()
+    public function getTemplateName(): string
     {
         return 'test';
     }
@@ -18,7 +18,7 @@ class TestTemplate extends Template
     /**
      * {@inheritdoc}
      */
-    protected function doDisplay(array $context, array $blocks = array())
+    protected function doDisplay(array $context, array $blocks = array()): iterable
     {
         yield 'test';
     }
@@ -26,7 +26,7 @@ class TestTemplate extends Template
     /**
      * {@inheritdoc}
      */
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [];
     }
@@ -34,7 +34,7 @@ class TestTemplate extends Template
     /**
      * {@inheritdoc}
      */
-    public function getSourceContext()
+    public function getSourceContext(): Source
     {
         return new Source('test', 'test');
     }

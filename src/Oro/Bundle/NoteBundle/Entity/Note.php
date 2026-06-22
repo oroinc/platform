@@ -14,6 +14,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * Represents an additional information that a user can leave about an entity record.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository")
  * @ORM\Table(name="oro_note")
  * @Config(
@@ -40,6 +42,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *              "acl"="oro_note_view",
  *              "action_button_widget"="oro_add_note_button",
  *              "action_link_widget"="oro_add_note_link"
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

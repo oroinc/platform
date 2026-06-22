@@ -62,6 +62,9 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *          },
  *          "tag"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

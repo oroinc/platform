@@ -6,3 +6,10 @@ oro.email:
         configuration:
             connection:
                 smtp: Could not establish the SMTP connection
+
+        security_policy:
+            disallowed_tag: 'The template in {{ field }} field ({{ locale }}) uses a disallowed Twig tag "{{ name }}".'
+            disallowed_filter: 'The template in {{ field }} field ({{ locale }}) uses a disallowed Twig filter "{{ name }}".'
+            disallowed_function: 'The template in {{ field }} field ({{ locale }}) calls a disallowed Twig function "{{ name }}".'
+            disallowed_property: 'The template in {{ field }} field ({{ locale }}) accesses a disallowed property "{{ name }}" on "{{ variable }}" variable.'
+            disallowed_method: 'The template in {{ field }} field ({{ locale }}) calls a disallowed method "{{ name }}" on "{{ variable }}" variable.'

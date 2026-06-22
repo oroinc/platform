@@ -344,6 +344,10 @@ services:
         arguments:
             - '@oro_imap.connector.factory'
             - '@oro_security.encoder.default'
+        calls:
+            - [setLogger, ['@logger']]
+            - [setConnectionCheckDuration, ['%outbound_connection_check_duration%']]
+            - [setConnectionValidator, ['@oro_config.outbound_connection_validator']]
 
     oro_imap.validator.connection_configuration.imap:
         class: Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfigurationValidator

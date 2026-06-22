@@ -35,6 +35,9 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

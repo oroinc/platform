@@ -31,6 +31,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

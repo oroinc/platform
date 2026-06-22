@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
 /**
  * Clears email renderer configuration cache when related entity configuration is changed.
+ *
+ * @bc-layer This class is retained for BC reasons, use {@see AvailableInTemplateEntityConfigListener} instead.
  */
 class EntityConfigListener
 {

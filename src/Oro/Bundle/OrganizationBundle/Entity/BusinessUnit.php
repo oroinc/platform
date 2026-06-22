@@ -47,6 +47,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "grid"={
  *              "default"="business-unit-grid"
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

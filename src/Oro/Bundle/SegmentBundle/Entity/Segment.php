@@ -36,6 +36,9 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "email"={
+ *              "available_in_template"=true
  *          }
  *      }
  * )

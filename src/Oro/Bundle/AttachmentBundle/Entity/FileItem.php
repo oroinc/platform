@@ -13,7 +13,13 @@ use Oro\Bundle\FormBundle\Entity\EmptyItem;
  *
  * @ORM\Table(name="oro_attachment_file_item")
  * @ORM\Entity()
- * @Config
+ * @Config(
+ *      defaultValues={
+ *          "email"={
+ *              "available_in_template"=true
+ *          }
+ *      }
+ * )
  */
 class FileItem extends ExtendFileItem implements EmptyItem
 {
