@@ -35,3 +35,9 @@
         }
     }
 }
+
+@media only screen and (min-width: $medium-screen) {
+    .select2-organization-switcher {
+        max-width: $select2-organization-switcher-medium-screen-max-width;
+    }
+}
