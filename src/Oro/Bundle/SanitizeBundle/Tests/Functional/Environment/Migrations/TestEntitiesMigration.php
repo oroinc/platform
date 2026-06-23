@@ -30,6 +30,19 @@ class TestEntitiesMigration implements
 
         $this->createTestSanitizable($schema);
         $this->addSerializedFieldsToTestSanitizable($schema);
+        $this->createTestSanitizableWithCustomIdColumn($schema);
+    }
+
+    private function createTestSanitizableWithCustomIdColumn(Schema $schema): void
+    {
+        if ($schema->hasTable('test_sanitizable_custom_id_column')) {
+            return;
+        }
+
+        $table = $schema->createTable('test_sanitizable_custom_id_column');
+        $table->addColumn('owner_id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('email', 'string', ['length' => 255, 'notnull' => false]);
+        $table->setPrimaryKey(['owner_id']);
     }
 
     private function createTestSanitizable(Schema $schema): void
