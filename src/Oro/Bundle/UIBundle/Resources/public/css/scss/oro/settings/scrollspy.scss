@@ -25,13 +25,16 @@ $scrollspy-nav-navbar-inner-nav-link-active-box-shadow:
     0 1px 2px -1px rgba(10, 13, 18, .1),
     0 1px 3px 0 rgba(10, 13, 18, .1) !default;
 $scrollspy-nav-navbar-inner-nav-link-active-font-weight: font-weight('semi-bold') !default;
-
 $scrollspy-title-background: $primary-accent-background !default;
 $scrollspy-title-font-size: $base-font-size !default;
 $scrollspy-title-font-weight: font-weight('semi-bold') !default;
+$scrollspy-title-letter-spacing: .2px !default;
 $scrollspy-title-color: $text-primary !default;
 $scrollspy-title-offset: 0 !default;
-$scrollspy-title-inner-offset: 11px 20px !default;
+$scrollspy-title-display: flex !default;
+$scrollspy-title-gap: 16px !default;
+$scrollspy-title-align-items: center !default;
+$scrollspy-title-inner-offset: 12px 20px 12px 16px !default;
 $scrollspy-title-border-radius: 4px !default;
 
 $scrollspy-data-scroll-focus-outline: 0 none !default;

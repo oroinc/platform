@@ -60,11 +60,15 @@
     }
 
     &-title {
+        display: $scrollspy-title-display;
+        gap: $scrollspy-title-gap;
+        align-items: $scrollspy-title-align-items;
         padding: $scrollspy-title-inner-offset;
         margin: $scrollspy-title-offset;
 
         font-size: $scrollspy-title-font-size;
         font-weight: $scrollspy-title-font-weight;
+        letter-spacing: $scrollspy-title-letter-spacing;
 
         background: $scrollspy-title-background;
         border-radius: $scrollspy-title-border-radius;
