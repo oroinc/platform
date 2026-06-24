@@ -157,6 +157,7 @@
             {% if stepData.allowed_transitions is not empty %}
                 <ul class="transitions-list-short">
                     {% for transitionName in stepData.allowed_transitions %}
+                        {% if transitionName in (entity.configuration.transitions|keys) %}
                         {% set currentTransition = entity.configuration.transitions[transitionName] %}
                         {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
                         <li class="transition-info">
@@ -179,6 +180,7 @@
                                 <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ conditionalToStep.label|trans({},'workflows') }}</span>
                             </li>
                         {% endfor %}
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% endif %}
