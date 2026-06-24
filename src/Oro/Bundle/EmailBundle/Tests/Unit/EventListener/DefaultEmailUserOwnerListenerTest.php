@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\EventListener\DefaultEmailUserOwnerListener;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
@@ -68,6 +69,57 @@ class DefaultEmailUserOwnerListenerTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame($owner, $entity->getOwner());
         self::assertSame($owner->getOrganization(), $entity->getOrganization());
+    }
+
+    public function testPrePersistWithEntityAndMailboxOwner(): void
+    {
+        $defaultOwner = $this->getUser();
+        $this->assertDefaultOwner($defaultOwner);
+
+        $organization = new Organization();
+        $entity = new EmailUser();
+        $entity->setMailboxOwner(new Mailbox());
+        $entity->setOrganization($organization);
+
+        $event = $this->getEvent($entity);
+
+        $this->listener->prePersist($event);
+
+        self::assertNull($entity->getOwner());
+        self::assertSame($organization, $entity->getOrganization());
+    }
+
+    public function testPrePersistWithMailboxOwnerButNoOrganization(): void
+    {
+        $defaultOwner = $this->getUser();
+        $this->assertDefaultOwner($defaultOwner);
+
+        $entity = new EmailUser();
+        $entity->setMailboxOwner(new Mailbox());
+
+        $event = $this->getEvent($entity);
+
+        $this->listener->prePersist($event);
+
+        self::assertSame($defaultOwner, $entity->getOwner());
+        self::assertSame($defaultOwner->getOrganization(), $entity->getOrganization());
+    }
+
+    public function testPrePersistWithOwnerButNoOrganization(): void
+    {
+        $defaultOwner = $this->getUser();
+        $owner = $this->getUser();
+        $this->assertDefaultOwner($defaultOwner);
+
+        $entity = new EmailUser();
+        $entity->setOwner($owner);
+
+        $event = $this->getEvent($entity);
+
+        $this->listener->prePersist($event);
+
+        self::assertSame($defaultOwner, $entity->getOwner());
+        self::assertSame($defaultOwner->getOrganization(), $entity->getOrganization());
     }
 
     private function assertDefaultOwner(User $user): void
