@@ -29,6 +29,11 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ApiBundle
+
+* Added `CorsSettings::addAllowedOrigins(array $origins): void` method to append extra allowed origins to the existing list at runtime (deduplicated).
+* Added `CorsSettings::enableCredentials(): void` method to enable credential support in CORS responses at runtime.
+
 #### EmailBundle
 * Added `email.available_in_template` entity config option that controls whether an entity can be selected when creating email templates. Defaults to false.
 * Updated entity field config setting `email.available_in_template` to allow it for `toMany` associations.
