@@ -28,6 +28,7 @@ use Symfony\Component\Process\Process;
 class JobStatusSubscriber implements EventSubscriberInterface
 {
     private const ACTIVE_JOB_STATUSES = [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
+    private const DEFAULT_JOB_STUCK_THRESHOLD_SECONDS = 30;
     private \DateTime $startDateTime;
     private string $phpExecutablePath;
     private bool   $shouldNotRunConsumer = false;
@@ -89,13 +90,16 @@ class JobStatusSubscriber implements EventSubscriberInterface
         /** @var Connection $connection */
         $connection = $doctrine->getManagerForClass(Job::class)->getConnection();
 
-        $endTime = new \DateTime('+900 seconds');
+        $waitTime = getenv('BEHAT_JOB_STATUS_WAIT_TIME_INTERVAL') ?: '+900 seconds';
+        $endTime = new \DateTime($waitTime);
+        $stallDetector = new JobStallDetector($this->getStuckThresholdSeconds());
         $isSearchIndex = false;
+
         while (true) {
             $this->startConsumerIfNotRunning();
 
             $activeJobs = $connection->fetchAllAssociative(
-                'SELECT j.id, j.name FROM oro_message_queue_job j WHERE j.status IN (?) AND j.created_at > ?',
+                'SELECT j.id, j.name, j.status FROM oro_message_queue_job j WHERE j.status IN (?) AND j.created_at > ?',
                 [self::ACTIVE_JOB_STATUSES, $this->startDateTime],
                 [Connection::PARAM_STR_ARRAY, Types::DATETIME_MUTABLE]
             );
@@ -110,6 +114,16 @@ class JobStatusSubscriber implements EventSubscriberInterface
                 }
 
                 return;
+            }
+
+            if ($stallDetector->isStuck($activeJobs)) {
+                $this->getLogger()->warning(sprintf(
+                    'No job progress within the stuck threshold, restarting consumers (stuck jobs: %s)',
+                    implode(', ', array_column($activeJobs, 'name'))
+                ));
+
+                $this->restartConsumers();
+                $stallDetector->reset();
             }
 
             usleep(100000);
@@ -144,6 +158,26 @@ class JobStatusSubscriber implements EventSubscriberInterface
     public function setCountConsumersFromOption(int $countConsumers)
     {
         $this->countConsumers = $countConsumers;
+    }
+
+    private function getStuckThresholdSeconds(): int
+    {
+        $value = getenv('BEHAT_JOB_STUCK_THRESHOLD_SECONDS');
+
+        return false === $value ? self::DEFAULT_JOB_STUCK_THRESHOLD_SECONDS : (int)$value;
+    }
+
+    private function restartConsumers(): void
+    {
+        $this->getLogger()->info('Stopping all managed consumer processes.');
+        foreach ($this->processes as $process) {
+            if ($process->isRunning()) {
+                $process->stop(3);
+            }
+        }
+
+        $this->processes = [];
+        $this->startConsumerIfNotRunning();
     }
 
     private function startConsumerIfNotRunning(): void
