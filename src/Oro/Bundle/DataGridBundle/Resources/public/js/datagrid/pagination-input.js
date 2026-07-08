@@ -70,6 +70,7 @@ define([
             }
 
             if (state.currentPage !== pageIndex) {
+                this.scrollToSavedPosition();
                 collection.getPage(pageIndex);
             }
         },
