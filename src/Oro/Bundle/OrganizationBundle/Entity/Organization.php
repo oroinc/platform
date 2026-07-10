@@ -29,7 +29,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     defaultValues: [
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
         'form' => ['form_type' => OrganizationSelectType::class],
-        'dataaudit' => ['auditable' => true]
+        'dataaudit' => ['auditable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Organization implements OrganizationInterface, ExtendEntityInterface
@@ -39,20 +40,26 @@ class Organization implements OrganizationInterface, ExtendEntityInterface
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255, unique: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'dataaudit' => ['auditable' => true],
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $name = null;
 
     #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?string $description = null;
 
     /**
      * @var Collection<int, BusinessUnit>
      */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: BusinessUnit::class, cascade: ['ALL'], fetch: 'EXTRA_LAZY')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $businessUnits = null;
 
     /**
@@ -60,24 +67,31 @@ class Organization implements OrganizationInterface, ExtendEntityInterface
      */
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'organizations')]
     #[ORM\JoinTable(name: 'oro_user_organization')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $users = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(name: 'enabled', type: Types::BOOLEAN, options: ['default' => 1])]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?bool $enabled = true;
 
     public function __construct()
     {
         $this->businessUnits = new ArrayCollection();
-        $this->users         = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     /**

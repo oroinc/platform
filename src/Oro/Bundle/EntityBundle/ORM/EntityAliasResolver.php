@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
@@ -239,6 +240,12 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
             $this->loader->load($storage);
         } catch (InvalidEntityAliasException $e) {
             throw $e;
+        } catch (TableNotFoundException $e) {
+            $storage = null;
+            $this->logger->warning(
+                'Loading of entity aliases skipped: database schema is not fully migrated yet',
+                ['exception' => $e]
+            );
         } catch (\Exception $e) {
             $storage = null;
             $this->logger->error('Loading of entity aliases failed', ['exception' => $e]);

@@ -31,7 +31,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
         'comment' => ['immutable' => true],
         'activity' => ['immutable' => true],
         'attachment' => ['immutable' => true],
-        'entity_management' => ['enabled' => false]
+        'entity_management' => ['enabled' => false],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class File implements FileExtensionInterface, ExtendEntityInterface
@@ -41,32 +42,42 @@ class File implements FileExtensionInterface, ExtendEntityInterface
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     /**
      * @var string|null
      */
     #[ORM\Column(name: 'uuid', type: Types::GUID, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected $uuid;
 
     #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(name: 'owner_user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?UserInterface $owner = null;
 
     #[ORM\Column(name: 'filename', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $filename = null;
 
     #[ORM\Column(name: 'extension', type: Types::STRING, length: 10, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $extension = null;
 
     #[ORM\Column(name: 'mime_type', type: Types::STRING, length: 100, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $mimeType = null;
 
     #[ORM\Column(name: 'original_filename', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $originalFilename = null;
 
     #[ORM\Column(name: 'file_size', type: Types::INTEGER, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $fileSize = null;
 
     /**
@@ -94,14 +105,21 @@ class File implements FileExtensionInterface, ExtendEntityInterface
     protected ?string $parentEntityFieldName = null;
 
     #[ORM\Column(name: 'external_url', type: Types::STRING, length: 1024, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $externalUrl = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     protected ?\SplFileInfo $file = null;

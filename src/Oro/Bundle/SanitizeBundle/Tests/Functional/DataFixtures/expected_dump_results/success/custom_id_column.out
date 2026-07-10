@@ -1,0 +1,1 @@
+UPDATE "test_sanitizable_custom_id_column" SET "email"=CASE WHEN POSITION('@' IN "email")>0 THEN CONCAT(SUBSTRING("email", 1, POSITION('@' IN "email")-1), '_', "owner_id", '@', MD5(SUBSTRING("email", POSITION('@' IN "email")+1)), '.test') ELSE "email" END;

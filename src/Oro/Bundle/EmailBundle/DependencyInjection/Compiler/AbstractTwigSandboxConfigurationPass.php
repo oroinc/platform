@@ -11,8 +11,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInterface
 {
-    private const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
-    private const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.twig.email_environment';
+    private const string EMAIL_TEMPLATE_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
+    private const string EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.twig.email_environment';
 
     #[\Override]
     public function process(ContainerBuilder $container)
@@ -50,7 +50,7 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
     {
         $functions = $this->getFunctions();
         if ($functions) {
-            $this->addToSandboxSecurityPolicy($container, 4, $functions);
+            $this->addToSandboxSecurityPolicyCalls($container, 'setAllowedFunctions', $functions);
         }
     }
 
@@ -61,7 +61,7 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
     {
         $filters = $this->getFilters();
         if ($filters) {
-            $this->addToSandboxSecurityPolicy($container, 1, $filters);
+            $this->addToSandboxSecurityPolicyCalls($container, 'setAllowedFilters', $filters);
         }
     }
 
@@ -72,7 +72,7 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
     {
         $tags = $this->getTags();
         if ($tags) {
-            $this->addToSandboxSecurityPolicy($container, 0, $tags);
+            $this->addToSandboxSecurityPolicyCalls($container, 'setAllowedTags', $tags);
         }
     }
 
@@ -91,12 +91,28 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
     /**
      * Adds the given functions, filters or tags to the sandbox security policy.
      */
-    private function addToSandboxSecurityPolicy(ContainerBuilder $container, int $argumentIndex, array $newItems): void
-    {
-        $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
-        $securityPolicyDef->replaceArgument(
-            $argumentIndex,
-            array_merge($securityPolicyDef->getArgument($argumentIndex), $newItems)
-        );
+    private function addToSandboxSecurityPolicyCalls(
+        ContainerBuilder $container,
+        string $methodName,
+        array $newItems
+    ): void {
+        $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SECURITY_POLICY_SERVICE_KEY);
+        $methodCalls = $securityPolicyDef->getMethodCalls();
+        $found = false;
+        foreach ($methodCalls as $i => $methodCall) {
+            if ($methodCall[0] === $methodName) {
+                $methodCalls[$i] = [
+                    $methodCall[0],
+                    [array_values(array_unique(array_merge($methodCall[1][0], $newItems)))]
+                ];
+                $found = true;
+            }
+        }
+
+        if (!$found) {
+            $methodCalls[] = [$methodName, [$newItems]];
+        }
+
+        $securityPolicyDef->setMethodCalls($methodCalls);
     }
 }

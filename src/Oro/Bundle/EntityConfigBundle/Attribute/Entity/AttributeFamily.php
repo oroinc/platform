@@ -40,9 +40,9 @@ use Oro\Component\Layout\ContextItemInterface;
         'ownership' => [
             'owner_type' => 'ORGANIZATION',
             'owner_field_name' => 'owner',
-            'owner_column_name' => 'organization_id'
+            'owner_column_name' => 'organization_id',
         ],
-        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'catalog']
+        'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'catalog'],
     ]
 )]
 class AttributeFamily implements
@@ -56,6 +56,7 @@ class AttributeFamily implements
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?int $id = null;
 
     /**
@@ -68,16 +69,21 @@ class AttributeFamily implements
     #[ConfigField(
         defaultValues: [
             'dataaudit' => ['auditable' => true],
-            'importexport' => ['order' => 40, 'full' => true, 'fallback_field' => 'string']
+            'importexport' => ['order' => 40, 'full' => true, 'fallback_field' => 'string'],
+            'email' => ['available_in_template' => true],
         ]
     )]
     protected ?Collection $labels = null;
 
     #[ORM\Column(name: 'code', type: Types::STRING, length: 255)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     private ?string $code = null;
 
     #[ORM\Column(name: 'entity_class', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $entityClass = null;
 
     /**
@@ -91,16 +97,19 @@ class AttributeFamily implements
         indexBy: 'code'
     )]
     #[ORM\OrderBy(['id' => Criteria::ASC])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?Collection $attributeGroups = null;
 
     /**
      * @var bool|null
      */
     #[ORM\Column(name: 'is_enabled', type: Types::BOOLEAN, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private $isEnabled = true;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Organization $owner = null;
 
     public function __construct()

@@ -5,6 +5,7 @@ namespace Oro\Bundle\CronBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 
 /**
  * Represents a table with CRON jobs schedules.
@@ -26,18 +27,22 @@ class Schedule
     protected ?int $id = null;
 
     #[ORM\Column(name: 'command', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $command = null;
 
     /**
      * @var array
      */
     #[ORM\Column(name: 'args', type: 'json')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected $arguments;
 
     #[ORM\Column(name: 'args_hash', type: Types::STRING, length: 32)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $argumentsHash = null;
 
     #[ORM\Column(name: 'definition', type: Types::STRING, length: 100, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $definition = null;
 
     public function __construct()
