@@ -52,6 +52,9 @@ The current file describes significant changes in the code that may affect the u
 #### FormBundle
 * Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
 
+#### SearchBundle
+* Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`.
+
 ### Changed
 
 #### EmailBundle
