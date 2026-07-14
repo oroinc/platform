@@ -2,6 +2,13 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## UNRELEASED
+
+### Added
+
+#### SearchBundle
+* Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`; used by the back-office Elasticsearch engine to enable search synonyms for an entity index.
+
 ## 6.0.10
 
 ### Added

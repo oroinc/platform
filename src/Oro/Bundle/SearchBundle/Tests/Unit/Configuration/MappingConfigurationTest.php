@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SearchBundle\Configuration\MappingConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
-class MappingConfigurationTest extends \PHPUnit\Framework\TestCase
+final class MappingConfigurationTest extends TestCase
 {
     /**
      * @dataProvider processConfigurationDataProvider
@@ -17,7 +20,7 @@ class MappingConfigurationTest extends \PHPUnit\Framework\TestCase
     {
         $processor = new Processor();
 
-        $this->assertEquals(
+        self::assertSame(
             $expected,
             $processor->processConfiguration(new MappingConfiguration(), $configs)
         );
