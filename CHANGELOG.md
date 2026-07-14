@@ -24,6 +24,13 @@ The current file describes significant changes in the code that may affect the u
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
 
+## UNRELEASED
+
+### Added
+
+#### SearchBundle
+* Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`; used by the back-office Elasticsearch engine to enable search synonyms for an entity index.
+
 ## 6.1.9
 
 ### Added
