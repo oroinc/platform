@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * The document builder for REST API response conforms JSON:API specification.
+ * The document builder for REST API response that conforms JSON:API specification.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -32,13 +32,13 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     public const META_UPDATE = 'update';
     public const META_UPSERT = 'upsert';
 
-    private const ERROR_STATUS = 'status';
-    private const ERROR_CODE = 'code';
-    private const ERROR_TITLE = 'title';
-    private const ERROR_DETAIL = 'detail';
-    private const ERROR_SOURCE = 'source';
-    private const ERROR_POINTER = 'pointer';
-    private const ERROR_PARAMETER = 'parameter';
+    public const ERROR_STATUS = 'status';
+    public const ERROR_CODE = 'code';
+    public const ERROR_TITLE = 'title';
+    public const ERROR_DETAIL = 'detail';
+    public const ERROR_SOURCE = 'source';
+    public const ERROR_POINTER = 'pointer';
+    public const ERROR_PARAMETER = 'parameter';
 
     /**
      * {@inheritdoc}

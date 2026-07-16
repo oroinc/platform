@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode(self::SESSION_ID_FIELD_NAME)
                     ->info(
                         'The name of the hidden field that should be used to pass the session id'
-                        . ' to third party site. This allows to use the embedded form even if'
+                        . ' to third party site. This allows using the embedded form even if'
                         . ' a web browser blocks third-party cookies.'
                     )
                     ->cannotBeEmpty()

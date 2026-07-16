@@ -68,6 +68,12 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldBePossibleToSetPrimaryEntity(): void
     {
+        self::assertNull($this->collection->getPrimaryEntity());
+        self::assertNull($this->collection->getPrimaryEntityClass());
+        self::assertNull($this->collection->getPrimaryEntityId());
+        self::assertNull($this->collection->getPrimaryEntityMetadata());
+        self::assertNull($this->collection->getPrimaryEntityRequestData());
+
         $entityClass = 'Test\Class';
         $entityId = '123';
         $entity = new \stdClass();
@@ -76,6 +82,8 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection->setPrimaryEntity($entity, $metadata);
         self::assertTrue($this->collection->isPrimaryEntity('Test\Class', '123'));
         self::assertSame($entity, $this->collection->getPrimaryEntity());
+        self::assertSame($entityClass, $this->collection->getPrimaryEntityClass());
+        self::assertSame($entityId, $this->collection->getPrimaryEntityId());
         self::assertSame($metadata, $this->collection->getPrimaryEntityMetadata());
     }
 

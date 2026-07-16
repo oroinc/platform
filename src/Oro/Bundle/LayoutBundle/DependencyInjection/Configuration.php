@@ -103,7 +103,7 @@ class Configuration implements ConfigurationInterface
         $parentNode
             ->children()
                 ->booleanNode('debug')
-                    ->info('Enable layout debug mode. Allows to switch theme using request parameter _theme.')
+                    ->info('Enable layout debug mode. Allows switching the theme using the request parameter _theme.')
                     ->defaultValue('%kernel.debug%')
                 ->end()
                 ->scalarNode('active_theme')

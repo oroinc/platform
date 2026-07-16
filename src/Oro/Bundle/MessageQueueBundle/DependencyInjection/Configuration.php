@@ -182,17 +182,17 @@ class Configuration implements ConfigurationInterface
                             ->booleanNode('enabled')
                                 ->defaultValue(true)
                                 ->info(
-                                    "If redelivery enabled than new copied message will be published\n"
-                                    . "to message broker and old one will be REJECTED when error\n"
-                                    . 'was occurred during message processing.'
+                                    "If redelivery is enabled than new copied message will be published\n"
+                                    . "to the message broker, and the old one will be REJECTED when an error\n"
+                                    . ' occurred during message processing.'
                                 )
                             ->end()
                             ->integerNode('delay_time')
                                 ->min(1)
                                 ->defaultValue(10)
                                 ->info(
-                                    "Time through which message will be re-published to the broker,\n"
-                                    . 'old one will be REJECTED immediately.'
+                                    "Time through which the message will be re-published to the broker,\n"
+                                    . 'the old one will be REJECTED immediately.'
                                 )
                             ->end()
                         ->end()

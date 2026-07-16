@@ -20,7 +20,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('readonly_protocol')
                         ->info(
                             'The name of read-only Gaufrette protocol.'
-                            . ' By default it is "{gaufrette protocol name}-readonly".'
+                            . ' By default, it is "{gaufrette protocol name}-readonly".'
                         )
                         ->defaultNull()
                     ->end()
