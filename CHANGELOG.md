@@ -24,9 +24,13 @@ The current file describes significant changes in the code that may affect the u
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
 
-## UNRELEASED
+## 6.1.11
 
 ### Added
+
+#### ApiBundle
+* Added `CorsSettings::addAllowedOrigins(array $origins): void` method to append extra allowed origins to the existing list at runtime (deduplicated).
+* Added `CorsSettings::enableCredentials(): void` method to enable credential support in CORS responses at runtime.
 
 #### SearchBundle
 * Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`; used by the back-office Elasticsearch engine to enable search synonyms for an entity index.
