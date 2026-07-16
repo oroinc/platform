@@ -15,7 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
- * Provides functionality to convert an entity object to a model object and vise versa.
+ * Provides functionality to convert an entity object to a model object and vice versa.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityMapper
