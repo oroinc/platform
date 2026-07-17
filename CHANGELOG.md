@@ -53,6 +53,10 @@ The current file describes significant changes in the code that may affect the u
 #### FormBundle
 * Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
 
+#### MessageQueueBundle
+* Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
+* Added the configurable consumer idle timeout. It is set via the `oro_message_queue.consumer.idle_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_IDLE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_idle_timeout_default` container parameter (defaults to `0.1` seconds). It controls how long the consumer sleeps when no message is received from a queue.
+
 #### SearchBundle
 * Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`.
 
@@ -66,6 +70,11 @@ The current file describes significant changes in the code that may affect the u
 
 #### EntityBundle
 * Updated `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider` so it implements `\Oro\Component\Config\Cache\ClearableConfigCacheInterface`.
+
+#### MessageQueueBundle
+* Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
+* Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value. The `$idleMicroseconds` and `$receiveTimeout` constructor arguments were removed in favor of the `setIdleTimeout(float $idleTimeout)` and `setReceiveTimeout(float $receiveTimeout)` setters. Both timeouts are now expressed in seconds as floats (the former `$idleMicroseconds` integer default of `100000` microseconds is now the `0.1` seconds `idleTimeout` default).
+* Changed `DbalMessageConsumer::receive()` to bound each poll sleep by the time remaining until the receive timeout, so the DBAL `polling_interval` no longer imposes a de-facto minimum receive timeout.
 
 #### UserBundle
 * Updated `invite_user` email template to use `system.appURL` system variable.

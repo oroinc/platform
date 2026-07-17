@@ -31,7 +31,9 @@ class QueueConsumer
 
     private MessageProcessorRegistryInterface $messageProcessorRegistry;
 
-    private int $idleMicroseconds;
+    private float $idleTimeout = 0.1;
+
+    private float $receiveTimeout = 1.0;
 
     private QueueIteratorFactoryInterface $queueIteratorFactory;
 
@@ -50,17 +52,33 @@ class QueueConsumer
         ExtensionInterface $extension,
         ConsumerState $consumerState,
         MessageProcessorRegistryInterface $messageProcessorRegistry,
-        QueueIteratorFactoryInterface $queueIteratorFactory,
-        int $idleMicroseconds = 100000
+        QueueIteratorFactoryInterface $queueIteratorFactory
     ) {
         $this->connection = $connection;
         $this->extension = $extension;
         $this->consumerState = $consumerState;
         $this->messageProcessorRegistry = $messageProcessorRegistry;
-        $this->idleMicroseconds = $idleMicroseconds;
         $this->queueIteratorFactory = $queueIteratorFactory;
 
         $this->boundQueues = [];
+    }
+
+    /**
+     * Sets the message receive timeout in seconds. Lower values make a consumer bound to
+     * multiple queues switch between them faster.
+     */
+    public function setReceiveTimeout(float $receiveTimeout): void
+    {
+        $this->receiveTimeout = $receiveTimeout;
+    }
+
+    /**
+     * Sets the idle timeout in seconds, i.e. how long the consumer sleeps when no message
+     * is received from a queue.
+     */
+    public function setIdleTimeout(float $idleTimeout): void
+    {
+        $this->idleTimeout = $idleTimeout;
     }
 
     /**
@@ -216,7 +234,7 @@ class QueueConsumer
             throw new ConsumptionInterruptedException($context->getInterruptedReason() ?? '');
         }
         $logger->debug('Pre receive message');
-        $message = $messageConsumer->receive(1);
+        $message = $messageConsumer->receive($this->receiveTimeout);
         if (null !== $message) {
             $context->setMessage($message);
             $extension->onPreReceived($context);
@@ -266,7 +284,7 @@ class QueueConsumer
         } else {
             $logger->info('Idle', ['queue' => $context->getQueueName()]);
 
-            usleep($this->idleMicroseconds);
+            usleep((int)($this->idleTimeout * 1000000));
             $extension->onIdle($context);
         }
 

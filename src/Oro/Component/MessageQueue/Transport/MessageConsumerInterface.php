@@ -12,11 +12,11 @@ interface MessageConsumerInterface
      * This call blocks until a message arrives, the timeout expires, or this message consumer is closed.
      * A timeout of zero never expires, and the call blocks indefinitely.
      *
-     * @param int $timeout the timeout value (in seconds)
+     * @param int|float $timeout the timeout value (in seconds)
      *
      * @return MessageInterface|null
      */
-    public function receive($timeout = 0): ?MessageInterface;
+    public function receive(int|float $timeout = 0): ?MessageInterface;
 
     /**
      * Tell the MQ broker that the message was processed successfully
