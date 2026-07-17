@@ -2,6 +2,7 @@ parameters:
     oro_message_queue.maintenance.idle_time: 5
     oro_message_queue.consumption_mode: '%env(default::ORO_MQ_CONSUMPTION_MODE)%'
     oro_message_queue.consumption_groups: '%env(default::ORO_MQ_CONSUMPTION_GROUPS)%'
+    oro_message_queue.consumer_receive_timeout_default: 1.0
 
 services:
     oro_message_queue.consumption.extensions:
@@ -220,6 +221,7 @@ services:
             - '@oro_message_queue.client.message_processor_registry'
         calls:
             - [ 'setQueueIteratorFactory', [ '@oro_message_queue.consumption.queue_iterator.chain_factory' ] ]
+            - [ 'setReceiveTimeout', [ '%oro_message_queue.consumer_receive_timeout%' ] ]
 
     oro_message_queue.listener.update_schema:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'

@@ -110,11 +110,20 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 return $message;
             }
 
-            if ($timeout && (microtime(true) - $startAt) >= $timeout) {
+            $elapsed = microtime(true) - $startAt;
+            if ($timeout && $elapsed >= $timeout) {
                 return null;
             }
 
-            usleep($this->pollingInterval);
+            // Bound the poll sleep by the time remaining until the receive timeout so that
+            // the polling interval does not impose a minimum timeout.
+            $sleep = $this->pollingInterval;
+            if ($timeout) {
+                $sleep = min($this->pollingInterval, (int)(($timeout - $elapsed) * 1000000));
+            }
+            if ($sleep > 0) {
+                usleep($sleep);
+            }
 
             if ($timeout && (microtime(true) - $startAt) >= $timeout) {
                 return null;

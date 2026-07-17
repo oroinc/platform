@@ -132,6 +132,21 @@ class QueueConsumerTest extends TestCase
             ->consume();
     }
 
+    public function testShouldPassConfiguredReceiveTimeoutToConsumer(): void
+    {
+        $this->messageConsumer->expects(self::once())
+            ->method('receive')
+            ->with(0.1)
+            ->willReturn(null);
+
+        $this->messageProcessor->expects(self::never())
+            ->method('process');
+
+        $this->createQueueConsumer(null, new BreakCycleExtension(1), null, null, null, 0.1)
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
+            ->consume();
+    }
+
     public function testShouldProcessFiveMessagesAndQuit(): void
     {
         $this->messageConsumer
@@ -838,18 +853,20 @@ class QueueConsumerTest extends TestCase
         ExtensionInterface $extension = null,
         ConsumerState $consumerState = null,
         MessageProcessorRegistryInterface $messageProcessorRegistry = null,
-        ?QueueIteratorFactoryInterface $queueIteratorFactory = null
+        ?QueueIteratorFactoryInterface $queueIteratorFactory = null,
+        float $receiveTimeout = 1.0
     ): QueueConsumer {
-        $consumer = new QueueConsumer(
+        $queueConsumer = new QueueConsumer(
             $connection ?? $this->connection,
             $extension ?? new BreakCycleExtension(1),
             $consumerState ?? $this->consumerState,
             $messageProcessorRegistry ?? $this->messageProcessorRegistry,
             0
         );
-        $consumer->setQueueIteratorFactory($queueIteratorFactory ?? $this->queueIteratorFactory);
+        $queueConsumer->setQueueIteratorFactory($queueIteratorFactory ?? $this->queueIteratorFactory);
+        $queueConsumer->setReceiveTimeout($receiveTimeout);
 
-        return $consumer;
+        return $queueConsumer;
     }
 
     private function createSession(): SessionInterface|MockObject
