@@ -76,6 +76,10 @@ class OroMessageQueueExtension extends Extension
                 'oro_message_queue.consumer_heartbeat_update_period',
                 $config['consumer']['heartbeat_update_period']
             );
+            $container->setParameter(
+                'oro_message_queue.consumer_receive_timeout',
+                $config['consumer']['receive_timeout']
+            );
             $container->setParameter('oro_message_queue.client.noop_status', $config['client']['noop_status']);
         }
 

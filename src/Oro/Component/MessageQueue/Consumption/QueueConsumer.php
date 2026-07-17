@@ -34,6 +34,8 @@ class QueueConsumer
 
     private int $idleMicroseconds;
 
+    private float $receiveTimeout = 1.0;
+
     private ?QueueIteratorFactoryInterface $queueIteratorFactory;
 
     /** @var array<string, array{processor?: string, ...array<string, string>}> */
@@ -58,6 +60,15 @@ class QueueConsumer
         $this->consumerState = $consumerState;
         $this->messageProcessorRegistry = $messageProcessorRegistry;
         $this->idleMicroseconds = $idleMicroseconds;
+    }
+
+    /**
+     * Sets the message receive timeout in seconds. Lower values make a consumer bound to
+     * multiple queues switch between them faster.
+     */
+    public function setReceiveTimeout(float $receiveTimeout): void
+    {
+        $this->receiveTimeout = $receiveTimeout;
     }
 
     /**
@@ -228,7 +239,7 @@ class QueueConsumer
             throw new ConsumptionInterruptedException($context->getInterruptedReason());
         }
         $logger->debug('Pre receive message');
-        $message = $messageConsumer->receive(1);
+        $message = $messageConsumer->receive($this->receiveTimeout);
         if (null !== $message) {
             $context->setMessage($message);
             $extension->onPreReceived($context);

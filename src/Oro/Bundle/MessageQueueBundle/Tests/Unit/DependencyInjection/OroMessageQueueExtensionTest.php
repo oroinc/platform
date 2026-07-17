@@ -286,12 +286,22 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertParametersExist(
             array_merge(
                 $this->getRequiredParameters(),
-                ['oro_message_queue.consumer_heartbeat_update_period']
+                [
+                    'oro_message_queue.consumer_heartbeat_update_period',
+                    'oro_message_queue.consumer_receive_timeout',
+                    'oro_message_queue.consumer_receive_timeout_default',
+                ]
             ),
             $container
         );
         self::assertDefinitionsExist($this->getRequiredDefinitions(), $container);
         self::assertEquals(1823, $container->getParameter('oro_message_queue.consumer_heartbeat_update_period'));
+        self::assertEquals(
+            '%env(default:oro_message_queue.consumer_receive_timeout_default'
+                . ':float:ORO_MQ_CONSUMER_RECEIVE_TIMEOUT)%',
+            $container->getParameter('oro_message_queue.consumer_receive_timeout')
+        );
+        self::assertEquals(1.0, $container->getParameter('oro_message_queue.consumer_receive_timeout_default'));
         self::assertEmpty(array_diff($this->getRequiredDefinitions(), array_keys($container->getDefinitions())));
         self::assertEquals(
             [

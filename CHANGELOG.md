@@ -2,6 +2,20 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 5.1.18
+
+### Added
+
+#### MessageQueueBundle
+* Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
+
+### Changed
+
+#### MessageQueueBundle
+* Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
+* Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value.
+* Changed `DbalMessageConsumer::receive()` to bound each poll sleep by the time remaining until the receive timeout, so the DBAL `polling_interval` no longer imposes a de-facto minimum receive timeout.
+
 ## 5.1.17
 
 ### Added

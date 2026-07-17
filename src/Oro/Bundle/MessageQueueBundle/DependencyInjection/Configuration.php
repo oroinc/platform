@@ -59,6 +59,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('scalar')->end()
             ->end()
             ->arrayNode('consumer')
+                ->addDefaultsIfNotSet()
                 ->children()
                     ->integerNode('heartbeat_update_period')
                         ->min(0)
@@ -66,6 +67,17 @@ class Configuration implements ConfigurationInterface
                         ->info(
                             'Consumer heartbeat update period in minutes. To disable the checks, set this option to 0'
                         )
+                    ->end()
+                    ->scalarNode('receive_timeout')
+                        ->info(
+                            'Consumer message receive timeout in seconds (float). '
+                            . 'Lower values make a consumer switch between bound queues faster.'
+                        )
+                        ->defaultValue(sprintf(
+                            '%%env(default:%s:float:%s)%%',
+                            'oro_message_queue.consumer_receive_timeout_default',
+                            'ORO_MQ_CONSUMER_RECEIVE_TIMEOUT'
+                        ))
                     ->end()
                 ->end()
             ->end()

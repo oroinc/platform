@@ -210,6 +210,43 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->consumer->receive(0.1));
     }
 
+    public function testReceiveBoundsSleepByReceiveTimeout(): void
+    {
+        $updateStatement = $this->createMock(Statement::class);
+        $updateStatement->expects(self::once())
+            ->method('execute')
+            ->with(
+                self::logicalAnd(
+                    self::containsEqual('test_queue'),
+                    self::containsEqual($this->consumer->getConsumerId())
+                )
+            );
+        $updateStatement->expects(self::once())
+            ->method('rowCount')
+            ->willReturn(0);
+
+        $this->dbal->expects(self::once())
+            ->method('getDatabasePlatform')
+            ->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())
+            ->method('prepare')
+            ->willReturn($updateStatement);
+
+        $this->connection->expects(self::once())
+            ->method('getTableName')
+            ->willReturn('oro_message_queue');
+
+        // Polling interval (10s) is much larger than the receive timeout (0.1s).
+        // The poll sleep must be bounded by the remaining timeout so the call returns promptly.
+        $this->consumer->setPollingInterval(10000);
+
+        $startAt = microtime(true);
+        self::assertNull($this->consumer->receive(0.1));
+        $elapsed = microtime(true) - $startAt;
+
+        self::assertLessThan(1.0, $elapsed);
+    }
+
     public function testReceiveThrowLogicException(): void
     {
         $this->dbal->expects(self::once())
