@@ -35,6 +35,8 @@ class ConfigurationTest extends TestCase
             ],
             'consumer' => [
                 'heartbeat_update_period' => 15,
+                'receive_timeout' => '%env(default:oro_message_queue.consumer_receive_timeout_default'
+                    . ':float:ORO_MQ_CONSUMER_RECEIVE_TIMEOUT)%',
             ],
             'transport' => [
                 'dbal' => [
