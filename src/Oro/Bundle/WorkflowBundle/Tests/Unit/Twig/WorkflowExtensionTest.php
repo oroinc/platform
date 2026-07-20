@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
@@ -26,7 +28,7 @@ class WorkflowExtensionTest extends TestCase
         $this->workflowManager = $this->createMock(WorkflowManager::class);
 
         $workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
-        $workflowManagerRegistry->expects($this->any())
+        $workflowManagerRegistry->expects(self::any())
             ->method('getManager')
             ->willReturn($this->workflowManager);
 
@@ -42,7 +44,7 @@ class WorkflowExtensionTest extends TestCase
     {
         $entity = new \stdClass();
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowManager->expects(self::once())
             ->method('hasApplicableWorkflows')
             ->with(self::identicalTo($entity))
             ->willReturn(true);
@@ -56,7 +58,7 @@ class WorkflowExtensionTest extends TestCase
     {
         $entity = new \stdClass();
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowManager->expects(self::once())
             ->method('hasWorkflowItemsByEntity')
             ->with(self::identicalTo($entity))
             ->willReturn(true);
@@ -71,7 +73,7 @@ class WorkflowExtensionTest extends TestCase
         $variable = $this->createMock(Variable::class);
         $formattedVariable = 'formatted variable';
 
-        $this->workflowVariableFormatter->expects($this->once())
+        $this->workflowVariableFormatter->expects(self::once())
             ->method('formatWorkflowVariableValue')
             ->with(self::identicalTo($variable))
             ->willReturn($formattedVariable);

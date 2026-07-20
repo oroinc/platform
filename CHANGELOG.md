@@ -29,8 +29,65 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ApiBundle
+
+* Added `CorsSettings::addAllowedOrigins(array $origins): void` method to append extra allowed origins to the existing list at runtime (deduplicated).
+* Added `CorsSettings::enableCredentials(): void` method to enable credential support in CORS responses at runtime.
+
+#### EmailBundle
+* Added `email.available_in_template` entity config option that controls whether an entity can be selected when creating email templates. Defaults to false.
+* Updated entity field config setting `email.available_in_template` to allow it for `toMany` associations.
+* Added `oro:debug:email:template:entities` command to show the list of entity classes available when creating email templates.
+* Added `oro:debug:email:tags`, `oro:debug:email:functions`, `oro:debug:email:filters` commands to show the list of allowed Twig tags, functions, and filters correspondingly in email templates.
+* Added `oro:email:template:security-policy-check` command to check email template security policy against an email template(s).
+* Added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` instead of the removed `\Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator`.
+* Added `\Oro\Bundle\EmailBundle\Twig\SecurityPolicy\EmailTemplateSecurityPolicyChecker` as the main entry point of checking email template security policy against an email template.
+* Added `\Oro\Bundle\EmailBundle\SecurityPolicyInspector\EmailTemplateSecurityPolicyInspector` to check multiple email templates, and loading email templates via loader notation (e.g. `@db:website=101/sample_template_name`).
+* Added `\Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy` validation constraint and validator classes to bring early security policy checking to the email template create/update page.
+* Added `\Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension`, `\Oro\Bundle\EmailBundle\Twig\NodeVisitor\SafeGetAttrNodeVisitor`, and `\Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode` to enable more graceful handling of non-allowed properties and methods in email templates by replacing them with `null`.
+
+#### EntityBundle
+* Added `\Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessAnalyzer` introducing the mechanism of static analysis of a Twig template to extract all property and method accesses on typed variables.
+* Added `\Oro\Bundle\EntityBundle\Twig\SecurityPolicy\TemplateSecurityPolicyChecker` introducing the mechanism of checking a Twig template against a security policy based on the results of static analysis.
+
 #### FormBundle
 * Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
+
+#### MessageQueueBundle
+* Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
+* Added the configurable consumer idle timeout. It is set via the `oro_message_queue.consumer.idle_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_IDLE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_idle_timeout_default` container parameter (defaults to `0.1` seconds). It controls how long the consumer sleeps when no message is received from a queue.
+
+#### SearchBundle
+* Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`.
+
+### Changed
+
+#### EmailBundle
+* Updated entity config setting `email.available_in_template` to make it `false` be default. Make sure to update this setting for your custom fields if you want to use them in email templates. You can do this using `\Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery` in a schema migration.
+* Updated entity config setting `email.available_in_template` to allow it for `toMany` associations.
+* Updated `\Oro\Bundle\EmailBundle\DependencyInjection\Compiler\AbstractTwigSandboxConfigurationPass` so it makes use the calls `setAllowedFunctions`, `setAllowedFilters`, `setAllowedTags` instead of constructor arguments on email templates security policy service `oro_email.twig.email_security_policy`.
+* Updated validation constraint configuration for `\Oro\Bundle\EmailBundle\Entity\EmailTemplate` with `Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy` constraint.
+
+#### EntityBundle
+* Updated `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider` so it implements `\Oro\Component\Config\Cache\ClearableConfigCacheInterface`.
+
+#### MessageQueueBundle
+* Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
+* Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value. The `$idleMicroseconds` and `$receiveTimeout` constructor arguments were removed in favor of the `setIdleTimeout(float $idleTimeout)` and `setReceiveTimeout(float $receiveTimeout)` setters. Both timeouts are now expressed in seconds as floats (the former `$idleMicroseconds` integer default of `100000` microseconds is now the `0.1` seconds `idleTimeout` default).
+* Changed `DbalMessageConsumer::receive()` to bound each poll sleep by the time remaining until the receive timeout, so the DBAL `polling_interval` no longer imposes a de-facto minimum receive timeout.
+
+#### UserBundle
+* Updated `invite_user` email template to use `system.appURL` system variable.
+
+### Removed
+
+#### EmailBundle
+* Removed `\Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator`, added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` instead.
+* Removed `oro_config_value` Twig function from email templates rendering sandbox.
+* Removed `\Oro\Bundle\EmailBundle\EventListener\EntityConfigListener`, use `\Oro\Bundle\EmailBundle\EventListener\AvailableInTemplateEntityConfigListener` instead.
+
+#### UserBundle
+* Removed unused Twig templates `@OroUser/Email/invite.html.twig`, `@OroUser/Email/layout.html.twig`, `@OroUser/Email/reset.html.twig`.
 
 ## 7.0.0 (2026-03-31)
 [Show detailed list of changes](incompatibilities-7-0.md)

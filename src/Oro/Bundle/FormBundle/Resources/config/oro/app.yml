@@ -9,6 +9,12 @@ oro_form:
                 - 'data'
                 - 'tel'
 
+            allowed_rel:
+                - 'noopener'
+                - 'nofollow'
+                - 'noreferrer'
+                - 'external'
+
             allowed_iframe_domains:
                 - 'youtube.com/embed/'
                 - 'www.youtube.com/embed/'
@@ -76,6 +82,7 @@ oro_form:
                         - target
                         - title
                         - data-action
+                        - rel
                 dl: ~
                 dt: ~
                 div:

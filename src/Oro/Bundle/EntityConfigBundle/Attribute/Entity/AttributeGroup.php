@@ -36,6 +36,7 @@ class AttributeGroup implements DatesAwareInterface, ExtendEntityInterface
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?int $id = null;
 
     /**
@@ -45,14 +46,16 @@ class AttributeGroup implements DatesAwareInterface, ExtendEntityInterface
     #[ORM\JoinTable(name: 'oro_attribute_group_label')]
     #[ORM\JoinColumn(name: 'attribute_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'localized_value_id', referencedColumnName: 'id', unique: true, onDelete: 'CASCADE')]
-    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
+    #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'email' => ['available_in_template' => true]])]
     protected ?Collection $labels = null;
 
     #[ORM\Column(name: 'code', type: Types::STRING, length: 255, unique: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $code = null;
 
     #[ORM\ManyToOne(targetEntity: AttributeFamily::class, inversedBy: 'attributeGroups')]
     #[ORM\JoinColumn(name: 'attribute_family_id', referencedColumnName: 'id')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?AttributeFamily $attributeFamily = null;
 
     /**
@@ -67,6 +70,7 @@ class AttributeGroup implements DatesAwareInterface, ExtendEntityInterface
     private ?Collection $attributeRelations = null;
 
     #[ORM\Column(name: 'is_visible', type: Types::BOOLEAN, nullable: false, options: ['default' => true])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?bool $isVisible = true;
 
     public function __construct()

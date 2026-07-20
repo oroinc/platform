@@ -43,7 +43,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
             'owner_field_name' => 'owner',
             'owner_column_name' => 'user_owner_id',
             'organization_field_name' => 'organization',
-            'organization_column_name' => 'organization_id'
+            'organization_column_name' => 'organization_id',
         ],
         'security' => ['type' => 'ACL'],
         'dataaudit' => ['auditable' => false, 'immutable' => true],
@@ -51,7 +51,8 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
         'comment' => ['immutable' => true],
         'activity' => ['immutable' => true],
         'workflow' => ['show_step_in_grid' => false],
-        'tag' => ['immutable' => true]
+        'tag' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class DigitalAsset implements DatesAwareInterface, OrganizationAwareInterface, ExtendEntityInterface
@@ -63,6 +64,7 @@ class DigitalAsset implements DatesAwareInterface, OrganizationAwareInterface, E
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     /**
@@ -72,11 +74,15 @@ class DigitalAsset implements DatesAwareInterface, OrganizationAwareInterface, E
     #[ORM\JoinTable(name: 'oro_digital_asset_title')]
     #[ORM\JoinColumn(name: 'digital_asset_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'localized_value_id', referencedColumnName: 'id', unique: true, onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $titles = null;
 
     #[ORM\OneToOne(targetEntity: File::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\JoinColumn(name: 'source_file_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
-    #[ConfigField(defaultValues: ['attachment' => ['acl_protected' => true, 'file_applications' => ['default']]])]
+    #[ConfigField(defaultValues: [
+        'attachment' => ['acl_protected' => true, 'file_applications' => ['default']],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?File $sourceFile = null;
 
     public function __construct()

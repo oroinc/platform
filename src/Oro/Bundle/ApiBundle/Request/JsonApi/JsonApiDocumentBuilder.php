@@ -15,7 +15,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * The document builder for REST API response conforms JSON:API specification.
+ * The document builder for REST API response that conforms JSON:API specification.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */

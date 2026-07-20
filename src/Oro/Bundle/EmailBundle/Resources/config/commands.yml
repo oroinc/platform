@@ -42,11 +42,39 @@ services:
         tags:
             - { name: console.command }
 
+    Oro\Bundle\EmailBundle\Command\DebugEmailTagsCommand:
+        arguments:
+            - '@oro_email.twig.email_security_policy'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\DebugEmailFunctionsCommand:
+        arguments:
+            - '@oro_email.twig.email_security_policy'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\DebugEmailFiltersCommand:
+        arguments:
+            - '@oro_email.twig.email_security_policy'
+        tags:
+            - { name: console.command }
+
     Oro\Bundle\EmailBundle\Command\DebugEmailVariablesCommand:
         arguments:
             - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
             - '@Oro\Bundle\EmailBundle\Provider\EmailRenderer'
             - '@Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+        tags:
+            - { name: console.command }
+
+    oro_email.command.debug_email_template_entities:
+        class: Oro\Bundle\EmailBundle\Command\DebugEmailTemplateEntitiesCommand
+        arguments:
+            - '@oro_email.email_template_entity_provider'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: console.command }
 
@@ -62,5 +90,11 @@ services:
             - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
             - '@oro_email.email_template_hydrator.raw_data_parser'
             - '@oro_email.email_template_hydrator.from_array'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\EmailTemplateSecurityPolicyCheckCommand:
+        arguments:
+            - '@oro_email.security_policy_inspector.email_template_security_policy'
         tags:
             - { name: console.command }

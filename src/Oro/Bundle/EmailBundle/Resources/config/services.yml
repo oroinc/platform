@@ -430,10 +430,17 @@ services:
         tags:
           - { name: 'cache.pool', namespace: 'oro_email' }
 
-    oro_email.listener.config_listener:
-        class: Oro\Bundle\EmailBundle\EventListener\EntityConfigListener
+    oro_email.listener.config_listener.template_renderer_config:
+        class: Oro\Bundle\EmailBundle\EventListener\AvailableInTemplateEntityConfigListener
         arguments:
             - '@oro_email.email_renderer_configuration'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
+
+    oro_email.listener.config_listener.entity_variables_config:
+        class: Oro\Bundle\EmailBundle\EventListener\AvailableInTemplateEntityConfigListener
+        arguments:
+            - '@oro_email.twig.analyzer.entity_variables_provider'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
@@ -509,25 +516,15 @@ services:
             - 'oro_email.available_in_template_fields'
 
     oro_email.twig.email_security_policy:
-        class: Twig\Sandbox\SecurityPolicy
+        class: Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy
         arguments:
-            # tags
-            - [ 'app', 'for', 'if', 'apply', 'set', 'block' ]
-            # filters
-            - [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper', 'oro_html_sanitize', 'slice', 'spaceless' ]
-            # methods
-            - []
-            # properties
-            - []
-            # functions
-            - [ '_entity_var', 'date' ]
-
-    oro_email.twig.email_security_policy_decorator:
-        decorates: oro_email.twig.email_security_policy
-        class: Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator
-        arguments:
-            - '@.inner'
+            - !service
+                class: Twig\Sandbox\SecurityPolicy
             - '@oro_email.email_renderer_configuration'
+        calls:
+            - [ setAllowedTags, [ [ 'app', 'for', 'if', 'apply', 'set', 'block' ] ] ]
+            - [ setAllowedFunctions, [ [ '_entity_var', 'date' ] ] ]
+            - [ setAllowedFilters, [ [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper', 'oro_html_sanitize', 'slice', 'spaceless' ] ] ]
 
     oro_email.twig.sandbox.sandbox_extension:
         class: Twig\Extension\SandboxExtension
@@ -579,6 +576,13 @@ services:
     oro_email.twig.sandbox.get_attribute_node_extension:
         class: Oro\Bundle\EntityExtendBundle\Twig\GetAttributeNodeExtension
 
+    oro_email.twig.sandbox.safe_get_attribute_node_extension:
+        class: Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_email }
+
     oro_email.twig.email_environment:
         class: Twig\Environment
         arguments:
@@ -588,6 +592,7 @@ services:
             - [addExtension, ['@oro_email.twig.sandbox.sandbox_extension']]
             - [addExtension, ['@oro_email.twig.sandbox.entity_format_extension']]
             - [addExtension, ['@oro_email.twig.sandbox.get_attribute_node_extension']]
+            - [addExtension, ['@oro_email.twig.sandbox.safe_get_attribute_node_extension']]
 
     oro_email.emailtemplate.variable_provider:
         class: Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider
@@ -709,7 +714,7 @@ services:
         class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
         public: true
         arguments:
-            - '@oro_entity.entity_provider'
+            - '@oro_email.email_template_entity_provider'
             - '@translator'
 
     oro_email_filter.filter_origin_folder:
@@ -1610,6 +1615,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onRequest }
 
+    Oro\Bundle\EmailBundle\EntityConfig\EmailEntityConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
     Oro\Bundle\EmailBundle\EntityConfig\EmailFieldConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
@@ -1637,6 +1646,19 @@ services:
         class: Oro\Bundle\EmailBundle\Provider\EmailTemplateEntityProvider
         parent: oro_entity.entity_provider.abstract
         lazy: true
+        calls:
+            - [setExclusionProvider,  ['@oro_email.email_template_exclusion_provider']]
+
+    oro_email.email_template_exclusion_provider:
+        class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+        calls:
+            - [addProvider, ['@oro_entity.exclusion_provider']]
+            - [addProvider, ['@oro_entity.provider.available_in_template_exclusion_provider']]
+
+    oro_entity.provider.available_in_template_exclusion_provider:
+        class: Oro\Bundle\EmailBundle\Provider\AvailableInTemplateEntityExclusionProvider
+        arguments:
+            - '@oro_entity_config.provider.email'
 
     oro_email.email_template_organization_provider:
         arguments:
@@ -1737,3 +1759,114 @@ services:
             - ['setLogger', ['@logger']]
         tags:
             - { name: monolog.logger, channel: oro_email }
+
+    oro_email.twig.analyzer.entity_variables_provider:
+        class: Oro\Bundle\EntityBundle\Twig\Analyzer\EntityVariablesProvider
+        arguments:
+            - '@oro_email.emailtemplate.variable_provider'
+            - '@oro_email.cache'
+            - 'oro_email.twig.analyzer.entity_variables'
+
+    oro_email.twig.analyzer.template_renderer_config_type_resolver:
+        class: Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateRendererConfigTypeResolver
+        arguments:
+            - '@oro_email.twig.analyzer.entity_variables_provider'
+        tags:
+            # Priority 100 ensures this resolver runs before DoctrineTypeResolver (default priority 0)
+            # to handle virtual variables from EntityVariablesProviderInterface without false positives.
+            - { name: oro_email.twig.analyzer.type_resolver, priority: 100 }
+
+    oro_email.twig.analyzer.doctrine_type_resolver:
+        class: Oro\Bundle\EntityBundle\Twig\Analyzer\DoctrineTypeResolver
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_email.twig.analyzer.type_resolver }
+
+    oro_email.twig.analyzer.noop_resolver:
+        class: Oro\Bundle\EntityBundle\Twig\Analyzer\NoopResolver
+        tags:
+            - { name: oro_email.twig.analyzer.type_resolver, priority: -100 }
+
+    oro_email.twig.analyzer.chain_type_resolver:
+        class: Oro\Bundle\EntityBundle\Twig\Analyzer\ChainTypeResolver
+        arguments:
+            - !tagged_iterator oro_email.twig.analyzer.type_resolver
+
+    oro_email.twig.analyzer.access_node_visitor:
+        class: Oro\Bundle\EntityBundle\Twig\Analyzer\AccessNodeVisitor
+        arguments:
+            - '@oro_email.twig.analyzer.chain_type_resolver'
+
+    oro_email.twig.analyzer.template_access_analyzer:
+        class: Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessAnalyzer
+        arguments:
+            - '@twig'
+            - '@oro_email.twig.analyzer.access_node_visitor'
+
+    oro_email.provider.email_template_metadata:
+        class: Oro\Bundle\EmailBundle\Provider\EmailTemplateMetadataProvider
+        arguments:
+            - '@doctrine'
+
+    oro_email.twig.security_policy.template_checker:
+        class: Oro\Bundle\EntityBundle\Twig\SecurityPolicy\TemplateSecurityPolicyChecker
+        arguments:
+            - '@oro_email.twig.email_environment'
+            - '@oro_email.twig.analyzer.template_access_analyzer'
+
+    oro_email.twig.security_policy.email_template_checker:
+        class: Oro\Bundle\EmailBundle\Twig\SecurityPolicy\EmailTemplateSecurityPolicyChecker
+        arguments:
+            - '@oro_email.twig.security_policy.template_checker'
+            - '@oro_email.provider.email_template_metadata'
+            - '@event_dispatcher'
+
+    oro_email.validator.email_template_security_policy:
+        class: Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicyValidator
+        arguments:
+            - '@oro_email.twig.security_policy.email_template_checker'
+            - '@oro_email.provider.translated_email_template'
+            - '@oro_locale.manager.localization'
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_email.security_policy_inspector.email_template_security_policy:
+        class: Oro\Bundle\EmailBundle\SecurityPolicyInspector\EmailTemplateSecurityPolicyInspector
+        arguments:
+            - '@doctrine'
+            - '@oro_email.provider.email_template'
+            - '@validator'
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_email }
+
+    oro_email.post_upgrade.entity_fields_used_in_email_templates:
+        class: Oro\Bundle\EmailBundle\PostUpgrade\EntityFieldsUsedInEmailTemplatesProvider
+        arguments:
+            - '@doctrine'
+            - '@oro_email.twig.analyzer.template_access_analyzer'
+            - '@event_dispatcher'
+        calls:
+            - [ 'setLogger', [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_email }
+
+    oro_email.post_upgrade.enable_available_in_templates_for_entities_having_templates_task:
+        class: Oro\Bundle\EmailBundle\PostUpgrade\EnableAvailableInTemplateForEntitiesHavingTemplatesTask
+        arguments:
+            - '@doctrine'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro.post_upgrade_task }
+
+    oro_email.post_upgrade.enable_available_in_templates_for_fields_in_templates_task:
+        class: Oro\Bundle\EmailBundle\PostUpgrade\EnableAvailableInTemplatesForFieldsInTemplatesTask
+        arguments:
+            - '@oro_email.post_upgrade.entity_fields_used_in_email_templates'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro.post_upgrade_task }

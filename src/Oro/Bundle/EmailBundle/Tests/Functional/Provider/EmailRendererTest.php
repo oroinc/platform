@@ -7,6 +7,11 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Twig\Error\RuntimeError;
+use Twig\Sandbox\SecurityNotAllowedFilterError;
+use Twig\Sandbox\SecurityNotAllowedFunctionError;
+use Twig\Sandbox\SecurityNotAllowedTagError;
 
 /**
  * @dbIsolationPerTest
@@ -125,6 +130,120 @@ class EmailRendererTest extends WebTestCase
                 'expected' => 'testProperty2.object1 subject',
             ],
         ];
+    }
+
+    public function testRenderTemplateWithNotAllowedFunctionThrowsException(): void
+    {
+        $this->expectException(SecurityNotAllowedFunctionError::class);
+
+        $this->emailRenderer->renderTemplate('{{ oro_config_value(\'oro_user.password_min_length\') }}');
+    }
+
+    public function testRenderTemplateWithNotAllowedTagThrowsException(): void
+    {
+        $this->expectException(SecurityNotAllowedTagError::class);
+
+        $this->emailRenderer->renderTemplate('{% macro test() %}foobar{% endmacro %}');
+    }
+
+    public function testRenderTemplateWithNotAllowedFilterThrowsException(): void
+    {
+        $this->expectException(SecurityNotAllowedFilterError::class);
+
+        $this->emailRenderer->renderTemplate('{{ foobar|raw }}');
+    }
+
+    public function testRenderTemplateWithNotAllowedMethodReplacesWithNull(): void
+    {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        self::assertSame(
+            'N/A',
+            $this->emailRenderer->renderTemplate(
+                '{{ entity.getPassword()|default(\'N/A\') }}',
+                ['entity' => $entity]
+            )
+        );
+    }
+
+    public function testRenderTemplateWithNotAllowedPropertyReplacesWithNulll(): void
+    {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        self::assertSame(
+            'N/A',
+            $this->emailRenderer->renderTemplate(
+                '{{ entity.password|default(\'N/A\') }}',
+                ['entity' => $entity]
+            )
+        );
+    }
+
+    public function testRenderTemplateWithNotAllowedPropertyReplacesWithNullAndSurvivesInLoop(): void
+    {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        self::assertSame(
+            'Text that must be rendered.',
+            $this->emailRenderer->renderTemplate(
+                <<<'TWIG'
+{% for organization in entity.organizations %}
+    {{ organization.name }} - must not be rendered at all.
+{% endfor %}
+Text that must be rendered.
+TWIG,
+                ['entity' => $entity]
+            )
+        );
+    }
+    public function testRenderTemplateWithNotAllowedMethodReplacesWithNullAndSurvivesInLoop(): void
+    {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        self::assertSame(
+            'Text that must be rendered.',
+            $this->emailRenderer->renderTemplate(
+                <<<'TWIG'
+{% for organization in entity.getOrganizations() %}
+    {{ organization.name }} - must not be rendered at all.
+{% endfor %}
+Text that must be rendered.
+TWIG,
+                ['entity' => $entity]
+            )
+        );
+    }
+
+    public function testRenderTemplateWithNotAllowedMethodReplacesWithNullAndCausesError(): void
+    {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        $this->expectException(RuntimeError::class);
+        $this->expectExceptionMessageMatches('/Impossible to access a key \("0"\) on a null variable in/');
+
+        $this->emailRenderer->renderTemplate(
+            '{{ entity.getOrganizations()[0].name }}',
+            ['entity' => $entity]
+        );
+    }
+
+    public function testRenderTemplateWithNotAllowedPropertyReplacesWithNullAndCausesError(): void
+    {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        $this->expectException(RuntimeError::class);
+        $this->expectExceptionMessageMatches('/Impossible to access a key \("0"\) on a null variable in/');
+
+        $this->emailRenderer->renderTemplate(
+            '{{ entity.organizations[0].name }}',
+            ['entity' => $entity]
+        );
     }
 
     private function createTestEntity(): TestActivity

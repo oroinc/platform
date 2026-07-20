@@ -47,20 +47,20 @@ class AbstractTwigSandboxConfigurationPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $securityPolicyDef = $container->register('oro_email.twig.email_security_policy')
-            ->setArguments([['some_existing_tag'], ['some_existing_filter'], [], [], ['some_existing_function']]);
+            ->addMethodCall('setAllowedTags', [['some_existing_tag']])
+            ->addMethodCall('setAllowedFunctions', [['some_existing_function']])
+            ->addMethodCall('setAllowedFilters', [['some_existing_filter']]);
         $rendererDef = $container->register('oro_email.twig.email_environment');
 
         $this->compiler->process($container);
 
         self::assertEquals(
             [
-                ['some_existing_tag', 'tag1', 'tag2'],
-                ['some_existing_filter', 'filter1', 'filter2'],
-                [],
-                [],
-                ['some_existing_function', 'function1', 'function2']
+                ['setAllowedTags', [['some_existing_tag', 'tag1', 'tag2']]],
+                ['setAllowedFunctions', [['some_existing_function', 'function1', 'function2']]],
+                ['setAllowedFilters', [['some_existing_filter', 'filter1', 'filter2']]],
             ],
-            $securityPolicyDef->getArguments()
+            $securityPolicyDef->getMethodCalls()
         );
         self::assertEquals(
             [

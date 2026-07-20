@@ -36,23 +36,30 @@ class Country implements Translatable, ExtendEntityInterface
 
     #[ORM\Id]
     #[ORM\Column(name: 'iso2_code', type: Types::STRING, length: 2)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $iso2Code = null;
 
     #[ORM\Column(name: 'iso3_code', type: Types::STRING, length: 3)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $iso3Code = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
     #[Gedmo\Translatable]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $name = null;
 
     /**
      * @var Collection<int, Region>
      */
     #[ORM\OneToMany(mappedBy: 'country', targetEntity: Region::class, cascade: ['ALL'], fetch: 'EXTRA_LAZY')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $regions = null;
 
     #[ORM\Column(name: 'deleted', type: Types::BOOLEAN, options: ['default' => false])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected bool $deleted = false;
 
     #[Gedmo\Locale]

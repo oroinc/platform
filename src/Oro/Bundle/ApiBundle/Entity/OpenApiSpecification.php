@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -30,7 +31,8 @@ use Oro\Bundle\UserBundle\Entity\User;
             'group_name' => '',
             'category' => '',
             'permissions' => 'VIEW;CREATE;EDIT;DELETE'
-        ]
+        ],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class OpenApiSpecification
@@ -43,50 +45,65 @@ class OpenApiSpecification
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'status', type: Types::STRING, length: 8)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $status = null;
 
     #[ORM\Column(name: 'published', type: Types::BOOLEAN)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private bool $published = false;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?User $owner = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?Organization $organization = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $name = null;
 
     #[ORM\Column(name: 'public_slug', type: Types::STRING, length: 100, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $publicSlug = null;
 
     #[ORM\Column(name: 'view', type: Types::STRING, length: 100)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $view = null;
 
     #[ORM\Column(name: 'format', type: Types::STRING, length: 20)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $format = null;
 
     #[ORM\Column(name: 'entities', type: Types::SIMPLE_ARRAY, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?array $entities = null;
 
     #[ORM\Column(name: 'server_urls', type: Types::SIMPLE_ARRAY, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?array $serverUrls = null;
 
     #[ORM\Column(name: 'specification', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?string $specification = null;
 
     #[ORM\Column(name: 'specification_created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     private ?\DateTimeInterface $specificationCreatedAt = null;
 
     /**

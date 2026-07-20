@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -32,7 +33,8 @@ use Oro\Component\Config\Common\ConfigObject;
         ],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
         'activity' => ['immutable' => true],
-        'attachment' => ['immutable' => true]
+        'attachment' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Channel implements OrganizationAwareInterface
@@ -49,15 +51,19 @@ class Channel implements OrganizationAwareInterface
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $name = null;
 
     #[ORM\Column(name: 'type', type: Types::STRING, length: 255)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $type = null;
 
     #[ORM\OneToOne(inversedBy: 'channel', targetEntity: Transport::class, cascade: ['all'], orphanRemoval: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Transport $transport = null;
 
     /**
@@ -79,6 +85,7 @@ class Channel implements OrganizationAwareInterface
     protected $mappingSettings;
 
     #[ORM\Column(name: 'enabled', type: Types::BOOLEAN, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?bool $enabled = null;
 
     /**
@@ -89,10 +96,12 @@ class Channel implements OrganizationAwareInterface
      * @var boolean
      */
     #[ORM\Column(name: 'previously_enabled', type: Types::BOOLEAN, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?bool $previouslyEnabled = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'default_user_owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?User $defaultUserOwner = null;
 
     #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
@@ -102,10 +111,12 @@ class Channel implements OrganizationAwareInterface
         nullable: true,
         onDelete: 'SET NULL'
     )]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?BusinessUnit $defaultBusinessUnitOwner = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     /**
@@ -128,6 +139,7 @@ class Channel implements OrganizationAwareInterface
         nullable: false,
         options: ['default' => Channel::EDIT_MODE_ALLOW]
     )]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected int $editMode;
 
     public function __construct()

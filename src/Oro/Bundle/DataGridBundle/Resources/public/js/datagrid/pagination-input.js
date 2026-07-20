@@ -67,6 +67,7 @@ const PaginationInput = Pagination.extend({
         }
 
         if (state.currentPage !== pageIndex) {
+            this.scrollToSavedPosition();
             collection.getPage(pageIndex);
         }
     },

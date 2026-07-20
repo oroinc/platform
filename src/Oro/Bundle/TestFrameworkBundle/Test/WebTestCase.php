@@ -163,6 +163,7 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$referenceRepository = null;
 
             self::rollbackTransaction();
+            self::clearConfigCache();
             self::resetClient();
         }
     }
@@ -177,7 +178,27 @@ abstract class WebTestCase extends BaseWebTestCase
         self::$referenceRepository = null;
 
         self::rollbackTransaction();
+        self::clearConfigCache();
         self::resetClient();
+    }
+
+    /**
+     * Clears the system configuration cache.
+     *
+     * ConfigManager::flush() repopulates the persistent config cache with data written inside
+     * the test transaction. The cache outlives both the transaction rollback and the kernel
+     * shutdown, so without this cleanup it diverges from the database and leaks configuration
+     * state (including "use parent scope value" flags) into subsequent tests.
+     */
+    private static function clearConfigCache(): void
+    {
+        if (!self::$kernel) {
+            return;
+        }
+
+        $container = self::$kernel->getContainer()->get('test.service_container');
+        $container->get('oro_config.cache')->clear();
+        $container->get('oro_config.manager.memory_cache')->deleteAll();
     }
 
     #[\Override]

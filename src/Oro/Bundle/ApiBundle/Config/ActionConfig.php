@@ -670,8 +670,8 @@ class ActionConfig
      * Gets the default page size.
      *
      * @return int|null A positive number
-     *                  NULL if the default page size should be set be a processor
-     *                  -1 if the pagination should be disabled
+     *                  NULL if the default page size should be set by a processor
+     *                  -1 if the pagination is disabled
      */
     public function getPageSize(): ?int
     {
@@ -680,7 +680,7 @@ class ActionConfig
 
     /**
      * Sets the default page size.
-     * Set NULL if the default page size should be set be a processor.
+     * Set NULL if the default page size should be set by a processor.
      * Set -1 if the pagination should be disabled.
      * Set a positive number to set own page size that should be used as a default one.
      *

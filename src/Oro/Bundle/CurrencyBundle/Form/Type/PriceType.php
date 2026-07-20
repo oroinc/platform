@@ -69,7 +69,8 @@ class PriceType extends AbstractType
                     'attr' => [
                         'readonly' => $options['readonly'],
                         'data-match-price-on-null' =>  $options['match_price_on_null'] ? 1 : 0
-                    ]
+                    ],
+                    'invalid_message' => 'oro.currency.price.value.invalid',
                 ]
             )
             ->add('currency', $currencyType, $currencyOptions);

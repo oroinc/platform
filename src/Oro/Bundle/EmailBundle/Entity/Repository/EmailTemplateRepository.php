@@ -6,6 +6,8 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorInterface;
+use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -14,8 +16,10 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  * Provides methods for querying email templates related information such as getting localized email template or
  * getting system only email templates.
  */
-class EmailTemplateRepository extends EntityRepository
+class EmailTemplateRepository extends EntityRepository implements BatchIteratorInterface
 {
+    use BatchIteratorTrait;
+
     /**
      * Gets a template by its name
      * This method can return null if the requested template does not exist

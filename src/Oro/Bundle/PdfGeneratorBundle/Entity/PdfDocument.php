@@ -36,6 +36,7 @@ use Oro\Bundle\PdfGeneratorBundle\PdfDocument\AbstractPdfDocument;
         ],
         'dataaudit' => ['auditable' => false],
         'security' => ['type' => 'ACL', 'group_name' => ''],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class PdfDocument extends AbstractPdfDocument implements
@@ -53,24 +54,28 @@ class PdfDocument extends AbstractPdfDocument implements
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     /**
      * The universally unique identifier (UUID), e.g. to identify the document in URL.
      */
     #[ORM\Column(name: 'uuid', type: Types::GUID, unique: true, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected string $uuid;
 
     /**
      * The name of the PDF document (e.g., order-0101).
      */
     #[ORM\Column(name: 'pdf_document_name', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected string $pdfDocumentName;
 
     /**
      * The type of the PDF document (e.g., us_standard_invoice).
      */
     #[ORM\Column(name: 'pdf_document_type', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected string $pdfDocumentType;
 
     /**
@@ -86,7 +91,8 @@ class PdfDocument extends AbstractPdfDocument implements
                 'use_dam' => false,
                 'file_applications' => ['default'],
             ],
-        ]
+            'email' => ['available_in_template' => true],
+        ],
     )]
     protected ?File $pdfDocumentFile = null;
 
@@ -94,12 +100,14 @@ class PdfDocument extends AbstractPdfDocument implements
      * The class name of the entity associated with the PDF document.
      */
     #[ORM\Column(name: 'source_entity_class', type: Types::STRING, length: 255, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $sourceEntityClass = null;
 
     /**
      * The ID of the entity associated with the PDF document.
      */
     #[ORM\Column(name: 'source_entity_id', type: Types::INTEGER, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $sourceEntityId = null;
 
     /**
@@ -112,18 +120,21 @@ class PdfDocument extends AbstractPdfDocument implements
      * PDF options preset name (e.g., default, default_a4, etc.).
      */
     #[ORM\Column(name: 'pdf_options_preset', type: Types::STRING, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected string $pdfOptionsPreset;
 
     /**
      * The PDF document state (e.g., new, resolved, failed, etc.).
      */
     #[ORM\Column(name: 'pdf_document_state', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected string $pdfDocumentState;
 
     /**
      * The PDF document generation mode, {@see PdfDocumentGenerationMode}.
      */
     #[ORM\Column(name: 'pdf_document_generation_mode', type: Types::STRING, length: 255, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected string $pdfDocumentGenerationMode;
 
     public function getId(): ?int

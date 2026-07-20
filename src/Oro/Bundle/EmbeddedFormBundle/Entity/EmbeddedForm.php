@@ -27,10 +27,11 @@ use Symfony\Component\Validator\Constraints as Assert;
         'ownership' => [
             'owner_type' => 'ORGANIZATION',
             'owner_field_name' => 'owner',
-            'owner_column_name' => 'owner_id'
+            'owner_column_name' => 'owner_id',
         ],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
-        'activity' => ['immutable' => true]
+        'activity' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class EmbeddedForm implements ExtendEntityInterface
@@ -39,36 +40,49 @@ class EmbeddedForm implements ExtendEntityInterface
 
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::STRING)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $id = null;
 
     #[ORM\Column(name: 'title', type: Types::TEXT)]
     #[Assert\NotBlank]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $title = null;
 
     #[ORM\Column(name: 'css', type: Types::TEXT)]
     #[Assert\NotBlank]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $css = null;
 
     #[ORM\Column(name: 'form_type', type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $formType = null;
 
     #[ORM\Column(name: 'success_message', type: Types::TEXT)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $successMessage = null;
 
     #[ORM\Column(name: 'allowed_domains', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $allowedDomains = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Organization $owner = null;
 
     /**

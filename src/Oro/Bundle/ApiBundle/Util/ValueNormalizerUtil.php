@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 /**
  * Provides a set of static methods that can be used to simplify converting
- * an entity class name to API entity type and vise versa.
+ * an entity class name to API entity type and vice versa.
  * In additional this class can be used to transform any class, usually an exception
  * or a validation constraint, to a human-readable representation.
  */

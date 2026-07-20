@@ -21,7 +21,10 @@ abstract class AbstractTypedAddress extends AbstractAddress implements PrimaryIt
     protected ?Collection $types = null;
 
     #[ORM\Column(name: 'is_primary', type: Types::BOOLEAN, nullable: true)]
-    #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['excluded' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?bool $primary = null;
 
     public function __construct()

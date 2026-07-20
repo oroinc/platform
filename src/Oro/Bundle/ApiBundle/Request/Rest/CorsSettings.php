@@ -56,11 +56,26 @@ final class CorsSettings
     }
 
     /**
+     * Adds extra origins to the list of origins that are allowed to send CORS requests.
+     *
+     * @param string[] $origins
+     */
+    public function addAllowedOrigins(array $origins): void
+    {
+        $this->allowedOrigins = array_values(array_unique(array_merge($this->allowedOrigins, $origins)));
+    }
+
+    /**
      * Indicates whether CORS request can include user credentials.
      */
     public function isCredentialsAllowed(): bool
     {
         return $this->isCredentialsAllowed;
+    }
+
+    public function enableCredentials(): void
+    {
+        $this->isCredentialsAllowed = true;
     }
 
     /**

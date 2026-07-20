@@ -78,12 +78,13 @@ class EmailProcessor implements ProcessorInterface
 
     private function getUpdateSqlValue(string $quotedColumnName, ClassMetadata $metadata): string
     {
-        // Use MD5 hash of email (first 8 chars) for composite keys, ID for integer keys
+        // Use MD5 hash of email (first 8 chars) for composite keys, ID column for integer keys
         $emailBoxSuffixExpr = sprintf('SUBSTRING(MD5(%s), 1, 8)', $quotedColumnName);
         try {
-            $idFieldType = $this->helper->getFieldType($metadata->getSingleIdentifierFieldName(), $metadata);
+            $idFieldName = $metadata->getSingleIdentifierFieldName();
+            $idFieldType = $this->helper->getFieldType($idFieldName, $metadata);
             if (in_array($idFieldType, ['integer', 'bigint', 'smallint'], true)) {
-                $emailBoxSuffixExpr = $metadata->getSingleIdentifierFieldName();
+                $emailBoxSuffixExpr = $this->helper->getQuotedColumnName($idFieldName, $metadata);
             }
         } catch (\Exception $e) {
             // Composite or missing key - use MD5

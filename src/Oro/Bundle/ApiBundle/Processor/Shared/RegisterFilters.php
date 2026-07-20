@@ -48,6 +48,9 @@ abstract class RegisterFilters implements ProcessorInterface
         } elseif ($filterType !== $dataType) {
             $filterOptions[FilterFactoryInterface::DATA_TYPE_OPTION] = $dataType;
         }
+        if (null === $filterType) {
+            return null;
+        }
         $filter = $this->filterFactory->createFilter($filterType, $filterOptions);
         if (null !== $filter) {
             $this->initializeFilterOptions($filter, $filterConfig);

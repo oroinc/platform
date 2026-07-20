@@ -32,11 +32,12 @@ use Oro\Bundle\UserBundle\Entity\Repository\GroupRepository;
             'owner_field_name' => 'owner',
             'owner_column_name' => 'business_unit_owner_id',
             'organization_field_name' => 'organization',
-            'organization_column_name' => 'organization_id'
+            'organization_column_name' => 'organization_id',
         ],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
         'activity' => ['immutable' => true],
-        'attachment' => ['immutable' => true]
+        'attachment' => ['immutable' => true],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Group implements ExtendEntityInterface
@@ -46,10 +47,14 @@ class Group implements ExtendEntityInterface
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 30, nullable: false)]
-    #[ConfigField(defaultValues: ['importexport' => ['identity' => true]])]
+    #[ConfigField(defaultValues: [
+        'importexport' => ['identity' => true],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?string $name = null;
 
     /**
@@ -59,15 +64,17 @@ class Group implements ExtendEntityInterface
     #[ORM\JoinTable(name: 'oro_user_access_group_role')]
     #[ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $roles = null;
 
     #[ORM\ManyToOne(targetEntity: BusinessUnit::class)]
     #[ORM\JoinColumn(name: 'business_unit_owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?BusinessUnit $owner = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[ConfigField(defaultValues: ['importexport' => ['short' => true]])]
+    #[ConfigField(defaultValues: ['importexport' => ['short' => true], 'email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     /**
@@ -75,7 +82,7 @@ class Group implements ExtendEntityInterface
      */
     public function __construct($name = '')
     {
-        $this->name  = $name;
+        $this->name = $name;
         $this->roles = new ArrayCollection();
     }
 
@@ -96,7 +103,7 @@ class Group implements ExtendEntityInterface
     }
 
     /**
-     * @param  string $name
+     * @param string $name
      * @return Group
      */
     public function setName($name)
@@ -128,7 +135,7 @@ class Group implements ExtendEntityInterface
 
     /**
      * Get role by string
-     * @param  string $roleName Role name
+     * @param string $roleName Role name
      * @return Role|null
      */
     public function getRole($roleName)
@@ -144,7 +151,7 @@ class Group implements ExtendEntityInterface
     }
 
     /**
-     * @param  Role|string $role
+     * @param Role|string $role
      * @return boolean
      * @throws \InvalidArgumentException
      */
@@ -165,7 +172,7 @@ class Group implements ExtendEntityInterface
 
     /**
      * Adds a Role to the Collection
-     * @param  Role $role
+     * @param Role $role
      * @return Group
      */
     public function addRole(Role $role)
@@ -179,7 +186,7 @@ class Group implements ExtendEntityInterface
 
     /**
      * Remove the Role object from collection
-     * @param  Role|string $role
+     * @param Role|string $role
      * @return Group
      * @throws \InvalidArgumentException
      */
@@ -203,7 +210,7 @@ class Group implements ExtendEntityInterface
 
     /**
      * Set new Roles collection
-     * @param  array|Collection $roles
+     * @param array|Collection $roles
      * @return Group
      * @throws \InvalidArgumentException
      */
@@ -249,7 +256,7 @@ class Group implements ExtendEntityInterface
     #[\Override]
     public function __toString()
     {
-        return (string) $this->name;
+        return (string)$this->name;
     }
 
     /**

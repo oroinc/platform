@@ -14,6 +14,7 @@ default: &default
                                 chromeOptions:
                                     args:
                                         - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 first_session:
                     oroSelenium2:
@@ -23,6 +24,7 @@ default: &default
                                 chromeOptions:
                                     args:
                                         - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 system_session:
                     oroSelenium2:
@@ -32,6 +34,7 @@ default: &default
                                 chromeOptions:
                                     args:
                                         - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 375_session:
                     oroSelenium2:
@@ -41,6 +44,7 @@ default: &default
                                 chromeOptions:
                                     args:
                                         - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 640_session:
                     oroSelenium2:
@@ -50,6 +54,7 @@ default: &default
                                 chromeOptions:
                                     args:
                                         - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 mobile_session:
                     oroSelenium2:
@@ -59,6 +64,7 @@ default: &default
                                 chromeOptions:
                                     args:
                                         - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                                     mobileEmulation:
                                         deviceName: "iPhone 12 Pro"
@@ -104,13 +110,13 @@ chromedriver:
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
                                         - "--disable-gpu"
-                                        - "--guest"
                                         - "--headless"
                                         - "--window-size=1920,1080"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 first_session:
                     oroSelenium2:
@@ -124,13 +130,13 @@ chromedriver:
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
                                         - "--disable-gpu"
-                                        - "--guest"
                                         - "--headless"
                                         - "--window-size=1920,1080"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 system_session:
                     oroSelenium2:
@@ -144,13 +150,13 @@ chromedriver:
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
                                         - "--disable-gpu"
-                                        - "--guest"
                                         - "--headless"
                                         - "--window-size=1920,1080"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                 375_session:
                     oroSelenium2:
@@ -164,13 +170,13 @@ chromedriver:
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
                                         - "--disable-gpu"
-                                        - "--guest"
                                         - "--headless"
                                         - "--window-size=375,640"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
 
                 640_session:
@@ -185,13 +191,13 @@ chromedriver:
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
                                         - "--disable-gpu"
-                                        - "--guest"
                                         - "--headless"
                                         - "--window-size=640,1100"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
 
                 mobile_session:
@@ -206,12 +212,12 @@ chromedriver:
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
                                         - "--disable-gpu"
-                                        - "--guest"
                                         - "--headless"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
                                         - "--disable-extensions"
                                         - "--disable-dev-shm-usage"
+                                        - "--ignore-certificate-errors"
                                         - "--guest"
                                     mobileEmulation:
                                         deviceName: "iPhone 12 Pro"

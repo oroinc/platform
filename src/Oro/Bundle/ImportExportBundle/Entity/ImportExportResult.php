@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\ImportExportBundle\Entity\Repository\ImportExportResultRepository;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
@@ -29,7 +30,8 @@ use Oro\Bundle\UserBundle\Entity\User;
             'organization_field_name' => 'organization',
             'organization_column_name' => 'organization_id'
         ],
-        'security' => ['type' => 'ACL']
+        'security' => ['type' => 'ACL'],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareInterface
@@ -40,22 +42,28 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: Types::INTEGER)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?User $owner = null;
 
     #[ORM\Column(name: 'filename', type: Types::STRING, length: 255, unique: true, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $filename = null;
 
     #[ORM\Column(name: 'job_id', type: Types::INTEGER, unique: true, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $jobId = null;
 
     #[ORM\Column(name: 'type', type: Types::STRING, length: 255, unique: false, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $type = null;
 
     #[ORM\Column(name: 'entity', type: Types::STRING, length: 255, unique: false, nullable: false)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $entity = null;
 
     /**
@@ -65,6 +73,7 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
     protected $options = [];
 
     #[ORM\Column(name: 'expired', type: Types::BOOLEAN, options: ['default' => false])]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?bool $expired = false;
 
     public function getId(): ?int

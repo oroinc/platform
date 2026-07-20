@@ -72,7 +72,7 @@ Feature: Send email form
       | Subject       | Test Template Subject              |
       | Content       | Test {{ entity.nonExisting }} Body |
     When I save and close form
-    Then I should see "Template saved" flash message
+    Then I should see only "The template in Content field (English (United States)) accesses a disallowed property \"nonExisting\" on \"entity\" variable." error message
 
   Scenario: Check if email templates can be used
     Given I click My Emails in user menu
@@ -81,11 +81,6 @@ Feature: Send email form
       | Body           | This is test mail with template error |
       | To             | Charlie Sheen                         |
       | Subject        | Behat test                            |
-    When I select "test_error_template_entity" from "Apply template"
-    And I click "Yes, Proceed"
-    Then "Email Form" must contains values:
-      | Subject | Test Template Subject |
-      | Body    | Test N/A Body         |
     When I select "test_error_template_no_entity" from "Apply template"
     And I click "Yes, Proceed"
     Then I should see "This email template can't be used"

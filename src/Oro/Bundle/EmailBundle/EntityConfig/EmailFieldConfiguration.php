@@ -22,7 +22,7 @@ class EmailFieldConfiguration implements FieldConfigInterface
         $nodeBuilder
             ->node('available_in_template', 'normalized_boolean')
                 ->info('`boolean` if set to true, the field can be used in email templates.')
-                ->defaultTrue()
+                ->defaultFalse()
             ->end()
             ->node('immutable', 'normalized_boolean')
                 ->info('`boolean` this attribute can be used to prohibit changing the email state (no matter ' .

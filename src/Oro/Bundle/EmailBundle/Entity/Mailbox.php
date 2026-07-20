@@ -36,7 +36,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             'owner_type' => 'ORGANIZATION',
             'owner_field_name' => 'organization',
             'owner_column_name' => 'organization_id'
-        ]
+        ],
+        'email' => ['available_in_template' => true],
     ]
 )]
 class Mailbox implements EmailOwnerInterface, EmailHolderInterface
@@ -44,12 +45,15 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?int $id = null;
 
     #[ORM\Column(name: 'email', type: Types::STRING, unique: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $email = null;
 
     #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?string $label = null;
 
     #[ORM\OneToOne(
@@ -59,20 +63,24 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         orphanRemoval: true
     )]
     #[ORM\JoinColumn(name: 'process_settings_id', referencedColumnName: 'id', nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?MailboxProcessSettings $processSettings = null;
 
     #[ORM\OneToOne(inversedBy: 'mailbox', targetEntity: EmailOrigin::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'origin_id', referencedColumnName: 'id', nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?EmailOrigin $origin = null;
 
     /**
      * @var Collection<int, EmailUser>
      */
     #[ORM\OneToMany(mappedBy: 'mailboxOwner', targetEntity: EmailUser::class)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $emailUsers = null;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?OrganizationInterface $organization = null;
 
     /**
@@ -84,6 +92,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     #[ORM\JoinTable(name: 'oro_email_mailbox_users')]
     #[ORM\JoinColumn(name: 'mailbox_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $authorizedUsers = null;
 
     /**
@@ -95,6 +104,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     #[ORM\JoinTable(name: 'oro_email_mailbox_roles')]
     #[ORM\JoinColumn(name: 'mailbox_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => true]])]
     protected ?Collection $authorizedRoles = null;
 
     /**
@@ -104,11 +114,17 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected ?Collection $autoResponseRules = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.created_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.created_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[ConfigField(defaultValues: ['entity' => ['label' => 'oro.ui.updated_at']])]
+    #[ConfigField(defaultValues: [
+        'entity' => ['label' => 'oro.ui.updated_at'],
+        'email' => ['available_in_template' => true],
+    ])]
     protected ?\DateTimeInterface $updatedAt = null;
 
     /**

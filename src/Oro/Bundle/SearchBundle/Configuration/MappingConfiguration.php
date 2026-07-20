@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\SearchBundle\Configuration;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
@@ -15,25 +17,23 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class MappingConfiguration implements ConfigurationInterface
 {
-    public const ROOT_NODE = 'search';
+    public const string ROOT_NODE = 'search';
 
-    private const RELATION_FIELDS_NODE_MAX_LEVEL = 4;
+    private const int RELATION_FIELDS_NODE_MAX_LEVEL = 4;
 
-    /** @var array */
-    protected $targetTypes = array(
+    protected array $targetTypes = [
         Query::TYPE_TEXT,
         Query::TYPE_DECIMAL,
         Query::TYPE_INTEGER,
         Query::TYPE_DATETIME
-    );
+    ];
 
-    /** @var array */
-    protected $relationTypes = array(
+    protected array $relationTypes = [
         Indexer::RELATION_ONE_TO_ONE,
         Indexer::RELATION_ONE_TO_MANY,
         Indexer::RELATION_MANY_TO_ONE,
         Indexer::RELATION_MANY_TO_MANY
-    );
+    ];
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
@@ -51,6 +51,10 @@ class MappingConfiguration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('label')
                     ->defaultNull()
+                ->end()
+                ->booleanNode('synonyms_enabled')
+                    ->defaultFalse()
+                    ->info('Enables search synonyms support for the entity index (back-office Elasticsearch engine)')
                 ->end()
                 ->arrayNode('route')
                     ->children()
@@ -98,11 +102,7 @@ class MappingConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param int $level
-     * @return ArrayNodeDefinition
-     */
-    protected function getRelationFieldsNodeDefinition($level = 1)
+    protected function getRelationFieldsNodeDefinition(int $level = 1): ArrayNodeDefinition
     {
         $nodeBuilder = new NodeBuilder();
         $relationFieldsNode = $nodeBuilder->arrayNode('relation_fields');
@@ -138,10 +138,7 @@ class MappingConfiguration implements ConfigurationInterface
         return $relationFieldsNode;
     }
 
-    /**
-     * @return ArrayNodeDefinition
-     */
-    protected function addTargetFieldsNode()
+    protected function addTargetFieldsNode(): ArrayNodeDefinition
     {
         $nodeBuilder = new NodeBuilder();
 

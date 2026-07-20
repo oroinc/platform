@@ -127,6 +127,7 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface, Actio
      * Serialized data of WorkflowItem
      */
     #[ORM\Column(name: 'data', type: Types::TEXT, nullable: true)]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?string $serializedData = null;
 
     /**
