@@ -1,5 +1,4 @@
 @ticket-BAP-19774
-@regression
 
 Feature: Entity field integer
   As an administrator, I want to add fields of type 'smallint', 'int', 'bigint', make sure that validation and

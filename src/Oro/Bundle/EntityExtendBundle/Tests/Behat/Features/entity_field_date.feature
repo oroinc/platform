@@ -1,5 +1,4 @@
 @ticket-BAP-20723
-@regression
 
 Feature: Entity field Date
   In order to have custom Date fields for an entity

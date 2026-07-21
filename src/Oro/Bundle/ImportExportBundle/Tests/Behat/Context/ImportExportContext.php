@@ -709,7 +709,11 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
             $this->absoluteUrl = $this->getAppContainer()->get('oro_config.manager')->get('oro_ui.application_url');
         }
 
-        return sprintf('%s/%s', $this->absoluteUrl, ltrim($path, '/'));
+        return sprintf(
+            '%s/%s',
+            rtrim($this->absoluteUrl, '/'),
+            ltrim($path, '/')
+        );
     }
 
     private function getAbsolutePath(string $path): string

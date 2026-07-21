@@ -86,11 +86,11 @@ trait MessageQueueConsumerTestTrait
 
             // Unbinds queue so consumption can start more than 1 time.
             \Closure::bind(static function (QueueConsumer $queueConsumer) {
-                unset($queueConsumer->boundMessageProcessors['oro.default']);
+                unset($queueConsumer->boundQueues['oro.default']);
             }, null, QueueConsumer::class)($queueConsumer);
 
             $queueConsumer
-                ->bind('oro.default')
+                ->bindQueue('oro.default')
                 ->consume(
                     new ChainExtension([
                         new LoggerExtension(self::getLogger()),

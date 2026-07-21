@@ -26,7 +26,7 @@ class DefaultEmailUserOwnerListener
             return;
         }
 
-        if ($entity->getOwner() && $entity->getOrganization()) {
+        if (($entity->getOwner() || $entity->getMailboxOwner()) && $entity->getOrganization()) {
             return;
         }
 

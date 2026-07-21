@@ -32,7 +32,7 @@ interface FilterValueAccessorInterface extends QueryStringAccessorInterface
      *
      * @param string $group
      *
-     * @return array [filter key => [FilterValue, ...], ...]
+     * @return array<string, array<int, FilterValue>> [filter key => [FilterValue, ...], ...]
      */
     public function getGroup(string $group): array;
 
@@ -49,7 +49,7 @@ interface FilterValueAccessorInterface extends QueryStringAccessorInterface
     /**
      * Gets all filter values.
      *
-     * @return array [filter key => [FilterValue, ...], ...]
+     * @return array<string, array<int, FilterValue>> [filter key => [FilterValue, ...], ...]
      */
     public function getAll(): array;
 

@@ -18,9 +18,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Processes messages from the message-queue.
+ * Processes messages from the specified client-level queue(s), e.g. "default".
  */
-#[AsCommand(name: 'oro:message-queue:consume')]
+#[AsCommand(
+    name: 'oro:message-queue:consume',
+    description: 'Processes messages from the specified client-level queue(s), e.g. "default".'
+)]
 class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
 {
     private ConsumerState $consumerState;
@@ -34,7 +37,10 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
         LoggerInterface $logger,
         JobManager $jobManager
     ) {
-        parent::__construct($queueConsumer, $destinationMetaRegistry);
+        parent::__construct(
+            $queueConsumer,
+            $destinationMetaRegistry,
+        );
 
         $this->consumerState = $consumerState;
         $this->logger = $logger;

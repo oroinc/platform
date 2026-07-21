@@ -43,7 +43,7 @@ class OroUserBundleInstaller implements
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v7_0_3_0';
+        return 'v7_0_3_1';
     }
 
     #[\Override]
@@ -160,7 +160,9 @@ class OroUserBundleInstaller implements
         $table->addColumn('external_id', 'string', ['length' => 36, 'notnull' => false, OroOptions::KEY => [
             ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
             'extend' => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
-            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_HIDDEN],
+            'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+            'form' => ['is_enabled' => false],
+            'view' => ['is_displayable' => false],
             'importexport' => ['excluded' => true],
             'dataaudit' => ['auditable' => true]
         ]]);

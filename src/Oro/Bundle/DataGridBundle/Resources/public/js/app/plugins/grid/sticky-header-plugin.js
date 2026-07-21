@@ -223,7 +223,11 @@ const StickyHeaderPlugin = BasePlugin.extend({
      * @param {Element} cell
      */
     syncCellSize(cell) {
-        const {width} = cell.getBoundingClientRect();
+        // getBoundingClientRect returns a fractional border-box width, and how that fraction is resolved back to
+        // device pixels is left to the layout engine — different engines round it differently, so re-pinning the
+        // raw value is not idempotent: each ResizeObserver round-trip can measure a bit more and the cell keep
+        // drifting wider. Rounding to a whole pixel drops the fraction and keeps the sync stable across engines.
+        const width = Math.round(cell.getBoundingClientRect().width);
         const item = this.domCache.headerCells.item(cell.cellIndex);
 
         Object.assign(item.style, {
