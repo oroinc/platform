@@ -276,7 +276,7 @@ class ImportExportController extends AbstractController
      * Called by importValidateExportTemplateFormAction with forward
      *
      * @Route("/import/process/{processorAlias}", name="oro_importexport_import_process", methods={"POST"})
-     * @AclAncestor("oro_importexport_export")
+     * @AclAncestor("oro_importexport_import")
      * @CsrfProtection()
      *
      * @param string $processorAlias
