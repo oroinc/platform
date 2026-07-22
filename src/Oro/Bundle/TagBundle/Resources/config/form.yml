@@ -73,7 +73,7 @@ services:
         class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
         public: true
         arguments:
-            - '@oro_tag.form.type.tag.api'
+            - '@oro_tag.form.tag.api'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
