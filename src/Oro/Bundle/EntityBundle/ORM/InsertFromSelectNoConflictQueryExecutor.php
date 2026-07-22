@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 /**
  * Compiles and executes "insert from select ... on conflict(field) do nothing" query
  */
-class InsertFromSelectNoConflictQueryExecutor implements InsertQueryExecutorInterface
+class InsertFromSelectNoConflictQueryExecutor implements InsertNoConflictQueryExecutorInterface
 {
     private array $onConflictIgnoredFields = [];
 
