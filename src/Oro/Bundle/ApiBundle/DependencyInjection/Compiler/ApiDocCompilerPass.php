@@ -21,6 +21,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
 {
     use ApiTaggedServiceTrait;
 
+    private const API_DOC_CONTROLLER_SERVICE = 'Nelmio\ApiDocBundle\Controller\ApiDocController';
     private const API_DOC_EXTRACTOR_SERVICE = 'nelmio_api_doc.extractor.api_doc_extractor';
     private const API_DOC_REQUEST_TYPE_PROVIDER_SERVICE = 'oro_api.rest.request_type_provider';
     private const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE = 'oro_api.rest.chain_routing_options_resolver';
@@ -216,6 +217,9 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $container->removeDefinition(self::COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE);
         $container->setDefinition(self::API_DOC_HTML_FORMATTER_SERVICE, $compositeHtmlFormatterDef);
         $compositeHtmlFormatterDef->setPublic($isPublicService);
+
+        // remove the unused ApiDocController definition; its route is overridden by RestApiDocController
+        $container->removeDefinition(self::API_DOC_CONTROLLER_SERVICE);
 
         // configure formatters according to views config
         $htmlFormatters = [];
