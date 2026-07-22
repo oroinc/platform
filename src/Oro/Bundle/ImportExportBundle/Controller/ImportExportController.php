@@ -277,7 +277,7 @@ class ImportExportController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/import/process/{processorAlias}', name: 'oro_importexport_import_process', methods: ['POST'])]
-    #[AclAncestor('oro_importexport_export')]
+    #[AclAncestor('oro_importexport_import')]
     #[CsrfProtection()]
     public function importProcessAction(Request $request, $processorAlias)
     {
