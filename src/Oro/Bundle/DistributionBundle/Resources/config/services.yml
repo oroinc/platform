@@ -1,6 +1,4 @@
 parameters:
-    oro_distribution.composer_json: '%kernel.project_dir%/composer.json'
-
     # Makes the service container compile into multiple small files.
     container.dumper.inline_factories: false
 
@@ -45,29 +43,6 @@ services:
         public: false
         arguments:
             - !tagged_iterator routing.options_resolver
-
-    oro_distribution.composer.io:
-        class: Composer\IO\BufferIO
-        public: false
-        lazy: true
-
-    oro_distribution.composer:
-        class: Composer\Composer
-        factory: ['Composer\Factory', create]
-        arguments: ['@oro_distribution.composer.io', '%oro_distribution.composer_json%']
-        lazy: true
-
-    oro_distribution.composer.installation_manager:
-        class: Composer\Installer\InstallationManager
-        public: true
-        factory: ['@oro_distribution.composer', getInstallationManager]
-        lazy: true
-
-    oro_distribution.composer.json_file:
-        class: Composer\Json\JsonFile
-        public: true
-        arguments:
-          - '%oro_distribution.composer_json%'
 
     oro_distribution.handler.application_status:
         public: true
