@@ -435,6 +435,7 @@ services:
             - '@oro_attachment.provider.resized_image_path'
             - '@oro_attachment.media_cache_manager_registry'
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
+            - '@lock.attachment_media_cache.factory'
 
     oro_attachment.manager.image_resize.webp_aware:
         class: 'Oro\Bundle\AttachmentBundle\Manager\WebpAwareImageResizeManager'

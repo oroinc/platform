@@ -340,4 +340,30 @@ class OroAttachmentExtensionTest extends TestCase
             $container->getExtensionConfig('liip_imagine')
         );
     }
+
+    public function testDefaultMediaCacheLockConfiguration(): void
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroAttachmentExtension();
+        $extension->prepend($container);
+
+        $frameworkConfigs = $container->getExtensionConfig('framework');
+        self::assertEquals(
+            '%env(pgsql_advisory_schema:ORO_DB_DSN)%',
+            $frameworkConfigs[0]['lock']['attachment_media_cache']
+        );
+    }
+
+    public function testMediaCacheLockConfigurationWhenItAlreadyExists(): void
+    {
+        $container = new ContainerBuilder();
+        $container->prependExtensionConfig('framework', ['lock' => ['attachment_media_cache' => 'dsn']]);
+
+        $extension = new OroAttachmentExtension();
+        $extension->prepend($container);
+
+        $frameworkConfigs = $container->getExtensionConfig('framework');
+        self::assertEquals('dsn', $frameworkConfigs[0]['lock']['attachment_media_cache']);
+    }
 }
