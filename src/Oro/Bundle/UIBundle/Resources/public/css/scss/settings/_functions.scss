@@ -109,7 +109,7 @@
     );
     @return the value with a merged breakpoints;
     $breakpoints: (
-        'desktop''(min-width: 1200px)',
+        'desktop': '(min-width: 1200px)',
         'mobile': '(max-width: 640px)'
     );
     Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
