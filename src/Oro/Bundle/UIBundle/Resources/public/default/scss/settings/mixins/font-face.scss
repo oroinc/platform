@@ -113,7 +113,7 @@
 
     // List with section keys
     // ('main', 'secondary', 'icon')
-    $font-names: map_keys($fonts);
+    $font-names: map.keys($fonts);
 
     @if (list.length($fonts) >= 1) {
         @each $font in $fonts {

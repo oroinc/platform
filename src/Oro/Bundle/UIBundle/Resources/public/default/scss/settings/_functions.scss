@@ -22,7 +22,7 @@
 }
 
 /** @return the value from a $color-palette map associated with a given key and with css var;
-    Use: color: get-var-color('primary', 'base') => color: var(--primary-base, #000);
+    Use: color: get-var-color('primary', 'main') => color: var(--primary-main, #000);
 */
 
 @function get-var-color($palette, $keys...) {
@@ -167,7 +167,7 @@
     );
     @return the value with a merged breakpoints;
     $breakpoints: (
-        'desktop''(min-width: 1200px)',
+        'desktop': '(min-width: 1200px)',
         'mobile': '(max-width: 640px)'
     );
     Use: merge-breakpoints($old-breakpoints, $new-breakpoints);

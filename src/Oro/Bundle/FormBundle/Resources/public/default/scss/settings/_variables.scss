@@ -32,8 +32,8 @@ $base-ui-element-bg-color-error-state: get-var-color('destructive', 'light') !de
 $base-ui-element-border-color-error-state: get-var-color('destructive', 'main') !default;
 
 $base-ui-element-bg-color-disabled-state: get-var-color('neutral', 'grey1') !default;
-$base-ui-element-border-color-disabled-state: get-var-color('neutral', 'grea2') !default;
-$base-ui-element-color-disabled-state: get-var-color('text', 'disable') !default;
+$base-ui-element-border-color-disabled-state: get-var-color('neutral', 'grey2') !default;
+$base-ui-element-color-disabled-state: get-var-color('text', 'disabled') !default;
 
 $base-ui-popup-border-radius: $base-ui-element-border-radius !default;
 

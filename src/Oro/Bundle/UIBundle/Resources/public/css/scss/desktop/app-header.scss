@@ -2,6 +2,8 @@
 
 /* stylelint-disable no-descending-specificity */
 
+@use 'sass:math';
+
 .app-logo {
     display: inline-block;
     text-indent: -9999px;
@@ -30,7 +32,7 @@
     }
 
     &__container-panel {
-        padding: $content-padding / 2 $content-padding;
+        padding: math.div($content-padding, 2) $content-padding;
         display: grid;
         grid-template-areas: 'start center end';
         grid-template-columns: auto auto 1fr;
