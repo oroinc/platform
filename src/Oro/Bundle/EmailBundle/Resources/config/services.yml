@@ -1617,6 +1617,8 @@ services:
         arguments:
             - '@oro_email.twig.email_environment'
             - '@oro_email.twig.analyzer.template_access_analyzer'
+        calls:
+            - [setTemplateRenderer, ['@oro_email.email_renderer']]
 
     oro_email.twig.security_policy.email_template_checker:
         class: Oro\Bundle\EmailBundle\Twig\SecurityPolicy\EmailTemplateSecurityPolicyChecker

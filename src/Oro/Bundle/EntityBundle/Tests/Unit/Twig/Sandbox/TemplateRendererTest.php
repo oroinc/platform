@@ -133,6 +133,64 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $this->securityPolicy->checkMethodAllowed($entity, '__toString');
     }
 
+    public function testCreateTemplateConfiguresSandboxBeforeCompiling()
+    {
+        $entityClass = TestSubEntity1::class;
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties'         => [$entityClass => ['field2']],
+                'methods'            => [$entityClass => ['getField1']],
+                'accessors'          => [$entityClass => ['field1' => 'getField1', 'field2' => null]],
+                'default_formatters' => []
+            ]);
+
+        $template = '{{ foo }}';
+        $templateStub = new TestTemplateStub($this->environment, '', $template);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->with($template)
+            ->willReturn($templateWrapper);
+
+        $result = $this->renderer->createTemplate($template);
+
+        self::assertSame($templateWrapper, $result);
+    }
+
+    public function testCreateTemplateConfiguresSandboxOnlyOnceAcrossSubsequentRenderTemplateCall()
+    {
+        $this->configProvider->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties'         => [],
+                'methods'            => [],
+                'accessors'          => [],
+                'default_formatters' => []
+            ]);
+        $this->configProvider->expects(self::once())
+            ->method('getSystemVariableValues')
+            ->willReturn([]);
+
+        $checkTemplate = '{{ bar }}';
+        $checkTemplateStub = new TestTemplateStub($this->environment, '', $checkTemplate);
+        $checkTemplateWrapper = new TemplateWrapper($this->environment, $checkTemplateStub);
+
+        $renderTemplateSource = 'baz';
+        $renderTemplateStub = new TestTemplateStub($this->environment, '', $renderTemplateSource);
+        $renderTemplateWrapper = new TemplateWrapper($this->environment, $renderTemplateStub);
+
+        $this->environment->expects(self::exactly(2))
+            ->method('createTemplate')
+            ->willReturnOnConsecutiveCalls($checkTemplateWrapper, $renderTemplateWrapper);
+
+        $this->renderer->createTemplate($checkTemplate);
+        $result = $this->renderer->renderTemplate($renderTemplateSource);
+
+        self::assertSame($renderTemplateSource, $result);
+    }
+
     public function testRenderTemplateForVariablesWithFormatters()
     {
         $entity = new TestMainEntity();
