@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -14,6 +17,7 @@ use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\Constraint\Callback;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -45,14 +49,35 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->setConfigManager($this->configManager);
     }
 
-    private function getExpectedHttpOptions(): array
+    /**
+     * The ALLOW_REDIRECTS option carries an on_redirect closure that cannot be compared by value,
+     * so the expected options are matched structurally via a dedicated callback method.
+     */
+    private function getExpectedHttpOptions(): Callback
     {
-        return self::DEFAULT_HTTP_OPTIONS + [
-                RequestOptions::HTTP_ERRORS => false,
-                RequestOptions::ALLOW_REDIRECTS => true,
-                RequestOptions::CONNECT_TIMEOUT => 30,
-                RequestOptions::TIMEOUT => 30,
-            ];
+        return self::callback($this->isExpectedHttpOptions(...));
+    }
+
+    private function isExpectedHttpOptions(array $options): bool
+    {
+        foreach (self::DEFAULT_HTTP_OPTIONS as $key => $value) {
+            if (($options[$key] ?? null) !== $value) {
+                return false;
+            }
+        }
+
+        if (($options[RequestOptions::HTTP_ERRORS] ?? null) !== false
+            || ($options[RequestOptions::CONNECT_TIMEOUT] ?? null) !== 30
+            || ($options[RequestOptions::TIMEOUT] ?? null) !== 30
+        ) {
+            return false;
+        }
+
+        $allowRedirects = $options[RequestOptions::ALLOW_REDIRECTS] ?? null;
+
+        return is_array($allowRedirects)
+            && ($allowRedirects['protocols'] ?? null) === ['http', 'https']
+            && is_callable($allowRedirects['on_redirect'] ?? null);
     }
 
     /**
@@ -259,6 +284,68 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
             new ExternalFile(self::URL, 'image.png'),
             $this->factory->createFromUrl(self::URL)
         );
+    }
+
+    public function testCreateFromUrlBlocksRedirectToDisallowedUrl(): void
+    {
+        $factory = $this->getFactoryWithMockedResponses(
+            [new Response(302, ['Location' => 'http://internal.example.net/secret'])],
+            '^http://example\.org'
+        );
+
+        $this->expectException(ExternalFileNotAccessibleException::class);
+        $this->expectExceptionMessage(
+            'Redirect to a URL that is not allowed by the external file URL configuration.'
+        );
+
+        $factory->createFromUrl('http://example.org/redirect');
+    }
+
+    public function testCreateFromUrlBlocksRedirectWhenNoAllowedUrlsConfigured(): void
+    {
+        $factory = $this->getFactoryWithMockedResponses(
+            [new Response(302, ['Location' => 'http://example.org/final'])],
+            ''
+        );
+
+        $this->expectException(ExternalFileNotAccessibleException::class);
+
+        $factory->createFromUrl('http://example.org/redirect');
+    }
+
+    public function testCreateFromUrlFollowsRedirectToAllowedUrl(): void
+    {
+        $factory = $this->getFactoryWithMockedResponses(
+            [
+                new Response(302, ['Location' => 'http://example.org/final.png']),
+                new Response(200, ['Content-Disposition' => 'inline;filename=image.png']),
+            ],
+            '^http://example\.org'
+        );
+
+        self::assertEquals(
+            new ExternalFile('http://example.org/redirect', 'image.png'),
+            $factory->createFromUrl('http://example.org/redirect')
+        );
+    }
+
+    private function getFactoryWithMockedResponses(array $responses, string $allowedUrlsRegExp): ExternalFileFactory
+    {
+        $client = new Client(['handler' => HandlerStack::create(new MockHandler($responses))]);
+
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects(self::any())
+            ->method('get')
+            ->willReturnCallback(
+                static fn (string $name) => $name === 'oro_attachment.external_file_allowed_urls_regexp'
+                    ? $allowedUrlsRegExp
+                    : null
+            );
+
+        $factory = new ExternalFileFactory($client, [], new BufferingLogger());
+        $factory->setConfigManager($configManager);
+
+        return $factory;
     }
 
     /**

@@ -11,7 +11,9 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -140,10 +142,54 @@ class ExternalFileFactory
     {
         return $this->httpOptions + [
                 RequestOptions::HTTP_ERRORS => false,
-                RequestOptions::ALLOW_REDIRECTS => true,
+                RequestOptions::ALLOW_REDIRECTS => [
+                    'max' => 5,
+                    'strict' => false,
+                    'referer' => false,
+                    'protocols' => ['http', 'https'],
+                    'on_redirect' => function (
+                        RequestInterface $request,
+                        ResponseInterface $response,
+                        UriInterface $uri
+                    ): void {
+                        $this->assertRedirectTargetAllowed((string)$uri);
+                    },
+                ],
                 RequestOptions::CONNECT_TIMEOUT => 30,
                 RequestOptions::TIMEOUT => 30,
             ];
+    }
+
+    /**
+     * Ensures that a redirect target is still permitted: it must match the configured allowed URLs
+     * regular expression. This prevents following a redirect from an allowed host to a URL that would
+     * not be accepted if it had been submitted directly (SSRF).
+     *
+     * @throws ExternalFileNotAccessibleException when the redirect target is not allowed
+     */
+    private function assertRedirectTargetAllowed(string $url): void
+    {
+        $regExp = $this->getExternalFileAllowedUrlsRegExp();
+        if (!$regExp || !preg_match($regExp, $url)) {
+            $this->logger->error(
+                'Redirect to a URL that is not allowed by the external file URL configuration {url}',
+                [
+                    'url' => $url
+                ]
+            );
+
+            throw new ExternalFileNotAccessibleException(
+                $url,
+                'Redirect to a URL that is not allowed by the external file URL configuration.'
+            );
+        }
+    }
+
+    private function getExternalFileAllowedUrlsRegExp(): string
+    {
+        $regExp = (string)$this->configManager->get('oro_attachment.external_file_allowed_urls_regexp');
+
+        return $regExp ? '~' . $regExp . '~i' : '';
     }
 
     private function getOriginalFilename(ResponseInterface $response): string
