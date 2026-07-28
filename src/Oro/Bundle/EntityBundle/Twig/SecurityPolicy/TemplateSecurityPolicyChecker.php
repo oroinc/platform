@@ -6,6 +6,7 @@ namespace Oro\Bundle\EntityBundle\Twig\SecurityPolicy;
 
 use Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessAnalyzer;
 use Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessEntry;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\SecurityPolicy\Violation\SecurityPolicyFilterViolation;
 use Oro\Bundle\EntityBundle\Twig\SecurityPolicy\Violation\SecurityPolicyFunctionViolation;
 use Oro\Bundle\EntityBundle\Twig\SecurityPolicy\Violation\SecurityPolicyMethodViolation;
@@ -38,10 +39,17 @@ use Twig\Sandbox\SecurityNotAllowedTagError;
  */
 class TemplateSecurityPolicyChecker
 {
+    private ?TemplateRenderer $templateRenderer = null;
+
     public function __construct(
         private readonly Environment $twigEnvironment,
         private readonly TemplateAccessAnalyzer $templateAccessAnalyzer,
     ) {
+    }
+
+    public function setTemplateRenderer(TemplateRenderer $templateRenderer): void
+    {
+        $this->templateRenderer = $templateRenderer;
     }
 
     /**
@@ -86,7 +94,9 @@ class TemplateSecurityPolicyChecker
     private function getSandboxViolation(string $templateSource): ?SecurityPolicyViolationInterface
     {
         try {
-            $template = $this->twigEnvironment->createTemplate($templateSource);
+            $template = $this->templateRenderer !== null
+                ? $this->templateRenderer->createTemplate($templateSource)
+                : $this->twigEnvironment->createTemplate($templateSource);
             // {@see Twig\Node\CheckSecurityNode}
             $template->unwrap()->checkSecurity();
         } catch (SecurityNotAllowedTagError $e) {
