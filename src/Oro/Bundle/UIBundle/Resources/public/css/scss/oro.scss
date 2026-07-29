@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 @use 'sass:math';
+@use 'sass:color';
 
 /* stylelint-disable no-descending-specificity */
 
@@ -28,6 +29,11 @@ footer {
     border-radius: $border-radius;
     border: 1px solid $general-border-color;
     margin: 0 0 $margin-bottom-box;
+}
+
+b,
+bdo {
+    font-weight: font-weight('semi-bold');
 }
 
 .small-text {
@@ -396,26 +402,32 @@ textarea {
     @include clearfix();
 
     &.row-fluid-divider {
-        background: linear-gradient($neutral-grey-3, $neutral-grey-3) repeat-y 50% 0;
+        background:
+            linear-gradient(
+                color.adjust($neutral-grey-3, $lightness: 9%),
+                color.adjust($neutral-grey-3, $lightness: 9%)
+            ) repeat-y 50% 0;
         background-size: 1px 100%;
     }
 }
 
 .user-fieldset {
-    font-weight: $content-title-font-weight;
-    font-size: $content-title-font-size;
-    line-height: $content-title-line-height;
-    padding-bottom: $content-title-inner-offset-bottom;
+    font-weight: font-weight('semi-bold');
+    font-size: 14px;
+    line-height: 28px;
+    padding-bottom: 6px;
     margin: 0 0 $content-padding-medium;
     text-align: left;
+    letter-spacing: .2px;
 }
 
 .widget-title {
-    font-weight: $content-title-font-weight;
-    font-size: $content-title-font-size;
-    line-height: $content-title-line-height;
-    padding-bottom: $content-title-inner-offset-bottom;
+    font-weight: font-weight('semi-bold');
+    font-size: 14px;
+    line-height: 28px;
+    margin-bottom: $content-padding-xmd;
     display: block;
+    letter-spacing: .2px;
 }
 
 .page-size .dropdown-menu {
@@ -609,10 +621,9 @@ label.radio.error {
 .collection-fields-list-bg.oro-item-collection {
     > div {
         position: relative;
-        padding: $content-padding-medium 0;
+        padding: $content-padding-medium;
         margin: 0 0 $content-padding-medium;
-        border: 1px solid $primary-860;
-        background: $primary-900;
+        background: $neutral-grey-1;
         border-radius: 4px;
     }
 
@@ -635,7 +646,7 @@ label.radio.error {
 
 .box-type1 {
     .title {
-        padding-bottom: $content-padding-medium;
+        padding-bottom: $content-padding-xs;
     }
 
     .box-content {
@@ -763,7 +774,6 @@ span.validation-failed {
 
 .nav-tabs > li > a.widget-component-processing {
     /* stylelint-disable declaration-no-important */
-    background: rgba($primary-inverse, .5) !important;
     color: $text-disabled !important;
     /* stylelint-enable declaration-no-important */
     position: relative;
@@ -896,27 +906,9 @@ label .popover-body {
     }
 
     &.overflow-mode {
-        &::after {
-            position: absolute;
-            bottom: 0;
-
-            display: block;
-            height: math.round($font-size-base * $line-height-base);
-            width: 100%;
-
-            background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, .1));
-
-            content: '';
-            pointer-events: none;
-        }
-
         &.show {
             overflow: initial;
             max-height: initial;
-
-            &::after {
-                content: none;
-            }
         }
     }
 
@@ -935,13 +927,12 @@ label .popover-body {
     }
 
     .section-content & {
-        max-width: 900px;
+        max-width: 800px;
     }
 }
 
 .collapse-toggle {
     display: inline-block;
-    margin-top: 16px;
     text-decoration: underline;
     font-weight: font-weight('medium');
     line-height: 18px;
@@ -949,6 +940,10 @@ label .popover-body {
 
     &:hover {
         text-decoration: none;
+    }
+
+    .collapse-overflow + & {
+        margin-top: 16px;
     }
 }
 

@@ -34,7 +34,7 @@ body {
         ol,
         ul,
         dl {
-            &:not(.extra-list):not(.list-inline) {
+            &:not(.extra-list):not(.list-inline):not(.responsive-tabs):not(.schedule-list) {
                 margin: 0 0 $content-padding-medium $content-padding;
 
                 overflow-wrap: break-word;
@@ -140,16 +140,6 @@ body {
             }
         }
 
-        &.responsive-big,
-        &.responsive-medium,
-        &:not(.responsive-small) {
-            form[name='oro_product'] & {
-                .responsive-cell {
-                    padding-bottom: $content-padding-medium;
-                }
-            }
-        }
-
         &.responsive-medium {
             &:not(.responsive-section-no-blocks) {
                 .responsive-cell {
@@ -248,7 +238,7 @@ body.backdrop {
 
             a {
                 padding-right: 24px;
-                font-weight: font-weight('bold');
+                font-weight: font-weight('semi-bold');
                 background-color: $primary-800;
                 color: $primary-100;
             }

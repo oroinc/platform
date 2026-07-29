@@ -26,6 +26,12 @@ $select2-container-input-append-create-enabled-width:
 $select2-container-input-append--create-enabled-max-width:
         $select2-container-input-append-max-width - $add-on-append-outer-offset-left -
         $add-on-size - (2 * $select2-container-border-width) !default;
+$select2-container-input-append-create-multi-enabled-width:
+        $select2-container-input-append-max-width - $add-on-append-outer-offset-left -
+        $btn-square-icon-dropdown-toggle-width - (2 * $select2-container-border-width) !default;
+$select2-container-input-append--create-multi-enabled-max-width:
+        $select2-container-input-append-max-width - $add-on-append-outer-offset-left -
+        $btn-square-icon-dropdown-toggle-width - (2 * $select2-container-border-width) !default;
 
 $select2-container-active-border-color: $secondary-focus !default;
 $select2-container-active-box-shadow: inset 0 0 0 1px $secondary-focus !default;
@@ -64,7 +70,7 @@ $select2-chosen-result-entry-font-style: italic !default;
 $select2-chosen-result-entry-color: $primary-700 !default;
 
 $select2-choice-disabled-border-color: $text-disabled !default;
-$select2-choice-disabled-background-color: $neutral-grey-3 !default;
+$select2-choice-disabled-background-color: $neutral-grey-2 !default;
 $select2-choice-disabled-color: $text-disabled !default;
 $select2-choice-disabled-cursor: not-allowed !default;
 
@@ -123,7 +129,7 @@ $select2-search-field-border: none !default;
 $select2-search-field-box-shadow: none !default;
 $select2-search-field-top-offset: -3px !default;
 
-$select2-search-field-default-color: $primary-700 !default;
+$select2-search-field-default-color: $text-disabled !default;
 $select2-search-field-default-inner-offset: 0 5px !default;
 
 $select2-search-field-offset: 0 !default;

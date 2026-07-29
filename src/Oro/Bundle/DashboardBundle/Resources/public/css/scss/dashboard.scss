@@ -117,8 +117,8 @@
             cursor: move;
         }
 
-        .widget-title {
-            padding: 0;
+        .title.widget-title {
+            margin: 0 0 2px;
 
             color: $dashboard-widget-title-color;
             font-size: 16px;

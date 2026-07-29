@@ -29,7 +29,7 @@ $input-invalid-focus-border-width: 1px !default;
 
 $input-disabled-cursor: not-allowed !default;
 $input-disabled-border-color: $text-disabled !default;
-$input-disabled-background-color: $neutral-grey-3 !default;
+$input-disabled-background-color: $neutral-grey-2 !default;
 $input-disabled-color: $text-disabled !default;
 $input-disabled-resize: none !default;
 
@@ -75,6 +75,7 @@ $select-multiple-option-inner-offset: 4px 8px !default;
 $select-multiple-option-border-radius: $input-field-border-radius !default;
 
 $select-multiple-option-not-last-offset-bottom: 4px !default;
+$select-multiple-option-checked-background: $neutral-grey-2 !default;
 
 $select-width: $field-width !default;
 $selector-line-height: $field-size !default;

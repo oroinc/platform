@@ -69,11 +69,13 @@
             background: $table-thead-th-background;
             border-bottom: $table-thead-th-border-bottom;
             font-size: $table-thead-th-font-size;
+            font-weight: $table-thead-th-font-weight;
             color: $table-thead-th-color;
             padding: $table-thead-th-padding;
             white-space: $table-thead-th-white-space;
             vertical-align: $table-thead-th-vertical-align;
             text-transform: $table-thead-th-text-transform;
+            letter-spacing: $table-thead-th-letter-spacing;
 
             a {
                 color: $table-thead-th-a-color;

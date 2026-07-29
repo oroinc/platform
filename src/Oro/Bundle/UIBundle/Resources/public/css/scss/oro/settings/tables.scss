@@ -23,11 +23,13 @@ $table-td-nowrap-ellipsis-div-width: 100% !default;
 $table-thead-th-background: $neutral-grey-2 !default;
 $table-thead-th-border-bottom: 1px solid $neutral-grey-3 !default;
 $table-thead-th-font-size: 12px !default;
-$table-thead-th-color: $text-secondary !default;
+$table-thead-th-font-weight: font-weight('semi-bold') !default;
+$table-thead-th-color: $text-primary !default;
 $table-thead-th-padding: 11px 8px !default;
 $table-thead-th-white-space: nowrap !default;
 $table-thead-th-vertical-align: top !default;
 $table-thead-th-text-transform: uppercase !default;
+$table-thead-th-letter-spacing: .1px !default;
 
 $table-thead-th-a-color: inherit !default;
 $table-thead-th-a-display: block !default;

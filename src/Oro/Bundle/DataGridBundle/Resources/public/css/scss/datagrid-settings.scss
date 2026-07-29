@@ -39,7 +39,7 @@
         font-size: $datagrid-settings-title-font-size;
         line-height: $datagrid-settings-title-line-height;
         margin: $datagrid-settings-title-offset;
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
     }
 
     &__tabs {
@@ -211,7 +211,7 @@
     &-title {
         font-size: $base-font-size--l;
         line-height: $base-font-size--l;
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
         margin-bottom: -3px;
     }
 
@@ -271,7 +271,7 @@
             margin-top: -10px;
             z-index: 1;
             font-size: $base-font-size * 1.15;
-            font-weight: font-weight('bold');
+            font-weight: font-weight('semi-bold');
             line-height: 20px;
             color: color.adjust($btn-text-color, $lightness: 15%);
 

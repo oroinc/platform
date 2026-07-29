@@ -1,6 +1,8 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
 <li class="nav-item dropdown" data-dropdown role="presentation">
-    <a href="#" id="<%- togglerId %>" class="nav-link dropdown-toggle" data-toggle="dropdown"
+    <a href="#" id="<%- togglerId %>"
+       class="nav-link dropdown-toggle<% if (label === _.__('oro.ui.tab_view_more')) { %> tab-view-more<% } %>"
+       data-toggle="dropdown"
        data-dropdown-placeholder="<%- label %>"
        data-flip="true"
        data-position-fixed="true"

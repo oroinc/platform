@@ -29,7 +29,7 @@
     }
 
     &__title-text {
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
         font-size: $widget-picker-item-header-font-size;
         color: $widget-picker-item-header-color;
         font-style: normal;
@@ -145,7 +145,7 @@
 
     &__new-badge,
     &__added-badge {
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
         margin-left: $widget-picker-added-badge-space;
     }
 

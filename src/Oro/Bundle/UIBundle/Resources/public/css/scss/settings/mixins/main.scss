@@ -46,7 +46,7 @@
 }
 
 @mixin accordion-toggle() {
-    font-weight: font-weight('bold');
+    font-weight: font-weight('semi-bold');
     padding-left: 15px;
     background: $accordion-heading-background-color;
 }

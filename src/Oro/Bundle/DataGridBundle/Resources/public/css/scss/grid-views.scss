@@ -4,6 +4,10 @@
     display: flex;
     gap: $oro-datagrid-inner-grid-views-gap;
 
+    &:empty {
+        display: none;
+    }
+
     .inner-grid & {
         margin: $oro-datagrid-inner-grid-views-offset;
     }

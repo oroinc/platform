@@ -149,6 +149,10 @@ select[multiple] {
         &:not(:last-child) {
             margin-bottom: $select-multiple-option-not-last-offset-bottom;
         }
+
+        &:checked {
+            background: $select-multiple-option-checked-background;
+        }
     }
 
     td & {
@@ -338,6 +342,10 @@ select[multiple] {
 .input-append,
 .input-prepend {
     &.collection-element-primary {
+        > input {
+            border-radius: 4px 0 0 4px;
+        }
+
         .add-on {
             background: $primary-900;
 
@@ -405,6 +413,10 @@ select[multiple] {
         &:not(:last-of-type) {
             margin-bottom: $form-container-control-row-space;
         }
+
+        &:last-of-type {
+            margin-right: 0;
+        }
     }
 
     .control-group {
@@ -438,14 +450,6 @@ select[multiple] {
 
     .control-group,
     .control-group-container {
-        padding: $form-container-control-group-offset;
-        border-bottom: $form-container-control-group-border-bottom;
-
-        .control-group {
-            padding: 0;
-            border-bottom: 0;
-        }
-
         &--column:not(:last-of-type) {
             margin: 0;
         }
@@ -453,10 +457,6 @@ select[multiple] {
         &.control-group-checkbox {
             margin-top: -$content-padding-small;
         }
-    }
-
-    div[data-name='field__default-product-options'] {
-        margin: 0 0 $form-container-control-row-space;
     }
 
     + .form-horizontal,

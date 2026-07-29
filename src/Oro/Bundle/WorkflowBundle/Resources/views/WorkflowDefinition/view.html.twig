@@ -355,10 +355,10 @@
                         {% for variable in variables %}
                             <div class="control-group">
                                 <label class="control-label">
+                                    {{ variable.label }}
                                     {% if variable.options.form_options is defined and variable.options.form_options.tooltip is defined %}
                                         {{ UI.tooltip(variable.options.form_options.tooltip) }}
                                     {% endif %}
-                                    {{ variable.label }}
                                 </label>
                                 <div class="controls">
                                     <div class="control-label">

@@ -2,8 +2,7 @@
 
 .attribute-item {
     display: $attribute-item-display;
-    padding: $attribute-item-offset;
-    border-bottom: $attribute-item-border-bottom;
+    max-width: 800px;
 
     &__term {
         width: $attribute-item-term-width;
@@ -11,6 +10,11 @@
         color: $attribute-item-term-color;
         text-align: $attribute-item-term-text-align;
         flex-shrink: 0;
+
+        .tooltip-icon {
+            display: inline;
+            margin-left: $content-padding-small;
+        }
     }
 
     &__description {

@@ -42,7 +42,7 @@ $nav-link-hover-outline: none !default;
 
 $nav-link-active-background: linear-gradient($nav-link-border-color, $nav-link-border-color) left / 1px 100% no-repeat,
                              linear-gradient($nav-link-border-color, $nav-link-border-color) right / 1px 100% no-repeat,
-                             linear-gradient($neutral-white, $neutral-white) bottom / 100% 2px no-repeat !default;
+                             linear-gradient($neutral-white, $neutral-white) top / 100% 100% no-repeat !default;
 $nav-link-active-font-weight: font-weight('semi-bold') !default;
 $nav-link-active-color: $text-primary !default;
 $nav-link-active-position: relative !default;
@@ -59,3 +59,5 @@ $nav-link-column-active-border-top-color: $nav-tabs-border-color !default;
 $nav-link-column-active-border-left-color: $nav-tabs-active-border-color !default;
 $nav-link-column-active-border-right-color: $nav-tabs-column-inverse-border-color !default;
 $nav-link-column-active-border-bottom-color: $nav-tabs-border-color !default;
+
+$nav-tabs-with-action-link-padding: 10px 16px !default;

@@ -103,6 +103,8 @@ $filter-criteria-hint-text-overflow: ellipsis !default;
 $filter-criteria-hint-white-space: nowrap !default;
 $filter-criteria-hint-overflow: hidden !default;
 $filter-criteria-hint-vertical-align: bottom !default;
+$filter-criteria-hint-font-weight: font-weight('semi-bold') !default;
+$filter-criteria-hint-letter-spacing: .2px !default;
 
 $choice-tree-filter-offset-right: 0 !default;
 $choice-tree-filter-offset-bottom: 0 !default;
@@ -286,6 +288,7 @@ $filter-select-oro-line-height: 20px !default;
 $filter-select-oro-width: 100% !default;
 
 $filter-criteria-selector-font-weight: font-weight('normal') !default;
+$filter-criteria-selector-letter-spacing: .1px !default;
 
 $filter-criteria-selector-after-color: $primary-main !default;
 

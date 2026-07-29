@@ -104,7 +104,7 @@
     }|merge(options|default({})) %}
 
     <div class="attribute-item{% if options.rootClass %} {{ options.rootClass }}{% endif %}">
-        <label class="attribute-item__term{% if options.termClass %} {{ options.termClass }}{% endif %}">{% if options.tooltipHTML %}{{ options.tooltipHTML|raw }} {% endif %}{{ title }}</label>
+        <label class="attribute-item__term{% if options.termClass %} {{ options.termClass }}{% endif %}">{{ title }}{% if options.tooltipHTML %}{{ options.tooltipHTML|raw }} {% endif %}</label>
         <div class="attribute-item__description{% if options.descriptionClass %} {{ options.descriptionClass }}{% endif %}"
             {% if options.dir %}dir="{{ options.dir }}" {% endif %}
         >

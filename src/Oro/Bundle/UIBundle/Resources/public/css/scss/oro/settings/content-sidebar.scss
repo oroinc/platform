@@ -12,7 +12,7 @@ $content-sidebar-content-min-width: 288px !default;
 $content-sidebar-sidebar-display: flex !default;
 $content-sidebar-sidebar-flex-direction: column !default;
 $content-sidebar-sidebar-background: $neutral-grey-2 !default;
-$content-sidebar-sidebar-border-radius: 4px !default;
+$content-sidebar-sidebar-border-radius: 10px !default;
 
 $content-sidebar-sidebar-position: relative !default;
 $content-sidebar-sidebar-flex-shrink: 0 !default;
@@ -24,15 +24,19 @@ $content-sidebar-minimized-offset-inner-left: 0 !default;
 $content-sidebar-minimized-width: $content-sidebar-minimized-width !default;
 
 $content-sidebar-resizable-area-position: absolute !default;
-$content-sidebar-resizable-area-top: 0 !default;
-$content-sidebar-resizable-area-right: 0 !default;
+$content-sidebar-resizable-area-top: 8px !default;
+$content-sidebar-resizable-area-right: -3px !default;
+$content-sidebar-resizable-area-bottom: 0 !default;
+$content-sidebar-resizable-area-height: calc(100% - 16px) !default;
 $content-sidebar-resizable-area-width: 10px !default;
-$content-sidebar-resizable-area-height: 100% !default;
-$content-sidebar-resizable-area-border-right: 3px solid $content-sidebar-resizable-area-color !default;
+$content-sidebar-resizable-area-border-right: 3px solid transparent !important !default;
+$content-sidebar-resizable-area-border-radius: 6px;
+$content-sidebar-resizable-area-hover-background: $neutral-grey-3 !default;
+$content-sidebar-resizable-area-hover-background-clip: content-box !default;
 $content-sidebar-resizable-area-touch-action: none !default;
 $content-sidebar-resizable-area-cursor: ew-resize !default;
 $content-sidebar-resizable-area-opacity: 0 !default;
-$content-sidebar-resizable-area-transition: opacity 150ms linear !default;
+$content-sidebar-resizable-area-transition: opacity 150ms ease-in !default;
 $content-sidebar-resizable-area-visibility: hidden !default;
 $content-sidebar-hover-resizable-area-opacity: 1 !default;
 

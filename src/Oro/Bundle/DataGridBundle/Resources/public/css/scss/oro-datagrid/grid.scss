@@ -108,6 +108,8 @@
     box-shadow: 1px 0 $oro-datagrid-header-background;
     border-bottom: $oro-datagrid-header-cell-border-bottom;
     line-height: $oro-datagrid-header-cell-line-height;
+    font-weight: $oro-datagrid-header-cell-font-weight;
+    letter-spacing: $oro-datagrid-header-cell-letter-spacing;
 
     white-space: nowrap;
 
@@ -115,6 +117,7 @@
     &__link {
         font-size: $oro-datagrid-label-font-size;
         line-height: $oro-datagrid-label-line-height;
+        letter-spacing: $oro-datagrid-label-letter-spacing;
 
         color: $oro-datagrid-label-color;
 

@@ -63,6 +63,11 @@
                 width: $select2-container-input-append-create-enabled-width;
                 max-width: $select2-container-input-append--create-enabled-max-width;
             }
+
+            .entity-create-multi-enabled & {
+                width: $select2-container-input-append-create-multi-enabled-width;
+                max-width: $select2-container-input-append--create-multi-enabled-max-width;
+            }
         }
 
         .input-append & {

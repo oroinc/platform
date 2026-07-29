@@ -15,6 +15,7 @@ $oro-datagrid-action-cell-color-hover: $text-primary !default;
 $oro-datagrid-label-offset: 10px !default;
 $oro-datagrid-label-font-size: 12px !default;
 $oro-datagrid-label-line-height: 1.28 !default;
+$oro-datagrid-label-letter-spacing: .1px !default;
 $oro-datagrid-label-color: $text-primary !default;
 $oro-datagrid-label-active-color: $primary-main !default;
 
@@ -27,6 +28,8 @@ $oro-datagrid-header-cell-inner-offset: 12px 8px !default;
 $oro-datagrid-header-cell-border-bottom: 1px solid $neutral-grey-3 !default;
 $oro-datagrid-header-cell-radius: 2px !default;
 $oro-datagrid-header-cell-line-height: 1 !default;
+$oro-datagrid-header-cell-font-weight: font-weight('semi-bold') !default;
+$oro-datagrid-header-cell-letter-spacing: .1px !default;
 
 $oro-datagrid-body-cell-inner-vertical: 8px !default;
 $oro-datagrid-body-cell-inner-horizontal: 8px !default;

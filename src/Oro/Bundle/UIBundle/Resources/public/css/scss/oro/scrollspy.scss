@@ -45,7 +45,7 @@
             font-weight: $scrollspy-nav-navbar-inner-nav-link-font-weight;
 
             &:hover {
-                background: $scrollspy-nav-navbar-inner-nav-link-background-color;
+                color: $scrollspy-nav-navbar-inner-nav-link-active-color;
             }
 
             &.active {
@@ -63,6 +63,7 @@
         display: $scrollspy-title-display;
         gap: $scrollspy-title-gap;
         align-items: $scrollspy-title-align-items;
+        justify-content: $scrollspy-title-justify-content;
         padding: $scrollspy-title-inner-offset;
         margin: $scrollspy-title-offset;
 

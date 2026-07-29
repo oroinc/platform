@@ -56,11 +56,11 @@ body:not(.login-page) {
     min-width: 340px;
 
     &:first-child {
-        padding-right: $content-padding-small;
+        padding-right: $content-padding-xl;
     }
 
     &:last-child {
-        padding-left: $content-padding-small;
+        padding-left: $content-padding-xl;
     }
 
     &:only-child {
@@ -215,6 +215,10 @@ body:not(.login-page) {
     flex-shrink: 1;
     height: 100%;
     min-height: 0;
+
+    .alert--compact {
+        align-self: flex-start;
+    }
 }
 
 #container:not(:has(.dashboard-container-wrapper)) {
@@ -244,13 +248,6 @@ body:not(.login-page) {
     > .responsive-section {
         &:not(.responsive-small) {
             .responsive-cell {
-                &:first-child {
-                    .user-fieldset,
-                    .widget-title {
-                        margin-left: $content-padding-medium;
-                    }
-                }
-
                 &:nth-child(2) {
                     .inner-grid {
                         // stylelint-disable-next-line max-nesting-depth
@@ -258,26 +255,6 @@ body:not(.login-page) {
                             margin-left: 0;
                         }
                     }
-                }
-            }
-        }
-
-        &.responsive-medium {
-            &:not(.responsive-section-no-blocks) {
-                .responsive-cell {
-                    .user-fieldset,
-                    .widget-title {
-                        margin-left: $content-padding-medium;
-                    }
-                }
-            }
-        }
-
-        &.responsive-small {
-            .responsive-cell {
-                .user-fieldset,
-                .widget-title {
-                    margin-left: $content-padding-medium;
                 }
             }
         }

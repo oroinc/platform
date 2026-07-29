@@ -2,14 +2,12 @@
 
 .main-menu-toggler {
     position: absolute;
-    inset: auto 24px 24px auto;
+    inset: auto 24px 4px auto;
 
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
 
-    background-color: $primary-main-light;
-
-    border-radius: 4px;
+    background: none;
 
     @extend %main-menu-trigger;
 
@@ -18,14 +16,14 @@
         transform: rotate($menu-icon-toggler-transform);
     }
 
-    &:hover,
-    &:focus {
-        background-color: $secondary-secondary-6;
+    &:hover {
+        background-color: $primary-main-light;
     }
 
+    &:focus,
     &:active {
-        background-color: $secondary-secondary-4;
-        color: $neutral-white;
+        background: $neutral-white;
+        box-shadow: 0 0 0 2px $text-inverse, 0 0 0 4px $secondary-focus;
     }
 }
 

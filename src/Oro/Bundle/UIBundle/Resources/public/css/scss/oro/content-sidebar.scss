@@ -24,11 +24,13 @@
             position: $content-sidebar-resizable-area-position;
             top: $content-sidebar-resizable-area-top;
             right: $content-sidebar-resizable-area-right;
+            bottom: $content-sidebar-resizable-area-bottom;
 
             width: $content-sidebar-resizable-area-width;
             height: $content-sidebar-resizable-area-height;
 
             border-right: $content-sidebar-resizable-area-border-right;
+            border-radius: $content-sidebar-resizable-area-border-radius;
 
             touch-action: $content-sidebar-resizable-area-touch-action;
 
@@ -39,11 +41,13 @@
             transition: $content-sidebar-resizable-area-transition;
 
             visibility: $content-sidebar-resizable-area-visibility;
-        }
 
-        &:hover {
-            .resizable-area {
+            &:hover {
                 opacity: $content-sidebar-hover-resizable-area-opacity;
+                border: $content-sidebar-resizable-area-border-right;
+                border-radius: $content-sidebar-resizable-area-border-radius;
+                background: $content-sidebar-resizable-area-hover-background;
+                background-clip: $content-sidebar-resizable-area-hover-background-clip;
             }
         }
 

@@ -33,7 +33,7 @@
             border-radius: 4px;
 
             .desktop-version & {
-                padding: ($content-padding + 4) $content-padding $content-padding;
+                padding: ($content-padding + 4) $content-padding-large $content-padding;
             }
 
             @include clearfix();
@@ -62,9 +62,9 @@
 
         .control-group {
             display: block;
-            padding-left: 20px;
+            margin-left: 20px;
             float: left;
-            margin-bottom: $content-padding-medium;
+            margin-bottom: $content-padding-xs;
             width: 50%;
 
             @include media-breakpoint-down(sm) {

@@ -3,8 +3,9 @@
 @mixin validation-failed($color) {
     color: $color;
     display: block;
-    margin: 3px 0;
+    margin: 4px 0;
     line-height: 1;
+    font-size: 12px;
     clear: both;
 
     /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
