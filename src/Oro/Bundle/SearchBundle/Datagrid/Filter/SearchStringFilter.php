@@ -51,6 +51,9 @@ class SearchStringFilter extends AbstractFilter
             case TextFilterType::TYPE_NOT_CONTAINS:
                 $this->addRestrictionForNotContains($ds, $builder, $data['value']);
                 break;
+            case TextFilterType::TYPE_STARTS_WITH:
+                $ds->addRestriction($builder->startsWith($fieldName, $data['value']), FilterUtility::CONDITION_AND);
+                break;
         }
     }
 

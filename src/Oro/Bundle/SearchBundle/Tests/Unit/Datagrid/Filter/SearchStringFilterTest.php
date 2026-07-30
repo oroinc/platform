@@ -136,6 +136,10 @@ class SearchStringFilterTest extends TestCase
                 'filterType' => TextFilterType::TYPE_EQUAL,
                 'comparisonOperator' => Comparison::EQ,
             ],
+            'starts with' => [
+                'filterType' => TextFilterType::TYPE_STARTS_WITH,
+                'comparisonOperator' => Comparison::STARTS_WITH,
+            ],
         ];
     }
 
