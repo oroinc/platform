@@ -100,6 +100,7 @@ dynamic-imports:
         - oroui/js/app/views/input-widget/uniform-file
         - oroui/js/app/views/input-widget/uniform-select
         - oroui/js/app/views/layout-subtree-view
+        - oroui/js/app/views/go-back-view
         - oroui/js/app/views/page/content-view
         - oroui/js/app/views/page/messages-view
         - oroui/js/app/views/show-more/inline-show-more-view
