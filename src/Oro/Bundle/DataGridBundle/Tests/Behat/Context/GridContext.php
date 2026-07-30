@@ -2808,13 +2808,14 @@ TEXT;
         );
     }
 
+    // phpcs:disable
     /**
      * Example: I should see "Preview Image" element in grid row containing "PSKU1" for grid "gridName"
      *
      * @When /^(?:|I )I should see "(?P<element>[^"]+)" element in grid row containing "(?P<content>[^"]+)"$/
-     * @When /^(?:|I )I should see "(?P<element>[^"]+)" element in grid row containing "(?P<content>[^"]+)"
-     * for "(?P<gridName>[^"]+)"$/
+     * @When /^(?:|I )I should see "(?P<element>[^"]+)" element in grid row containing "(?P<content>[^"]+)" for "(?P<gridName>[^"]+)"$/
      */
+    // phpcs:enable
     public function iShouldSeeElementInGridRowContainingContent(
         string $elementName,
         string $content,
@@ -2834,6 +2835,53 @@ TEXT;
         self::assertTrue(
             $element->isValid(),
             sprintf('There is no row with content "%s" containing element "%s"', $content, $elementName)
+        );
+    }
+
+    // phpcs:disable
+    /**
+     * Same as iShouldSeeElementInGridRowContainingContent(), but also asserts on the found element's own
+     * text content, not just its presence.
+     *
+     * Example: I should see "KIT-001" in "Customer Part Number Line Item Detail" element in grid row containing "CPN Kit Product" for "gridName"
+     *
+     * @When /^(?:|I )should see "(?P<value>(?:[^"]|\\")*)" in "(?P<elementName>[^"]+)" element in grid row containing "(?P<content>[^"]+)"$/
+     * @When /^(?:|I )should see "(?P<value>(?:[^"]|\\")*)" in "(?P<elementName>[^"]+)" element in grid row containing "(?P<content>[^"]+)" for "(?P<gridName>[^"]+)"$/
+     */
+    // phpcs:enable
+    public function iShouldSeeValueInElementInGridRowContainingContentForGrid(
+        string $value,
+        string $elementName,
+        string $content,
+        ?string $gridName = null
+    ): void {
+        $grid = $this->getGrid($gridName);
+        $rowElement = $grid->getRowByContent($content);
+
+        self::assertNotNull($rowElement, sprintf('There is no row containing "%s"', $content));
+        self::assertTrue($rowElement->isValid(), sprintf('There is no row containing "%s"', $content));
+
+        $element = $rowElement->getElement($elementName);
+        self::assertNotNull(
+            $element,
+            sprintf('There is no row with content "%s" containing element "%s"', $content, $elementName)
+        );
+        self::assertTrue(
+            $element->isValid(),
+            sprintf('There is no row with content "%s" containing element "%s"', $content, $elementName)
+        );
+
+        $actualText = $element->getText();
+        self::assertStringContainsString(
+            $value,
+            $actualText,
+            sprintf(
+                'Failed asserting that element "%s" in the row containing "%s" contains "%s", actual text was "%s"',
+                $elementName,
+                $content,
+                $value,
+                $actualText
+            )
         );
     }
 
