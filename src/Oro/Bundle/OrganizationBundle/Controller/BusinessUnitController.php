@@ -50,6 +50,7 @@ class BusinessUnitController extends AbstractController
         name: 'oro_business_unit_search',
         requirements: ['organizationId' => '\d+']
     )]
+    #[AclAncestor('oro_business_unit_view')]
     public function searchAction($organizationId)
     {
         $businessUnits = [];

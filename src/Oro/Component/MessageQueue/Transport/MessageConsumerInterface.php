@@ -12,7 +12,7 @@ interface MessageConsumerInterface
      * This call blocks until a message arrives, the timeout expires, or this message consumer is closed.
      * A timeout of zero never expires, and the call blocks indefinitely.
      *
-     * @param int $timeout the timeout value (in seconds)
+     * @param int|float $timeout the timeout value (in seconds)
      *
      * @return MessageInterface|null
      */

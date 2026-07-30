@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\EntityBundle\ORM\InsertFromSelectNoConflictQueryExecutor;
+use Oro\Bundle\EntityBundle\ORM\InsertNoConflictQueryExecutor;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Group;
@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class InsertFromSelectNoConflictQueryExecutorTest extends WebTestCase
 {
-    private InsertFromSelectNoConflictQueryExecutor $queryExecutor;
+    private InsertNoConflictQueryExecutor $queryExecutor;
 
     #[\Override]
     protected function setUp(): void

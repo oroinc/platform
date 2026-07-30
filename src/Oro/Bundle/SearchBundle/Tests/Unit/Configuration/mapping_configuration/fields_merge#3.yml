@@ -49,8 +49,6 @@ expected:
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
         alias: test_alias
         search_template: search_template.html.twig
-        label: ~
-        mode: normal
         fields:
             some_field_1:
                 name: some_field_1
@@ -60,13 +58,6 @@ expected:
                         name: emails
                         relation_type: one-to-one
                         relation_fields:
-                            id:
-                                name: id
-                                target_type: integer
-                                target_fulltext: true
-                                target_fields:
-                                    - id
-                                relation_fields: {}
                             email:
                                 name: email
                                 target_type: text
@@ -74,21 +65,31 @@ expected:
                                 target_fields:
                                     - email
                                 relation_fields: {}
+                            id:
+                                name: id
+                                target_type: integer
+                                target_fields:
+                                    - id
+                                target_fulltext: true
+                                relation_fields: { }
                         target_fulltext: true
                         target_fields: {}
                     firstName:
                         name: firstName
                         target_type: text
-                        target_fulltext: true
                         target_fields:
                             - firstName
+                        target_fulltext: true
                         relation_fields: {}
                     lastName:
                         name: lastName
                         target_type: text
-                        target_fulltext: true
                         target_fields:
                             - lastName
+                        target_fulltext: true
                         relation_fields: {}
                 target_fulltext: true
                 target_fields: {}
+        label: ~
+        synonyms_enabled: false
+        mode: normal

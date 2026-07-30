@@ -37,21 +37,20 @@ expected:
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
         alias: test_alias
         search_template: search_template.html.twig
-        label: ~
-        mode: normal
         fields:
             name:
                 name: name
                 target_type: text
-                target_fulltext: true
-                relation_fields: {}
                 target_fields:
                     - name
+                target_fulltext: true
+                relation_fields: { }
+        label: ~
+        synonyms_enabled: false
+        mode: normal
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\AnotherItem:
         alias: another_test_alias
         search_template: another_search_template.html.twig
-        label: ~
-        mode: normal
         fields:
             some_field_1:
                 name: some_field_1
@@ -64,18 +63,21 @@ expected:
                             id:
                                 name: id
                                 target_type: integer
-                                target_fulltext: true
                                 target_fields:
                                     - id
+                                target_fulltext: true
                                 relation_fields: {}
                         target_fulltext: true
                         target_fields: {}
                     lastName:
                         name: lastName
                         target_type: text
-                        target_fulltext: true
                         target_fields:
                             - lastName
+                        target_fulltext: true
                         relation_fields: {}
                 target_fulltext: true
                 target_fields: {}
+        label: ~
+        synonyms_enabled: false
+        mode: normal

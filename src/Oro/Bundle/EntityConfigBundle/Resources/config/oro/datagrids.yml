@@ -127,6 +127,11 @@ datagrids:
                 route: oro_entityconfig_field_update
                 params:
                     - id
+        filters:
+            columns:
+                fieldName:
+                    type: string
+                    data_name: cf.fieldName
 
     # Attribute fields datagrid
     attributes-grid:
@@ -165,6 +170,9 @@ datagrids:
                 rowAction: true
         filters:
             columns:
+                fieldName:
+                    type: string
+                    data_name: cf.fieldName
                 type:
                     type:      choice
                     data_name: cf.type

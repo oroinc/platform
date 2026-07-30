@@ -57,6 +57,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('scalar')->end()
             ->end()
             ->arrayNode('consumer')
+                ->addDefaultsIfNotSet()
                 ->children()
                     ->integerNode('heartbeat_update_period')
                         ->min(0)
@@ -64,6 +65,17 @@ class Configuration implements ConfigurationInterface
                         ->info(
                             'Consumer heartbeat update period in minutes. To disable the checks, set this option to 0'
                         )
+                    ->end()
+                    ->scalarNode('receive_timeout')
+                        ->info(
+                            'Consumer message receive timeout in seconds (float). '
+                            . 'Lower values make a consumer switch between bound queues faster.'
+                        )
+                        ->defaultValue(sprintf(
+                            '%%env(default:%s:float:%s)%%',
+                            'oro_message_queue.consumer_receive_timeout_default',
+                            'ORO_MQ_CONSUMER_RECEIVE_TIMEOUT'
+                        ))
                     ->end()
                 ->end()
             ->end()
@@ -180,17 +192,17 @@ class Configuration implements ConfigurationInterface
                             ->booleanNode('enabled')
                                 ->defaultValue(true)
                                 ->info(
-                                    "If redelivery enabled than new copied message will be published\n"
-                                    . "to message broker and old one will be REJECTED when error\n"
-                                    . 'was occurred during message processing.'
+                                    "If redelivery is enabled than new copied message will be published\n"
+                                    . "to the message broker, and the old one will be REJECTED when an error\n"
+                                    . ' occurred during message processing.'
                                 )
                             ->end()
                             ->integerNode('delay_time')
                                 ->min(1)
                                 ->defaultValue(10)
                                 ->info(
-                                    "Time through which message will be re-published to the broker,\n"
-                                    . 'old one will be REJECTED immediately.'
+                                    "Time through which the message will be re-published to the broker,\n"
+                                    . 'the old one will be REJECTED immediately.'
                                 )
                             ->end()
                         ->end()

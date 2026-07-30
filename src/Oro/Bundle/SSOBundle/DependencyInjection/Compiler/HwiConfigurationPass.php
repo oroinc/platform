@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SSOBundle\DependencyInjection\Compiler;
 
+use HWI\Bundle\OAuthBundle\Controller\Connect\RegisterController;
 use Oro\Bundle\SSOBundle\Security\OAuthAuthenticator;
 use Oro\Bundle\SSOBundle\Security\RefreshAccessTokenListener;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -34,5 +35,10 @@ class HwiConfigurationPass implements CompilerPassInterface
         // remove services that use deleted classes
         $container->removeDefinition('hwi_oauth.authentication.listener.oauth');
         $container->removeDefinition('hwi_oauth.authentication.provider.oauth');
+
+        // the connect flow is not configured, its RegisterController cannot be instantiated and is removed.
+        if (false === $container->getParameter('hwi_oauth.connect')) {
+            $container->removeDefinition(RegisterController::class);
+        }
     }
 }

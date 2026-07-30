@@ -168,7 +168,7 @@ trait FormContextTrait
     }
 
     /**
-     * Gets a service that can be used to convert an entity object to a model object and vise versa.
+     * Gets a service that can be used to convert an entity object to a model object and vice versa.
      */
     public function getEntityMapper(): ?EntityMapper
     {
@@ -176,7 +176,7 @@ trait FormContextTrait
     }
 
     /**
-     * Sets a service that can be used to convert an entity object to a model object and vise versa.
+     * Sets a service that can be used to convert an entity object to a model object and vice versa.
      */
     public function setEntityMapper(?EntityMapper $entityMapper): void
     {

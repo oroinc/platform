@@ -66,6 +66,26 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Gets the primary entity class.
+     */
+    public function getPrimaryEntityClass(): ?string
+    {
+        return null !== $this->primaryEntity
+            ? $this->primaryEntity[0]
+            : null;
+    }
+
+    /**
+     * Gets the primary entity identifier.
+     */
+    public function getPrimaryEntityId(): mixed
+    {
+        return null !== $this->primaryEntity
+            ? $this->primaryEntity[1]
+            : null;
+    }
+
+    /**
      * Gets the primary entity.
      */
     public function getPrimaryEntityMetadata(): ?EntityMetadata

@@ -10,12 +10,15 @@ use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * The main authorization point of the Security component.
  */
-class AuthorizationChecker implements AuthorizationCheckerInterface
+class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthorizationCheckerInterface
 {
     private AuthorizationCheckerInterface $authorizationChecker;
     private ObjectIdentityFactory $objectIdentityFactory;
@@ -93,6 +96,24 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         }
 
         return $isGranted;
+    }
+
+    #[\Override]
+    public function isGrantedForUser(
+        UserInterface $user,
+        mixed $attribute,
+        mixed $subject = null,
+        ?AccessDecision $accessDecision = null
+    ): bool {
+        if (!$this->authorizationChecker instanceof UserAuthorizationCheckerInterface) {
+            throw new \LogicException(sprintf(
+                'The decorated authorization checker "%s" must implement "%s" to check user authorization.',
+                get_debug_type($this->authorizationChecker),
+                UserAuthorizationCheckerInterface::class
+            ));
+        }
+
+        return $this->authorizationChecker->isGrantedForUser($user, $attribute, $subject, $accessDecision);
     }
 
     private function getAttribute(string $attributeId): ?AclAttribute

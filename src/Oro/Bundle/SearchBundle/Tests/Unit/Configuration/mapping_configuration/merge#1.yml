@@ -2,6 +2,7 @@ configs:
     -
         Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
             alias: test_alias
+            synonyms_enabled: true
             route:
                 name: route_name
                 parameters:
@@ -50,53 +51,53 @@ configs:
                                 - lastName
 expected:
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
-      alias: test_alias
-      route:
-          name: route_name
-          parameters:
-              id: id
-      search_template: search_template.html.twig
-      label: ~
-      mode: normal
-      fields:
-          name:
-              name: name
-              target_type: text
-              target_fulltext: true
-              relation_fields: {}
-              target_fields:
-                  - name
-          defaultContact:
-              name: defaultContact
-              relation_type: one-to-one
-              relation_fields:
-                  emails:
-                      name: emails
-                      relation_type: one-to-many
-                      target_fulltext: true
-                      target_fields: {}
-                      relation_fields:
-                          email:
-                              name: email
-                              target_type: text
-                              target_fulltext: true
-                              target_fields:
-                                  - email
-                              relation_fields: {}
-                  firstName:
-                      name: firstName
-                      target_type: text
-                      target_fulltext: true
-                      target_fields:
-                          - firstName
-                      relation_fields: {}
-
-                  lastName:
-                      name: lastName
-                      target_type: text
-                      target_fulltext: true
-                      target_fields:
-                          - lastName
-                      relation_fields: {}
-              target_fulltext: true
-              target_fields: {}
+        alias: test_alias
+        synonyms_enabled: true
+        route:
+            name: route_name
+            parameters:
+                id: id
+        search_template: search_template.html.twig
+        fields:
+            name:
+                name: name
+                target_type: text
+                target_fields:
+                    - name
+                target_fulltext: true
+                relation_fields: { }
+            defaultContact:
+                name: defaultContact
+                relation_type: one-to-one
+                relation_fields:
+                    emails:
+                        name: emails
+                        relation_type: one-to-many
+                        relation_fields:
+                            email:
+                                name: email
+                                target_type: text
+                                target_fields:
+                                    - email
+                                target_fulltext: true
+                                relation_fields: {}
+                        target_fulltext: true
+                        target_fields: { }
+                    firstName:
+                        name: firstName
+                        target_type: text
+                        target_fields:
+                            - firstName
+                        target_fulltext: true
+                        relation_fields: {}
+                    lastName:
+                        name: lastName
+                        target_type: text
+                        target_fields:
+                            - lastName
+                        target_fulltext: true
+                        relation_fields: {}
+                target_fulltext: true
+                target_fields: {}
+        label: ~
+        mode: normal

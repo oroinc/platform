@@ -22,20 +22,21 @@ expected:
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
         alias: test_alias
         search_template: search_template.html.twig
-        label: ~
-        mode: normal
         fields:
             name:
                 name: name
                 target_type: text
-                target_fulltext: true
-                relation_fields: {}
                 target_fields:
                     - name
+                target_fulltext: true
+                relation_fields: { }
             subject:
                 name: subject
                 target_type: text
-                target_fulltext: true
-                relation_fields: {}
                 target_fields:
                     - subject
+                target_fulltext: true
+                relation_fields: { }
+        label: ~
+        synonyms_enabled: false
+        mode: normal

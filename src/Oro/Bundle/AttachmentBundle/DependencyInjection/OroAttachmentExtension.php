@@ -76,9 +76,29 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $container->setParameter('oro_attachment.files', $value['file-icons']);
     }
 
+    private function configureMediaCacheLock(ContainerBuilder $container): void
+    {
+        $isMediaCacheLockConfigured = false;
+        $configs = $container->getExtensionConfig('framework');
+        foreach ($configs as $config) {
+            if (isset($config['lock']['attachment_media_cache'])) {
+                $isMediaCacheLockConfigured = true;
+                break;
+            }
+        }
+        if (!$isMediaCacheLockConfigured) {
+            $container->prependExtensionConfig(
+                'framework',
+                ['lock' => ['attachment_media_cache' => '%env(pgsql_advisory_schema:ORO_DB_DSN)%']]
+            );
+        }
+    }
+
     #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
+        $this->configureMediaCacheLock($container);
+
         if ($container instanceof ExtendedContainerBuilder) {
             $this->configureImagine($container);
         }

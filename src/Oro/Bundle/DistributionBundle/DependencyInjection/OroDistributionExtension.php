@@ -19,6 +19,15 @@ class OroDistributionExtension extends Extension
             $loader->load('services_dev.yml');
         }
 
+        // the composer services are unusable when the composer/composer package
+        // that provides their classes is not installed
+        if (!class_exists(\Composer\Composer::class)) {
+            $container->removeDefinition('oro_distribution.composer.io');
+            $container->removeDefinition('oro_distribution.composer');
+            $container->removeDefinition('oro_distribution.composer.installation_manager');
+            $container->removeDefinition('oro_distribution.composer.json_file');
+        }
+
         $this->loadTwigResources($container);
     }
 
