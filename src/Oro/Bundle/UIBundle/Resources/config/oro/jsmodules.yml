@@ -128,6 +128,7 @@ dynamic-imports:
         - oroui/js/app/views/input-widget/select2
         - oroui/js/app/views/input-widget/uniform-file
         - oroui/js/app/views/input-widget/uniform-select
+        - oroui/js/app/views/go-back-view
         - oroui/js/app/views/jstree/action-manager-view
         - oroui/js/app/views/jstree/move-action-view
         - oroui/js/app/views/page-center-title-view
