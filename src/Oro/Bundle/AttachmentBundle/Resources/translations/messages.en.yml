@@ -21,7 +21,7 @@ oro:
         mimetypes.tooltip:    The list of allowed MIME types.
         mimetypes.placeholder: Please select MIME type...
 
-        max_size.tooltip:     Max allowed file size to upload in MB.
+        max_size.tooltip:     Max allowed file size to upload in MB. Max allowed file size to upload in MB for Digital Assets. Note that any File entity field can have a lower limit defined.
         thumb_width.tooltip:  Thumbnail width in pixels.
         thumb_height.tooltip: Thumbnail height in pixels.
 
