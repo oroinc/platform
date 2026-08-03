@@ -1,4 +1,6 @@
 import BaseView from 'oroui/js/app/views/base/view';
+import mediator from 'oroui/js/mediator';
+import pageStateChecker from 'oronavigation/js/app/services/page-state-checker';
 
 /**
  * Makes a "Back"/"Cancel" link navigate to the previous page in the browser history
@@ -64,6 +66,11 @@ const GoBackView = BaseView.extend({
     },
 
     goToEntry(entry) {
+        if (this.$el.data('action') === 'cancel') {
+            pageStateChecker.ignoreChanges();
+            mediator.once('page:afterChange', () => pageStateChecker.notIgnoreChanges());
+        }
+
         if (entry.key) {
             window.navigation.traverseTo(entry.key);
         } else {
