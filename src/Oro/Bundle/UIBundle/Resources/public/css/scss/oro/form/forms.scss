@@ -58,6 +58,7 @@
 
         .control-label {
             .tooltip-icon {
+                /* rtl:remove */
                 display: inline;
                 margin-left: $content-padding-small;
             }

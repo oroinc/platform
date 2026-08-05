@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 $oro-quarter-width: auto !default;
 $oro-quarter-min-width: 68px !default;
 $oro-quarter-float: left !default;
@@ -28,7 +30,7 @@ $mce-tinymce-disabled-overlay-height: 100% !default;
 $mce-tinymce-disabled-overlay-background: #eee !default;
 $mce-tinymce-disabled-overlay-opacity: .4 !default;
 
-$fallback-item-border: 1px solid $primary-860 !default;
+$fallback-item-border: 1px dashed color.adjust($neutral-grey-3, $lightness: 6%) !default;
 
 $fallback-item-top-offset: 10px 0 !default;
 $fallback-item-value-top-inner-offset-top: 5px !default;

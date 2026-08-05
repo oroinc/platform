@@ -24,3 +24,13 @@
         display: block;
     }
 }
+
+@at-root .filter-box + .no-data-visible {
+    .no-data {
+        margin-top: $content-padding-medium;
+
+        .no-data__title {
+            padding-top: $content-padding-small;
+        }
+    }
+}

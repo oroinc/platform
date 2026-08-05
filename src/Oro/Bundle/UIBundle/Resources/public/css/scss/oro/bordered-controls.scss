@@ -679,3 +679,9 @@
 .user-fieldset-with-offset-top {
     margin-top: $content-padding;
 }
+
+.form-flex {
+    > .control-group {
+        border: none;
+    }
+}

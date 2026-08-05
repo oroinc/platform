@@ -64,10 +64,6 @@
         border-top: $fallback-item-border;
     }
 
-    &:not(.tab-pane):last-child {
-        border-bottom: $fallback-item-border;
-    }
-
     .tox-tinymce {
         &:not(.tox-fullscreen) {
             max-width: $fallback-item-mce-tinymce-max-width;

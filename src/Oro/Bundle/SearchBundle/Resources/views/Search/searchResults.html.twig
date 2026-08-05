@@ -22,7 +22,7 @@
 
     {% if groupedResults is defined and '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
         {% set togglerId = 'dropdown-'|uniqid %}
-        <div class="oro-page collapsible-sidebar clearfix">
+        <div class="oro-page search-content-results collapsible-sidebar clearfix">
             <div class="oro-page-sidebar search-entity-types-column dropdown">
                 <a href="#" role="button" id="{{ togglerId }}" class="dropdown-toggle" data-toggle="dropdown"
                    aria-label="{{ 'oro.search.result.entity_filter'|trans }}" aria-haspopup="true" aria-expanded="false">

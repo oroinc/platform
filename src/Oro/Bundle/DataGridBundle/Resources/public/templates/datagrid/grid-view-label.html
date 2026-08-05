@@ -1,8 +1,8 @@
 <% if (title && title.trim()) { %>
     <% if (navbar) { %>
-        <h1 class="oro-subtitle" <% if (obj.uniqueId) { %> id="<%- uniqueId %>"<% } %>><%- title %></h1>
+        <h1 class="grid-view-title" <% if (obj.uniqueId) { %> id="<%- uniqueId %>"<% } %>><%- title %></h1>
     <% } else { %>
-        <h3 class="oro-subtitle" <% if (obj.uniqueId) { %> id="<%- uniqueId %>"<% } %>><%- title %></h3>
+        <h3 class="grid-view-title" <% if (obj.uniqueId) { %> id="<%- uniqueId %>"<% } %>><%- title %></h3>
     <% } %>
 <% } %>
 <% if (hasCaret && title && title.trim()) { %>
