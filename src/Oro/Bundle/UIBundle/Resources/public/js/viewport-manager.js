@@ -7,6 +7,8 @@ const viewportManager = {
      */
     mediaTypes: null,
 
+    normalizeJSONVarValueRegExp: /^["']|["']$|\\(["'])/g,
+
     /**
      * @inheritdoc
      */
@@ -55,9 +57,29 @@ const viewportManager = {
 
         const cssProperty =
             window.getComputedStyle(context).getPropertyValue('--breakpoints').trim() || '{}';
-        const result = {all: 'all', ...JSON.parse(cssProperty)};
+
+        const result = {all: 'all', ...this.parseBreakpoints(cssProperty)};
 
         return typeof callback === 'function' ? callback(result) : result;
+    },
+
+    /**
+     * Parses the `--breakpoints` custom property value into an object.
+     *
+     * @param {string} cssProperty
+     * @returns {Object}
+     */
+    parseBreakpoints(cssProperty) {
+        const normalized = cssProperty
+            .replace(this.normalizeJSONVarValueRegExp, (match, unescapedQuote) => unescapedQuote || '');
+
+        try {
+            return JSON.parse(normalized);
+        } catch (e) {
+            error.showErrorInConsole(`Unable to parse the "--breakpoints" CSS custom property: ${e.message}`);
+
+            return {};
+        }
     },
 
     _prepareMediaTypes(breakpoints) {

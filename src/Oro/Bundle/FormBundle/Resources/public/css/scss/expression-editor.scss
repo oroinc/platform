@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 :root {
     --exp-editor-highlight-common: #585858;
     --exp-editor-highlight-string: #519808;
@@ -225,7 +227,7 @@
     }
 
     .expression-editor-data-source.active + & {
-        margin-top: $offset-block / 2;
+        margin-top: math.div($offset-block, 2);
     }
 
     .cm-linter-bottom-panel {
