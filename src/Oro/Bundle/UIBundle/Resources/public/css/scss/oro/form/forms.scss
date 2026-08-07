@@ -121,7 +121,9 @@
                 }
 
                 .tooltip-icon {
-                    margin-right: $content-padding-small;
+                    /* rtl:remove */
+                    display: inline;
+                    margin-left: $content-padding-small;
                 }
             }
 
