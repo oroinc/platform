@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Locales;
  */
 class LoadLocalizationDemoData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    private array $localizations = [
+    protected array $localizations = [
         ['language' => LoadLanguageDemoData::LANG_EN_US, 'formatting' => 'en_US', 'parent' => null],
         ['language' => LoadLanguageDemoData::LANG_EN_CA, 'formatting' => 'en_CA', 'parent' => 'en_US'],
         ['language' => LoadLanguageDemoData::LANG_EN_GB, 'formatting' => 'en_GB', 'parent' => 'en_US'],
