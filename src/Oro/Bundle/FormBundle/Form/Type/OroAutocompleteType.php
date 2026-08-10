@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
@@ -22,11 +22,11 @@ class OroAutocompleteType extends AbstractType
     public const NAME = 'oro_autocomplete';
 
     /**
-     * @var SearchRegistry
+     * @var SearchRegistryInterface
      */
     protected $searchRegistry;
 
-    public function __construct(SearchRegistry $registry)
+    public function __construct(SearchRegistryInterface $registry)
     {
         $this->searchRegistry = $registry;
     }
