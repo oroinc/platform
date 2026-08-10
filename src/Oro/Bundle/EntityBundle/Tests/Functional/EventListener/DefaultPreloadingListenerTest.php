@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Proxy;
 use Oro\Bundle\EntityBundle\Event\PreloadEntityEvent;
 use Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener;
+use Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -21,8 +22,7 @@ class DefaultPreloadingListenerTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        self::ensureKernelShutdown();
-        $this->client = self::createClient([], self::generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
 
         $this->listener = self::getContainer()->get('oro_entity.tests.event_listener.user_preloading');
         $this->entityManager = self::getContainer()->get('doctrine')->getManagerForClass(User::class);
@@ -130,6 +130,47 @@ class DefaultPreloadingListenerTest extends WebTestCase
 
         // Checks to-one relation is initialized.
         $this->assertNotProxyOrInitialized($user->getOwner(), BusinessUnit::class);
+    }
+
+    public function testOnPreloadInitializesManyToManyRelationSharedByMultipleOwners(): void
+    {
+        // Adds a second user (simple_user) that belongs to the same organization as the admin user,
+        // so the organization is a many-to-many collection item shared by several owners.
+        $this->loadFixtures([LoadUserData::class]);
+
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $adminUserId = $userRepository->findOneBy(['username' => 'admin'])->getId();
+        $simpleUserId = $userRepository->findOneBy(['username' => 'simple_user'])->getId();
+
+        /** @var Organization $sharedOrganization */
+        $sharedOrganization = $this->entityManager->getRepository(Organization::class)->findOneBy([]);
+        $sharedOrganizationId = $sharedOrganization->getId();
+
+        // Ensure entity manager is cleared and will not use already loaded entities.
+        $this->entityManager->clear();
+
+        /** @var User $adminUser */
+        $adminUser = $this->entityManager->getReference(User::class, $adminUserId);
+        /** @var User $simpleUser */
+        $simpleUser = $this->entityManager->getReference(User::class, $simpleUserId);
+
+        $event = new PreloadEntityEvent([$adminUser, $simpleUser], ['organizations' => []], []);
+
+        $this->listener->onPreload($event);
+
+        // The organization shared by both users must be preloaded into each owner's collection,
+        // i.e. a single many-to-many collection item is assigned to every owner returned in "entity_ids".
+        self::assertTrue($adminUser->getOrganizations()->isInitialized());
+        self::assertContains(
+            $sharedOrganizationId,
+            $adminUser->getOrganizations()->map(static fn (Organization $o) => $o->getId())->toArray()
+        );
+
+        self::assertTrue($simpleUser->getOrganizations()->isInitialized());
+        self::assertContains(
+            $sharedOrganizationId,
+            $simpleUser->getOrganizations()->map(static fn (Organization $o) => $o->getId())->toArray()
+        );
     }
 
     public function testOnPreloadStopsEventPropagationWhenConfigured(): void

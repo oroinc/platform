@@ -28,6 +28,9 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### DraftSession Component
+* Added `\Oro\Component\DraftSession\Entity\NoopEntityDraftAwareTrait` — a reusable no-op implementation of `\Oro\Component\DraftSession\Entity\EntityDraftAwareInterface`. Use it on entities that are not draft-aware themselves but must satisfy the interface to be accepted as a draft source entity by the draft factory chain.
+ 
 #### MessageQueueBundle
 * Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
 
@@ -39,6 +42,9 @@ The current file describes significant changes in the code that may affect the u
 * Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`; used by the back-office Elasticsearch engine to enable search synonyms for an entity index.
 
 ### Changed
+
+#### EntityBundle
+* Changed `\Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener` to support preloading many-to-many collections whose items are shared by several owners. A collection item is now assigned to all of its owners (owner ids are aggregated per item) instead of a single owner.
 
 #### MessageQueueBundle
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
