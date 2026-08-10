@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistryInterface;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
@@ -30,7 +30,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         private FeatureChecker $featureChecker,
         private ConfigManager $configManager,
         private ManagerRegistry $doctrine,
-        private SearchRegistry $searchRegistry
+        private SearchRegistryInterface $searchRegistry
     ) {
     }
 

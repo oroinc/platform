@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Controller;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\Security;
+use Oro\Bundle\FormBundle\Exception\NotFoundSearchHandlerException;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -60,9 +61,13 @@ class AutocompleteController extends AbstractController
         }
 
         /** @var SearchHandlerInterface $searchHandler */
-        $searchHandler = $this->container
-            ->get(SearchRegistry::class)
-            ->getSearchHandler($autocompleteRequest->getName());
+        try {
+            $searchHandler = $this->container
+                ->get(SearchRegistry::class)
+                ->getSearchHandler($autocompleteRequest->getName());
+        } catch (NotFoundSearchHandlerException $e) {
+            throw $this->createNotFoundException($e->getMessage());
+        }
 
         return new JsonResponse(
             $searchHandler->search(
