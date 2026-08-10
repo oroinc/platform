@@ -60,6 +60,9 @@ The current file describes significant changes in the code that may affect the u
 #### SearchBundle
 * Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`.
 
+#### DraftSession Component
+* Added `\Oro\Component\DraftSession\Entity\NoopEntityDraftAwareTrait` — a reusable no-op implementation of `\Oro\Component\DraftSession\Entity\EntityDraftAwareInterface`. Use it on entities that are not draft-aware themselves but must satisfy the interface to be accepted as a draft source entity by the draft factory chain.
+
 #### UIBundle
 * Added the `$primary-accent-background` SCSS variable in `Resources/public/css/scss/settings/colors.scss`.
 * Added the `$primary-background` SCSS variable in `Resources/public/css/scss/settings/colors.scss`.
@@ -93,6 +96,7 @@ The current file describes significant changes in the code that may affect the u
 
 #### EntityBundle
 * Updated `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider` so it implements `\Oro\Component\Config\Cache\ClearableConfigCacheInterface`.
+* Changed `\Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener` to support preloading many-to-many collections whose items are shared by several owners. A collection item is now assigned to all of its owners (owner ids are aggregated per item) instead of a single owner.
 
 #### MessageQueueBundle
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.

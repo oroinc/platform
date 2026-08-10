@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistryInterface;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -24,7 +24,7 @@ class OroJquerySelect2HiddenType extends AbstractType
 {
     public function __construct(
         protected ManagerRegistry $doctrine,
-        protected SearchRegistry $searchRegistry,
+        protected SearchRegistryInterface $searchRegistry,
         protected ConfigProvider $configProvider
     ) {
     }
