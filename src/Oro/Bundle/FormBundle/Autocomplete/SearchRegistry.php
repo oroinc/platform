@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
+use Oro\Bundle\FormBundle\Exception\NotFoundSearchHandlerException;
 use Psr\Container\ContainerInterface;
 
 /**
  * The registry of autocomplete search handlers.
  */
-class SearchRegistry
+class SearchRegistry implements SearchRegistryInterface
 {
     private ContainerInterface $searchHandlers;
 
@@ -19,15 +20,17 @@ class SearchRegistry
     /**
      * @throws \RuntimeException if a handler with the given name does not exist
      */
+    #[\Override]
     public function getSearchHandler(string $name): SearchHandlerInterface
     {
         if (!$this->searchHandlers->has($name)) {
-            throw new \RuntimeException(sprintf('Search handler "%s" is not registered.', $name));
+            throw new NotFoundSearchHandlerException(sprintf('Search handler "%s" is not registered.', $name));
         }
 
         return $this->searchHandlers->get($name);
     }
 
+    #[\Override]
     public function hasSearchHandler(string $name): bool
     {
         return $this->searchHandlers->has($name);

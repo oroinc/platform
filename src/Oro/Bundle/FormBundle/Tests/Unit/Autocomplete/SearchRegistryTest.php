@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Exception\NotFoundSearchHandlerException;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -35,7 +36,7 @@ class SearchRegistryTest extends TestCase
 
     public function testGetSearchHandlerFails(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NotFoundSearchHandlerException::class);
         $this->expectExceptionMessage('Search handler "testNotExists" is not registered.');
 
         $this->searchRegistry->getSearchHandler('testNotExists');
