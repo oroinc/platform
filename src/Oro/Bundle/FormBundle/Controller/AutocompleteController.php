@@ -31,6 +31,12 @@ class AutocompleteController extends AbstractController
     #[Route(path: '/search', name: 'oro_form_autocomplete_search')]
     public function searchAction(Request $request)
     {
+        // Unlock the session to not block concurrent requests
+        $session = $request->getSession();
+        if ($session->isStarted()) {
+            $session->save();
+        }
+
         $autocompleteRequest = new AutocompleteRequest($request);
         $validator           = $this->container->get(ValidatorInterface::class);
         $isXmlHttpRequest    = $request->isXmlHttpRequest();

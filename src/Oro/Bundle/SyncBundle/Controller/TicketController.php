@@ -20,6 +20,12 @@ class TicketController extends AbstractController
     #[CsrfProtection()]
     public function syncTicketAction(): JsonResponse
     {
+        // Unlock the session to not block concurrent requests
+        $session = $this->container->get('request_stack')->getSession();
+        if ($session->isStarted()) {
+            $session->save();
+        }
+
         return new JsonResponse(
             ['ticket' => $this->container->get(TicketProvider::class)->generateTicket($this->getUser())]
         );

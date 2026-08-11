@@ -24,7 +24,14 @@ class DictionaryController extends AbstractController
     #[Route(path: '/{dictionary}/search', name: 'oro_dictionary_search')]
     public function searchAction($dictionary)
     {
-        $searchQuery = $this->container->get('request_stack')->getCurrentRequest()->get('q');
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        // Unlock the session to not block concurrent requests
+        $session = $request->getSession();
+        if ($session->isStarted()) {
+            $session->save();
+        }
+
+        $searchQuery = $request->get('q');
         $manager = $this->container->get(DictionaryApiEntityManager::class);
         $manager->setClass($manager->resolveEntityClass($dictionary, true));
         $results = $manager->findValueBySearchQuery($searchQuery);
