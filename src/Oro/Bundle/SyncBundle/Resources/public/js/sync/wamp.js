@@ -9,7 +9,9 @@ define(function(require) {
     const defaultOptions = {
         port: 80,
         debug: false,
-        path: ''
+        path: '',
+        keepReconnectTimeout: 15000,
+        keepReconnectRetryDelay: 2000
     };
 
     /**
@@ -32,6 +34,10 @@ define(function(require) {
      * @param {string} options.host is required
      * @param {number=} options.port default is 80
      * @param {number=} options.retryDelay time before next reconnection attempt, default is 5000 (5s)
+     * @param {number=} options.keepReconnectTimeout time after a disconnect during which reconnects
+     *      are retried silently, without surfacing an error to the user, default is 15000 (15s)
+     * @param {number=} options.keepReconnectRetryDelay time before a reconnection attempt while still within
+     *      keepReconnectTimeout, default is 2000 (2s)
      * @param {boolean=} options.skipSubprotocolCheck, default is false
      * @param {boolean=} options.skipSubprotocolAnnounce, default is false
      * @param {boolean=} options.debug, default is false
@@ -67,6 +73,22 @@ define(function(require) {
         // number of retry reconnects
         retryCount: 0,
 
+        // timestamp (ms) of the first failed attempt in the current outage, null while connected
+        disconnectedAt: null,
+
+        // true once a "connection lost" message has been shown for the current outage
+        errorNotified: false,
+
+        /**
+         * Whether the current outage is still within keepReconnectTimeout
+         *
+         * @return {boolean}
+         */
+        isWithinKeepReconnectTimeout: function() {
+            return this.disconnectedAt !== null &&
+                (Date.now() - this.disconnectedAt) < this.options.keepReconnectTimeout;
+        },
+
         /**
          * Initiate connection process
          */
@@ -74,6 +96,7 @@ define(function(require) {
             if (!this.session) {
                 $.ajax(this.options.syncTicketUrl, {
                     method: 'POST',
+                    errorHandlerMessage: !this.isWithinKeepReconnectTimeout(),
                     success: (function(response) {
                         const protocol = this.options.secure ? 'wss' : 'ws';
                         let wsuri = [
@@ -156,19 +179,30 @@ define(function(require) {
          * @param {number} details.retries number of scheduled attempt
          */
         onHangup: function(code, msg, details) {
-            this.retryCount += 1;
-            // change the callback retries parameter to real attempt
-            details = _.extend(
-                details || {},
-                {retries: this.retryCount, delay: this.options.retryDelay}
-            );
-
             if (code !== ab.CONNECTION_CLOSED) {
-                this.trigger('connection_lost', _.extend({code: code}, details));
+                if (this.disconnectedAt === null) {
+                    this.disconnectedAt = Date.now();
+                }
+
+                let delay = this.options.keepReconnectRetryDelay;
+
+                if (!this.isWithinKeepReconnectTimeout()) {
+                    this.retryCount += 1;
+                    delay = this.retryCount * this.options.retryDelay;
+                    details = _.extend(
+                        details || {},
+                        {retries: this.retryCount, delay: delay}
+                    );
+
+                    if (!this.errorNotified) {
+                        this.errorNotified = true;
+                        this.trigger('connection_lost', _.extend({code: code}, details));
+                    }
+                }
 
                 window.setTimeout(() => {
                     this.connect();
-                }, this.retryCount * this.options.retryDelay);
+                }, delay);
             }
 
             this.session = null;
@@ -181,6 +215,8 @@ define(function(require) {
         onConnect: function(session) {
             this.session = session;
             this.retryCount = 0;
+            this.disconnectedAt = null;
+            this.errorNotified = false;
             this.trigger('connection_established');
             _.each(this.channels, function(callbacks, channel) {
                 _.each(callbacks, function(callback) {
