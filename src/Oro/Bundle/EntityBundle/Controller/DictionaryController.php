@@ -26,6 +26,12 @@ class DictionaryController
     #[Route(path: '/{dictionary}/search', name: 'oro_dictionary_search')]
     public function searchAction(string $dictionary, Request $request): JsonResponse
     {
+        // Unlock the session to not block concurrent requests
+        $session = $request->getSession();
+        if ($session->isStarted()) {
+            $session->save();
+        }
+
         return $this->getJsonResponse(
             $this->dictionaryEntityDataProvider->getValuesBySearchQuery($dictionary, $request->get('q'))
         );
