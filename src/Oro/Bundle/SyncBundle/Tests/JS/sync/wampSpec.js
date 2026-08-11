@@ -18,7 +18,13 @@ describe('orosync/js/sync/wamp', function() {
         let wamp;
         let options;
         beforeEach(function() {
-            options = {host: '127.0.0.1', syncTicketUrl: 'test_url'};
+            options = {
+                host: '127.0.0.1',
+                syncTicketUrl: 'test_url',
+                retryDelay: 60000,
+                reconnectGraceTimeout: 15000,
+                graceRetryDelay: 2000
+            };
         });
 
         it('required options', function() {
@@ -117,32 +123,215 @@ describe('orosync/js/sync/wamp', function() {
             });
 
             it('on hangup peacefully', function() {
+                jasmine.clock().mockDate();
                 wamp.session = session;
                 onHangup(0);
                 expect(wamp.session).toBeFalsy();
+                expect(wamp.retryCount).toBe(0);
+                expect(wamp.disconnectedAt).toBeNull();
+                expect(wamp.trigger).not.toHaveBeenCalledWith('connection_lost', jasmine.anything());
+
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + wamp.options.retryDelay);
+                expect(wamp.connect).not.toHaveBeenCalled();
             });
 
-            it('on reconnect reset retryCount', function() {
+            it('on reconnect resets retryCount, disconnectedAt and errorNotified', function() {
+                jasmine.clock().mockDate();
                 onConnect(session);
                 expect(wamp.session).toBe(session);
                 expect(wamp.retryCount).toBe(0);
 
-                onHangup(0);
+                onHangup(1);
                 expect(wamp.session).toBeFalsy();
+                expect(wamp.retryCount).toBe(0);
+
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + 1);
+                onHangup(1);
                 expect(wamp.retryCount).toBe(1);
+                expect(wamp.errorNotified).toBe(true);
 
                 onConnect(session);
                 expect(wamp.session).toBe(session);
                 expect(wamp.retryCount).toBe(0);
+                expect(wamp.disconnectedAt).toBeNull();
+                expect(wamp.errorNotified).toBe(false);
             });
 
-            it('on hangup with error code', function() {
+            it('on hangup within grace period retries silently, without connection_lost', function() {
+                jasmine.clock().mockDate();
                 wamp.session = session;
                 onHangup(1);
-                jasmine.clock().tick(wamp.options.retryDelay + 1);
                 expect(wamp.session).toBeFalsy();
-                expect(wamp.trigger).toHaveBeenCalledWith('connection_lost', jasmine.objectContaining({code: 1}));
+                expect(wamp.retryCount).toBe(0);
+                expect(wamp.trigger).not.toHaveBeenCalledWith('connection_lost', jasmine.anything());
+
+                jasmine.clock().tick(wamp.options.graceRetryDelay - 1);
+                expect(wamp.connect).not.toHaveBeenCalled();
+                jasmine.clock().tick(1);
                 expect(wamp.connect).toHaveBeenCalled();
+
+                // several more silent retries within the grace window keep retryCount untouched
+                for (let i = 0; i < 6; i++) {
+                    wamp.connect.calls.reset();
+                    onHangup(1);
+                    expect(wamp.retryCount).toBe(0);
+                    jasmine.clock().tick(wamp.options.graceRetryDelay);
+                    expect(wamp.connect).toHaveBeenCalled();
+                }
+                expect(wamp.trigger).not.toHaveBeenCalledWith('connection_lost', jasmine.anything());
+            });
+
+            it('on hangup past grace period triggers connection_lost once and keeps retrying', function() {
+                jasmine.clock().mockDate();
+                wamp.session = session;
+                onHangup(1);
+                expect(wamp.trigger).not.toHaveBeenCalledWith('connection_lost', jasmine.anything());
+
+                // real time elapses past reconnectGraceTimeout before the next scheduled attempt fails again
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + 1);
+                wamp.connect.calls.reset();
+
+                onHangup(1);
+                expect(wamp.session).toBeFalsy();
+                expect(wamp.retryCount).toBe(1);
+                expect(wamp.trigger).toHaveBeenCalledWith('connection_lost', jasmine.objectContaining({
+                    code: 1,
+                    retries: 1,
+                    delay: wamp.options.retryDelay
+                }));
+
+                jasmine.clock().tick(wamp.options.retryDelay - 1);
+                expect(wamp.connect).not.toHaveBeenCalled();
+                jasmine.clock().tick(1);
+                expect(wamp.connect).toHaveBeenCalled();
+
+                // a further failure within the same ongoing outage does not re-trigger connection_lost
+                wamp.trigger.calls.reset();
+                onHangup(1);
+                expect(wamp.trigger).not.toHaveBeenCalledWith('connection_lost', jasmine.anything());
+            });
+
+            it('first attempt after grace period uses a single retryDelay', function() {
+                jasmine.clock().mockDate();
+                wamp.session = session;
+                onHangup(1);
+
+                // seven silent grace-period retries, well within the 15s window
+                for (let i = 0; i < 7; i++) {
+                    jasmine.clock().tick(wamp.options.graceRetryDelay);
+                    onHangup(1);
+                    expect(wamp.retryCount).toBe(0);
+                }
+                expect(wamp.trigger).not.toHaveBeenCalledWith('connection_lost', jasmine.anything());
+
+                // push past the grace window, then fail once more — the first real backoff attempt
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout);
+                onHangup(1);
+
+                expect(wamp.retryCount).toBe(1);
+                expect(wamp.trigger).toHaveBeenCalledWith('connection_lost', jasmine.objectContaining({
+                    retries: 1,
+                    delay: wamp.options.retryDelay
+                }));
+            });
+
+            it('linear backoff for consecutive attempts after grace period', function() {
+                jasmine.clock().mockDate();
+                wamp.session = session;
+                onHangup(1);
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + 1);
+                onHangup(1);
+                expect(wamp.retryCount).toBe(1);
+
+                wamp.connect.calls.reset();
+                wamp.trigger.calls.reset();
+                jasmine.clock().tick(wamp.options.retryDelay + 1);
+                onHangup(1);
+
+                expect(wamp.retryCount).toBe(2);
+                // connection_lost fires once per outage — a second post-grace failure must not re-trigger it
+                expect(wamp.trigger).not.toHaveBeenCalledWith('connection_lost', jasmine.anything());
+
+                wamp.connect.calls.reset();
+                jasmine.clock().tick(2 * wamp.options.retryDelay - 1);
+                expect(wamp.connect).not.toHaveBeenCalled();
+                jasmine.clock().tick(1);
+                expect(wamp.connect).toHaveBeenCalled();
+            });
+
+            it('grace retries of a previous outage do not inflate the next outage backoff', function() {
+                jasmine.clock().mockDate();
+                wamp.session = session;
+
+                // first outage: a couple of silent grace retries, then reconnect before grace elapses
+                onHangup(1);
+                jasmine.clock().tick(wamp.options.graceRetryDelay);
+                onHangup(1);
+                jasmine.clock().tick(wamp.options.graceRetryDelay);
+                onHangup(1);
+                expect(wamp.retryCount).toBe(0);
+
+                onConnect(session);
+                expect(wamp.retryCount).toBe(0);
+                expect(wamp.disconnectedAt).toBeNull();
+
+                // second outage: past its own grace period, the first real attempt is still retries: 1
+                onHangup(1);
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + 1);
+                onHangup(1);
+
+                expect(wamp.retryCount).toBe(1);
+                expect(wamp.trigger).toHaveBeenCalledWith('connection_lost', jasmine.objectContaining({retries: 1}));
+            });
+
+            it('without grace period the first failure backs off by one retryDelay', function() {
+                const noGraceWamp = new Wamp({...options, reconnectGraceTimeout: 0});
+                spyOn(noGraceWamp, 'trigger').and.callThrough();
+                spyOn(noGraceWamp, 'connect');
+                const noGraceOnHangup = ab.connect.calls.mostRecent().args[2];
+
+                jasmine.clock().mockDate();
+                noGraceWamp.session = session;
+                noGraceOnHangup(1);
+
+                expect(noGraceWamp.retryCount).toBe(1);
+                expect(noGraceWamp.trigger).toHaveBeenCalledWith('connection_lost', jasmine.objectContaining({
+                    retries: 1,
+                    delay: noGraceWamp.options.retryDelay
+                }));
+            });
+
+            it('CONNECTION_CLOSED during an ongoing outage does not consume a backoff step', function() {
+                jasmine.clock().mockDate();
+                wamp.session = session;
+                onHangup(1);
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + 1);
+                onHangup(1);
+                expect(wamp.retryCount).toBe(1);
+
+                onHangup(0);
+                expect(wamp.retryCount).toBe(1);
+                expect(wamp.session).toBeFalsy();
+
+                wamp.connect.calls.reset();
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + 1);
+                onHangup(1);
+                expect(wamp.retryCount).toBe(2);
+            });
+
+            it('connection_lost payload overrides autobahn details', function() {
+                jasmine.clock().mockDate();
+                wamp.session = session;
+                onHangup(1);
+                jasmine.clock().tick(wamp.options.reconnectGraceTimeout + 1);
+
+                onHangup(1, 'msg', {retries: 3, delay: 1});
+
+                expect(wamp.trigger).toHaveBeenCalledWith('connection_lost', jasmine.objectContaining({
+                    code: 1,
+                    retries: 1,
+                    delay: wamp.options.retryDelay
+                }));
             });
         });
 
