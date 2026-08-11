@@ -6,7 +6,7 @@ $pin-item-active-bg-color: null !default;
 $pin-item-highlight-bg-color: $secondary-secondary-6 !default;
 $pin-item-close-color: $primary-200 !default;
 $pin-item-close-hover-color: color.adjust($pin-item-close-color, $lightness: -8%) !default;
-$pin-item-outdated-color: $warning-dark !default;
+$pin-item-outdated-color: $warning !default;
 $pin-item-outdated-hover-color: color.adjust($pin-item-outdated-color, $lightness: -8%) !default;
 
 $pin-item-show-more-menu-width: 20px !default;

@@ -1,0 +1,53 @@
+/* @theme: admin.oro; */
+
+@mixin table-outlined(
+    $border:         $table-outlined-border,
+    $border-radius:  $table-outlined-border-radius,
+    $border-spacing: $table-outlined-border-spacing,
+    $border-collapse: $table-outlined-border-collapse
+) {
+    border: $border;
+    border-radius: $border-radius;
+    border-spacing: $border-spacing;
+    border-collapse: $border-collapse;
+
+    thead th {
+        padding: $table-outlined-thead-th-padding;
+        font-size: $table-outlined-thead-th-font-size;
+        font-weight: $table-outlined-thead-th-font-weight;
+        text-transform: $table-outlined-thead-th-text-transform;
+        letter-spacing: $table-outlined-thead-th-letter-spacing;
+        border-bottom: $table-outlined-thead-th-border-bottom;
+        background: $table-outlined-thead-th-background;
+
+        > span {
+            text-transform: $table-outlined-thead-th-span-text-transform;
+        }
+    }
+
+    tbody {
+        td {
+            padding: $table-outlined-tbody-td-padding;
+            font-size: $table-outlined-tbody-td-font-size;
+            letter-spacing: $table-outlined-tbody-td-letter-spacing;
+            font-weight: $table-outlined-tbody-td-font-weight;
+            border-top: $table-outlined-tbody-td-border-top;
+            border-bottom: $table-outlined-tbody-td-border-bottom;
+
+            &:first-child {
+                font-weight: $table-outlined-tbody-td-first-child-font-weight;
+                border-image: $table-outlined-tbody-td-first-child-border-image;
+            }
+
+            &:last-child {
+                border-image: $table-outlined-tbody-td-last-child-border-image;
+            }
+        }
+
+        tr:last-child {
+            td {
+                border-bottom: $table-outlined-tbody-tr-last-child-td-border-bottom;
+            }
+        }
+    }
+}

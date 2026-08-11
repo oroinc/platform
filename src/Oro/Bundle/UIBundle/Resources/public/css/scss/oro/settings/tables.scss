@@ -1,8 +1,6 @@
 /* @theme: admin.oro; */
 
 $table-offset-bottom: 0 !default;
-$table-unit-table-min-width: 300px !default;
-$table-unit-table-td-first-child-font-weight: font-weight('bold') !default;
 
 $table-td-first-child-inner-offset: $content-padding-medium !default;
 $table-td-first-child-text-align: left !default;
@@ -23,18 +21,19 @@ $table-td-nowrap-ellipsis-div-text-overflow: ellipsis !default;
 $table-td-nowrap-ellipsis-div-width: 100% !default;
 
 $table-thead-th-background: $neutral-grey-2 !default;
-$table-thead-th-font-size: $base-font-size--xs !default;
-$table-thead-th-color: $text-secondary !default;
+$table-thead-th-border-bottom: 1px solid $neutral-grey-3 !default;
+$table-thead-th-font-size: 12px !default;
+$table-thead-th-font-weight: font-weight('semi-bold') !default;
+$table-thead-th-color: $text-primary !default;
 $table-thead-th-padding: 11px 8px !default;
 $table-thead-th-white-space: nowrap !default;
 $table-thead-th-vertical-align: top !default;
 $table-thead-th-text-transform: uppercase !default;
-$table-bordered-thead-th-border-color: $primary-200 !default;
+$table-thead-th-letter-spacing: .1px !default;
 
 $table-thead-th-a-color: inherit !default;
 $table-thead-th-a-display: block !default;
-$table-thead-th-a-line-height: 11px !default;
-$table-thead-th-a-inner-offset: 7px 0 5px !default;
+$table-thead-th-a-line-height: 18px !default;
 $table-thead-th-a-text-transform: uppercase !default;
 
 $table-thead-th-a-focus-outline: none !default;
@@ -44,14 +43,14 @@ $table-thead-th-sortable-border: none !default;
 $table-thead-th-sortable-border-right: 4px solid transparent !default;
 $table-thead-th-sortable-border-left: 4px solid transparent !default;
 
-$table-thead-th-ascending-color: $extra-100 !default;
+$table-thead-th-ascending-color: $primary-accent-light !default;
 
 $table-thead-th-ascending-caret-offset-top: 0 !default;
 $table-thead-th-ascending-caret-display: inline-block !default;
 $table-thead-th-ascending-caret-border-top: none !default;
 $table-thead-th-ascending-caret-border-bottom: 4px solid !default;
 
-$table-thead-th-descending-color: $extra-100 !default;
+$table-thead-th-descending-color: $primary-accent-light !default;
 
 $table-thead-th-descending-caret-offset-top: 4px !default;
 $table-thead-th-descending-caret-display: inline-block !default;
@@ -67,7 +66,7 @@ $table-tbody-row-selected-hover-background: $row-selected-background !default;
 $table-tbody-row-selected-hover-td-background: inherit !default;
 
 $table-tbody-td-border-top: 1px solid var(--table-tbody-tr-border-color, #{$primary-860}) !default;
-$table-tbody-td-border-bottom: 1px solid var(--table-tbody-tr-border-color, #{$primary-860}) !default;
+$table-tbody-td-border-bottom: 1px solid $neutral-grey-3 !default;
 $table-tbody-td-offset: $content-padding-small !default;
 
 $table-tfoot-th-background: $primary-200 !default;
@@ -126,3 +125,32 @@ $table-open-tr-open-row-background-position: 0 -13px !default;
 
 $sub-table-border-radius: 4px !default;
 $table-thead-th-background: $primary-200 !default;
+
+$table-outlined-border-radius: 4px !default;
+$table-outlined-border-spacing: 0 !default;
+$table-outlined-border-collapse: separate !default;
+$table-outlined-border: 1px solid $neutral-grey-3 !default;
+
+$table-outlined-thead-th-padding: 8px 8px 4px !default;
+$table-outlined-thead-th-font-size: 12px !default;
+$table-outlined-thead-th-font-weight: font-weight('normal') !default;
+$table-outlined-thead-th-text-transform: capitalize !default;
+$table-outlined-thead-th-letter-spacing: .024px !default;
+$table-outlined-thead-th-border-bottom: 1px solid $neutral-grey-3 !default;
+$table-outlined-thead-th-background: none !default;
+$table-outlined-thead-th-span-text-transform: none !default;
+
+$table-outlined-tbody-td-padding: 8px !default;
+$table-outlined-tbody-td-font-size: 12px !default;
+$table-outlined-tbody-td-letter-spacing: .2px !default;
+$table-outlined-tbody-td-font-weight: font-weight('medium') !default;
+$table-outlined-tbody-td-border-top: 0 !default;
+$table-outlined-tbody-td-border-bottom: 1px solid $neutral-grey-3 !default;
+
+$table-outlined-tbody-td-first-child-font-weight: font-weight('normal') !default;
+$table-outlined-tbody-td-first-child-border-image: linear-gradient(to right, transparent 8px, $neutral-grey-3 8px)
+        1 !default;
+$table-outlined-tbody-td-last-child-border-image: linear-gradient(to left, transparent 8px, $neutral-grey-3 8px)
+        1 !default;
+
+$table-outlined-tbody-tr-last-child-td-border-bottom: 0 !default;

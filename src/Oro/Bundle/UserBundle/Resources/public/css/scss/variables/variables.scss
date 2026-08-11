@@ -15,8 +15,9 @@ $role-capability-label-line-height: 1.5;
 $role-collapse-label-width: 500px !default;
 
 $role-capability-group-title-offset: 30px 0 0 !default;
-$role-capability-group-title-font-size: 18px !default;
-$role-capability-group-title-weight: font-weight('bold') !default;
+$role-capability-group-title-font-size: 14px !default;
+$role-capability-group-title-weight: font-weight('semi-bold') !default;
+$role-capability-group-title-letter-spacing: .1px !default;
 
 $role-collapse-action-container-width: 226px !default;
 $role-collapse-expand-action-container-offset: 30px !default;
@@ -35,7 +36,7 @@ $entity-permission-entity-row-action-offset: 5px 0 !default;
 $inner-permissions-grid-collapse-action-offset: $content-padding-medium !default;
 
 $inner-permissions-grid-entity-name-offset: 10px !default;
-$inner-permissions-grid-entity-name-weight: font-weight('bold') !default;
+$inner-permissions-grid-entity-name-weight: font-weight('semi-bold') !default;
 
 $inner-permissions-grid-fields-list-offset: $content-padding-small !default;
 $inner-permissions-grid-fields-list-indent: 29px !default;

@@ -11,7 +11,7 @@
 
     border-collapse: separate;
     border-spacing: 0;
-    background-color: $primary-inverse;
+    background-color: $neutral-white;
 }
 
 .datagrid {
@@ -106,12 +106,18 @@
     background-color: $oro-datagrid-header-background;
     padding: $oro-datagrid-header-cell-inner-offset;
     box-shadow: 1px 0 $oro-datagrid-header-background;
+    border-bottom: $oro-datagrid-header-cell-border-bottom;
+    line-height: $oro-datagrid-header-cell-line-height;
+    font-weight: $oro-datagrid-header-cell-font-weight;
+    letter-spacing: $oro-datagrid-header-cell-letter-spacing;
 
     white-space: nowrap;
 
     &__label,
     &__link {
+        font-size: $oro-datagrid-label-font-size;
         line-height: $oro-datagrid-label-line-height;
+        letter-spacing: $oro-datagrid-label-letter-spacing;
 
         color: $oro-datagrid-label-color;
 

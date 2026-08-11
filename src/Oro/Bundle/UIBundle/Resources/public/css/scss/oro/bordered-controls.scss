@@ -1,0 +1,687 @@
+/* @theme: admin.oro; */
+
+/* stylelint-disable no-descending-specificity */
+
+/* Add general border-styles for controls on Edit Pages */
+.control-group {
+    padding: $form-container-control-group-offset;
+    border-bottom: $form-container-control-group-border-bottom;
+
+    &:has(+ .control-group[style*='display: none']),
+    &:has(+ .control-group.hide),
+    &:has(+ input[type='hidden']),
+    &:has(+ .email-body-actions),
+    &:has(+ .scope-elements),
+    &:has(+ .removeRow),
+    &:has(+ .hidden-only-by-default[style*='display: none']),
+    &:has(+ .report-chart > div[style*='display: none'] + div[style*='display: none']) {
+        border-bottom: 0;
+    }
+
+    &:has(+ input[type='hidden'] ~ .control-group:not(.hide)),
+    &:has(+ .control-group[style*='display: none'] + .control-group:not(.hide)),
+    &:has(+ .control-group.hide ~ .control-group:not(.hide)) {
+        border-bottom: $form-container-control-group-border-bottom;
+    }
+
+    &.price-attributes-collection {
+        border-bottom: 0;
+
+        .control-group {
+            border-bottom: 0;
+        }
+    }
+
+    .control-group {
+        &:first-child {
+            padding-top: 0;
+        }
+
+        &:only-child {
+            padding-top: 0;
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        .jstree-wrapper,
+        .jstree-container,
+        .jstree-wholerow-ul {
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+    }
+
+    + .row-oro {
+        margin-top: $content-padding;
+    }
+}
+
+/* Add general border-styles for fields on View Pages */
+.attribute-item {
+    padding: $form-container-control-group-offset;
+    border-bottom: $form-container-control-group-border-bottom;
+
+    .attribute-item {
+        &:first-child {
+            padding-top: 0;
+        }
+
+        &:only-child {
+            padding-top: 0;
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+    }
+
+    &:has(+ .oro-datagrid) {
+        border-bottom: 0;
+    }
+
+    + .oro-datagrid {
+        margin-top: $content-padding-medium;
+    }
+}
+
+/* Start: Reset border-styles as general rules */
+.form-container,
+.form-horizontal {
+    .responsive-cell:only-child {
+        .control-group:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    .control-group {
+        &:only-child {
+            border-bottom: 0;
+        }
+
+        &.control-group-choice .choice-widget-expanded {
+            padding-top: 0;
+        }
+    }
+}
+
+.responsive-cell {
+    &:has(+ .responsive-cell .grid-container) {
+        .attribute-item:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    .control-group {
+        &:has(+ .row-oro, + .control-group > .controls:first-child) {
+            border-bottom: 0;
+        }
+
+        &:has(> .controls:only-child > input[type='hidden']:only-child) {
+            padding: 0;
+            margin: 0;
+        }
+
+        + .price_rule__priority {
+            padding: $form-container-control-group-offset;
+        }
+    }
+
+    .controls {
+        .control-group {
+            &:has(+ .control-group .controls:first-child) {
+                border-bottom: 0;
+            }
+        }
+    }
+
+    .attribute-item:only-child {
+        border-bottom: 0;
+    }
+
+    .order-view-rest-info__wrapper {
+        .form-horizontal {
+            .responsive-block {
+                width: 50%;
+                padding-right: $content-padding-xl;
+            }
+        }
+    }
+}
+/* End: Reset border-styles as general rules */
+
+.responsive-section:not(.responsive-small) {
+    .form-container,
+    .form-horizontal {
+        .control-group:last-child {
+            border-bottom: 0;
+        }
+
+        .control-group-container:not(:last-of-type) {
+            .control-group {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+
+    .user-view-list-attributes {
+        .form-container,
+        .form-horizontal {
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+
+        .attribute-item {
+            .attribute-item {
+                border-bottom: 0;
+            }
+        }
+    }
+}
+
+.responsive-section:not(.responsive-small):not(.responsive-medium) {
+    .form-container,
+    .form-horizontal {
+        .attribute-item:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    .responsive-with-extra-block:has(+ .row-fluid .responsive-block .attribute-item, + .attribute-item) {
+        .responsive-block:last-child {
+            .attribute-item:last-child {
+                border-bottom: 0;
+            }
+        }
+    }
+}
+
+.responsive-small {
+    .form-container,
+    .form-horizontal {
+        .responsive-cell {
+            &:not(:first-child) {
+                .oro-collection-table,
+                .list-widget {
+                    margin-top: $content-padding-xl;
+                }
+
+                .price-attribute-item {
+                    margin-top: $content-padding-medium;
+                }
+            }
+
+            &:last-child {
+                .control-group:last-child {
+                    border-bottom: 0;
+                }
+            }
+
+            .control-group:empty {
+                padding: 0;
+            }
+        }
+    }
+
+    .order-view-rest-info__wrapper {
+        .form-horizontal {
+            .responsive-block {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.responsive-small,
+.responsive-medium {
+    .form-container,
+    .form-horizontal {
+        .responsive-block {
+            &:last-child,
+            &:has(+ .responsive-block:empty) {
+                .attribute-item:last-child {
+                    border-bottom: 0;
+                }
+            }
+        }
+    }
+
+    .responsive-cell {
+        &:has(+ .responsive-cell) {
+            .control-group {
+                &:has(+ input[type='hidden']),
+                &:has(+ .control-group[style*='display: none']) {
+                    border-bottom: $form-container-control-group-border-bottom;
+                }
+            }
+        }
+
+        &:has(+ .responsive-cell .box-type1),
+        &.responsive-cell-no-blocks {
+            .attribute-item:last-child {
+                border-bottom: 0;
+            }
+        }
+
+        &:has(+ .responsive-cell .user-fieldset) {
+            .control-group:last-child {
+                border-bottom: 0;
+            }
+
+            .control-group-container:last-child {
+                .control-group:last-child {
+                    border-bottom: 0;
+                }
+            }
+
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+
+        &:first-child,
+        &:last-child {
+            .responsive-list-with-divider--medium {
+                .control-group:last-child {
+                    border-bottom: $form-container-control-group-border-bottom;
+                }
+            }
+
+            .organization-dynamic-block {
+                .attribute-item:last-child {
+                    border-bottom: $form-container-control-group-border-bottom;
+                }
+            }
+        }
+
+        + .responsive-cell {
+            .user-fieldset,
+            .widget-title {
+                margin-top: $content-padding;
+            }
+        }
+    }
+
+    .responsive-list-with-divider--medium {
+        .responsive-block:first-child,
+        .responsive-cell:first-child > {
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+
+    .responsive-with-extra-block {
+        &.no-border-for-last-item--medium {
+            + .attribute-item:last-child {
+                border-bottom: 0;
+            }
+        }
+    }
+
+    .one-col-with-extra-block {
+        .responsive-cell {
+            &:last-child {
+                > .attribute-item:last-child {
+                    border-bottom: 0;
+                }
+            }
+        }
+    }
+
+    .title:has(+ .user-view-address-list),
+    .contact-widget-wrapper .title {
+        margin-top: $content-padding;
+    }
+
+    .user-view-list-attributes {
+        .responsive-block {
+            width: 100%;
+        }
+    }
+
+    .order-view-info__wrapper {
+        .responsive-block:last-child {
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+
+    .oro-item-collection {
+        .responsive-block:has(+ .responsive-block) {
+            margin-bottom: 0;
+
+            .control-group:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+}
+
+.responsive-section,
+.responsive-section.responsive-big,
+.responsive-section.responsive-medium,
+.responsive-section.responsive-small {
+    .info-embedded-form {
+        .form-horizontal {
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+
+    .form-horizontal {
+        .always-border-visible-for-last-child {
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+
+            .control-group {
+                &:last-child,
+                &:has(+ .control-group[style*='display: none']) {
+                    border-bottom: $form-container-control-group-border-bottom;
+                }
+            }
+        }
+
+        .responsive-with-extra-block:has(+ .row-fluid .responsive-block .attribute-item, + .attribute-item) {
+            .responsive-block {
+                /* stylelint-disable-next-line selector-max-compound-selectors */
+                .attribute-item:last-child {
+                    border-bottom: $form-container-control-group-border-bottom;
+                }
+            }
+        }
+
+        .info-opportunity-right-block:last-child {
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+
+            .collapse-block:last-child {
+                /* stylelint-disable-next-line selector-max-compound-selectors */
+                .attribute-item:last-child {
+                    border-bottom: 0;
+                }
+            }
+        }
+
+        .control-group-oro_catalog_category_unit_precision.control-group:last-child {
+            border-bottom: $form-container-control-group-border-bottom;
+        }
+
+        .redirect-content-node__wrapper {
+            width: 100%;
+        }
+    }
+
+    .always-border-visible-for-last-child {
+        &.user-information-widget {
+            + .row-fluid {
+                .attribute-item:last-child {
+                    border-bottom: $form-container-control-group-border-bottom;
+                }
+            }
+
+            ~ .attribute-item:not(:has(~ .attribute-item)) {
+                border-bottom: 0;
+            }
+        }
+    }
+}
+
+.form-horizontal {
+    .order-view-info__wrapper {
+        .responsive-block:first-child {
+            .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+
+    .product-kit-view__info:first-child,
+    .product-kit-item:first-child {
+        .content-variant-item-content,
+        .product-kit-item__properties {
+            .attribute-item:not(:has(~ .attribute-item)) {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+
+            .attribute-wide {
+                /* stylelint-disable-next-line selector-max-compound-selectors */
+                .attribute-item {
+                    border-bottom: 0;
+                }
+            }
+        }
+    }
+
+    .user-view-list-attributes,
+    .account-information-view {
+        .responsive-block:first-child {
+            > .attribute-item:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+
+    .responsive-cell:last-child {
+        .target-fields {
+            .control-group:last-child {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+
+    .theme-configuration-options {
+        .control-group.dependent-fields-container {
+            background: none;
+            border-radius: 0;
+            grid-row-gap: 0;
+
+            > .control-label {
+                margin-bottom: $content-padding;
+            }
+
+            .theme-configuration-container {
+                margin-bottom: 0;
+            }
+
+            .control-group {
+                border-bottom: 0;
+            }
+        }
+    }
+
+    .product-view-attribute-item {
+        .form-horizontal,
+        .responsive-block {
+            width: 100%;
+        }
+    }
+
+    .control-group:has(+ .email-template__wrapper:empty) {
+        border-bottom: 0;
+    }
+}
+
+.form-horizontal-large {
+    .control-group:last-child {
+        border-bottom: 0;
+    }
+}
+
+.form-vertical {
+    .control-group:has(+ .loader-mask) {
+        border-bottom: 0;
+    }
+}
+
+.content-variant-item-content__body {
+    .control-group:not(:has(~ .control-group)) {
+        border-bottom: 0;
+    }
+}
+
+.scope-collection {
+    .collection-fields-list {
+        .control-group {
+            border-bottom: 0;
+        }
+    }
+}
+
+.oro-address-collection,
+.order-update-address-form {
+    .control-group:has(+ div > input[type='hidden']) {
+        border-bottom: 0;
+    }
+}
+
+.ui-dialog {
+    .form-container,
+    .form-horizontal {
+        .control-group {
+            &:last-child,
+            &:has(+ div > input[type='hidden'], + input[type='hidden'], + .hide) {
+                border-bottom: 0;
+            }
+
+            &:has(+ div > input[type='hidden'] + .control-group),
+            &:has(+ input[type='hidden'] + .control-group),
+            &:has(+ .hide + .control-group),
+            &:has(+ .hidden-input__wrapper + .control-group:not(.hide)) {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+    }
+}
+
+.target-fields {
+    .target-choices-field {
+        &:not(:has(~ .control-group-container:not([style*='display: none']))) {
+            .control-group:last-child {
+                border-bottom: 0;
+            }
+        }
+    }
+
+    > .control-group-container:not([style*='display: none']):not(
+    :has(~ .control-group-container:not([style*='display: none']))) {
+        .control-group:last-child {
+            border-bottom: 0;
+        }
+    }
+}
+
+.dependent-fields-container {
+    .control-group:has(~ .control-group.hide) {
+        border-bottom: 0;
+    }
+}
+
+.sidebar-items {
+    &.form-vertical {
+        .control-group {
+            + .control-group {
+                margin-top: 0;
+            }
+
+            &:last-child {
+                border-bottom: 0;
+            }
+        }
+    }
+}
+
+.responsive-section,
+.responsive-section.responsive-small,
+.ui-dialog {
+    .form-horizontal {
+        .calendar-event-daterange:has(+ .calendar-event-recurrence) {
+            .control-group {
+                border-bottom: $form-container-control-group-border-bottom;
+            }
+        }
+
+        .calendar-event-recurrence {
+            .control-group {
+                &:last-child {
+                    border-bottom: $form-container-control-group-border-bottom;
+                }
+
+                &:has(+ .recurrence-settings[style*='display: none']) {
+                    border-bottom: 0;
+                }
+            }
+
+            .recurrence-ends {
+                /* stylelint-disable-next-line selector-max-compound-selectors */
+                .control-group:last-child {
+                    border-bottom: 0;
+                }
+            }
+        }
+    }
+}
+
+.system-configuration-content-wrapper {
+    .control-group-container {
+        .control-group:first-child {
+            padding-top: $content-padding-small;
+        }
+    }
+}
+
+.customer-address-types__wrapper {
+    .control-group-choice {
+        &:has(+ .control-group-choice) {
+            padding-bottom: 0;
+        }
+
+        + .control-group-choice {
+            padding-top: 0;
+
+            .choice-widget-expanded {
+                padding-top: 0;
+            }
+        }
+
+        .choice-widget-expanded__item {
+            margin-bottom: $content-padding-xs;
+        }
+    }
+}
+
+.dependent-field {
+    + .control-group:empty {
+        padding: 0;
+    }
+}
+
+.select-coupon-container {
+    align-items: center;
+
+    .control-group:has(+ .btn) {
+        border-bottom: 0;
+    }
+
+    .btn {
+        height: auto;
+    }
+}
+
+.search-term-last-item-in-current-state {
+    .control-group {
+        border-bottom: none;
+    }
+}
+
+.user-fieldset-with-offset-top {
+    margin-top: $content-padding;
+}
+
+.form-flex {
+    > .control-group {
+        border: none;
+    }
+}

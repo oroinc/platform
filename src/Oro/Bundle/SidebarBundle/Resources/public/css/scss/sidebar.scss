@@ -64,7 +64,7 @@
     .sidebar.sidebar-right &__resize {
         left: -1px;
         padding-left: 4px;
-        border-left-width: 2px;
+        border-left-width: 3px;
     }
 
     .sidebar.sidebar-left &__resize {
@@ -321,7 +321,7 @@
     }
 
     &__header-title {
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
         font-size: 14px;
         color: $sidebar-widget-title-color;
         flex-grow: 1;

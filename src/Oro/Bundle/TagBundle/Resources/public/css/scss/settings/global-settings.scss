@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 $tag-selector-min-width: 100px !default;
 // stylelint-disable-next-line declaration-no-important
 $tag-selector-items-width: 100% !important;
@@ -22,11 +24,11 @@ $tag-selector-item-input-inner-offset-start:
 $tag-selector-actions-width: 65px !default;
 $tag-selector-actions-font-size: $base-font-size--m !default;
 
-$tag-item-color: $secondary;
-$tag-item-background: $secondary-300;
-$tag-my-item-background: $secondary;
-$tag-item-editable-hover-background: $secondary;
-$tag-item-edit-hover-alt-background: $secondary-dark;
+$tag-item-color: $primary-main;
+$tag-item-background: $neutral-grey-2;
+$tag-my-item-background: $primary-main;
+$tag-item-editable-hover-background: $primary-main;
+$tag-item-edit-hover-alt-background: $secondary-secondary-5;
 $tag-item-editable-hover-color: $primary-inverse;
 $tag-item-height: 24px !default;
 $tag-item-font-size: 12px !default;
@@ -47,11 +49,12 @@ $tag-selector-action-height: $select2-search-field-line-height + ($tag-selector-
 $tag-selector-action-width: $tag-selector-action-height !default;
 
 $tag-cell-container-height-delta: $tag-item-height - $oro-datagrid-editable-cell-line-height;
-$tag-cell-container-inner-offset-top: $oro-datagrid-body-cell-inner-top -
+$tag-cell-container-inner-offset-top: $oro-datagrid-body-cell-inner-vertical -
     $tag-cell-container-height-delta !default;
-$tag-cell-container-inner-offset-bottom: $oro-datagrid-body-cell-inner-bottom -
-    $tag-item-offset-vertical -
-    $tag-cell-container-height-delta !default;
+$tag-cell-container-inner-offset-bottom: math.max(
+    2px,
+    $oro-datagrid-body-cell-inner-vertical - $tag-item-offset-vertical - $tag-cell-container-height-delta
+) !default;
 $tag-cell-container-inner-offset:
         $tag-cell-container-inner-offset-top
         $oro-datagrid-editable-cell-offset

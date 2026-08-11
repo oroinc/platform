@@ -33,7 +33,7 @@
     &__title {
         background: $primary-300;
         font-size: 17px;
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
         color: $primary-inverse;
         text-transform: uppercase;
         display: block;
@@ -85,7 +85,7 @@
     &.form-signin--forgot {
         width: $signin-forgot-mobile-width;
         max-width: 100%;
-        
+
         input[type='text'] {
             width: 100%;
         }

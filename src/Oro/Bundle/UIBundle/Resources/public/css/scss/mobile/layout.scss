@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 /* stylelint-disable no-descending-specificity, selector-max-compound-selectors, scss/selector-no-redundant-nesting-selector */
 
 body {
@@ -305,7 +307,11 @@ form > .layout-content {
 
                 .row-fluid {
                     &.row-fluid-divider {
-                        background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+                        background:
+                            linear-gradient(
+                                color.adjust($neutral-grey-3, $lightness: 7%),
+                                color.adjust($neutral-grey-3, $lightness: 7%)
+                            ) repeat-y 50% 0;
                         background-size: 1px 100%;
                     }
                 }

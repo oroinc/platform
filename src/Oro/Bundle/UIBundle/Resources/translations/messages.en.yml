@@ -160,8 +160,8 @@ oro:
             skip_to_content_link: 'Learn more in'
             skip_to_content_link_text: 'Keyboard Navigation'
         collapse:
-            more: 'View More'
-            less: 'View Less'
+            more: 'View more'
+            less: 'View less'
         breadcrumb.aria_label: Breadcrumbs
         dropdown_option_aria_label: "More Actions"
         simplified_preview:

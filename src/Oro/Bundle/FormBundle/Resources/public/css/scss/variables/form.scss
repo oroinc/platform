@@ -73,17 +73,17 @@ $control-group-collapsible-collapse-action-icon-collapsed-content: '+' !default;
 $control-group-collapsible-controls-overflow: hidden !default;
 $control-group-collapsible-collapsed-content: '+' !default;
 
-$oro-hint-background-color: $extra-300 !default;
+$oro-hint-background-color: $primary-accent-extra-light !default;
 $oro-hint-border-radius: 2px !default;
 $oro-hint-border: 0 none !default;
-$oro-hint-color: $warning-darken !default;
+$oro-hint-color: $warning !default;
 $oro-hint-font-size: $base-font-size--sm !default;
 $oro-hint-line-height: 1.23 !default;
 $oro-hint-offset: 10px 0 0 0 !default;
 $oro-hint-inner-offset: 4px 8px !default;
 $oro-hint-text-shadow: none !default;
 $oro-hint-control-group-max-width: 465px !default;
-$oro-hint-controls-width: 294px !default;
+$oro-hint-controls-width: 300px !default;
 
 $oro-hint-above-offset-bottom: 10px !default;
 $oro-hint-above-offset-top: 0 !default;
@@ -100,9 +100,9 @@ $multi-checkbox-control-item-offset: 0 4px 0 0 !default;
 $multi-checkbox-control-input-offset-top: -2px !default;
 
 $section-content-offset-top: -20px !default;
-$section-content-inner-offset-top: 28px !default;
-$section-content-inner-offset-bottom: 20px !default;
+$section-content-inner-offset-top: $content-padding-medium !default;
+$section-content-inner-offset-bottom: $content-padding-xl !default;
 
-$row-fluid-inner-offset: 4px 0 12px !default;
+$row-fluid-inner-offset: 0 !default;
 
 $floating-error-message-line-height: 1.2 !default;

@@ -2,7 +2,6 @@
 
 .dynamic-field {
     display: grid;
-    gap: 16px;
 
     &:not(:first-child) {
         margin-top: 32px;

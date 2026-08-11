@@ -293,7 +293,7 @@ table.grid {
 .workflow-unordered-step-name {
     display: inline-block;
     padding: 0 10px;
-    border-radius: 10px;
+    border-radius: 4px;
     line-height: $btn-line-height-sm;
     color: $workflow-step-color;
     background: $workflow-step-background-color;
@@ -348,7 +348,7 @@ table.grid {
 }
 
 .transition-example-container .transition-btn-example .btn {
-    max-width: 294px;
+    max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
 }

@@ -233,21 +233,21 @@
             color: transparent;
             outline: none;
             background: transparent;
-            border: 1px solid $extra;
+            border: 1px solid $primary-accent;
             border-radius: 50%;
 
             @include hover() {
-                border-color: $extra-100;
-                background: $extra-100;
+                border-color: $primary-accent-light;
+                background: $primary-accent-light;
             }
         }
 
         .slick-active {
             button {
-                background: $extra;
+                background: $primary-accent;
 
                 @include hover() {
-                    background: $extra;
+                    background: $primary-accent;
                     cursor: default;
                 }
             }

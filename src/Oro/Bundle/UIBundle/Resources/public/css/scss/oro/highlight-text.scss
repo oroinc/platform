@@ -7,7 +7,7 @@
             color: inherit;
             background-color: $highlight-text-color;
             font-family: inherit;
-            font-weight: font-weight('bold');
+            font-weight: font-weight('semi-bold');
             font-size: inherit;
             line-height: inherit;
 
@@ -55,6 +55,7 @@
 
         &__control {
             font-size: $base-font-size;
+            font-weight: font-weight('normal');
 
             &:last-child {
                 display: none;

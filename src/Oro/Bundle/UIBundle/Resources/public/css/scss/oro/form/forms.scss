@@ -22,14 +22,10 @@
 .dependent-fields-container {
     max-width: $form-container-control-group-max-width;
 
-    border-radius: $border-radius-md;
+    border-radius: $border-radius;
 
     background-color: $neutral-grey-1;
-    border: 1px solid $neutral-grey-3;
-    padding-top: $content-padding-medium;
-    padding-bottom: $content-padding-large;
-    padding-left: $content-padding-small;
-    margin-left: -#{$content-padding-small};
+    padding: $content-padding-small $content-padding;
 }
 
 .form-horizontal {
@@ -39,7 +35,7 @@
         > .control-label {
             width: $form-horizontal-control-label-width;
             font-weight: font-weight('light');
-            text-align: var(--form-horizontal-control-label-text-align, right);
+            text-align: var(--form-horizontal-control-label-text-align, left);
             flex-shrink: 0;
 
             .ui-dialog-content &,
@@ -53,12 +49,18 @@
             .control-label {
                 padding-top: $form-horizontal-control-label-offset;
                 line-height: $form-horizontal-control-label-line-height;
+
+                &.collapse-toggle {
+                    padding-top: 0;
+                }
             }
         }
 
         .control-label {
             .tooltip-icon {
-                margin-right: $content-padding-small;
+                /* rtl:remove */
+                display: inline;
+                margin-left: $content-padding-small;
             }
 
             label {
@@ -119,7 +121,9 @@
                 }
 
                 .tooltip-icon {
-                    margin-right: $content-padding-small;
+                    /* rtl:remove */
+                    display: inline;
+                    margin-left: $content-padding-small;
                 }
             }
 
@@ -146,7 +150,7 @@
         &.control-group-datetime {
             input[type='text'] {
                 &.datepicker-input {
-                    width: 189px;
+                    width: 192px;
                 }
 
                 &.timepicker-input {
@@ -275,7 +279,7 @@
 }
 
 .user-fieldset {
-    margin-bottom: 22px;
+    margin-bottom: 4px;
 
     span {
         background-color: $primary-inverse;
@@ -301,13 +305,11 @@ input[type='checkbox'] + label {
 
 label {
     &.required {
-        position: relative;
 
         em {
             color: $secondary-secondary-3;
-            font-size: 21px;
+            font-size: 14px;
             font-style: normal;
-            position: absolute;
 
             margin-top: -2px;
             margin-left: 4px;

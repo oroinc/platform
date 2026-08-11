@@ -58,6 +58,16 @@
         map_get($oro-form-selectors, 'select2-prepend')} {
             width: $select2-container-input-append-width;
             max-width: $select2-container-input-append-max-width;
+
+            .entity-create-enabled & {
+                width: $select2-container-input-append-create-enabled-width;
+                max-width: $select2-container-input-append--create-enabled-max-width;
+            }
+
+            .entity-create-multi-enabled & {
+                width: $select2-container-input-append-create-multi-enabled-width;
+                max-width: $select2-container-input-append--create-multi-enabled-max-width;
+            }
         }
 
         .input-append & {

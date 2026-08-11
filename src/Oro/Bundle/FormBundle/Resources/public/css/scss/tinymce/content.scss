@@ -37,12 +37,12 @@
 }
 
 .mce-match-marker-selected {
-    background: $secondary;
+    background: $primary-main;
     color: $primary-inverse;
 }
 
 .mce-spellchecker-word {
-    border-bottom: 2px solid $danger;
+    border-bottom: 2px solid $error;
     cursor: default;
 }
 
@@ -61,7 +61,7 @@
 td.mce-item-selected,
 th.mce-item-selected {
     // stylelint-disable-next-line declaration-no-important
-    background-color: $secondary !important;
+    background-color: $primary-main !important;
 }
 
 .mce-edit-focus {

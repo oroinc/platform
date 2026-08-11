@@ -2,48 +2,54 @@
 
 @use 'sass:color';
 
-// new palette
+// Figma color palette
 $primary-main: #355477 !default;
-$primary-main-light: #dfebf8 !default;
+$primary-main-light: #c9d6e4 !default;
 $primary-accent: #b48c50 !default;
 $primary-accent-light: #f0e8dc !default;
 $primary-accent-extra-light: #fff8ee !default;
-$primary-accent-gradient: radial-gradient(
-    ellipse at 73.28% 0%,
-    #ede6d9 0%,
-    #edeae5 47.74%,
-    #fafaf7 100%
-) !default;
+$primary-accent-background: linear-gradient(90deg, #d3d9e3 0%, #e2e5eb 63%) !default;
+$primary-background: radial-gradient(ellipse at 73.28% 0%, #ede6d9 0%, #edeae5 47.74%, #fafaf7 100%) !default;
+
+$primary-box-shadow: 0 2px 4px -2px rgba(10, 13, 18, .06), 0 4px 6px -1px rgba(10, 13, 18, .1) !default;
 
 $secondary-secondary-1: #2138cd !default;
 $secondary-secondary-2: #13a367 !default;
 $secondary-secondary-3: #b2454c !default;
 $secondary-secondary-4: #4c77a9 !default;
 $secondary-secondary-5: #2d4663 !default;
-$secondary-secondary-6: #c7d3e1 !default;
+$secondary-secondary-6: #b1c4d9 !default;
 $secondary-focus: #006fff !default;
 
 $text-primary: #181d27 !default;
 $text-secondary: #474c54 !default;
-$text-disabled: #62666f !default;
-$text-inverse: #fff !default;
+$text-disabled: #858890 !default;
+$text-inverse: #ffffff !default;
 
 $neutral-white: #fefdfd !default;
-$neutral-grey-1: #f8f9fa !default;
-$neutral-grey-2: #f1f4f8 !default;
-$neutral-grey-3: #ebedf1 !default;
-$neutral-grey-4: #9da5b6 !default;
-$neutral-dark: #181d27 !default;
+$neutral-grey-1: #f8f8f8 !default;
+$neutral-grey-2: #f0f1f1 !default;
+$neutral-grey-3: #d0d6dc !default;
+$neutral-grey-4: #8a94a8 !default;
+$neutral-dark: #2c2f33 !default;
 
-// Progress bars colors
-$in-progress-background: #95aee4 !default;
-$inverse-background: #d8ab4b !default;
-$warning-background-dark: #d28e87 !default;
+$error: #9c0000 !default;
+$error-light: #fff5f6 !default;
+$error-lighten: #f8d8db !default;
 
-$primary-box-shadow: 0 2px 4px -2px rgba(10, 13, 18, .06), 0 4px 6px -1px rgba(10, 13, 18, .1) !default;
+$warning: #8f3700 !default;
+$warning-light: #f2dab1 !default;
 
-// base colors
+$info: #00489c !default;
+$info-light: #f0f5fc !default;
+$info-lighten: #d3e4f9 !default;
+
+$success: #08590d !default;
+$success-light: #d5e6cf !default;
+
+// Zeplin color palette
 $primary: #404041 !default;
+$primary-inverse: #ffffff !default;
 $primary-100: color.adjust($primary, $lightness: 4%) !default;  /* #4a4a4a */
 $primary-200: $text-primary !default;
 $primary-300: color.adjust($primary, $lightness: 12%) !default; /* #5e5e60 */
@@ -57,59 +63,7 @@ $primary-800: color.adjust($primary, $lightness: 64%) !default; /* #e3e3e4 */
 $primary-830: color.adjust($primary, $lightness: 68%) !default; /* #eeeeee */
 $primary-860: color.adjust($primary, $lightness: 70%) !default; /* #f3f3f3 */
 $primary-900: color.adjust($primary, $lightness: 72%) !default; /* #f8f8f8 */
-$primary-inverse: #fff !default;
-
-$secondary: $primary-main !default;
-$secondary-100: color.adjust($secondary, $lightness: 6%) !default;  /* #3e638c */
-/* @info: never used in oro code */
-$secondary-150: color.adjust($secondary, $lightness: 40%) !default; /* #3e638c */
-$secondary-200: color.adjust($secondary, $lightness: 60%) !default; /* #e9eff5 */
-$secondary-300: color.adjust($secondary, $lightness: 62%) !default; /* #f0f4f8 */
-$secondary-dark: color.adjust($secondary, $lightness: -8%) !default;  /* #28405b */
-
-$extra: $primary-accent !default;
-$extra-100: $primary-accent-light !default;
-$extra-200: $primary-accent-extra-light !default;
-$extra-300: $primary-accent-extra-light !default;
-$extra-dark: $primary-accent !default;
-
-/* ui colors */
-$danger: #9c0000 !default;
-$danger-light: #fff5f6 !default;
-$danger-lighten: #f8d8db !default;
-$danger-ultra-light: $danger-lighten !default;
-$danger-dark: $danger !default;
-$danger-darken: $danger-dark !default;
-$danger-ultra-dark: $danger-dark !default;
-
-$warning: #8f3700 !default;
-$warning-light: #f2dab1 !default;
-$warning-dark: $warning !default;
-$warning-darken: $warning-dark !default;
-
-$info: #00489c !default;
-$info-light: #f0f5fc !default;
-$info-lighten: #d3e4f9 !default;
-$info-dark: $info !default;
-/* @info: never used in oro code */
-$info-darken: $info-dark !default;
-$info-ultra-dark: $info-dark !default;
-
-$success: #08590d !default;
-$success-light: #d5e6cf !default;
-$success-lighten: $success-light !default;
-/* @info: never used in oro code */
-$success-extra-light: $success-lighten !default;
-$success-extra-lighten: $success-lighten !default;
-$success-ultra-light: $success-lighten !default;
-$success-dark: $success !default;
-$success-darken: $success !default;
 
 $additional: #5c5c5c !default;
-/* @info: never used in oro code */
-$additional-light: color.adjust($additional, $lightness: 26%) !default;          /* #9e9e9e */
-$additional-lighten: color.adjust($additional, $lightness: 38%) !default;        /* #bdbdbd */
-$additional-extra-light: color.adjust($additional, $lightness: 50%) !default;    /* #dbdbdb */
-$additional-extra-lighten: color.adjust($additional, $lightness: 54%) !default;  /* #e6e6e6 */
-$additional-ultra-light: $neutral-grey-4 !default;
-$additional-dark: color.adjust($additional, $lightness: -12%) !default;            /* #3d3d3d */
+$additional-light: color.adjust($additional, $lightness: 38%) !default; /* #bdbdbd */
+$additional-extra-light: color.adjust($additional, $lightness: 50%) !default; /* #dbdbdb */

@@ -4,8 +4,12 @@
     {{ block('oro_chart_widget') }}
 {% endblock %}
 
+{% block oro_chart_settings_collection_row %}
+    {{ form_widget(form, {'attr': {'class': (form.vars.attr.class|default('') ~ ' report-chart')|trim}}) }}
+{% endblock %}
+
 {% block oro_report_chart_data_schema_collection_row %}
-    {{ form_widget(form) }}
+    {{ form_widget(form, {'attr': {'class': (form.vars.attr.class|default('') ~ ' report-chart')|trim}}) }}
 {% endblock %}
 
 {% block oro_report_chart_data_schema_row %}

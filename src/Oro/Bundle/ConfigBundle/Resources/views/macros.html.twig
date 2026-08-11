@@ -72,7 +72,7 @@
     {% set content %}
         <div class="layout-content" data-page-component-view="{{ {
             view: 'oroui/js/app/views/highlight-text-view',
-            highlightSwitcherContainer: 'div.system-configuration-content-header',
+            highlightSwitcherContainer: 'div.system-configuration-content-header__switchers',
             highlightStateStorageKey: 'show-all-configuration-items-on-search',
             highlightSelectors: [
                 'div.system-configuration-content-title',
@@ -177,6 +177,7 @@
                         <div class="system-configuration-content-title">
                             {{ scrollBlock.title|trans }}
                         </div>
+                        <div class="system-configuration-content-header__switchers"></div>
                     </div>
                     <div class="system-configuration-content-inner">
                         {% if scrollBlock.description is defined and scrollBlock.description != '' %}

@@ -27,19 +27,19 @@ $checkbox-sibling-label-display: inline !default;
 $checkbox-sibling-label-vertical-align: middle !default;
 
 // Checked
-$checkbox-background-checked: var(--checkbox-skin-color, #{$secondary}) !default;
-$checkbox-border-color-checked: var(--checkbox-skin-color, #{$secondary}) !default;
+$checkbox-background-checked: var(--checkbox-skin-color, #{$primary-main}) !default;
+$checkbox-border-color-checked: var(--checkbox-skin-color, #{$primary-main}) !default;
 
 // Indeterminate
-$checkbox-background-indeterminate: var(--checkbox-skin-color, #{$secondary}) !default;
-$checkbox-border-color-indeterminate: var(--checkbox-skin-color, #{$secondary}) !default;
+$checkbox-background-indeterminate: var(--checkbox-skin-color, #{$primary-main}) !default;
+$checkbox-border-color-indeterminate: var(--checkbox-skin-color, #{$primary-main}) !default;
 
 // Hover
-$checkbox-border-color-hover: var(--checkbox-skin-color, #{$secondary}) !default;
+$checkbox-border-color-hover: var(--checkbox-skin-color, #{$primary-main}) !default;
 
 // Focus
-$checkbox-border-color-focus: var(--checkbox-skin-color, #{$secondary}) !default;
-$checkbox-box-shadow-focus: 0 0 5px var(--checkbox-skin-color, #{$secondary}) !default;
+$checkbox-border-color-focus: var(--checkbox-skin-color, #{$primary-main}) !default;
+$checkbox-box-shadow-focus: 0 0 5px var(--checkbox-skin-color, #{$primary-main}) !default;
 
 // Disable
 $checkbox-opacity-disabled: .5 !default;
@@ -49,10 +49,10 @@ $checkbox-radio-border: 1px solid $primary-750 !default;
 $checkbox-radio-border-radius: 50% !default;
 
 $checkbox-radio-icon-content: '' !default;
-$checkbox-radio-icon-background-checked: $secondary !default;
+$checkbox-radio-icon-background-checked: $primary-main !default;
 $checkbox-radio-icon-size: 10px !default;
 $checkbox-radio-icon-border-radius: 50% !default;
 
 // Focus
-$checkbox-radio-border-color-focus: $secondary !default;
-$checkbox-radio-border-color-checked-focus: $secondary !default;
+$checkbox-radio-border-color-focus: $primary-main !default;
+$checkbox-radio-border-color-checked-focus: $primary-main !default;

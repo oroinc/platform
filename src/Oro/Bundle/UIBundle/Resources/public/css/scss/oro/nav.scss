@@ -67,6 +67,10 @@
     display: $nav-tabs-display;
     flex-wrap: $nav-tabs-flex-wrap;
 
+    &:empty {
+        display: none;
+    }
+
     > li > a,
     > .active > a {
         &,
@@ -99,10 +103,12 @@
     .nav-link {
         background: $nav-link-background;
         font-weight: $nav-link-font-weight;
+        letter-spacing: $nav-link-letter-spacing;
         color: $nav-link-color;
         border: $nav-link-border;
         margin: $nav-link-offset;
-        border-radius: 0;
+        border-radius: $nav-link-border-radius;
+        padding: $nav-link-padding;
 
         &:hover,
         &:active,
@@ -113,6 +119,14 @@
 
             z-index: 1;
             position: relative;
+        }
+
+        &.tab-view-more:not(.active) {
+            span {
+                line-height: 16px;
+                vertical-align: top;
+                font-weight: font-weight('semi-bold');
+            }
         }
     }
 
@@ -225,6 +239,12 @@
         .nav-link {
             padding-top: $nav-link-padding-y * .5;
             padding-bottom: $nav-link-padding-y * .5;
+        }
+    }
+
+    &--with-action {
+        .nav-link {
+            padding: $nav-tabs-with-action-link-padding;
         }
     }
 }

@@ -24,6 +24,7 @@
             flex-direction: column;
             margin-right: $query-designer-controls-group-margin-start;
             margin-bottom: $query-designer-controls-group-margin-start;
+            border-bottom: none;
 
             .control-label {
                 width: auto;
@@ -75,13 +76,6 @@
             margin-bottom: $query-designer-controls-group-margin-start;
 
             @include clearfix();
-
-            &::before {
-                display: block;
-                height: $form-horizontal-control-label-line-height + $form-horizontal-control-label-offset;
-
-                content: '';
-            }
 
             .btn-group {
                 float: none;

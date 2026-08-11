@@ -142,7 +142,7 @@ $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
      * @private
      */
     _removeHandlersFormDocument: function() {
-        this.highlightDropdown(this.$currentItem);
+        this.unhighlightDropdown();
         $(document).off(this.eventNamespace);
     },
 
@@ -211,16 +211,31 @@ $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
      * @param {Element} $element
      */
     highlightDropdown: function($element) {
+        this.unhighlightDropdown();
+
         if ($element && $element.length) {
             $element
-                .addClass('active')
+                .addClass('open')
                 .siblings()
-                .removeClass('active');
-        } else {
-            this.element
-                .find('.dropdown-level-1.active')
-                .removeClass('active');
+                .removeClass('open');
+
+            // Mark an open menu item as active, as UX uses different styles for these states
+            if (!$element.hasClass('active')) {
+                $element.addClass('active').attr('data-active-item', '');
+            }
         }
+    },
+
+    unhighlightDropdown: function() {
+        this.element
+            .find('.dropdown-level-1')
+            .removeClass('open');
+
+        // Clean up active state for menu items
+        this.element
+            .find('[data-active-item]')
+            .removeClass('active')
+            .removeAttr('data-active-item');
     },
 
     /**
@@ -260,10 +275,14 @@ $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
                     $menuItem.attr('data-related-groups', uniqueGroupIndex);
                 }
 
+                const isLeaf = $nestedMenuItem === null;
+                const isLevel1 = parentIndex === null;
+
                 $menuItem
                     .attr('data-index', uniqueIndex)
                     .attr('data-original-text', _.escape($menuItem.text()))
-                    .addClass(self.options.innerMenuItemClassName);
+                    .addClass(self.options.innerMenuItemClassName)
+                    .toggleClass('tree-boundary', isLevel1 && isLeaf);
                 collection.push($menuItem[0]);
 
                 if ($nestedMenuItem) {
@@ -272,6 +291,12 @@ $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
                         uniqueIndex,
                         uniqueGroupIndex
                     );
+                }
+
+                if (isLevel1 && !isLeaf) {
+                    $(collection[collection.length - 1])
+                        .addClass('tree-boundary')
+                        .addClass('last-item-in-group');
                 }
             }, this);
         };

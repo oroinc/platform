@@ -12,7 +12,7 @@
         margin: 4px auto 3px;
         width: 21px;
         height: 3px;
-        border-color: $additional-lighten;
+        border-color: $additional-light;
         border-width: 1px 0;
         border-style: solid;
     }
@@ -31,7 +31,7 @@
 .oro-datagrid {
     .draggable-separator {
         background-color: $sort-datagrid-sorted-row-bg-color;
-        cursor: row-resize;
+        cursor: ns-resize;
 
         &:hover {
             background-color: $primary-830;

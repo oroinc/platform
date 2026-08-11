@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 /* stylelint-disable no-descending-specificity */
 
 // Make the div behave like a button
@@ -130,7 +132,7 @@
             }
 
             &:focus {
-                border-right-color: $secondary-100;
+                border-right-color: color.adjust($primary-main, $lightness: 6%);
             }
         }
 
@@ -145,7 +147,7 @@
             }
 
             &:focus {
-                border-left-color: $secondary-100;
+                border-left-color: color.adjust($primary-main, $lightness: 6%);
             }
         }
     }

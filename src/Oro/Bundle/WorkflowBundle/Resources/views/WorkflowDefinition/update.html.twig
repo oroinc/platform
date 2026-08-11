@@ -30,12 +30,11 @@
 
 {% macro render_label(label, required, tooltip, tooltip_placement) %}
     <label class="control-label {% if required %}required{% endif %}">
+        {{ label }} {% if required %}<em>*</em>{% endif %}
         {% if tooltip is defined and tooltip %}
             {% import '@OroUI/macros.html.twig' as ui %}
             {{ ui.tooltip(tooltip, {}, tooltip_placement) }}
         {% endif %}
-
-        {{ label }} {% if required %}<em>*</em>{% endif %}
     </label>
 {% endmacro %}
 

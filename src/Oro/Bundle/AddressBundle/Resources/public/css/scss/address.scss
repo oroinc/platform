@@ -51,7 +51,7 @@
 
     &__title {
         font-size: $font-size-base;
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
         margin: 0 0 $address-box-item-title-offset-vertical;
     }
 }
@@ -62,11 +62,11 @@
     max-height: $address-map-size-limit;
 
     .map-address-list {
-        width: 40%;
+        width: 100%;
         overflow: hidden;
         max-height: inherit;
-        margin-right: $address-box-margin-small * .5;
-        padding-right: $address-box-margin-small * .5;
+        margin-right: $content-padding-small;
+        padding-right: $content-padding-small;
 
         &:hover {
             overflow-y: auto;

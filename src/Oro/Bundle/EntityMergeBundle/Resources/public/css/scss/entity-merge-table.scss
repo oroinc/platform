@@ -100,7 +100,7 @@
 
         .merge-first-column {
             label {
-                font-weight: font-weight('bold');
+                font-weight: font-weight('semi-bold');
                 margin-bottom: 0;
                 text-transform: uppercase;
             }
@@ -127,7 +127,7 @@
         .entity-merge-fields-blocks-wrapper {
             .entity-merge-inline-label {
                 width: calc(100% - 20px);
-                font-weight: font-weight('bold');
+                font-weight: font-weight('semi-bold');
             }
 
             .entity-merge-inline-label.entity-merge-not-selected {
