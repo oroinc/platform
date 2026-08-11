@@ -8,6 +8,8 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -23,24 +25,33 @@ class EntityToIdTransformer implements DataTransformerInterface
     protected ManagerRegistry $doctrine;
     protected string $className;
     private ?string $property;
-    /** @var callable */
-    protected $queryBuilderCallback;
+    /** @var callable|null */
+    protected $queryBuilderCallback = null;
+    protected ?AclHelper $aclHelper = null;
     private ?PropertyAccessorInterface $propertyAccessor = null;
     private ?PropertyPath $propertyPath = null;
 
-    public function __construct(
-        ManagerRegistry $doctrine,
-        string $className,
-        ?string $property = null,
-        mixed $queryBuilderCallback = null
-    ) {
+    public function __construct(ManagerRegistry $doctrine, string $className, ?string $property = null)
+    {
         $this->doctrine = $doctrine;
         $this->className = $className;
         $this->property = $property;
-        if (null !== $queryBuilderCallback && !\is_callable($queryBuilderCallback)) {
-            throw new UnexpectedTypeException($queryBuilderCallback, 'callable');
-        }
+    }
+
+    /**
+     * Sets the callback that builds the query used to load an entity instead of the default lookup by identifier.
+     */
+    public function setQueryBuilderCallback(?callable $queryBuilderCallback): void
+    {
         $this->queryBuilderCallback = $queryBuilderCallback;
+    }
+
+    /**
+     * Sets the ACL helper that restricts the loaded entities to the ones the current user is allowed to view.
+     */
+    public function setAclHelper(?AclHelper $aclHelper): void
+    {
+        $this->aclHelper = $aclHelper;
     }
 
     #[\Override]
@@ -81,7 +92,13 @@ class EntityToIdTransformer implements DataTransformerInterface
             if (!$qb instanceof QueryBuilder) {
                 throw new UnexpectedTypeException($qb, QueryBuilder::class);
             }
-            $result = $qb->getQuery()->execute();
+            $result = $this->executeQueryBuilder($qb);
+        } elseif (null !== $this->aclHelper) {
+            $result = $this->executeQueryBuilder(
+                $repository->createQueryBuilder('e')
+                    ->where(QueryBuilderUtil::sprintf('e.%s = :id', $this->getProperty()))
+                    ->setParameter('id', $id)
+            );
         } else {
             $result = $repository->find($id);
             if ($result) {
@@ -94,6 +111,18 @@ class EntityToIdTransformer implements DataTransformerInterface
         }
 
         return reset($result);
+    }
+
+    /**
+     * Executes the given query builder applying the ACL protection when the ACL helper is set.
+     */
+    protected function executeQueryBuilder(QueryBuilder $qb): mixed
+    {
+        $query = null !== $this->aclHelper
+            ? $this->aclHelper->apply($qb)
+            : $qb->getQuery();
+
+        return $query->execute();
     }
 
     protected function getProperty(): string

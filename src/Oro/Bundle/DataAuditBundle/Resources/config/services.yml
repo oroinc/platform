@@ -11,6 +11,17 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: audit }
 
+    oro_dataaudit.filter.audit_data:
+        class: 'Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter'
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_dataaudit.provider.config_audit_field_label_provider'
+            - '@oro_dataaudit.provider.entity_audit_field_search_provider'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: audit-data }
+
     oro_dataaudit.loggable.audit_entity_mapper:
         class: 'Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper'
         public: false
@@ -45,6 +56,69 @@ services:
             - { name: doctrine.event_listener, event: onFlush, priority: -255 }
             - { name: doctrine.event_listener, event: postFlush, priority: -255 }
 
+    oro_dataaudit.event_listener.config_change_audit:
+        class: 'Oro\Bundle\DataAuditBundle\EventListener\ConfigChangeAuditListener'
+        arguments:
+            - '@doctrine'
+            - '@security.token_storage'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_message_queue.message_producer'
+            - '@oro_distribution.handler.application_status'
+            - '@oro_dataaudit.model.config_audit_value_normalizer'
+            - '@oro_dataaudit.provider.audit_message_body_provider'
+            - '@oro_dataaudit.provider.config_audit_level_provider'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_dataaudit.model.config_audit_value_normalizer:
+        class: 'Oro\Bundle\DataAuditBundle\Model\ConfigAuditValueNormalizer'
+        arguments:
+            - '@oro_config.config_bag'
+            - '@oro_dataaudit.provider.sensitive_config_field_provider'
+
+    oro_dataaudit.provider.config_audit_level_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider'
+        arguments:
+            # Replaced with [scope => entity of its scope id], see ConfigurationLevelPass.
+            - []
+
+    oro_dataaudit.provider.sensitive_config_field_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\SensitiveConfigFieldProvider'
+        arguments:
+            - '@oro_config.config_bag'
+            - '@form.registry'
+
+    oro_dataaudit.provider.config_audit_field_label_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\ConfigAuditFieldLabelProvider'
+        arguments:
+            - '@oro_config.config_bag'
+            - '@oro_dataaudit.provider.config_audit_level_provider'
+            - '@translator'
+
+    oro_dataaudit.provider.entity_audit_field_search_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\EntityAuditFieldSearchProvider'
+        arguments:
+            - '@oro_dataaudit.audit_config_provider'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+
+    oro_dataaudit.twig.config_audit:
+        class: 'Oro\Bundle\DataAuditBundle\Twig\ConfigAuditExtension'
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_dataaudit.provider.config_audit_field_label_provider, key: Oro\Bundle\DataAuditBundle\Provider\ConfigAuditFieldLabelProvider }
+
+    oro_dataaudit.async.config_change_audit:
+        class: 'Oro\Bundle\DataAuditBundle\Async\ConfigChangeAuditProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_dataaudit.set_new_audit_version'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_dataaudit.datagrid.entity_type_provider:
         class: 'Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider'
         public: true
@@ -52,6 +126,8 @@ services:
             - '@oro_entity.entity_class_name_provider'
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_featuretoggle.checker.feature_checker'
+            - '@translator'
+            - '@oro_dataaudit.provider.config_audit_level_provider'
 
     oro_dataaudit.datagrid.author_provider:
         class: 'Oro\Bundle\DataAuditBundle\Datagrid\AuthorProvider'

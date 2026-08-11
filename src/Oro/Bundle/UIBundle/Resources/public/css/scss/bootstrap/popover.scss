@@ -73,7 +73,7 @@
         font-weight: var(--popover-header-font-weight, #{font-weight('light')});
         line-height: 18px;
         background-color: var(--popover-header-bg, #{$primary-900});
-        border-bottom: var(--popover-header-border, 1px solid #{$additional-ultra-light});
+        border-bottom: var(--popover-header-border, 1px solid #{$neutral-grey-4});
         border-radius: 5px 5px 0 0;
     }
 }

@@ -6,13 +6,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistryInterface;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -30,7 +28,8 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         private FeatureChecker $featureChecker,
         private ConfigManager $configManager,
         private ManagerRegistry $doctrine,
-        private SearchRegistryInterface $searchRegistry
+        private SearchRegistryInterface $searchRegistry,
+        private EntitySelectOrCreateDataTransformerFactory $transformerFactory
     ) {
     }
 
@@ -57,6 +56,9 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
      * - create_acl - ACL resource used to determine that create is allowed, by default CREATE for entity used
      * - create_form_route - route name for creation form
      * - create_form_route_parameters - route parameters for create_form_route_parameters
+     * - acl_protected - enables resolving of the submitted identifier with the VIEW permission applied, it is
+     *   disabled by default because the allowed values of most of the entity selects are restricted by their
+     *   autocomplete search handler or validated by a dedicated constraint
      *
      */
     #[\Override]
@@ -77,6 +79,8 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
             'new_item_allow_empty_property' => false,
             'new_item_value_path'           => 'value',
             'widget_title'                  => null,
+            'invalid_message'               => 'oro.form.entity_create_or_select_inline.invalid',
+            'acl_protected'                 => false,
         ]);
 
         $this->setCreateEnabledNormalizer($resolver);
@@ -152,12 +156,13 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
             'transformer',
             function (Options $options, $value) {
                 if (!$value && !empty($options['entity_class'])) {
-                    $value = $this->createDefaultTransformer(
+                    $value = $this->transformerFactory->createTransformer(
                         $options['entity_class'],
                         $options['new_item_property_name'],
                         $options['new_item_allow_empty_property'],
                         $options['new_item_value_path'],
-                        $options['create_enabled'] && $this->isCreateGranted($options)
+                        $options['create_enabled'] && $this->isCreateGranted($options),
+                        $options['acl_protected']
                     );
                 }
 
@@ -216,25 +221,6 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $view->vars['create_form_route_parameters'] = $options['create_form_route_parameters'];
         $view->vars['grid_view_widget_route'] = $options['grid_view_widget_route'];
         $view->vars['widget_title'] = $options['widget_title'];
-    }
-
-    private function createDefaultTransformer(
-        string $entityClass,
-        ?string $newItemPropertyName = null,
-        bool $newItemAllowEmptyProperty = false,
-        ?string $newItemValuePath = null,
-        bool $isCreateGranted = true
-    ): DataTransformerInterface {
-        if ($newItemPropertyName && $isCreateGranted) {
-            $transformer = new EntityCreationTransformer($this->doctrine, $entityClass);
-            $transformer->setNewEntityPropertyName($newItemPropertyName);
-            $transformer->setAllowEmptyProperty($newItemAllowEmptyProperty);
-            $transformer->setValuePath($newItemValuePath);
-
-            return $transformer;
-        }
-
-        return new EntityToIdTransformer($this->doctrine, $entityClass);
     }
 
     private function isManageableEntity(string $entityClass): bool

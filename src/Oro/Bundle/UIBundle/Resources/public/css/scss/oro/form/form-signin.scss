@@ -148,7 +148,7 @@
 
     .forgot-pass {
         float: left;
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
         margin: 9px 10px 0 0;
     }
 
@@ -295,7 +295,7 @@
 
 .login-copyright {
     font-size: 12px;
-    color: $additional-lighten;
+    color: $additional-light;
     text-align: center;
     padding: 0 16px;
 }

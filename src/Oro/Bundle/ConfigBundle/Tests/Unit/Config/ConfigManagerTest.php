@@ -142,7 +142,7 @@ class ConfigManagerTest extends TestCase
         $singleKeyBeforeEvent = new ConfigSettingsUpdateEvent($this->manager, $item1Value);
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $changes);
         $afterEvent = new ConfigUpdateEvent(
-            [$item1Name => ['old' => 'old value', 'new' => 'updated value']],
+            [$item1Name => ['old' => 'old value', 'new' => 'updated value', 'action' => 'update']],
             'user',
             $idValue
         );
@@ -161,6 +161,11 @@ class ConfigManagerTest extends TestCase
         $this->userScopeManager->expects(self::any())
             ->method('getScopeId')
             ->willReturn($idValue);
+
+        // The settings being saved already have a stored value in this scope, so they are updates.
+        $this->userScopeManager->expects(self::any())
+            ->method('hasSettingValue')
+            ->willReturn(true);
 
         $this->userScopeManager->expects(self::once())
             ->method('save')
@@ -239,8 +244,8 @@ class ConfigManagerTest extends TestCase
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $normalizedData);
         $afterEvent = new ConfigUpdateEvent(
             [
-                $item1Name => ['old' => 'old value', 'new' => 'updated value'],
-                $item2Name => ['old' => 2000, 'new' => 20]
+                $item1Name => ['old' => 'old value', 'new' => 'updated value', 'action' => 'update'],
+                $item2Name => ['old' => 2000, 'new' => 20, 'action' => 'remove']
             ],
             'user',
             $idValue
@@ -249,6 +254,11 @@ class ConfigManagerTest extends TestCase
         $item1OldValueLoadEvent = new ConfigGetEvent($this->manager, $item1Name, 'old value', false, 'user', $idValue);
         $item2OldValueLoadEvent = new ConfigGetEvent($this->manager, $item2Name, '2000', false, 'user', $idValue);
         $item2NullValueLoadEvent = new ConfigGetEvent($this->manager, $item2Name, null, false, 'user', $idValue);
+
+        // The settings being saved already have a stored value in this scope, so they are updates.
+        $this->userScopeManager->expects(self::any())
+            ->method('hasSettingValue')
+            ->willReturn(true);
 
         $this->userScopeManager->expects(self::once())
             ->method('save')
@@ -277,6 +287,156 @@ class ConfigManagerTest extends TestCase
             ->method('deleteAll');
 
         $this->manager->save($data, $scopeIdentifier);
+    }
+
+    public function testSaveTellsAFirstOwnValueFromAnUpdateOfIt(): void
+    {
+        $itemName = 'oro_user.item2';
+
+        $this->userScopeManager->expects(self::any())
+            ->method('resolveIdentifier')
+            ->willReturn(1);
+        $this->userScopeManager->expects(self::any())
+            ->method('getSettingValue')
+            ->willReturn(['value' => 20]);
+        $this->userScopeManager->expects(self::any())
+            ->method('hasSettingValue')
+            ->willReturn(false);
+        $this->userScopeManager->expects(self::once())
+            ->method('save')
+            ->willReturn([[$itemName => 42], []]);
+
+        $event = $this->captureConfigUpdateEvent(
+            [$itemName => ['value' => 42, 'use_parent_scope_value' => false]]
+        );
+
+        self::assertSame(
+            [$itemName => ['old' => 20, 'new' => 42, 'action' => 'create']],
+            $event->getChangeSet()
+        );
+        self::assertSame([], $event->getUseParentScopeChanges());
+    }
+
+    public function testSaveTracksTakingAValueOutOfTheParentScope(): void
+    {
+        $itemName = 'oro_user.item2';
+
+        $this->userScopeManager->expects(self::any())
+            ->method('resolveIdentifier')
+            ->willReturn(1);
+        $this->userScopeManager->expects(self::any())
+            ->method('getSettingValue')
+            ->willReturn(['value' => 'inherited value']);
+        $this->userScopeManager->expects(self::any())
+            ->method('hasSettingValue')
+            ->willReturn(false);
+        $this->userScopeManager->expects(self::once())
+            ->method('save')
+            ->willReturn([[$itemName => 'inherited value'], []]);
+
+        $event = $this->captureConfigUpdateEvent(
+            [$itemName => ['value' => 'inherited value', 'use_parent_scope_value' => false]]
+        );
+
+        self::assertSame([], $event->getChangeSet());
+        self::assertSame(
+            [$itemName => ['old' => 'inherited value', 'new' => 'inherited value', 'action' => 'create']],
+            $event->getUseParentScopeChanges()
+        );
+    }
+
+    public function testSaveTracksGivingAValueBackToTheParentScope(): void
+    {
+        $itemName = 'oro_user.item2';
+
+        $this->userScopeManager->expects(self::any())
+            ->method('resolveIdentifier')
+            ->willReturn(1);
+        $this->userScopeManager->expects(self::any())
+            ->method('getSettingValue')
+            ->willReturn(['value' => 20]);
+        $this->userScopeManager->expects(self::any())
+            ->method('hasSettingValue')
+            ->willReturn(true);
+        $this->userScopeManager->expects(self::once())
+            ->method('save')
+            ->willReturn([[], [$itemName]]);
+
+        $event = $this->captureConfigUpdateEvent([$itemName => ['use_parent_scope_value' => true]]);
+
+        self::assertSame([], $event->getChangeSet());
+        self::assertSame(
+            [$itemName => ['old' => 20, 'new' => 20, 'action' => 'remove']],
+            $event->getUseParentScopeChanges()
+        );
+    }
+
+    public function testSaveReportsNothingForASettingThatKeepsFollowingTheParentScope(): void
+    {
+        $itemName = 'oro_user.item2';
+
+        $this->userScopeManager->expects(self::any())
+            ->method('resolveIdentifier')
+            ->willReturn(1);
+        $this->userScopeManager->expects(self::any())
+            ->method('getSettingValue')
+            ->willReturn(['value' => 20]);
+        $this->userScopeManager->expects(self::any())
+            ->method('hasSettingValue')
+            ->willReturn(false);
+        $this->userScopeManager->expects(self::once())
+            ->method('save')
+            ->willReturn([[], [$itemName]]);
+
+        $event = $this->captureConfigUpdateEvent([$itemName => ['use_parent_scope_value' => true]]);
+
+        self::assertSame([], $event->getChangeSet());
+        self::assertSame([], $event->getUseParentScopeChanges());
+    }
+
+    public function testSaveReportsNothingWhenTheSameValueIsStoredAgain(): void
+    {
+        $itemName = 'oro_user.item2';
+
+        $this->userScopeManager->expects(self::any())
+            ->method('resolveIdentifier')
+            ->willReturn(1);
+        $this->userScopeManager->expects(self::any())
+            ->method('getSettingValue')
+            ->willReturn(['value' => 20]);
+        $this->userScopeManager->expects(self::any())
+            ->method('hasSettingValue')
+            ->willReturn(true);
+        $this->userScopeManager->expects(self::once())
+            ->method('save')
+            ->willReturn([[$itemName => 20], []]);
+
+        $event = $this->captureConfigUpdateEvent(
+            [$itemName => ['value' => 20, 'use_parent_scope_value' => false]]
+        );
+
+        self::assertSame([], $event->getChangeSet());
+        self::assertSame([], $event->getUseParentScopeChanges());
+    }
+
+    private function captureConfigUpdateEvent(array $settings): ConfigUpdateEvent
+    {
+        $captured = null;
+        $this->dispatcher->expects(self::any())
+            ->method('dispatch')
+            ->willReturnCallback(function (object $event) use (&$captured): object {
+                if ($event instanceof ConfigUpdateEvent) {
+                    $captured = $event;
+                }
+
+                return $event;
+            });
+
+        $this->manager->save($settings);
+
+        self::assertInstanceOf(ConfigUpdateEvent::class, $captured);
+
+        return $captured;
     }
 
     /**

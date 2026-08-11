@@ -53,6 +53,17 @@ The current file describes significant changes in the code that may affect the u
 #### FormBundle
 * Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
 
+#### ConfigBundle
+* Added `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager::hasSettingValue(string $name, object|int|null $scopeIdentifier = null): bool` method that tells whether a setting has its own stored value in the scope, ignoring the changes scheduled with `set()`.
+* Added the `action` key (`create`, `update` or `remove`) to every item of the change set carried by `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent`, with the `Oro\Bundle\ConfigBundle\Config\ConfigChangeSet::ACTION_*` constants.
+
+#### DataAuditBundle
+* Added recording of system configuration changes: every change made on behalf of a user is stored as an audit entry whose entity type is the configuration level it was made at, and is shown in the **System > Data Audit** grid.
+* Added recording of every configuration scope of the application as its own audit entity type. The scopes are taken from the `oro_config.scope` tags, so a scope contributed by any bundle is covered automatically.
+* Added the `oro_data_audit.configuration_level_entities` configuration option that tells the audit which entity the id of a configuration scope refers to, so that a record can be named after what was configured.
+* Added masking of secret configuration settings in the audit: the value of a setting rendered as a password field is stored as `***`.
+* Added the `audit-data` datagrid filter (`Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter`) that searches within the changed data of the audit grid.
+
 #### MessageQueueBundle
 * Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
 * Added the configurable consumer idle timeout. It is set via the `oro_message_queue.consumer.idle_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_IDLE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_idle_timeout_default` container parameter (defaults to `0.1` seconds). It controls how long the consumer sleeps when no message is received from a queue.
@@ -63,7 +74,34 @@ The current file describes significant changes in the code that may affect the u
 #### DraftSession Component
 * Added `\Oro\Component\DraftSession\Entity\NoopEntityDraftAwareTrait` — a reusable no-op implementation of `\Oro\Component\DraftSession\Entity\EntityDraftAwareInterface`. Use it on entities that are not draft-aware themselves but must satisfy the interface to be accepted as a draft source entity by the draft factory chain.
 
+#### UIBundle
+* Added the `$primary-accent-background` SCSS variable in `Resources/public/css/scss/settings/colors.scss`.
+* Added the `$primary-background` SCSS variable in `Resources/public/css/scss/settings/colors.scss`.
+* Added the `$primary-box-shadow` SCSS variable in `Resources/public/css/scss/settings/colors.scss`.
+* Added the `$content-padding-xl` SCSS variable in `Resources/public/css/scss/settings/global-variables.scss`.
+* Added `font-smoothing` SCSS mixin in `Resources/public/css/scss/settings/mixins/font-smoothing.scss`.
+* Added `table-outlined` SCSS mixin in `Resources/public/css/scss/settings/mixins/table-bordered.scss`.
+* Added `Resources/public/css/scss/oro/bordered-controls.scss` — a new stylesheet that provides bordered styles for `control-group` and `attribute-item` components on View, Update, and Create pages.
+* Added the `tab-view-more` CSS class to the overflow dropdown toggle in `Resources/public/templates/dropdown-control.html`.
+* Added `unhighlightDropdown` method to the `desktopSideMenu` widget in `Resources/public/js/desktop/side-menu.js`.
+* Added `open` CSS class support for active menu dropdown state in the side menu alongside the existing `active` class.
+* Added `tree-boundary` and `last-item-in-group` CSS classes for menu items in the overlay menu to support visual grouping of navigation levels.
+* Added the `system-configuration-content-header__switchers` container element in the System Configuration page layout (`ConfigBundle/Resources/views/macros.html.twig`).
+
+#### ConfigBundle
+* Added a dedicated wrapper element with the `system-configuration-content-header__switchers` class for highlight switcher controls in `Resources/views/macros.html.twig`.
+
+#### DataGridBundle
+* Added `$cell->focus()` call before `mouseOver()` in `GridRow::startInlineEditing()` to ensure cell interactability during Behat tests.
+
+#### NavigationBundle
+* Added `dropdown-menu-level-last` CSS class to the top menu template (`Resources/views/Menu/application_menu_desktop_top.html.twig`) for the deepest dropdown level, enabling targeted styling of leaf-level submenus.
+
 ### Changed
+
+#### DataAuditBundle
+* Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Symfony\Contracts\Translation\TranslatorInterface` and `Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider` arguments, as the entity type list now also contains the configuration levels.
+* Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
 
 #### EmailBundle
 * Updated entity config setting `email.available_in_template` to make it `false` be default. Make sure to update this setting for your custom fields if you want to use them in email templates. You can do this using `\Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery` in a schema migration.
@@ -75,10 +113,59 @@ The current file describes significant changes in the code that may affect the u
 * Updated `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider` so it implements `\Oro\Component\Config\Cache\ClearableConfigCacheInterface`.
 * Changed `\Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener` to support preloading many-to-many collections whose items are shared by several owners. A collection item is now assigned to all of its owners (owner ids are aggregated per item) instead of a single owner.
 
+#### FormBundle
+* Removed the fourth constructor argument `$queryBuilderCallback` of `\Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer`, use the new `setQueryBuilderCallback(?callable $queryBuilderCallback): void` method instead.
+* Added `\Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer::setAclHelper(?\Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper $aclHelper): void` to load entities with the `VIEW` permission applied.
+* Added `\Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory` (service `oro_form.form.data_transformer.entity_select_or_create_factory`) that creates the default data transformer for the `oro_entity_create_or_select_inline` form type.
+* Changed the constructor of `\Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType`, `\Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory` was added as the sixth argument.
+* Added the `acl_protected` option to the `oro_entity_create_or_select_inline` form type, set it to `true` to load entities with the `VIEW` permission applied. It is `false` by default because the allowed values of most of the entity selects are restricted by their autocomplete search handler or validated by a dedicated constraint, and these restrictions are not equivalent to the `VIEW` permission.
+* Changed the `invalid_message` option default of the `oro_entity_create_or_select_inline` form type to the `oro.form.entity_create_or_select_inline.invalid` translation key.
+
 #### MessageQueueBundle
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
 * Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value. The `$idleMicroseconds` and `$receiveTimeout` constructor arguments were removed in favor of the `setIdleTimeout(float $idleTimeout)` and `setReceiveTimeout(float $receiveTimeout)` setters. Both timeouts are now expressed in seconds as floats (the former `$idleMicroseconds` integer default of `100000` microseconds is now the `0.1` seconds `idleTimeout` default).
 * Changed `DbalMessageConsumer::receive()` to bound each poll sleep by the time remaining until the receive timeout, so the DBAL `polling_interval` no longer imposes a de-facto minimum receive timeout.
+
+#### UIBundle
+* Renamed the following SCSS variables in `Resources/public/css/scss/settings/colors.scss`. Update their usages:
+    * `$danger` to `$error`
+    * `$danger-light` to `$error-light`
+    * `$danger-lighten` to `$error-lighten`
+    * `$primary-accent-gradient` → `$primary-background`
+* Moved the progress bar related SCSS variables from `Resources/public/css/scss/settings/colors.scss` to `Resources/public/css/scss/oro/settings/progressbar.scss` and renamed them. Update their usages:
+    * `$in-progress-background` to `$progressbar-in-progress-background`
+    * `$inverse-background` to `$progressbar-inverse-background`
+    * `$warning-background-dark` to `$progressbar-warning-background`
+* Changed the values of the following SCSS variables in `Resources/public/css/scss/settings/colors.scss`:
+    * `$primary-main-light`
+    * `$secondary-secondary-6`
+    * `$text-disabled`
+    * `$neutral-grey-1`
+    * `$neutral-grey-2`
+    * `$neutral-grey-3`
+    * `$neutral-grey-4`
+    * `$neutral-dark`
+    * `$additional-light`
+* Changed the default font weight of `<b>` and `<bdo>` elements from bold to semi-bold in `Resources/public/css/scss/oro.scss`.
+* Changed the default font weight of the accordion toggle from bold to semi-bold in `Resources/public/css/scss/settings/mixins/main.scss`.
+* Changed the tooltip position in the `attribute-item` macro (`Resources/views/macros.html.twig`) — the tooltip now renders after the label text instead of before it.
+* Changed the `.attribute-item` component (`Resources/public/css/scss/oro/attribute-item.scss`) to use `max-width: 800px` instead of a margin-based offset.
+* Changed `.no-data` text alignment from `center` to `left` and removed horizontal padding in `Resources/public/css/scss/oro/no-data.scss`.
+* Changed `.tabs-content:empty` to `display: none` in `Resources/public/css/scss/oro/tab/tabs.scss`.
+* Changed inline table styles to use the new `table-outlined` mixin for `.unit-table` and `.table-outlined` classes in `Resources/public/css/scss/oro/tables.scss`.
+* Changed table header styles — added `border-bottom`, `font-weight`, and `letter-spacing` properties; removed inner `<span>` padding in `Resources/public/css/scss/oro/tables.scss`.
+* Changed table body styles — removed `border-top` from `td` elements (now uses `border-bottom` only) in `Resources/public/css/scss/oro/tables.scss`.
+* Changed the scrollspy component — removed outer border, updated hover and title styles, added flexbox layout to title in `Resources/public/css/scss/oro/scrollspy.scss`.
+* Changed the content sidebar resize handle — added hover background, border-radius, and moved hover handler inside the `.resizable-area` element in `Resources/public/css/scss/oro/content-sidebar.scss`.
+* Changed the side menu overlay to use SCSS variables instead of hardcoded values for header offsets, menu item width, search icon position, and transition in `Resources/public/css/scss/desktop/main-menu/side-menu-overlay.scss`.
+* Changed the `desktopSideMenu` widget to use separate `open` and `active` CSS states for menu items, with `data-active-item` attribute tracking in `Resources/public/js/desktop/side-menu.js`.
+* Changed the `highlightSwitcherContainer` selector in System Configuration from `div.system-configuration-content-header` to `div.system-configuration-content-header__switchers` in `ConfigBundle/Resources/views/macros.html.twig`.
+* Changed validation error message styling — updated margin from `3px` to `4px` and added explicit `font-size: 12px` in `Resources/public/css/scss/settings/mixins/validation-failed.scss`.
+* Changed collapse button labels from `View More` / `View Less` to `View more` / `View less` in `Resources/translations/messages.en.yml`.
+
+#### SidebarBundle
+* Changed the right sidebar resize handle border width from `2px` to `3px` in `Resources/public/css/scss/sidebar.scss`.
+* Changed the sidebar widget header title font weight from bold to semi-bold in `Resources/public/css/scss/sidebar.scss`.
 
 #### UserBundle
 * Updated `invite_user` email template to use `system.appURL` system variable.
@@ -89,6 +176,21 @@ The current file describes significant changes in the code that may affect the u
 * Removed `\Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator`, added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` instead.
 * Removed `oro_config_value` Twig function from email templates rendering sandbox.
 * Removed `\Oro\Bundle\EmailBundle\EventListener\EntityConfigListener`, use `\Oro\Bundle\EmailBundle\EventListener\AvailableInTemplateEntityConfigListener` instead.
+
+#### UIBundle
+* Removed the following SCSS variables from `Resources/public/css/scss/settings/colors.scss`:
+    * `$primary-inverse`
+    * `$secondary`, `$secondary-100`, `$secondary-150`, `$secondary-200`, `$secondary-300`, `$secondary-dark`
+    * `$extra`, `$extra-100`, `$extra-200`, `$extra-300`, `$extra-dark`
+    * `$danger-ultra-light`, `$danger-dark`, `$danger-darken`, `$danger-ultra-dark`
+    * `$warning-dark`, `$warning-darken`
+    * `$info-dark`, `$info-darken`, `$info-ultra-dark`
+    * `$success-lighten`, `$success-extra-light`, `$success-extra-lighten`, `$success-ultra-light`, `$success-dark`, `$success-darken`
+    * `$additional-lighten`, `$additional-extra-lighten`, `$additional-ultra-light`, `$additional-dark`
+* Removed the `$additional-extra-lighten` SCSS variable from `Resources/public/css/scss/settings/colors.scss`. Use `$additional-extra-light` instead.
+* Removed the border from scrollspy navigation in `Resources/public/css/scss/oro/scrollspy.scss`.
+* Removed the `border-top` rule from table body cells in `Resources/public/css/scss/oro/tables.scss`.
+* Use the new variables from the `Figma color palette` section of `Resources/public/css/scss/settings/colors.scss` file instead.
 
 #### UserBundle
 * Removed unused Twig templates `@OroUser/Email/invite.html.twig`, `@OroUser/Email/layout.html.twig`, `@OroUser/Email/reset.html.twig`.

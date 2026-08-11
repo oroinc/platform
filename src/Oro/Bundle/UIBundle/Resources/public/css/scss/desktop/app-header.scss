@@ -53,6 +53,10 @@
         .app-logo {
             display: none;
         }
+
+        .organization-logo-wrapper {
+            margin-left: 0;
+        }
     }
 
     .organization-logo-wrapper {
@@ -60,6 +64,7 @@
         align-items: center;
         grid-area: start;
         height: 100%;
+        margin-left: $app-header-think-margin-left;
     }
 
     .app-logo {
@@ -376,6 +381,18 @@
                             box-shadow: none;
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (min-width: $medium-screen) {
+    .app-header {
+        .dropdown.user-menu-dropdown {
+            > .dropdown-toggle {
+                .dropdown-toggle__label {
+                    max-width: 180px;
                 }
             }
         }

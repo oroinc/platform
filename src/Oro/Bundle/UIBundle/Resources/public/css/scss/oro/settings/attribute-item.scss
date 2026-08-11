@@ -1,12 +1,13 @@
 /* @theme: admin.oro; */
 
 $attribute-item-display: flex !default;
-$attribute-item-offset: 0 0 10px !default;
+$attribute-item-offset: 8px 0 !default;
+$attribute-item-border-bottom: 1px dashed $neutral-grey-3 !default;
 
 $attribute-item-term-width: 45% !default;
 $attribute-item-term-max-width: 200px !default;
-$attribute-item-term-color: $primary-550 !default;
-$attribute-item-term-text-align: right !default;
+$attribute-item-term-color: $text-primary !default;
+$attribute-item-term-text-align: left !default;
 
 $attribute-item-description-offset-start: $content-padding * .5 !default;
 $attribute-item-description-text-align: left !default;

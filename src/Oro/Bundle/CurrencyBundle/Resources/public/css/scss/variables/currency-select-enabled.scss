@@ -2,7 +2,7 @@
 
 $currency-select-enabled-base-currency-select-width: 62px;
 
-$currency-select-enabled-base-currency-input-width: $field-width - 60px;
+$currency-select-enabled-base-currency-input-width: calc($field-width - 60px);
 
 $currency-select-enabled-base-currency-selector-font-size: $base-font-size;
 $currency-select-enabled-base-currency-selector-offset-left: -2px;

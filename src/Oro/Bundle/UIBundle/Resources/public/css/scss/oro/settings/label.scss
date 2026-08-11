@@ -3,8 +3,8 @@
 @use 'sass:map';
 
 $label-theme-success: (
-    'background': $success-ultra-light,
-    'color': $success-darken
+    'background': $success-light,
+    'color': $success
 ) !default;
 
 $label-theme-info: (
@@ -14,12 +14,12 @@ $label-theme-info: (
 
 $label-theme-warning: (
     'background': $warning-light,
-    'color': $warning-darken
+    'color': $warning
 ) !default;
 
 $label-theme-danger: (
-    'background': $danger,
-    'color': $danger-ultra-light
+    'background': $error,
+    'color': $error-lighten
 ) !default;
 
 $label-theme-keys: () !default;

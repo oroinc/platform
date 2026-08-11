@@ -3,7 +3,7 @@
 @use 'sass:color';
 
 $tree-link-color: $primary-200 !default;
-$tree-link-bg-color: $extra-100 !default;
+$tree-link-bg-color: $primary-accent-light !default;
 $tree-icon-color: $primary-400 !default;
 $tree-icon-color-hover: color.adjust($tree-icon-color, $lightness: -10%) !default;
 
@@ -81,14 +81,14 @@ $jstree-icon-checkbox-icon-font-size: 10px !default;
 $jstree-icon-checkbox-icon-line-height: 1 !default;
 $jstree-icon-checkbox-icon-font-family: $fa-font-family !default;
 
-$jstree-checked-background: $secondary !default;
-$jstree-checked-border-color: $secondary !default;
+$jstree-checked-background: $primary-main !default;
+$jstree-checked-border-color: $primary-main !default;
 $jstree-checked-content: '\f00c' !default;
 
 $jstree-loading-inner-offset: $content-padding - 4px !default;
 
 $jstree-search-component-position: relative !default;
-$jstree-search-component-bottom-offset: $content-padding-medium !default;
+$jstree-search-component-bottom-offset: $content-padding-small !default;
 
 $jstree-search-component-clear-active-search-clear-display: block !default;
 $jstree-search-component-clear-active-search-search-display: none !default;

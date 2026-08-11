@@ -291,6 +291,12 @@ services:
         tags:
             - { name: form.type, alias: oro_textlist }
 
+    oro_form.form.data_transformer.entity_select_or_create_factory:
+        class: Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory
+        arguments:
+            - '@doctrine'
+            - '@oro_security.acl_helper'
+
     oro_form.type.oro_entity_create_or_select_inline:
         class: Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
         arguments:
@@ -299,6 +305,7 @@ services:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@oro_form.autocomplete.search_registry'
+            - '@oro_form.form.data_transformer.entity_select_or_create_factory'
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
 

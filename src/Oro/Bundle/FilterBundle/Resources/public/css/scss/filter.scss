@@ -323,6 +323,7 @@
         .filter-criteria-selector,
         .dropdown-toggle.btn {
             font-weight: $filter-criteria-selector-font-weight;
+            letter-spacing: $filter-criteria-selector-letter-spacing;
         }
 
         .filter-criteria-selector {
@@ -587,6 +588,8 @@
     white-space: $filter-criteria-hint-white-space;
     overflow: $filter-criteria-hint-overflow;
     vertical-align: $filter-criteria-hint-vertical-align;
+    font-weight: $filter-criteria-hint-font-weight;
+    letter-spacing: $filter-criteria-hint-letter-spacing;
 }
 
 .condition-item {

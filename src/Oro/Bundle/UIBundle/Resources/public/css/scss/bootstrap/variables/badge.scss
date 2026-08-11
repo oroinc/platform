@@ -3,27 +3,27 @@
 @use 'sass:map';
 
 $badge-theme-success: (
-    'background': $success-ultra-light,
-    'color': $success-darken,
-    'icon-color': $success-darken
+    'background': $success-light,
+    'color': $success,
+    'icon-color': $success
 ) !default;
 
 $badge-theme-danger: (
-    'background': $danger-lighten,
-    'color': $danger-ultra-dark,
-    'icon-color': $danger-darken
+    'background': $error-lighten,
+    'color': $error,
+    'icon-color': $error
 ) !default;
 
 $badge-theme-warning: (
     'background': $warning-light,
-    'color': $warning-darken,
-    'icon-color': $warning-dark
+    'color': $warning,
+    'icon-color': $warning
 ) !default;
 
 $badge-theme-info: (
     'background': $info-lighten,
-    'color': $info-ultra-dark,
-    'icon-color': $info-dark
+    'color': $info,
+    'icon-color': $info
 ) !default;
 
 $badge-theme-primary: (

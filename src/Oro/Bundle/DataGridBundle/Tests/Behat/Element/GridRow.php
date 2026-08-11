@@ -98,6 +98,7 @@ class GridRow extends TableRow
     public function startInlineEditing($header)
     {
         $cell = $this->getCellByHeader($header);
+        $cell->focus();
         $cell->mouseOver();
 
         /** @var NodeElement $pencilIcon */

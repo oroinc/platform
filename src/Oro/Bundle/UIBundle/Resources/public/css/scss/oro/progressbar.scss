@@ -18,20 +18,20 @@
 }
 
 .progress-bar {
+    &.in-progress {
+        background-color: $progress-in-progress-background;
+    }
+
     &.success {
-        background-color: $success-lighten;
+        background-color: $progress-success-background;
     }
 
     &.inverse {
-        background-color: $warning-background-dark;
-    }
-
-    &.info {
-        background-color: $in-progress-background;
+        background-color: $progress-inverse-background;
     }
 
     &.warning {
-        background-color: $inverse-background;
+        background-color: $progress-warning-background;
     }
 }
 

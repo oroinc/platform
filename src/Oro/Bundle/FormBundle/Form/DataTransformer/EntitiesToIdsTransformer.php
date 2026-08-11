@@ -66,7 +66,7 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
                 ->setParameter('ids', $ids);
         }
 
-        $result = $qb->getQuery()->execute();
+        $result = $this->executeQueryBuilder($qb);
 
         if (\count($result) !== \count($ids)) {
             throw new TransformationFailedException('Could not find all entities for the given IDs');

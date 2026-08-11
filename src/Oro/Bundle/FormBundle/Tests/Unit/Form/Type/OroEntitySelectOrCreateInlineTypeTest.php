@@ -12,12 +12,15 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -30,6 +33,8 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
     private SearchRegistry&MockObject $searchRegistry;
     private ConfigInterface&MockObject $config;
     private OroEntitySelectOrCreateInlineType $formType;
+    /** @var array<array<mixed>> */
+    private array $createTransformerCalls = [];
 
     #[\Override]
     protected function setUp(): void
@@ -71,12 +76,22 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->method('getSearchHandler')
             ->willReturn($searchHandler);
 
+        $transformerFactory = $this->createMock(EntitySelectOrCreateDataTransformerFactory::class);
+        $transformerFactory->expects($this->any())
+            ->method('createTransformer')
+            ->willReturnCallback(function (...$arguments) use ($doctrine) {
+                $this->createTransformerCalls[] = $arguments;
+
+                return new EntityToIdTransformer($doctrine, $arguments[0]);
+            });
+
         $this->formType = new OroEntitySelectOrCreateInlineType(
             $this->authorizationChecker,
             $this->featureChecker,
             $configManager,
             $doctrine,
-            $this->searchRegistry
+            $this->searchRegistry,
+            $transformerFactory
         );
 
         parent::setUp();
@@ -375,5 +390,74 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
                 ]
             ],
         ];
+    }
+
+    public function testTransformerIsCreatedByFactory(): void
+    {
+        $this->authorizationChecker->expects(self::any())
+            ->method('isGranted')
+            ->willReturn(true);
+        $this->featureChecker->expects(self::any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
+
+        $form = $this->factory->create(OroEntitySelectOrCreateInlineType::class, null, [
+            'grid_name' => 'test',
+            'converter' => $this->createMock(ConverterInterface::class),
+            'entity_class' => TestEntity::class,
+            'configs' => ['route_name' => 'test'],
+            'create_enabled' => true,
+            'create_form_route' => 'test',
+            'new_item_property_name' => 'name',
+        ]);
+
+        self::assertEquals(
+            [[TestEntity::class, 'name', false, 'value', true, false]],
+            $this->createTransformerCalls
+        );
+        self::assertInstanceOf(EntityToIdTransformer::class, $form->getConfig()->getOption('transformer'));
+    }
+
+    public function testTransformerIsCreatedByFactoryWhenAclIsProtected(): void
+    {
+        $this->authorizationChecker->expects(self::any())
+            ->method('isGranted')
+            ->willReturn(true);
+        $this->featureChecker->expects(self::any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
+
+        $this->factory->create(OroEntitySelectOrCreateInlineType::class, null, [
+            'grid_name' => 'test',
+            'converter' => $this->createMock(ConverterInterface::class),
+            'entity_class' => TestEntity::class,
+            'configs' => ['route_name' => 'test'],
+            'create_enabled' => true,
+            'create_form_route' => 'test',
+            'new_item_property_name' => 'name',
+            'acl_protected' => true,
+        ]);
+
+        self::assertEquals(
+            [[TestEntity::class, 'name', false, 'value', true, true]],
+            $this->createTransformerCalls
+        );
+    }
+
+    public function testTransformerIsNotCreatedByFactoryWhenExplicitlyProvided(): void
+    {
+        $transformer = $this->createMock(DataTransformerInterface::class);
+
+        $form = $this->factory->create(OroEntitySelectOrCreateInlineType::class, null, [
+            'grid_name' => 'test',
+            'converter' => $this->createMock(ConverterInterface::class),
+            'entity_class' => TestEntity::class,
+            'configs' => ['route_name' => 'test'],
+            'create_enabled' => false,
+            'transformer' => $transformer,
+        ]);
+
+        self::assertSame($transformer, $form->getConfig()->getOption('transformer'));
+        self::assertSame([], $this->createTransformerCalls);
     }
 }

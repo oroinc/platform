@@ -13,23 +13,17 @@
 
     @include fa-icon($fa-var-times, after, true) {
         position: absolute;
-        top: 5px;
+        top: $menu-mobile-close-button-top;
 
         @include safe-area-property-left(left, $main-menu-mobile-width - 36px);
-        
-        width: 32px;
-        height: 32px;
+
+        width: $menu-mobile-close-button-size;
+        height: $menu-mobile-close-button-size;
         text-align: center;
-        line-height: 32px;
+        line-height: $menu-mobile-close-button-size;
         border-radius: 50%;
         background-color: $menu-close-botton-background-color;
         color: $menu-close-button-color;
-    }
-
-    .divider {
-        height: 1px;
-        border: 1px solid $menu-item-divider-color;
-        border-width: 1px 0 0;
     }
 
     .main-menu {
@@ -49,8 +43,8 @@
         .title {
             margin: 0;
 
-            font-size: $menu-font-size + 2;
-            font-weight: font-weight('light');
+            font-size: $menu-item-font-size;
+            font-weight: $menu-item-title-font-weight;
 
             background-color: transparent;
 
@@ -59,6 +53,12 @@
 
         a {
             display: block;
+
+            &.unclickable {
+                &:focus {
+                    outline: $menu-dropdown-accordion-a-unclickable-outline-focus;
+                }
+            }
         }
     }
 
@@ -78,11 +78,11 @@
                 &::before {
                     content: '';
                     display: inline-block;
-                    height: 16px;
-                    min-width: 16px;
-                    margin-right: 8px;
-                    font-weight: font-weight('light');
-                    line-height: 1;
+                    height: $menu-accordion-icon-height;
+                    min-width: $menu-accordion-icon-min-width;
+                    margin-right: $menu-accordion-icon-margin-right;
+                    font-weight: $menu-accordion-icon-font-weight;
+                    line-height: $menu-accordion-icon-line-height;
                     text-align: center;
                     color: $menu-accordion-icon-color;
                     transition: $menu-animation;
@@ -90,8 +90,6 @@
             }
 
             .accordion-toggle {
-                font-weight: font-weight('bold');
-
                 @include fa-icon($fa-var-angle-right);
 
                 &::before {
@@ -99,7 +97,7 @@
                 }
 
                 &.collapsed {
-                    font-weight: font-weight('light');
+                    font-weight: $menu-item-collapsed-font-weight;
 
                     &::before {
                         transform: rotate(0);
@@ -109,16 +107,18 @@
 
             .title {
                 display: block;
-                padding: 10px 15px;
+                padding: $menu-mobile-item-padding;
 
-                &:hover {
-                    background-color: $menu-background-color-hover;
-                }
+                $menu-title-offset: 0;
 
-                @for $i from 1 through 5 {
-                    &-level-#{$i} {
-                        padding-left: $main-menu-title-mobile-offset * ($i - 1);
+                @for $i from 2 through 5 {
+                    $selector: '&-level-' + $i;
+
+                    #{$selector} {
+                        padding-left: $menu-title-offset + $menu-mobile-item-level-base-padding;
                     }
+
+                    $menu-title-offset: $menu-title-offset + $menu-item-title-level-offset-step;
                 }
             }
         }
@@ -136,20 +136,24 @@
         }
 
         .dropdown-menu-single-item.active {
-            background-color: $menu-background-color-active;
+            background: $menu-background-active;
+        }
+
+        &.menu-level-1.collapse {
+            border-bottom: $menu-dropdown-accordion-body-collapse-border-bottom;
         }
     }
 
-    // First level
     .title-level-1 {
         position: relative;
-        padding: 14px 22px 14px 24px;
+        padding: $menu-mobile-first-level-padding;
+        font-size: $menu-item-first-level-font-size;
         color: $menu-item-first-level-text-color;
         display: block;
 
         .menu-icon {
-            min-width: 16px;
-            margin-right: 8px;
+            min-width: $menu-accordion-icon-min-width;
+            margin-right: $menu-accordion-icon-margin-right;
             margin-left: 0;
             text-align: center;
         }
@@ -158,9 +162,15 @@
     .accordion-toggle.title-level-1 {
         position: relative;
         margin: 0;
+        font-weight: $menu-item-first-level-font-weight;
+        border-top: 1px solid $menu-dropdown-border-color-active;
+        border-bottom: 1px solid $menu-dropdown-border-color-active;
         background-color: $menu-dropdown-background-color-active;
 
         &.collapsed {
+            font-weight: $menu-item-first-level-collapsed-font-weight;
+            border-top-color: $menu-sided-first-level-collapsed-border-color;
+            border-bottom-color: $menu-sided-first-level-collapsed-border-color;
             background-color: $menu-background-color;
         }
 
@@ -169,6 +179,24 @@
         }
     }
 
+    .active {
+        > .accordion-heading {
+            .accordion-toggle {
+                font-weight: $menu-item-active-font-weight;
+
+                &.collapsed {
+                    background: $menu-background-active;
+                    font-weight: $menu-item-active-collapsed-font-weight;
+                }
+
+                &.title-level-1.collapsed {
+                    font-weight: $menu-item-active-font-weight;
+                }
+            }
+        }
+    }
+
+    .divider,
     .dropdown-menu-title-level-1 {
         display: none;
     }

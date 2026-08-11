@@ -11,7 +11,9 @@ use Oro\Component\MessageQueue\Consumption\QueueIterator\QueueIteratorFactoryInt
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
@@ -186,37 +188,63 @@ class QueueConsumer
 
                     $this->doConsume($extension, $context);
                 } catch (ConsumptionInterruptedException $e) {
-                    $logger->warning(\sprintf(
-                        'Consuming interrupted. Queue: "%s", reason: "%s"',
-                        $queueName,
-                        $e->getMessage()
-                    ));
-
-                    $extension->onInterrupted($context);
-                    $session->close();
+                    $this->stopConsumption($extension, $context, $session, $logger, $queueName, $e->getMessage());
 
                     return;
                 } catch (RejectMessageExceptionInterface $exception) {
-                    $context->setException($exception);
+                    $context->setStatus(MessageProcessorInterface::REJECT);
                     $context->getMessageConsumer()->reject($context->getMessage());
-                    $session->close();
-                    throw $exception;
+
+                    $logger->warning(\sprintf(
+                        'Message rejected. Queue: "%s", reason: "%s"',
+                        $queueName,
+                        $exception->getMessage()
+                    ));
+
+                    $extension->onPostReceived($context);
+
+                    if ($context->isExecutionInterrupted()) {
+                        $this->stopConsumption(
+                            $extension,
+                            $context,
+                            $session,
+                            $logger,
+                            $queueName,
+                            $context->getInterruptedReason() ?? ''
+                        );
+
+                        return;
+                    }
                 } catch (\Exception $exception) {
                     $context->setExecutionInterrupted(true);
                     $context->setException($exception);
 
                     try {
                         $this->onInterruptionByException($extension, $context);
+                    } finally {
                         $session->close();
-                    } catch (\Exception $e) {
-                        // for some reason finally does not work here on php5.5
-                        $session->close();
-
-                        throw $e;
                     }
                 }
             }
         }
+    }
+
+    private function stopConsumption(
+        ExtensionInterface $extension,
+        Context $context,
+        SessionInterface $session,
+        LoggerInterface $logger,
+        string $queueName,
+        string $reason
+    ): void {
+        $logger->warning(\sprintf(
+            'Consuming interrupted. Queue: "%s", reason: "%s"',
+            $queueName,
+            $reason
+        ));
+
+        $extension->onInterrupted($context);
+        $session->close();
     }
 
     /**

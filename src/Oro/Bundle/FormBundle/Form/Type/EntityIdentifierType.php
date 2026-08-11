@@ -105,20 +105,11 @@ class EntityIdentifierType extends AbstractType
 
     private function createEntitiesToIdsTransformer(array $options): DataTransformerInterface
     {
-        if ($options['multiple']) {
-            return new EntitiesToIdsTransformer(
-                $this->doctrine,
-                $options['class'],
-                $options['property'],
-                $options['queryBuilder']
-            );
-        }
+        $transformer = $options['multiple']
+            ? new EntitiesToIdsTransformer($this->doctrine, $options['class'], $options['property'])
+            : new EntityToIdTransformer($this->doctrine, $options['class'], $options['property']);
+        $transformer->setQueryBuilderCallback($options['queryBuilder']);
 
-        return new EntityToIdTransformer(
-            $this->doctrine,
-            $options['class'],
-            $options['property'],
-            $options['queryBuilder']
-        );
+        return $transformer;
     }
 }

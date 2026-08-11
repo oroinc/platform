@@ -20,7 +20,7 @@ form.change-password-form {
     span.fa-eye {
         position: absolute;
         top: 7px;
-        left: $field-width + 12px;
+        left: calc($field-width + 12px);
     }
 
     .validation-failed {

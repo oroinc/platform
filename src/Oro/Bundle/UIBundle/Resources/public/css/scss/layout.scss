@@ -3,7 +3,9 @@
 /* stylelint-disable no-descending-specificity */
 
 body {
-    background: $primary-accent-gradient;
+    background: $primary-background;
+
+    @include font-smoothing();
 }
 
 @mixin responsive-inline-position() {
@@ -32,7 +34,7 @@ body {
         ol,
         ul,
         dl {
-            &:not(.extra-list):not(.list-inline) {
+            &:not(.extra-list):not(.list-inline):not(.responsive-tabs):not(.schedule-list) {
                 margin: 0 0 $content-padding-medium $content-padding;
 
                 overflow-wrap: break-word;
@@ -123,32 +125,17 @@ body {
         &:not(.responsive-small) {
             .responsive-cell {
                 &:nth-child(2n - 1) {
-                    padding-right: $horizontal-padding;
+                    padding-right: $content-padding-xl;
                 }
 
                 &:nth-child(2n) {
-                    padding-left: $horizontal-padding;
-                }
-
-                &:not(:first-child),
-                &:not(:nth-child(2)) {
-                    padding-top: $vertical-padding;
+                    padding-left: $content-padding-xl;
                 }
 
                 &:only-child {
                     padding-right: 0;
                     padding-left: 0;
                     padding-bottom: 0;
-                }
-            }
-        }
-
-        &.responsive-big,
-        &.responsive-medium,
-        &:not(.responsive-small) {
-            form[name='oro_product'] & {
-                .responsive-cell {
-                    padding-bottom: $content-padding-medium;
                 }
             }
         }
@@ -165,10 +152,6 @@ body {
         &.responsive-small {
             .responsive-cell {
                 padding-right: 0;
-
-                &:not(:last-child) {
-                    margin-bottom: 16px;
-                }
             }
         }
 
@@ -215,14 +198,14 @@ body.backdrop {
 
     > li {
         @if ($add-border-to-last-el) {
-            border-bottom: 1px solid $additional-extra-lighten;
+            border-bottom: 1px solid $additional-extra-light;
 
             &:last-child {
                 border-color: $page-border-color;
             }
         } @else {
             &:not(:last-child) {
-                border-bottom: 1px solid $additional-extra-lighten;
+                border-bottom: 1px solid $additional-extra-light;
             }
         }
 
@@ -255,7 +238,7 @@ body.backdrop {
 
             a {
                 padding-right: 24px;
-                font-weight: font-weight('bold');
+                font-weight: font-weight('semi-bold');
                 background-color: $primary-800;
                 color: $primary-100;
             }

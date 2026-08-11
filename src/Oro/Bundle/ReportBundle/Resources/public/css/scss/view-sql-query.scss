@@ -13,7 +13,7 @@
 
     .collapse-text {
         display: inline;
-        font-weight: font-weight('bold');
+        font-weight: font-weight('semi-bold');
     }
 
     .sql-query-box {
@@ -26,7 +26,7 @@
         margin: 10px 0;
 
         background-color: $primary-900;
-        color: $danger;
+        color: $error;
         border: 1px solid $primary-830;
 
         word-break: normal;
@@ -48,7 +48,7 @@
 
             .expand-text {
                 display: inline;
-                font-weight: font-weight('bold');
+                font-weight: font-weight('semi-bold');
             }
 
             .collapse-text,

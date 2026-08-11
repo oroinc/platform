@@ -3,7 +3,7 @@
     {% set status = job.status %}
 
     {% if status is constant('STATUS_RUNNING', job) %}
-        {% set class = 'info' %}
+        {% set class = 'in-progress' %}
     {% elseif status is constant('STATUS_SUCCESS', job) %}
         {% set class = 'success' %}
     {% elseif status is constant('STATUS_FAILED', job) %}

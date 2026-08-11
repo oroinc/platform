@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+// This mixin enable smoothing for more better rendering of fonts
+@mixin font-smoothing() {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin no-font-smoothing() {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+}

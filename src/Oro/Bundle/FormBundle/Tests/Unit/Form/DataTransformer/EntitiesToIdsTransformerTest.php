@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestEntity;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -50,9 +51,12 @@ class EntitiesToIdsTransformerTest extends TestCase
             ->willReturn($this->repository);
     }
 
-    private function getTransformer(?string $property, mixed $queryBuilderCallback): EntitiesToIdsTransformer
+    private function getTransformer(?string $property, ?callable $queryBuilderCallback): EntitiesToIdsTransformer
     {
-        return new EntitiesToIdsTransformer($this->doctrine, TestEntity::class, $property, $queryBuilderCallback);
+        $transformer = new EntitiesToIdsTransformer($this->doctrine, TestEntity::class, $property);
+        $transformer->setQueryBuilderCallback($queryBuilderCallback);
+
+        return $transformer;
     }
 
     private function createEntityList(string $property, array $values): array
@@ -307,11 +311,144 @@ class EntitiesToIdsTransformerTest extends TestCase
         $transformer->transform($this->createEntityList('id', [1, 2, 3, 4]));
     }
 
-    public function testCreateFailsWhenQueryBuilderCallbackIsNotCallable(): void
+    public function testReverseTransformWithAclHelper(): void
     {
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "callable", "array" given');
+        $value = [1, 2, 3, 4];
+        $expectedValue = $this->createEntityList('id', [1, 2, 3, 4]);
 
-        $this->getTransformer('id', []);
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('execute')
+            ->willReturn($expectedValue);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->with('e.id IN (:ids)')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('setParameter')
+            ->with('ids', $value)
+            ->willReturnSelf();
+        $queryBuilder->expects(self::never())
+            ->method('getQuery');
+
+        $this->classMetadata->expects(self::once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $this->repository->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($queryBuilder);
+
+        $aclHelper = $this->createMock(AclHelper::class);
+        $aclHelper->expects(self::once())
+            ->method('apply')
+            ->with($queryBuilder)
+            ->willReturn($query);
+
+        $transformer = $this->getTransformer(null, null);
+        $transformer->setAclHelper($aclHelper);
+
+        self::assertEquals($expectedValue, $transformer->reverseTransform($value));
+    }
+
+    public function testReverseTransformWithCustomQueryBuilderCallbackAndAclHelper(): void
+    {
+        $value = [1, 2];
+        $expectedValue = $this->createEntityList('id', [1, 2]);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('execute')
+            ->willReturn($expectedValue);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::never())
+            ->method('getQuery');
+
+        $this->repository->expects(self::never())
+            ->method('createQueryBuilder');
+
+        $aclHelper = $this->createMock(AclHelper::class);
+        $aclHelper->expects(self::once())
+            ->method('apply')
+            ->with($queryBuilder)
+            ->willReturn($query);
+
+        $transformer = $this->getTransformer('id', fn () => $queryBuilder);
+        $transformer->setAclHelper($aclHelper);
+
+        self::assertEquals($expectedValue, $transformer->reverseTransform($value));
+    }
+
+    public function testReverseTransformWhenAclHelperFiltersOutSomeEntities(): void
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Could not find all entities for the given IDs');
+
+        $value = [1, 2, 3];
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('execute')
+            ->willReturn($this->createEntityList('id', [1, 2]));
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->with('e.id IN (:ids)')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('setParameter')
+            ->with('ids', $value)
+            ->willReturnSelf();
+
+        $this->classMetadata->expects(self::once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $this->repository->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($queryBuilder);
+
+        $aclHelper = $this->createMock(AclHelper::class);
+        $aclHelper->expects(self::once())
+            ->method('apply')
+            ->with($queryBuilder)
+            ->willReturn($query);
+
+        $transformer = $this->getTransformer(null, null);
+        $transformer->setAclHelper($aclHelper);
+
+        $transformer->reverseTransform($value);
+    }
+
+    public function testReverseTransformWhenAclHelperIsReset(): void
+    {
+        $value = [1, 2];
+        $expectedValue = $this->createEntityList('id', [1, 2]);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('execute')
+            ->willReturn($expectedValue);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $aclHelper = $this->createMock(AclHelper::class);
+        $aclHelper->expects(self::never())
+            ->method('apply');
+
+        $transformer = $this->getTransformer('id', fn () => $queryBuilder);
+        $transformer->setAclHelper($aclHelper);
+        $transformer->setAclHelper(null);
+
+        self::assertEquals($expectedValue, $transformer->reverseTransform($value));
     }
 }

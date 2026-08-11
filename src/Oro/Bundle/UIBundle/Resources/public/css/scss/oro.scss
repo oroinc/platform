@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 @use 'sass:math';
+@use 'sass:color';
 
 /* stylelint-disable no-descending-specificity */
 
@@ -30,6 +31,11 @@ footer {
     margin: 0 0 $margin-bottom-box;
 }
 
+b,
+bdo {
+    font-weight: font-weight('semi-bold');
+}
+
 .small-text {
     font-size: $base-font-size--s;
 }
@@ -57,8 +63,8 @@ footer {
 
 .label-important,
 .badge-important {
-    background: $danger;
-    background: linear-gradient($danger-light, $danger);
+    background: $error;
+    background: linear-gradient($error-light, $error);
 }
 
 /* general style classes */
@@ -396,26 +402,32 @@ textarea {
     @include clearfix();
 
     &.row-fluid-divider {
-        background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+        background:
+            linear-gradient(
+                color.adjust($neutral-grey-3, $lightness: 9%),
+                color.adjust($neutral-grey-3, $lightness: 9%)
+            ) repeat-y 50% 0;
         background-size: 1px 100%;
     }
 }
 
 .user-fieldset {
-    font-weight: $content-title-font-weight;
-    font-size: $content-title-font-size;
-    line-height: $content-title-line-height;
-    padding-bottom: $content-title-inner-offset-bottom;
+    font-weight: font-weight('semi-bold');
+    font-size: 14px;
+    line-height: 28px;
+    padding-bottom: 6px;
     margin: 0 0 $content-padding-medium;
     text-align: left;
+    letter-spacing: .2px;
 }
 
 .widget-title {
-    font-weight: $content-title-font-weight;
-    font-size: $content-title-font-size;
-    line-height: $content-title-line-height;
-    padding-bottom: $content-title-inner-offset-bottom;
+    font-weight: font-weight('semi-bold');
+    font-size: 14px;
+    line-height: 28px;
+    margin-bottom: $content-padding-xmd;
     display: block;
+    letter-spacing: .2px;
 }
 
 .page-size .dropdown-menu {
@@ -423,7 +435,7 @@ textarea {
 }
 
 .separator-btn {
-    border-left: 1px solid $additional-extra-lighten;
+    border-left: 1px solid $additional-extra-light;
     margin: 4px 8px 0;
     height: $btn-line-height;
 }
@@ -487,7 +499,7 @@ textarea {
         text-decoration: inherit;
         -webkit-font-smoothing: antialiased;
         content: '\f06a';
-        color: $danger;
+        color: $error;
         text-indent: 0;
         speak: never;
     }
@@ -609,10 +621,9 @@ label.radio.error {
 .collection-fields-list-bg.oro-item-collection {
     > div {
         position: relative;
-        padding: $content-padding-medium 0;
+        padding: $content-padding-medium;
         margin: 0 0 $content-padding-medium;
-        border: 1px solid $primary-860;
-        background: $primary-900;
+        background: $neutral-grey-1;
         border-radius: 4px;
     }
 
@@ -635,12 +646,12 @@ label.radio.error {
 
 .box-type1 {
     .title {
-        padding-bottom: $content-padding-medium;
+        padding-bottom: $content-padding-xs;
     }
 
     .box-content {
         &.box-split-content {
-            background: linear-gradient($additional-ultra-light, $additional-ultra-light) repeat-y 50% 0;
+            background: linear-gradient($neutral-grey-4, $neutral-grey-4) repeat-y 50% 0;
             background-size: 1px 100%;
 
             .responsive-small &,
@@ -717,7 +728,7 @@ iframe.email-body {
 }
 
 span.validation-failed {
-    @include validation-failed($danger-dark);
+    @include validation-failed($error);
 }
 
 .default-field {
@@ -763,7 +774,6 @@ span.validation-failed {
 
 .nav-tabs > li > a.widget-component-processing {
     /* stylelint-disable declaration-no-important */
-    background: rgba($primary-inverse, .5) !important;
     color: $text-disabled !important;
     /* stylelint-enable declaration-no-important */
     position: relative;
@@ -896,27 +906,9 @@ label .popover-body {
     }
 
     &.overflow-mode {
-        &::after {
-            position: absolute;
-            bottom: 0;
-
-            display: block;
-            height: math.round($font-size-base * $line-height-base);
-            width: 100%;
-
-            background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, .1));
-
-            content: '';
-            pointer-events: none;
-        }
-
         &.show {
             overflow: initial;
             max-height: initial;
-
-            &::after {
-                content: none;
-            }
         }
     }
 
@@ -932,6 +924,26 @@ label .popover-body {
         // Bootstrap adds the height property directly to the "style" attribute.
         // stylelint-disable-next-line declaration-no-important
         height: initial !important;
+    }
+
+    .section-content & {
+        max-width: 800px;
+    }
+}
+
+.collapse-toggle {
+    display: inline-block;
+    text-decoration: underline;
+    font-weight: font-weight('medium');
+    line-height: 18px;
+    letter-spacing: .2px;
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    .collapse-overflow + & {
+        margin-top: 16px;
     }
 }
 

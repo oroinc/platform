@@ -3,8 +3,14 @@
 .search-header {
     @include safe-area-offset(padding, $search-header-padding);
 
+    margin: $content-padding-small $content-padding 0;
+
     &.container-fluid {
         background-color: $primary-900;
+    }
+
+    + .no-data {
+        margin: $content-padding $content-padding 0;
     }
 
     h2,
@@ -72,4 +78,8 @@
     .grid-row:last-child .grid-body-cell {
         border-width: 0;
     }
+}
+
+.search-content-results {
+    margin: $content-padding $content-padding 0;
 }

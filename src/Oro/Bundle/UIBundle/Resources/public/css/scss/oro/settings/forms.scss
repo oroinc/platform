@@ -1,16 +1,21 @@
 /* @theme: admin.oro; */
 
-$form-horizontal-control-label-width: var(--form-horizontal-control-label-width, 182px) !default;
+@use 'sass:color';
+
+$form-horizontal-control-label-width: var(--form-horizontal-control-label-width, 200px) !default;
 $form-horizontal-control-label-offset: 6px !default;
 $form-horizontal-control-label-line-height: 20px !default;
 $form-horizontal-control-html-content-offset: 5px !default;
 $form-horizontal-widget-control-label-width: auto !default;
 
-$form-horizontal-control-margin-start: var(--form-horizontal-control-margin-start, 24px) !default;
+$form-horizontal-control-margin-start: var(--form-horizontal-control-margin-start, 8px) !default;
 $form-container-control-row-space: $content-padding-medium !default;
 
+$form-container-control-group-offset: 8px 0 !default;
+$form-container-control-group-border-bottom: 1px dashed color.adjust($neutral-grey-3, $lightness: 6%) !default;
+
 $form-container-column-max-width: 480px !default;
-$form-container-column-offset-right: 20px !default;
+$form-container-column-offset-right: $content-padding-xl * 2 !default;
 
 $form-container-control-group-max-width: 800px !default;
 

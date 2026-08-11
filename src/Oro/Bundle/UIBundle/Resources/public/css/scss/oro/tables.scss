@@ -7,14 +7,9 @@
     max-width: 100%;
     margin-bottom: $table-offset-bottom;
 
+    &.table-outlined,
     &.unit-table {
-        min-width: $table-offset-bottom;
-
-        td {
-            &:first-child {
-                font-weight: $table-unit-table-td-first-child-font-weight;
-            }
-        }
+        @include table-outlined();
     }
 
     td,
@@ -72,12 +67,15 @@
     thead {
         th {
             background: $table-thead-th-background;
+            border-bottom: $table-thead-th-border-bottom;
             font-size: $table-thead-th-font-size;
+            font-weight: $table-thead-th-font-weight;
             color: $table-thead-th-color;
             padding: $table-thead-th-padding;
             white-space: $table-thead-th-white-space;
             vertical-align: $table-thead-th-vertical-align;
             text-transform: $table-thead-th-text-transform;
+            letter-spacing: $table-thead-th-letter-spacing;
 
             a {
                 color: $table-thead-th-a-color;
@@ -87,7 +85,6 @@
             > span {
                 display: $table-thead-th-a-display;
                 line-height: $table-thead-th-a-line-height;
-                padding: $table-thead-th-a-inner-offset;
                 text-transform: $table-thead-th-a-text-transform;
 
                 &:focus {
@@ -156,7 +153,6 @@
         }
 
         td {
-            border-top: $table-tbody-td-border-top;
             border-bottom: $table-tbody-td-border-bottom;
             padding: $table-tbody-td-offset;
         }
@@ -330,10 +326,6 @@
         border-radius: $table-border-radius;
 
         thead {
-            th {
-                border-color: $table-bordered-thead-th-border-color;
-            }
-
             &:first-child {
                 tr {
                     &:first-child {

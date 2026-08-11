@@ -6,7 +6,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Async\Topic\SampleChildJobTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Exception\JobCannotBeStartedException;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 
 class JobRunnerTest extends WebTestCase
@@ -33,17 +33,20 @@ class JobRunnerTest extends WebTestCase
         $childJob = $this->createDelayedJob();
         $this->getJobProcessor()->failChildJob($childJob);
 
-        self::sendMessage(SampleChildJobTopic::getName(), ['jobId' => $childJob->getId()]);
-
-        $this->expectException(JobCannotBeStartedException::class);
-        $this->expectErrorMessage(
-            sprintf(
-                'Job "%s" cannot be started because it is already in status "%s"',
-                $childJob->getId(),
-                Job::STATUS_FAILED
-            )
-        );
+        $message = self::sendMessage(SampleChildJobTopic::getName(), ['jobId' => $childJob->getId()]);
 
         self::consume();
+
+        self::assertProcessedMessageStatus(MessageProcessorInterface::REJECT, $message);
+        self::assertTrue(
+            self::getLoggerTestHandler()->hasWarningThatContains(
+                sprintf(
+                    'Job "%s" cannot be started because it is already in status "%s"',
+                    $childJob->getId(),
+                    Job::STATUS_FAILED
+                )
+            )
+        );
+        self::assertFalse(self::getLoggerTestHandler()->hasErrorRecords());
     }
 }

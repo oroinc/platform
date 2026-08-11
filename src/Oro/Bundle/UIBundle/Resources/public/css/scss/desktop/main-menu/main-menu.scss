@@ -37,17 +37,4 @@
     .dropdown-menu {
         z-index: $zindex-fixed;
     }
-
-    .divider {
-        height: 1px;
-        margin: 0;
-
-        border: 1px solid $menu-item-divider-color;
-        border-width: 1px 0 0;
-
-        .title {
-            // stylelint-disable-next-line declaration-no-important
-            display: none !important;
-        }
-    }
 }
