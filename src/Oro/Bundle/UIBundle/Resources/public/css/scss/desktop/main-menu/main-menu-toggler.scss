@@ -16,14 +16,9 @@
         transform: rotate($menu-icon-toggler-transform);
     }
 
+    &:active,
     &:hover {
         background-color: $primary-main-light;
-    }
-
-    &:focus,
-    &:active {
-        background: $neutral-white;
-        box-shadow: 0 0 0 2px $text-inverse, 0 0 0 4px $secondary-focus;
     }
 }
 

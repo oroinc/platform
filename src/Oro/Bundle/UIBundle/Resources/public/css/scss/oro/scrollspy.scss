@@ -22,7 +22,7 @@
             content: '';
             position: absolute;
             pointer-events: none;
-            bottom: -$scrollspy-nav-gradient-height - 1;
+            bottom: -$scrollspy-nav-gradient-height;
             left: 0;
             right: 0;
             height: $scrollspy-nav-gradient-height;
