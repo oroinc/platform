@@ -264,7 +264,7 @@ class ImportExportController extends AbstractController
     }
 
     #[Route(path: '/export/config', name: 'oro_importexport_export_config')]
-    #[Template('@OroImportExport/ImportExport/configurableExport.html.twig')]
+    #[Template('@OroImportExport/ImportExport/widget/configurableExport.html.twig')]
     #[AclAncestor('oro_importexport_export')]
     public function configurableExportAction(Request $request): array|Response
     {

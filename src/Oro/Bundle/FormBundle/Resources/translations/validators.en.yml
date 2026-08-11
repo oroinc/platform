@@ -20,3 +20,5 @@ oro:
             captcha_not_verified: 'The form cannot be sent because you did not passed the anti-bot validation. If you are a human, please contact us.'
         unchangeable_field:
             error: 'This field cannot be changed once set.'
+        entity_create_or_select_inline:
+            invalid: "The selected option is not valid."

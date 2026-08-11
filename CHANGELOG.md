@@ -113,6 +113,14 @@ The current file describes significant changes in the code that may affect the u
 * Updated `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider` so it implements `\Oro\Component\Config\Cache\ClearableConfigCacheInterface`.
 * Changed `\Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener` to support preloading many-to-many collections whose items are shared by several owners. A collection item is now assigned to all of its owners (owner ids are aggregated per item) instead of a single owner.
 
+#### FormBundle
+* Removed the fourth constructor argument `$queryBuilderCallback` of `\Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer`, use the new `setQueryBuilderCallback(?callable $queryBuilderCallback): void` method instead.
+* Added `\Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer::setAclHelper(?\Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper $aclHelper): void` to load entities with the `VIEW` permission applied.
+* Added `\Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory` (service `oro_form.form.data_transformer.entity_select_or_create_factory`) that creates the default data transformer for the `oro_entity_create_or_select_inline` form type.
+* Changed the constructor of `\Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType`, `\Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory` was added as the sixth argument.
+* Added the `acl_protected` option to the `oro_entity_create_or_select_inline` form type, set it to `true` to load entities with the `VIEW` permission applied. It is `false` by default because the allowed values of most of the entity selects are restricted by their autocomplete search handler or validated by a dedicated constraint, and these restrictions are not equivalent to the `VIEW` permission.
+* Changed the `invalid_message` option default of the `oro_entity_create_or_select_inline` form type to the `oro.form.entity_create_or_select_inline.invalid` translation key.
+
 #### MessageQueueBundle
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
 * Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value. The `$idleMicroseconds` and `$receiveTimeout` constructor arguments were removed in favor of the `setIdleTimeout(float $idleTimeout)` and `setReceiveTimeout(float $receiveTimeout)` setters. Both timeouts are now expressed in seconds as floats (the former `$idleMicroseconds` integer default of `100000` microseconds is now the `0.1` seconds `idleTimeout` default).

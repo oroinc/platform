@@ -61,6 +61,31 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Writes the value directly to the hidden input the given element points to, bypassing its UI widget.
+     * Use it to check the server side processing of a value that cannot be chosen via the UI,
+     * for example an entity from another organization in an entity select field.
+     * No change event is dispatched, so the widget attached to the input keeps its current state.
+     * The value supports the "$alias$" placeholders of the previously remembered values.
+     *
+     * Example: And I set "42" value to the hidden "Product Id Input" element
+     * Example: And I set "$rememberedProductId$" value to the hidden "Product Id Input" element
+     *
+     * @When /^(?:|I )set "(?P<value>(?:[^"]|\\")*)" value to the hidden "(?P<elementName>[^"]+)" element$/
+     */
+    public function setValueToHiddenElement(string $value, string $elementName): void
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isIsset(), sprintf('Element "%s" is not found on the page', $elementName));
+
+        $this->getSession()->executeScript(sprintf(
+            'document.evaluate(%s, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)'
+            . '.singleNodeValue.value = %s;',
+            json_encode($element->getXpath()),
+            json_encode(VariableStorage::normalizeValue($value))
+        ));
+    }
+
+    /**
      * Fill form with data
      * Example: And fill form with:
      *            | Subject     | Simple text     |
