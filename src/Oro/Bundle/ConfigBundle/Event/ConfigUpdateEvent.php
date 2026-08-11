@@ -15,12 +15,18 @@ class ConfigUpdateEvent extends Event
     private ConfigChangeSet $changeSet;
     private string $scope;
     private int $scopeId;
+    private array $useParentScopeChanges;
 
-    public function __construct(array $changeSet, string $scope, int $scopeId)
-    {
+    public function __construct(
+        array $changeSet,
+        string $scope,
+        int $scopeId,
+        array $useParentScopeChanges = []
+    ) {
         $this->changeSet = new ConfigChangeSet($changeSet);
         $this->scope = $scope;
         $this->scopeId = $scopeId;
+        $this->useParentScopeChanges = $useParentScopeChanges;
     }
 
     /**
@@ -59,6 +65,18 @@ class ConfigUpdateEvent extends Event
     public function getOldValue(string $name): mixed
     {
         return $this->changeSet->getOldValue($name);
+    }
+
+    /**
+     * Gets settings that started or stopped using the value of the parent scope — the "Use default" /
+     * "Use Organization" / ... checkbox of the configuration form — while their value stayed the same.
+     * A setting whose value did change is reported by the change set instead.
+     *
+     * @return array [name => ['new' => value, 'old' => value, 'action' => action], ...]
+     */
+    public function getUseParentScopeChanges(): array
+    {
+        return $this->useParentScopeChanges;
     }
 
     public function getScope(): string

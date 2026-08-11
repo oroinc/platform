@@ -53,6 +53,17 @@ The current file describes significant changes in the code that may affect the u
 #### FormBundle
 * Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
 
+#### ConfigBundle
+* Added `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager::hasSettingValue(string $name, object|int|null $scopeIdentifier = null): bool` method that tells whether a setting has its own stored value in the scope, ignoring the changes scheduled with `set()`.
+* Added the `action` key (`create`, `update` or `remove`) to every item of the change set carried by `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent`, with the `Oro\Bundle\ConfigBundle\Config\ConfigChangeSet::ACTION_*` constants.
+
+#### DataAuditBundle
+* Added recording of system configuration changes: every change made on behalf of a user is stored as an audit entry whose entity type is the configuration level it was made at, and is shown in the **System > Data Audit** grid.
+* Added recording of every configuration scope of the application as its own audit entity type. The scopes are taken from the `oro_config.scope` tags, so a scope contributed by any bundle is covered automatically.
+* Added the `oro_data_audit.configuration_level_entities` configuration option that tells the audit which entity the id of a configuration scope refers to, so that a record can be named after what was configured.
+* Added masking of secret configuration settings in the audit: the value of a setting rendered as a password field is stored as `***`.
+* Added the `audit-data` datagrid filter (`Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter`) that searches within the changed data of the audit grid.
+
 #### MessageQueueBundle
 * Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
 * Added the configurable consumer idle timeout. It is set via the `oro_message_queue.consumer.idle_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_IDLE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_idle_timeout_default` container parameter (defaults to `0.1` seconds). It controls how long the consumer sleeps when no message is received from a queue.
@@ -64,6 +75,10 @@ The current file describes significant changes in the code that may affect the u
 * Added `\Oro\Component\DraftSession\Entity\NoopEntityDraftAwareTrait` — a reusable no-op implementation of `\Oro\Component\DraftSession\Entity\EntityDraftAwareInterface`. Use it on entities that are not draft-aware themselves but must satisfy the interface to be accepted as a draft source entity by the draft factory chain.
 
 ### Changed
+
+#### DataAuditBundle
+* Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Symfony\Contracts\Translation\TranslatorInterface` and `Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider` arguments, as the entity type list now also contains the configuration levels.
+* Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
 
 #### EmailBundle
 * Updated entity config setting `email.available_in_template` to make it `false` be default. Make sure to update this setting for your custom fields if you want to use them in email templates. You can do this using `\Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery` in a schema migration.

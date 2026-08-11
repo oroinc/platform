@@ -64,6 +64,15 @@ oro:
             author_impersonation_filter: "Impersonated from %ipAddress% using %token%"
             impersonation: Impersonation
 
+        config:
+            type:
+                system: 'Configuration: System'
+                organization: 'Configuration: Organization'
+                website: 'Configuration: Website'
+                customer: 'Configuration: Customer'
+                customer_group: 'Configuration: Customer Group'
+                user: 'Configuration: User'
+
         entity_config:
             entity:
                 items:

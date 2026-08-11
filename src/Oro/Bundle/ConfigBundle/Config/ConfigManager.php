@@ -215,14 +215,31 @@ class ConfigManager
 
         $settings = $this->dispatchConfigSettingsUpdateEvent(ConfigSettingsUpdateEvent::BEFORE_SAVE, $settings);
 
-        [$updated, $removed] = $this->getScopeManager()->save($settings, $scopeIdentifier);
+        $scopeManager = $this->getScopeManager();
+        // Settings that have no stored value in this scope yet: saving one of them creates it, which is
+        // what tells a "create" apart from an "update" in the change set below.
+        $newSettings = [];
+        foreach (array_keys($settings) as $name) {
+            $newSettings[$name] = !$scopeManager->hasSettingValue($name, $scopeIdentifier);
+        }
+
+        [$updated, $removed] = $scopeManager->save($settings, $scopeIdentifier);
 
         $this->resetMemoryCache();
 
+        [$changeSet, $useParentScopeChanges] = $this->buildChanges(
+            $updated,
+            $removed,
+            $oldValues,
+            $newSettings,
+            $scopeIdentifier
+        );
+
         $event = new ConfigUpdateEvent(
-            $this->buildChangeSet($updated, $removed, $oldValues),
+            $changeSet,
             $this->scope,
-            $this->resolveIdentifier($scopeIdentifier)
+            $this->resolveIdentifier($scopeIdentifier),
+            $useParentScopeChanges
         );
         $this->eventDispatcher->dispatch($event, ConfigUpdateEvent::EVENT_NAME);
 
@@ -491,28 +508,62 @@ class ConfigManager
         return $normalizedSettings;
     }
 
-    private function buildChangeSet(
+    /**
+     * @param array $updated [setting name => new value]
+     * @param array $removed [setting name, ...] settings reset to the parent scope or to the default
+     * @param array $oldValues [setting name => value before the save]
+     * @param array $newSettings [setting name => whether the setting had no stored value before the save]
+     *
+     * @return array [[name => ['old' => value, 'new' => value, 'action' => action], ...] change set,
+     *                [name => ['old' => value, 'new' => value, 'action' => action], ...] settings that
+     *                only started or stopped using the value of the parent scope]
+     */
+    private function buildChanges(
         array $updated,
         array $removed,
         array $oldValues,
+        array $newSettings = [],
         object|int|null $scopeIdentifier = null
     ): array {
         $changeSet = [];
+        $useParentScopeChanges = [];
         foreach ($updated as $name => $value) {
             $oldValue = $oldValues[$name] ?? null;
             if ($oldValue != $value) {
-                $changeSet[$name] = ['old' => $oldValue, 'new' => $value];
+                $changeSet[$name] = [
+                    'old' => $oldValue,
+                    'new' => $value,
+                    'action' => empty($newSettings[$name])
+                        ? ConfigChangeSet::ACTION_UPDATE
+                        : ConfigChangeSet::ACTION_CREATE,
+                ];
+            } elseif (!empty($newSettings[$name])) {
+                $useParentScopeChanges[$name] = [
+                    'old' => $oldValue,
+                    'new' => $value,
+                    'action' => ConfigChangeSet::ACTION_CREATE,
+                ];
             }
         }
         foreach ($removed as $name) {
             $oldValue = $oldValues[$name] ?? null;
             $value = $this->getValue($name, true, false, $scopeIdentifier);
             if ($oldValue != $value) {
-                $changeSet[$name] = ['old' => $oldValue, 'new' => $value];
+                $changeSet[$name] = [
+                    'old' => $oldValue,
+                    'new' => $value,
+                    'action' => ConfigChangeSet::ACTION_REMOVE,
+                ];
+            } elseif (empty($newSettings[$name])) {
+                $useParentScopeChanges[$name] = [
+                    'old' => $oldValue,
+                    'new' => $value,
+                    'action' => ConfigChangeSet::ACTION_REMOVE,
+                ];
             }
         }
 
-        return $changeSet;
+        return [$changeSet, $useParentScopeChanges];
     }
 
     private function resolveIdentifier(object|int|null $scopeIdentifier): int

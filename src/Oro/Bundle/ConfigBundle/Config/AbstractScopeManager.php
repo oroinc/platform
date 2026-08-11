@@ -220,6 +220,16 @@ abstract class AbstractScopeManager
     }
 
     /**
+     * Checks whether the setting has its own value stored in this scope, as opposed to inheriting one from
+     * a parent scope or using the default. Values set with {@see set()} but not flushed yet are ignored:
+     * this tells what is currently stored.
+     */
+    public function hasSettingValue(string $name, object|int|null $scopeIdentifier = null): bool
+    {
+        return null !== $this->getCachedSetting($this->resolveIdentifier($scopeIdentifier), $name, true);
+    }
+
+    /**
      * Calculates and returns config change set.
      * Does not modify anything, so even if you call flush after calculating you will not persist any changes.
      *

@@ -7,6 +7,10 @@ namespace Oro\Bundle\ConfigBundle\Config;
  */
 class ConfigChangeSet
 {
+    public const ACTION_CREATE = 'create';
+    public const ACTION_UPDATE = 'update';
+    public const ACTION_REMOVE = 'remove';
+
     private array $changeSet;
 
     public function __construct(array $changeSet)
@@ -17,7 +21,7 @@ class ConfigChangeSet
     /**
      * Gets config change set.
      *
-     * @return array [name => ['new' => value, 'old' => value], ...]
+     * @return array [name => ['new' => value, 'old' => value, 'action' => string], ...]
      */
     public function getChanges(): array
     {

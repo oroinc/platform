@@ -54,27 +54,47 @@ class AuditMessageBodyProvider
         $body['timestamp'] = time();
         $body['transaction_id'] = $this->getTransactionId();
 
-        if (null !== $securityToken) {
-            $user = $securityToken->getUser();
-            if ($user instanceof AbstractUser) {
-                $body['user_id'] = $user->getId();
-                $body['user_class'] = ClassUtils::getClass($user);
-                $body['owner_description'] = $this->entityNameResolver->getName($user, 'email');
-            }
-            if ($securityToken instanceof OrganizationAwareTokenInterface) {
-                $body['organization_id'] = $securityToken->getOrganization()->getId();
-            }
+        return array_merge($body, $this->prepareAuthorData($securityToken));
+    }
 
-            if ($securityToken->hasAttribute('IMPERSONATION')) {
-                $body['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
-            }
-
-            if ($securityToken->hasAttribute('owner_description')) {
-                $body['owner_description'] = $securityToken->getAttribute('owner_description');
-            }
+    /**
+     * Extracts the acting user, organization and impersonation from the security token, in the shape any
+     * audit message body expects. Used by every audit producer, so that all audit entries describe their
+     * author the same way.
+     *
+     * @param TokenInterface|null $securityToken
+     * @return array
+     */
+    public function prepareAuthorData(?TokenInterface $securityToken)
+    {
+        if (null === $securityToken) {
+            return [];
         }
 
-        return $body;
+        $data = [];
+        $user = $securityToken->getUser();
+        if ($user instanceof AbstractUser) {
+            $data['user_id'] = $user->getId();
+            $data['user_class'] = ClassUtils::getClass($user);
+            $data['owner_description'] = $this->entityNameResolver->getName($user, 'email');
+        }
+
+        $organization = $securityToken instanceof OrganizationAwareTokenInterface
+            ? $securityToken->getOrganization()
+            : null;
+        if (null !== $organization) {
+            $data['organization_id'] = $organization->getId();
+        }
+
+        if ($securityToken->hasAttribute('IMPERSONATION')) {
+            $data['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
+        }
+
+        if ($securityToken->hasAttribute('owner_description')) {
+            $data['owner_description'] = $securityToken->getAttribute('owner_description');
+        }
+
+        return $data;
     }
 
     private function getTransactionId(): string
