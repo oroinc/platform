@@ -131,13 +131,10 @@ const PageMessagesView = PageRegionView.extend({
      * @param {Object} messages
      */
     _addMessages: function(messages) {
-        let options;
-        if (this.pageIsGoingToReload) {
-            options = {afterReload: true};
-        }
+        const afterReload = this.pageIsGoingToReload;
         _.each(messages, function(messages, type) {
             _.each(messages, function(message) {
-                messenger.notificationFlashMessage(type, message, options);
+                messenger.notificationFlashMessage(type, message, afterReload ? {afterReload: true} : undefined);
             });
         });
     }

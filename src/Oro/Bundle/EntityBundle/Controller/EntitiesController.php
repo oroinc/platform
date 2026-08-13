@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
@@ -112,8 +113,10 @@ class EntitiesController extends AbstractController
         $entity = $this->container->get('doctrine')->getRepository($relationTargetEntity)->find($id);
 
         if (!$entity) {
-            return $this->createNotFoundException();
+            throw $this->createNotFoundException();
         }
+
+        $this->checkRecordAccess('VIEW', $entity);
 
         $dynamicRow = array();
         foreach ($fields as $field) {
@@ -201,11 +204,7 @@ class EntitiesController extends AbstractController
         /** @var OroEntityManager $em */
         $em = $this->container->get('doctrine')->getManager();
         $entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
-        $record = $em->getRepository($entityClass)->find($id);
-
-        if (!$record) {
-            throw $this->createNotFoundException();
-        }
+        $record = $this->getRecord($em, $entityClass, $id, 'VIEW');
 
         return [
             'entity_name'   => $entityName,
@@ -243,9 +242,7 @@ class EntitiesController extends AbstractController
         $entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
         $entityConfig         = $entityConfigProvider->getConfig($entityClass);
 
-        $entityRepository = $em->getRepository($entityClass);
-
-        $record = !$id ? new $entityClass() : $entityRepository->find($id);
+        $record = !$id ? new $entityClass() : $this->getRecord($em, $entityClass, $id, 'EDIT');
 
         $form = $this->createForm(
             CustomEntityType::class,
@@ -311,7 +308,7 @@ class EntitiesController extends AbstractController
         $entityRepository = $em->getRepository($entityClass);
 
         $record = $entityRepository->find($id);
-        if (!$record) {
+        if (!$record || !$this->isGranted('DELETE', $record)) {
             return new JsonResponse('', Response::HTTP_FORBIDDEN);
         }
 
@@ -334,6 +331,29 @@ class EntitiesController extends AbstractController
         if (!$this->isGranted($permission, 'entity:' . $entityName)) {
             throw new AccessDeniedException('Access denied.');
         }
+    }
+
+    private function checkRecordAccess(string $permission, object $record): void
+    {
+        if (!$this->isGranted($permission, $record)) {
+            throw new AccessDeniedException('Access denied.');
+        }
+    }
+
+    private function getRecord(
+        EntityManagerInterface $em,
+        string $entityClass,
+        mixed $id,
+        string $permission
+    ): object {
+        $record = $em->getRepository($entityClass)->find($id);
+        if (!$record) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->checkRecordAccess($permission, $record);
+
+        return $record;
     }
 
     #[\Override]
