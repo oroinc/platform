@@ -484,7 +484,10 @@
     {% if label is empty %}
         {% set label = 'Cancel'|trans %}
     {% endif %}
-    {{ UIMacro.button({'path' : path, 'title' : label, 'label' : label, data: {action: 'cancel'} }) }}
+    {{ UIMacro.button({'path' : path, 'title' : label, 'label' : label, data: {
+        'action': 'cancel',
+        'page-component-view': 'oroui/js/app/views/go-back-view'
+    } }) }}
 {% endmacro %}
 
 {#

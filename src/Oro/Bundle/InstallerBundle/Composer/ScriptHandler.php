@@ -214,7 +214,7 @@ class ScriptHandler
             ['symfony-web-dir' => 'public'],
             $composer->getPackage()->getExtra(),
             [
-                'process-timeout' => $config->get('process-timeout'),
+                'process-timeout' => max(0, (int)$config->get('process-timeout')),
                 'vendor-dir' => $config->get('vendor-dir'),
             ]
         );

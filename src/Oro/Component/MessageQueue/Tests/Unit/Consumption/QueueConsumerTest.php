@@ -156,20 +156,62 @@ class QueueConsumerTest extends TestCase
             ->consume();
     }
 
-    public function testThrowIfProcessorThrowsStaleException(): void
+    public function testShouldRejectMessageAndContinueConsumingWhenProcessorThrowsRejectMessageException(): void
+    {
+        $this->messageConsumer->expects(self::exactly(2))
+            ->method('receive')
+            ->willReturn($this->message);
+
+        $this->messageConsumer->expects(self::once())
+            ->method('reject')
+            ->with(self::identicalTo($this->message));
+
+        $this->messageConsumer->expects(self::once())
+            ->method('acknowledge')
+            ->with(self::identicalTo($this->message));
+
+        $callCount = 0;
+        $this->messageProcessor->expects(self::exactly(2))
+            ->method('process')
+            ->willReturnCallback(function () use (&$callCount) {
+                $callCount++;
+                if (1 === $callCount) {
+                    throw StaleJobRuntimeException::create();
+                }
+
+                return MessageProcessorInterface::ACK;
+            });
+
+        $this->createQueueConsumer(null, new BreakCycleExtension(2))
+            ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
+            ->consume();
+    }
+
+    public function testShouldSetRejectStatusAndInvokeOnPostReceivedWhenProcessorThrowsRejectMessageException(): void
     {
         $this->messageConsumer->expects(self::once())
             ->method('receive')
             ->willReturn($this->message);
 
+        $this->messageConsumer->expects(self::once())
+            ->method('reject')
+            ->with(self::identicalTo($this->message));
+
+        $exception = StaleJobRuntimeException::create();
         $this->messageProcessor->expects(self::once())
             ->method('process')
-            ->willThrowException(StaleJobRuntimeException::create());
+            ->willThrowException($exception);
 
-        $this->expectException(StaleJobRuntimeException::class);
-        $this->expectExceptionMessage('Stale Jobs cannot be run');
+        $extension = $this->createMock(ExtensionInterface::class);
+        $extension->expects(self::once())
+            ->method('onPostReceived')
+            ->with(self::isInstanceOf(Context::class))
+            ->willReturnCallback(function (Context $context) {
+                self::assertSame(MessageProcessorInterface::REJECT, $context->getStatus());
+                self::assertSame($this->message, $context->getMessage());
+            });
 
-        $this->createQueueConsumer()
+        $this->createQueueConsumer(null, new ChainExtension([$extension, new BreakCycleExtension(1)]))
             ->bindQueue(self::QUEUE_NAME, [QueueConsumer::PROCESSOR => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }
@@ -466,6 +508,46 @@ class QueueConsumerTest extends TestCase
             ->method('close');
 
         $this->createQueueConsumer($connection, new ChainExtension([$extension, new BreakCycleExtension(1)]))
+            ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
+            ->consume();
+    }
+
+    public function testShouldCloseSessionWhenConsumptionInterruptedWhileHandlingRejectedMessage(): void
+    {
+        $extension = $this->createMock(ExtensionInterface::class);
+        $extension->expects(self::once())
+            ->method('onPostReceived')
+            ->with(self::isInstanceOf(Context::class))
+            ->willReturnCallback(function (Context $context) {
+                $context->setExecutionInterrupted(true);
+            });
+        $extension->expects(self::once())
+            ->method('onInterrupted')
+            ->with(self::isInstanceOf(Context::class))
+            ->willReturnCallback(function (Context $context) {
+                // RejectMessageOnExceptionDbalExtension::onInterrupted() rejects the message again
+                // (with requeue) whenever getException() is set — the message is already rejected
+                // by this point, so it must stay null or that extension double-rejects it.
+                self::assertNull($context->getException());
+            });
+
+        $this->messageConsumer->expects(self::once())
+            ->method('receive')
+            ->willReturn($this->message);
+
+        $this->messageProcessor->expects(self::once())
+            ->method('process')
+            ->willThrowException(StaleJobRuntimeException::create());
+
+        $session = $this->createSession();
+        $connection = $this->createConnection($session);
+        $session->expects(self::any())
+            ->method('createConsumer')
+            ->willReturn($this->messageConsumer);
+        $session->expects(self::once())
+            ->method('close');
+
+        $this->createQueueConsumer($connection, new ChainExtension([$extension]))
             ->bindQueue(self::QUEUE_NAME, ['processor' => self::MESSAGE_PROCESSOR_NAME])
             ->consume();
     }

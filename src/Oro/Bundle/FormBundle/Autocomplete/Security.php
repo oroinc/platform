@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 /**
  * Provides a way to check whether an access to an autocomplete search handler is granted.
  */
-class Security
+class Security implements AutocompleteSecurityCheckerInterface
 {
     /** @var string[] [autocomplete search handler name => acl resource, ...] */
     private array $autocompleteAclResources;
@@ -19,11 +19,13 @@ class Security
         $this->authorizationChecker = $authorizationChecker;
     }
 
+    #[\Override]
     public function getAutocompleteAclResource(string $name): ?string
     {
         return $this->autocompleteAclResources[$name] ?? null;
     }
 
+    #[\Override]
     public function isAutocompleteGranted(string $name): bool
     {
         $aclResource = $this->getAutocompleteAclResource($name);

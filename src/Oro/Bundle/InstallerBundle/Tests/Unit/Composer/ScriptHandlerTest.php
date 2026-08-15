@@ -537,10 +537,56 @@ class ScriptHandlerTest extends TestCase
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    // process-timeout normalization
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @dataProvider processTimeoutCases
+     */
+    public function testInstallAssetsNormalizesProcessTimeout(
+        int|string $configuredTimeout,
+        int $expectedTimeout
+    ): void {
+        $this->stubExistingPackageJson(true, self::DEV_PKG_NAME);
+
+        $fs = $this->makeFilesystemMock([
+            'dev/package.json' => true,
+            'dev/pnpm-lock.yaml' => true,
+            '../../pnpm-workspace.yaml' => true,
+        ]);
+        TestableScriptHandler::$filesystem = $fs;
+        putenv('COMPOSER=dev.json');
+
+        TestableScriptHandler::installAssets($this->makeEvent('/abs/dev.json', $configuredTimeout));
+
+        // The dev monorepo path runs members-install + members-build + app-install.
+        self::assertSame(
+            array_fill(0, 3, $expectedTimeout),
+            array_column(TestableScriptHandler::$invocations, 'timeout'),
+            'process-timeout must reach every pnpm helper as an int'
+        );
+    }
+
+    /**
+     * 0 is not "zero seconds": Symfony Process treats it as no timeout at all.
+     */
+    public static function processTimeoutCases(): array
+    {
+        return [
+            'int from composer config' => ['configuredTimeout' => 300, 'expectedTimeout' => 300],
+            'string from COMPOSER_PROCESS_TIMEOUT' => ['configuredTimeout' => '600', 'expectedTimeout' => 600],
+            'empty value -> no timeout' => ['configuredTimeout' => '', 'expectedTimeout' => 0],
+            'negative value -> no timeout' => ['configuredTimeout' => '-5', 'expectedTimeout' => 0],
+            'non-numeric value -> no timeout' => ['configuredTimeout' => 'ten', 'expectedTimeout' => 0],
+            'digit-leading typo -> truncated' => ['configuredTimeout' => '6oo', 'expectedTimeout' => 6],
+        ];
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     // Helpers
     // ──────────────────────────────────────────────────────────────────────────
 
-    private function makeEvent(string $configSource = '/abs/composer.json'): Event
+    private function makeEvent(string $configSource = '/abs/composer.json', int|string $processTimeout = 300): Event
     {
         $cfgSrc = $this->createMock(ConfigSourceInterface::class);
         $cfgSrc->method('getName')->willReturn($configSource);
@@ -548,7 +594,7 @@ class ScriptHandlerTest extends TestCase
         $cfg = $this->createMock(Config::class);
         $cfg->method('getConfigSource')->willReturn($cfgSrc);
         $cfg->method('get')->willReturnCallback(static fn (string $k): mixed => match ($k) {
-            'process-timeout' => 300,
+            'process-timeout' => $processTimeout,
             'vendor-dir' => 'vendor',
             default => null,
         });

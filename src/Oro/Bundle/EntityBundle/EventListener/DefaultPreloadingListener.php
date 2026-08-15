@@ -248,17 +248,20 @@ class DefaultPreloadingListener
             $indexBy = $assocMapping['indexBy'] ?? null;
 
             foreach ($targetFieldItems as $targetFieldItem) {
-                $collectionOwner = $mainEntities[$targetFieldItem['id']];
-                /** @var PersistentCollection $collection */
-                $collection = $this->propertyAccessor->getValue($collectionOwner, $targetField);
-                if ($this->isCollectionAndNotInitialized($collection)) {
-                    $item = $targetFieldItem[0];
-                    $unwrappedCollection = $collection->unwrap();
-                    if ($indexBy) {
-                        $itemKey = $this->propertyAccessor->getValue($item, $indexBy);
-                        $unwrappedCollection->set($itemKey, $item);
-                    } else {
-                        $unwrappedCollection->add($item);
+                $collectionOwners = $this->getCollectionOwners($targetFieldItem, $mainEntities);
+
+                foreach ($collectionOwners as $collectionOwner) {
+                    /** @var PersistentCollection $collection */
+                    $collection = $this->propertyAccessor->getValue($collectionOwner, $targetField);
+                    if ($this->isCollectionAndNotInitialized($collection)) {
+                        $item = $targetFieldItem[0];
+                        $unwrappedCollection = $collection->unwrap();
+                        if ($indexBy) {
+                            $itemKey = $this->propertyAccessor->getValue($item, $indexBy);
+                            $unwrappedCollection->set($itemKey, $item);
+                        } else {
+                            $unwrappedCollection->add($item);
+                        }
                     }
                 }
             }
@@ -269,89 +272,86 @@ class DefaultPreloadingListener
         }
     }
 
+    /**
+     * Resolves the main entities that own the given collection item, supporting both a single owner
+     * ("entity_id") and multiple owners of a many-to-many relation ("entity_ids").
+     *
+     * @param array $targetFieldItem
+     * @param array $mainEntities
+     *
+     * @return array
+     */
+    private function getCollectionOwners(array $targetFieldItem, array $mainEntities): array
+    {
+        if (isset($targetFieldItem['entity_id'])) {
+            return [$mainEntities[$targetFieldItem['entity_id']]];
+        }
+
+        if (isset($targetFieldItem['entity_ids'])) {
+            $collectionOwnerIds = json_decode($targetFieldItem['entity_ids'], true, 2, JSON_THROW_ON_ERROR);
+
+            return array_intersect_key($mainEntities, array_flip($collectionOwnerIds));
+        }
+
+        throw new \LogicException('Collection owner id(s) not found in query result');
+    }
+
     private function getCollectionItems(
         array $mainEntities,
         ClassMetadata $mainEntityMetadata,
         string $targetField
     ): array {
+        $mainEntityClass = $mainEntityMetadata->getName();
+        $mainEntityIdField = $this->getEntityIdField($mainEntityClass);
         $assocMapping = $mainEntityMetadata->getAssociationMapping($targetField);
+        $targetEntityClass = $mainEntityMetadata->getAssociationTargetClass($targetField);
+        $targetEntityIdField = $this->getEntityIdField($targetEntityClass);
+        $targetEntityRepository = $this->doctrineHelper->getEntityRepositoryForClass($targetEntityClass);
+        $qbToMany = $targetEntityRepository->createQueryBuilder('collection_item');
+
+        QueryBuilderUtil::checkParameter($mainEntityIdField);
+
         if ($assocMapping['type'] & ClassMetadata::ONE_TO_MANY) {
-            $qbToMany = $this->getOneToManyQueryBuilder($mainEntityMetadata, $mainEntities, $targetField);
-        } elseif ($assocMapping['type'] & ClassMetadata::MANY_TO_MANY) {
-            $qbToMany = $this->getManyToManyQueryBuilder($mainEntityMetadata, $mainEntities, $targetField);
+            // A single owner per collection item is selected as "entity_id".
+            $mappedBy = $mainEntityMetadata->getAssociationMappedByTargetField($targetField);
+            QueryBuilderUtil::checkParameter($mappedBy);
+            $select = QueryBuilderUtil::sprintf('collection_item_%s.%s as entity_id', $mappedBy, $mainEntityIdField);
+
+            $qbToMany
+                ->addSelect($select)
+                ->innerJoin('collection_item.' . $mappedBy, 'collection_item_' . $mappedBy)
+                ->andWhere($qbToMany->expr()->in('collection_item_' . $mappedBy, ':entities'));
         } else {
-            throw new \LogicException(sprintf('Target field %s was expected to be a TO_MANY relation', $targetField));
+            // A collection item may be shared by several owners, aggregated as "entity_ids".
+            QueryBuilderUtil::checkParameter($mainEntityClass);
+            $select = QueryBuilderUtil::sprintf('JSON_AGG(entity.%s) as entity_ids', $mainEntityIdField);
+
+            $qbToMany
+                ->addSelect($select)
+                ->innerJoin($mainEntityClass, 'entity', Query\Expr\Join::WITH, $qbToMany->expr()->eq(1, 1))
+                ->innerJoin('entity.' . $targetField, 'entity_' . $targetField)
+                ->andWhere($qbToMany->expr()->eq('entity_' . $targetField, 'collection_item'))
+                ->andWhere($qbToMany->expr()->in('entity', ':entities'))
+                ->addGroupBy(QueryBuilderUtil::sprintf('collection_item.%s', $targetEntityIdField));
         }
+
+        $this->applyOrderBy($qbToMany, $assocMapping);
+        $qbToMany->setParameter(':entities', array_keys($mainEntities));
 
         return $qbToMany->getQuery()->execute();
     }
 
-    private function getOneToManyQueryBuilder(
-        ClassMetadata $mainEntityMetadata,
-        array $mainEntities,
-        string $fieldName
-    ): QueryBuilder {
-        $mainEntityClass = $mainEntityMetadata->getName();
-        $mainEntityIdField = $this->getEntityIdField($mainEntityClass);
-        $assocMapping = $mainEntityMetadata->getAssociationMapping($fieldName);
-        $targetEntityClass = $mainEntityMetadata->getAssociationTargetClass($fieldName);
-        $targetEntityRepository = $this->doctrineHelper->getEntityRepositoryForClass($targetEntityClass);
-        $qbToMany = $targetEntityRepository->createQueryBuilder('collection_item');
-
-        $mappedBy = $mainEntityMetadata->getAssociationMappedByTargetField($fieldName);
-        QueryBuilderUtil::checkParameter($mappedBy);
-        QueryBuilderUtil::checkParameter($mainEntityIdField);
-        $qbToMany
-            ->addSelect('collection_item_' . $mappedBy . '.' . $mainEntityIdField)
-            ->innerJoin('collection_item.' . $mappedBy, 'collection_item_' . $mappedBy)
-            ->andWhere($qbToMany->expr()->in('collection_item_' . $mappedBy, ':entities'));
-
-        if (!empty($assocMapping['orderBy'])) {
-            foreach ($assocMapping['orderBy'] as $sort => $order) {
-                QueryBuilderUtil::checkParameter($sort);
-                QueryBuilderUtil::checkParameter($order);
-                $qbToMany->addOrderBy('collection_item.' . $sort, $order);
-            }
+    private function applyOrderBy(QueryBuilder $qbToMany, array $assocMapping): void
+    {
+        if (empty($assocMapping['orderBy'])) {
+            return;
         }
 
-        $qbToMany->setParameter(':entities', array_keys($mainEntities));
-
-        return $qbToMany;
-    }
-
-    private function getManyToManyQueryBuilder(
-        ClassMetadata $mainEntityMetadata,
-        array $mainEntities,
-        string $fieldName
-    ): QueryBuilder {
-        $mainEntityClass = $mainEntityMetadata->getName();
-        $mainEntityIdField = $this->getEntityIdField($mainEntityClass);
-        $assocMapping = $mainEntityMetadata->getAssociationMapping($fieldName);
-        $targetEntityClass = $mainEntityMetadata->getAssociationTargetClass($fieldName);
-        $targetEntityRepository = $this->doctrineHelper->getEntityRepositoryForClass($targetEntityClass);
-        $qbToMany = $targetEntityRepository->createQueryBuilder('collection_item');
-
-        QueryBuilderUtil::checkParameter($mainEntityClass);
-        QueryBuilderUtil::checkParameter($mainEntityIdField);
-
-        $qbToMany
-            ->addSelect('entity.' . $mainEntityIdField)
-            ->innerJoin($mainEntityClass, 'entity', Query\Expr\Join::WITH, $qbToMany->expr()->eq(1, 1))
-            ->innerJoin('entity.' . $fieldName, 'entity_' . $fieldName)
-            ->andWhere($qbToMany->expr()->eq('entity_' . $fieldName, 'collection_item'))
-            ->andWhere($qbToMany->expr()->in('entity', ':entities'));
-
-        if (!empty($assocMapping['orderBy'])) {
-            foreach ($assocMapping['orderBy'] as $sort => $order) {
-                QueryBuilderUtil::checkParameter($sort);
-                QueryBuilderUtil::checkParameter($order);
-                $qbToMany->addOrderBy('collection_item.' . $sort, $order);
-            }
+        foreach ($assocMapping['orderBy'] as $sort => $order) {
+            QueryBuilderUtil::checkParameter($sort);
+            QueryBuilderUtil::checkParameter($order);
+            $qbToMany->addOrderBy('collection_item.' . $sort, $order);
         }
-
-        $qbToMany->setParameter(':entities', array_keys($mainEntities));
-
-        return $qbToMany;
     }
 
     /**
