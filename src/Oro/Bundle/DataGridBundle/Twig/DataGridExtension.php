@@ -206,8 +206,15 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         $queryString = $request->getQueryString();
         parse_str($queryString, $queryStringComponents);
 
+        if (!isset($queryStringComponents['grid']) || !\is_array($queryStringComponents['grid'])) {
+            $queryStringComponents['grid'] = [];
+        }
+
         $gridParams = [];
-        if (isset($queryStringComponents['grid'][$grid->getName()])) {
+        if (
+            isset($queryStringComponents['grid'][$grid->getName()])
+            && \is_string($queryStringComponents['grid'][$grid->getName()])
+        ) {
             parse_str($queryStringComponents['grid'][$grid->getName()], $gridParams);
         }
 

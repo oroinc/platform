@@ -423,6 +423,31 @@ class DataGridExtensionTest extends TestCase
                 'page' => 5,
                 'expectedParameters' => 'grid%5Btest%5D=i%3D5'
             ],
+            'with scalar grid param' => [
+                'queryString' => 'grid=1',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D5'
+            ],
+            'with empty scalar grid param' => [
+                'queryString' => 'grid=',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D5'
+            ],
+            'with scalar grid param and other params' => [
+                'queryString' => 'grid=1&other=2',
+                'page' => 3,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D3&other=2'
+            ],
+            'with array value under grid name' => [
+                'queryString' => 'grid%5Btest%5D%5Bi%5D=4',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D5'
+            ],
+            'with grid params of another grid' => [
+                'queryString' => 'grid%5Bother%5D=i%3D2',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Bother%5D=i%3D2&grid%5Btest%5D=i%3D5'
+            ],
         ];
     }
 }
