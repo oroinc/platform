@@ -80,6 +80,10 @@ class ChartOptionsFactory
         $dateTypes = [Types::DATETIME_MUTABLE, Types::DATE_MUTABLE, Types::DATETIMETZ_MUTABLE];
         if (in_array($labelFieldType, $dateTypes)) {
             $data = $this->datagrid->getData()->offsetGet('data');
+            if (empty($data)) {
+                return $this;
+            }
+
             $dates = array_map(fn ($dateItem) => $dateItem[$labelFieldName], $data);
             $minDate = new \DateTime(min($dates));
             $maxDate = new \DateTime(max($dates));
