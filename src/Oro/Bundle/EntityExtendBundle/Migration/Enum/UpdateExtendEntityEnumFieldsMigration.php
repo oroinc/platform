@@ -25,6 +25,12 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
 
     protected const int BATCH_SIZE = 10000;
 
+    /** @var EnumFieldSerializedDataBatchUpdater|null */
+    private ?EnumFieldSerializedDataBatchUpdater $batchUpdater = null;
+
+    /** @var string Primary key column of the table currently being migrated */
+    private string $idColumnName = 'id';
+
     public function __construct(protected ContainerInterface $container)
     {
     }
@@ -90,47 +96,48 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
         Schema $schema,
         array $entityConfig,
         array $fieldConfig,
-        array $serializedOptions
+        array $serializedOptions,
     ): void {
         $tableName = $entityConfig['data']['extend']['table'] ?? null;
         $entityClass = $entityConfig['class_name'];
         if (!$tableName) {
-            $tableName = $entityData['data']['extend']['schema']['doctrine'][$entityClass]['table']
+            $tableName = $entityConfig['data']['extend']['schema']['doctrine'][$entityClass]['table']
                 ?? $this->getMetadataHelper()->getTableNameByEntityClass($entityClass)
                 ?? null;
         }
         if (null === $tableName) {
-            throw new \LogicException('Undefined table name: %s', $tableName);
+            throw new \LogicException(sprintf('Undefined table name for entity: %s', $entityClass));
         }
         $idColumn = $this->getTableIdColumn($schema, $tableName);
+        $this->idColumnName = $idColumn->getName();
         $enumColumnName = self::getBaseEnumColumnName($fieldConfig['type'], $fieldConfig['field_name']);
-        $query = "SELECT id, $enumColumnName, serialized_data FROM $tableName";
-        // Migrate all table rows for non-numerical IDs
+        $isMultiEnum = ExtendHelper::isMultiEnumType($fieldConfig['type']);
+
         if (!\in_array($idColumn->getType()->getName(), [Types::SMALLINT, Types::INTEGER, Types::BIGINT], true)) {
-            $targetRows = $this->connection->fetchAllAssociative($query);
-            ExtendHelper::isMultiEnumType($fieldConfig['type'])
-                ? $this->migrateMultiEnum($enumColumnName, $tableName, $fieldConfig, $targetRows, $serializedOptions)
-                : $this->migrateEnum($enumColumnName, $tableName, $fieldConfig, $targetRows, $serializedOptions);
+            $isMultiEnum
+                ? $this->migrateMultiEnum($enumColumnName, $tableName, $fieldConfig, [], $serializedOptions)
+                : $this->migrateEnum($enumColumnName, $tableName, $fieldConfig, [], $serializedOptions);
 
             return;
         }
         // Migrate table rows in parts
-        $minId = $this->connection->executeQuery("SELECT MIN(id) FROM $tableName")->fetchOne();
-        // There are no records in this table
+        $minId = $this->connection->executeQuery(
+            sprintf('SELECT MIN(%s) FROM %s', $this->idColumnName, $tableName)
+        )->fetchOne();
         if ($minId === null) {
             return;
         }
-        $maxId = $this->connection->executeQuery("SELECT MAX(id) FROM $tableName")->fetchOne();
+        $maxId = $this->connection->executeQuery(
+            sprintf('SELECT MAX(%s) FROM %s', $this->idColumnName, $tableName)
+        )->fetchOne();
         while ($minId <= $maxId) {
             $currentMax = $minId + self::BATCH_SIZE;
             if ($currentMax > $maxId) {
                 $currentMax = $maxId;
             }
-            $targetRows = $this->connection->fetchAllAssociative(
-                $query . ' WHERE id BETWEEN :minId AND :maxId',
-                ['minId' => $minId, 'maxId' => $currentMax],
-            );
-            ExtendHelper::isMultiEnumType($fieldConfig['type'])
+            // Id bounds are passed via $targetRows to keep migrateEnum/migrateMultiEnum signatures for BC.
+            $targetRows = [['id' => $minId], ['id' => $currentMax]];
+            $isMultiEnum
                 ? $this->migrateMultiEnum($enumColumnName, $tableName, $fieldConfig, $targetRows, $serializedOptions)
                 : $this->migrateEnum($enumColumnName, $tableName, $fieldConfig, $targetRows, $serializedOptions);
             $minId = $currentMax + 1;
@@ -144,31 +151,21 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
         array $targetRows,
         array $serializedOptions,
     ): void {
-        foreach ($targetRows as $targetRow) {
-            $targetValue = $targetRow[$enumColumnName];
-            if (null === $targetValue) {
-                continue;
-            }
-            foreach ($serializedOptions as $serializedOption) {
-                if (ExtendHelper::buildEnumOptionId($fieldConfig['data']['enum']['enum_code'], $targetValue)
-                    !== $serializedOption['id']) {
-                    continue;
-                }
-                $previousSerializedData = null !== $targetRow['serialized_data']
-                    ? \json_decode($targetRow['serialized_data'], true, 512, JSON_THROW_ON_ERROR)
-                    : [];
-                $targetRow['serialized_data'] = array_merge(
-                    $previousSerializedData,
-                    [$fieldConfig['field_name'] => $serializedOption['id']]
-                );
-                break;
-            }
-            $this->connection->executeQuery(
-                "UPDATE $tableName SET serialized_data = :serialized_data WHERE  id = :id",
-                ['serialized_data' => $targetRow['serialized_data'], 'id' => $targetRow['id']],
-                ['serialized_data' => Types::JSON]
-            );
+        if (!$serializedOptions) {
+            return;
         }
+
+        [$minId, $maxId] = $this->resolveBatchIdRange($targetRows);
+
+        $this->getBatchUpdater()->updateEnum(
+            $tableName,
+            $this->idColumnName,
+            $enumColumnName,
+            $fieldConfig['field_name'],
+            $fieldConfig['data']['enum']['enum_code'],
+            $minId,
+            $maxId,
+        );
     }
 
     protected function migrateMultiEnum(
@@ -178,43 +175,43 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
         array $targetRows,
         array $serializedOptions,
     ): void {
-        foreach ($targetRows as $targetRow) {
-            $targetValues = $targetRow[$enumColumnName];
-            if (null === $targetValues) {
-                continue;
-            }
-            $targetValueIds = array_map(
-                function ($enumOptionId) use ($fieldConfig) {
-                    return ExtendHelper::buildEnumOptionId(
-                        $fieldConfig['data']['enum']['enum_code'],
-                        $enumOptionId
-                    );
-                },
-                explode(',', $targetValues)
-            );
-            $serializedOptionIds = [];
-            foreach ($serializedOptions as $serializedOption) {
-                if (!in_array($serializedOption['id'], $targetValueIds)) {
-                    continue;
-                }
-                $serializedOptionIds[] = $serializedOption['id'];
-            }
-            if (empty($serializedOptionIds)) {
-                continue;
-            }
-            $previousSerializedData = null !== $targetRow['serialized_data']
-                ? \json_decode($targetRow['serialized_data'], true, 512, JSON_THROW_ON_ERROR)
-                : [];
-            $targetRow['serialized_data'] = array_merge(
-                $previousSerializedData,
-                [$fieldConfig['field_name'] => $serializedOptionIds],
-            );
-            $this->connection->executeQuery(
-                "UPDATE $tableName SET serialized_data = :serialized_data WHERE  id = :id",
-                ['serialized_data' => $targetRow['serialized_data'], 'id' => $targetRow['id']],
-                ['serialized_data' => Types::JSON]
-            );
+        if (!$serializedOptions) {
+            return;
         }
+
+        [$minId, $maxId] = $this->resolveBatchIdRange($targetRows);
+
+        $this->getBatchUpdater()->updateMultiEnum(
+            $tableName,
+            $this->idColumnName,
+            $enumColumnName,
+            $fieldConfig['field_name'],
+            $fieldConfig['data']['enum']['enum_code'],
+            $minId,
+            $maxId,
+        );
+    }
+
+    /**
+     * @return array{0: int|null, 1: int|null}
+     */
+    private function resolveBatchIdRange(array $targetRows): array
+    {
+        if (!$targetRows) {
+            return [null, null];
+        }
+
+        $ids = array_column($targetRows, 'id');
+        if (!$ids) {
+            return [null, null];
+        }
+
+        return [(int) min($ids), (int) max($ids)];
+    }
+
+    private function getBatchUpdater(): EnumFieldSerializedDataBatchUpdater
+    {
+        return $this->batchUpdater ??= new EnumFieldSerializedDataBatchUpdater($this->connection);
     }
 
     private function getTableIdColumn(Schema $schema, string $tableName): Column
