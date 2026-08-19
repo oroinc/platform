@@ -36,7 +36,8 @@ class OutboundConnectionValidatorTest extends TestCase
             . ' *.host3.com ;'
             . '*.Host4.Com:443;'
             . ' *.host5.com : 443, 8000-8100, 8800 ;'
-            . ' ESPAÑOL.ES : 8080 ' // URL with multi-byte character
+            . ' ESPAÑOL.ES : 8080 ;' // URL with multi-byte character
+            . ' internal-*.host6.com '
         );
         self::assertSame($isMatched, $connectionValidator->isConnectionAllowed($host, $port));
     }
@@ -63,6 +64,7 @@ class OutboundConnectionValidatorTest extends TestCase
             [true, 'my.other.host3.com', 80],
             [false, '.host3.com', 80],
             [false, 'host3.com', 80],
+            [false, 'my.host3.com.bad.example', 80],
             [true, 'my.Host4.Com', 443],
             [true, 'my.host4.com', 443],
             [true, 'MY.HOST4.COM', 443],
@@ -81,6 +83,10 @@ class OutboundConnectionValidatorTest extends TestCase
             [false, '.host5.com', 80],
             [false, 'host5.com', 443],
             [false, 'host5.com', 80],
+            [true, 'internal-api.host6.com', 80],
+            [true, 'internal-a.b.host6.com', 80],
+            [false, 'bad-internal-api.host6.com', 80],
+            [false, 'internal-api.host6.com.bad.example', 80],
             // test URL with multi-byte character
             [true, 'Español.Es', 8080],
             [true, 'español.es', 8080],
