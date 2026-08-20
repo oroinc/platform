@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -20,17 +21,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class NormalizeMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
-    private $entityOverrideProvider;
-
-    /** @var NormalizeMetadata */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private MetadataProvider&MockObject $metadataProvider;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
+    private NormalizeMetadata $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -96,12 +90,12 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         return $associationMetadata;
     }
 
-    public function testProcessWithoutMetadata()
+    public function testProcessWithoutMetadata(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessNormalizationWithoutLinkedProperties()
+    public function testProcessNormalizationWithoutLinkedProperties(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -163,7 +157,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessWhenExcludedPropertiesShouldNotBeRemoved()
+    public function testProcessWhenExcludedPropertiesShouldNotBeRemoved(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -196,7 +190,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForFieldWithoutPropertyPath()
+    public function testProcessLinkedPropertiesForFieldWithoutPropertyPath(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -224,7 +218,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForRenamedField()
+    public function testProcessLinkedPropertiesForRenamedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -254,7 +248,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesWhenItIsAlreadyProcessed()
+    public function testProcessLinkedPropertiesWhenItIsAlreadyProcessed(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -288,7 +282,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForNotManageableEntity()
+    public function testProcessLinkedPropertiesForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -325,7 +319,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndHasConfigForTargetField()
+    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndHasConfigForTargetField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -422,7 +416,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndWithoutConfigForTargetField()
+    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndWithoutConfigForTargetField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -460,7 +454,112 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesWithPropertyPathButWhenIntermediateFieldIsNotAssociation()
+    public function testProcessLinkedPropertiesForFieldWithPropertyPathContainsNullableAssociation(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field5' => [
+                    'property_path' => 'association51.field511'
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
+
+        $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
+        $association51ClassMetadata->fieldMappings = ['field511' => ['type' => 'string']];
+        $association51ClassMetadata->associationMappings = [];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->fieldMappings = [];
+        $classMetadata->associationMappings = [
+            'association51' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\Association51Target',
+                'joinColumns'  => [['nullable' => true]]
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('findEntityMetadataByPath')
+            ->with(self::TEST_CLASS_NAME, ['association51'])
+            ->willReturn($association51ClassMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, false)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $expectedField5 = $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
+        $expectedField5->setPropertyPath('association51.field511');
+        $expectedField5->setIsNullable(true);
+
+        self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testProcessLinkedPropertiesForFieldWithPropertyPathContainsNotNullableAssociation(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field5' => [
+                    'property_path' => 'association51.field511'
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
+
+        $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
+        $association51ClassMetadata->fieldMappings = ['field511' => ['type' => 'string']];
+        $association51ClassMetadata->associationMappings = [];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->fieldMappings = [];
+        $classMetadata->associationMappings = [
+            'association51' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\Association51Target',
+                'joinColumns'  => [['nullable' => false]]
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('findEntityMetadataByPath')
+            ->with(self::TEST_CLASS_NAME, ['association51'])
+            ->willReturn($association51ClassMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, false)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $expectedField5 = $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
+        $expectedField5->setPropertyPath('association51.field511');
+
+        self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testProcessLinkedPropertiesWithPropertyPathButWhenIntermediateFieldIsNotAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -495,7 +594,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessRenamedLinkedPropertyWhenItIsField()
+    public function testProcessRenamedLinkedPropertyWhenItIsField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -566,7 +665,92 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessRenamedLinkedPropertyWhenItIsAssociation()
+    public function testProcessRenamedLinkedPropertyWhenItIsFieldAndAssociationIsNullable(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'linkedField1' => [
+                    'property_path' => 'realAssociation1.realField11'
+                ],
+                'association1'       => [
+                    'exclude'       => true,
+                    'property_path' => 'realAssociation1',
+                    'target_class'  => 'Test\AssociationTarget',
+                    'fields'        => [
+                        'field11' => [
+                            'property_path' => 'realField11'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $metadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association1Target']
+            )
+        );
+
+        $association1TargetMetadata = new EntityMetadata('Test\Association11Target');
+        $field11Metadata = $this->createFieldMetadata('field11', 'integer');
+        $field11Metadata->setPropertyPath('realField11');
+        $association1TargetMetadata->addField($field11Metadata);
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->fieldMappings = [];
+        $classMetadata->associationMappings = [
+            'realAssociation1' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\AssociationTarget',
+                'joinColumns'  => [['nullable' => true]]
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, false)
+            ->willReturn($classMetadata);
+
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                'Test\AssociationTarget',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $configObject->getField('association1')->getTargetEntity(),
+                $this->context->getExtras(),
+                false
+            )
+            ->willReturn($association1TargetMetadata);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $expectedLinkedField1 = $this->createFieldMetadata('linkedField1', 'integer');
+        $expectedLinkedField1->setIsNullable(true);
+        $expectedMetadata->addField($expectedLinkedField1);
+
+        self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessRenamedLinkedPropertyWhenItIsAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -680,7 +864,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessCollapsedArrayAssociationLinkedProperty()
+    public function testProcessCollapsedArrayAssociationLinkedProperty(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -795,7 +979,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testNormalizeAcceptableTargetClassNames()
+    public function testNormalizeAcceptableTargetClassNames(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -885,7 +1069,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testNormalizeExpandedNestedAssociation()
+    public function testNormalizeExpandedNestedAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -966,7 +1150,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($association1Metadata, $metadata->getAssociation('association1'));
     }
 
-    public function testNormalizeExpandedNestedAssociationWithRenamedFields()
+    public function testNormalizeExpandedNestedAssociationWithRenamedFields(): void
     {
         $config = [
             'exclusion_policy' => 'all',
