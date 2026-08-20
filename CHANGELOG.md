@@ -9,12 +9,21 @@ The current file describes significant changes in the code that may affect the u
 #### MessageQueueBundle
 * Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
 
+#### UserBundle
+* Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.
+* Added `Oro\Bundle\UserBundle\Async\AbstractPasswordResetRequestProcessor` that holds the guard that prevents sending the reset password email more than once within the reset token lifetime, and `Oro\Bundle\UserBundle\Async\UserPasswordResetRequestProcessor` that resolves the user account and sends the reset password email.
+* Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue. The message producer and the user logging info provider are injected into it with the `setMessageProducer()` and `setUserLoggingInfoProvider()` methods.
+
 ### Changed
 
 #### MessageQueueBundle
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
 * Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value.
 * Changed `DbalMessageConsumer::receive()` to bound each poll sleep by the time remaining until the receive timeout, so the DBAL `polling_interval` no longer imposes a de-facto minimum receive timeout.
+
+#### UserBundle
+* Changed `Oro\Bundle\UserBundle\Controller\ResetController::sendEmailAction()` so it only schedules the processing of the submitted value to the message queue instead of resolving the user account and sending the reset password email within the request. This way the forgot password form does the same amount of work for every submitted value, so neither the response nor its time discloses whether the value belongs to an existing account. The reason why the reset password email is not sent is written to the log only. A message queue consumer must be running for the reset password emails to be sent.
+* Changed the guard that prevents sending the reset password email more than once within the reset token lifetime: it is skipped now when the password was never requested before, regardless of the `frontend` request parameter (the parameter is not used anymore).
 
 ## 5.1.17
 

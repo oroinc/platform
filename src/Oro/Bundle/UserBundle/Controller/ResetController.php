@@ -6,6 +6,8 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic;
+use Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\ResetHandler;
@@ -13,6 +15,7 @@ use Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,52 +47,19 @@ class ResetController extends AbstractController
                 ->add('warn', 'The CSRF token is invalid. Please try to resubmit the form.');
             return $this->redirect($this->generateUrl('oro_user_reset_request'));
         }
-        $email = $request->request->get('username');
-        $inputData = $email;
+        $userIdentifier = $request->request->get('username');
 
-        $userManager = $this->getUserManager();
-        /** @var User $user */
-        $user = $userManager->findUserByUsernameOrEmail($email);
+        $this->get(MessageProducerInterface::class)->send(
+            UserPasswordResetRequestTopic::getName(),
+            [AbstractPasswordResetRequestTopic::USER_IDENTIFIER => $userIdentifier]
+        );
 
-        if (null !== $user && $user->isEnabled()) {
-            $email = $user->getEmail();
+        $this->get(LoggerInterface::class)->notice(
+            'Reset password email has been requested.',
+            $this->get(UserLoggingInfoProvider::class)->getUserLoggingInfo($userIdentifier)
+        );
 
-            $tokenTtl = $this->getParameter('oro_user.reset.ttl');
-            if ($user->isPasswordRequestNonExpired($tokenTtl)
-                && !($request->get('frontend', false) && null === $user->getPasswordRequestedAt())
-            ) {
-                $securityLogMessage = sprintf(
-                    'The password for this user has already been requested within the last %d hours.',
-                    $tokenTtl / 3600 //reset password token ttl in hours
-                );
-            } else {
-                try {
-                    $userManager->sendResetPasswordEmail($user);
-                } catch (\Exception $e) {
-                    $this->get(LoggerInterface::class)->error(
-                        'Unable to sent the reset password email.',
-                        ['email' => $email, 'exception' => $e]
-                    );
-                    $request->getSession()->getFlashBag()
-                        ->add(
-                            'warn',
-                            $this->get(TranslatorInterface::class)->trans('oro.email.handler.unable_to_send_email')
-                        );
-
-                    return $this->redirect($this->generateUrl('oro_user_reset_request'));
-                }
-
-                $securityLogMessage = 'Reset password email has been sent';
-                $userManager->updateUser($user);
-            }
-
-            $this->get(LoggerInterface::class)->notice(
-                $securityLogMessage,
-                $this->get(UserLoggingInfoProvider::class)->getUserLoggingInfo($user)
-            );
-        }
-
-        $request->getSession()->set(static::SESSION_EMAIL, $inputData);
+        $request->getSession()->set(static::SESSION_EMAIL, $userIdentifier);
 
         return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
     }
@@ -196,7 +166,6 @@ class ResetController extends AbstractController
     {
         $session = $request->getSession();
         $email = $session->get(static::SESSION_EMAIL);
-
         $session->remove(static::SESSION_EMAIL);
 
         if (empty($email)) {
@@ -320,6 +289,7 @@ class ResetController extends AbstractController
                 UserLoggingInfoProvider::class => UserLoggingInfoProviderInterface::class,
                 EntityRoutingHelper::class,
                 LoggerInterface::class,
+                MessageProducerInterface::class,
                 ResetPasswordHandler::class,
                 'oro_user.form.reset' => Form::class,
                 'oro_user.form.type.set_password.form' => Form::class,

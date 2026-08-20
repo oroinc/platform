@@ -52,7 +52,10 @@ class ControllersResetTest extends WebTestCase
         $this->assertNotEquals($oldPassword, $newPassword);
     }
 
-    public function testRequestAction()
+    /**
+     * @dataProvider requestActionDataProvider
+     */
+    public function testRequestAction(string $submittedValue)
     {
         $crawler = $this->client->request(
             'GET',
@@ -66,16 +69,24 @@ class ControllersResetTest extends WebTestCase
         self::assertStringContainsString('_token', $content);
 
         $form = $crawler->selectButton('Request')->form();
-        $form['username'] = LoadUserData::SIMPLE_USER_EMAIL;
+        $form['username'] = $submittedValue;
 
         $this->client->submit($form);
         $result = $this->client->getResponse();
 
         $this->assertResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString(
-            'If there is a user account associated with simple_user@example.com',
+            sprintf('If there is a user account associated with %s', $submittedValue),
             $result->getContent()
         );
+    }
+
+    public function requestActionDataProvider(): array
+    {
+        return [
+            'existing user' => ['submittedValue' => LoadUserData::SIMPLE_USER_EMAIL],
+            'non-existing user' => ['submittedValue' => 'nonexisting_user@example.com'],
+        ];
     }
 
     public function testSendEmailAction()
@@ -94,12 +105,6 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('If there is a user account associated with', $result->getContent());
-
-        /** @var User $user */
-        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(
-            ['username' => self::USER_NAME]
-        );
-        $this->assertNotNull($user->getPasswordRequestedAt());
     }
 
     public function testSendEmailWithWrongCsrfToken()
