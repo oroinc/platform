@@ -74,20 +74,73 @@ class EntityConfigMergerTest extends TestCase
                 'parentConfig' => [
                     'fields' => [
                         'field1' => ['data_type' => 'string'],
-                        'field2' => ['data_type' => 'string', 'form_type' => 'Form1']
+                        'field2' => ['data_type' => 'string', 'form_type' => 'Form1'],
+                        'field4' => ['data_type' => 'string'],
+                        'field5' => ['data_type' => 'string', 'property_path' => 'property5'],
+                        'field6' => ['data_type' => 'string', 'property_path' => 'property6']
                     ]
                 ],
                 'config'       => [
                     'fields' => [
                         'field2' => ['data_type' => 'integer', 'form_options' => ['k' => 'v']],
-                        'field3' => ['data_type' => 'string']
+                        'field3' => ['data_type' => 'string'],
+                        'renamedField4' => ['property_path' => 'field4'],
+                        'renamedField5' => ['property_path' => 'property5'],
+                        'field6' => ['property_path' => 'property6', 'form_type' => 'Form2']
                     ]
                 ],
                 'mergedConfig' => [
                     'fields' => [
                         'field1' => ['data_type' => 'string'],
                         'field2' => ['data_type' => 'integer', 'form_type' => 'Form1', 'form_options' => ['k' => 'v']],
-                        'field3' => ['data_type' => 'string']
+                        'field3' => ['data_type' => 'string'],
+                        'renamedField4' => ['property_path' => 'field4', 'data_type' => 'string'],
+                        'renamedField5' => ['property_path' => 'property5', 'data_type' => 'string'],
+                        'field6' => ['data_type' => 'string', 'property_path' => 'property6', 'form_type' => 'Form2']
+                    ]
+                ]
+            ],
+            'fields when the source field is overridden' => [
+                'parentConfig' => [
+                    'fields' => [
+                        'sku' => ['data_type' => 'string', 'property_path' => 'text.sku'],
+                        'product' => [
+                            'data_type' => 'integer',
+                            'property_path' => 'integer.system_entity_id',
+                            'form_type' => 'Form1'
+                        ]
+                    ]
+                ],
+                'config'       => [
+                    'fields' => [
+                        'productId' => ['data_type' => 'integer', 'property_path' => 'integer.system_entity_id'],
+                        'product' => ['data_type' => 'string', 'property_path' => 'text.sku']
+                    ]
+                ],
+                'mergedConfig' => [
+                    'fields' => [
+                        'sku' => ['data_type' => 'string', 'property_path' => 'text.sku'],
+                        'product' => ['data_type' => 'string', 'property_path' => 'text.sku', 'form_type' => 'Form1'],
+                        'productId' => ['data_type' => 'integer', 'property_path' => 'integer.system_entity_id']
+                    ]
+                ]
+            ],
+            'fields when the parent config has a field with the same name' => [
+                'parentConfig' => [
+                    'fields' => [
+                        'field1' => ['data_type' => 'string', 'property_path' => 'property1'],
+                        'newField' => ['data_type' => 'integer']
+                    ]
+                ],
+                'config'       => [
+                    'fields' => [
+                        'newField' => ['property_path' => 'property1']
+                    ]
+                ],
+                'mergedConfig' => [
+                    'fields' => [
+                        'field1' => ['data_type' => 'string', 'property_path' => 'property1'],
+                        'newField' => ['data_type' => 'integer', 'property_path' => 'property1']
                     ]
                 ]
             ]

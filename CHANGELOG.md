@@ -97,6 +97,11 @@ The current file describes significant changes in the code that may affect the u
 #### NavigationBundle
 * Added `dropdown-menu-level-last` CSS class to the top menu template (`Resources/views/Menu/application_menu_desktop_top.html.twig`) for the deepest dropdown level, enabling targeted styling of leaf-level submenus.
 
+#### UserBundle
+* Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.
+* Added `Oro\Bundle\UserBundle\Async\UserPasswordResetRequestProcessor` that resolves the user account and sends the reset password email.
+* Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue.
+
 ### Changed
 
 #### DataAuditBundle
@@ -169,6 +174,8 @@ The current file describes significant changes in the code that may affect the u
 
 #### UserBundle
 * Updated `invite_user` email template to use `system.appURL` system variable.
+* Changed `Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler` so it extends `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` and only schedules the processing of the submitted value instead of resolving the user account and sending the reset password email within the request. Its constructor accepts `Oro\Component\MessageQueue\Client\MessageProducerInterface`, `Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface` and `Psr\Log\LoggerInterface` now. This way the forgot password form does the same amount of work for every submitted value, so the response time no longer discloses whether the value belongs to an existing account. A message queue consumer must be running for the reset password emails to be sent.
+* Changed the guard that prevents sending the reset password email more than once within the reset token lifetime: it is skipped now when the password was never requested before, regardless of the `frontend` field of the `Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType` form (the field is not used anymore).
 
 ### Removed
 
@@ -194,6 +201,7 @@ The current file describes significant changes in the code that may affect the u
 
 #### UserBundle
 * Removed unused Twig templates `@OroUser/Email/invite.html.twig`, `@OroUser/Email/layout.html.twig`, `@OroUser/Email/reset.html.twig`.
+* Removed `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE` and `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE` constants together with the `resetUnavailable` and `resetUnavailableMessage` variables of the `@OroUser/Reset/checkEmail_form.html.twig` template and the `oro.user.password.reset_password.unavailable.title` and `oro.user.password.reset_password.unavailable.message` translations. The reason why the reset password email is not sent is written to the log only, because exposing it to an unauthenticated visitor discloses that the submitted value belongs to an existing account.
 
 ## 7.0.0 (2026-03-31)
 [Show detailed list of changes](incompatibilities-7-0.md)

@@ -51,12 +51,9 @@ services:
 
     Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler:
         arguments:
-            - '@oro_user.manager'
-            - '@translator'
-            - '@logger'
+            - '@oro_message_queue.client.message_producer'
             - '@oro_user.provider.user_logging_info_provider'
-            - '%oro_user.reset.ttl%'
-            - '@event_dispatcher'
+            - '@logger'
 
     oro_user.form.emailsettings:
         class: Symfony\Component\Form\Form

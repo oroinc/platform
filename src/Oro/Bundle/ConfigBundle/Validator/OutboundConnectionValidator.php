@@ -77,8 +77,8 @@ class OutboundConnectionValidator implements OutboundConnectionValidatorInterfac
             return $host === $hostRule;
         }
 
-        return preg_match(
-            '/' . str_replace(preg_quote('*', '/'), '.+', preg_quote($hostRule, '/')) . '/',
+        return (bool) preg_match(
+            '/^' . str_replace(preg_quote('*', '/'), '.+', preg_quote($hostRule, '/')) . '$/',
             $host
         );
     }
