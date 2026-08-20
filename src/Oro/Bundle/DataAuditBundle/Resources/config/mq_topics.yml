@@ -8,3 +8,4 @@ services:
     Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic: ~
     Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesRelationsTopic: ~
     Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic: ~
+    Oro\Bundle\DataAuditBundle\Async\Topic\ConfigChangeAuditTopic: ~
