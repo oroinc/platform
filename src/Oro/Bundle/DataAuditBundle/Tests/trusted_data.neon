@@ -5,6 +5,9 @@ trusted_data:
             apply:
                 objectAlias: true
                 dql: true
+        Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter:
+            apply:
+                conditions: true
     properties:
         Oro\Bundle\DataAuditBundle\Filter\AuditFilter:
             apply:

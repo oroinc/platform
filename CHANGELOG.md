@@ -29,6 +29,19 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ConfigBundle
+* Added `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager::hasSettingValue(string $name, object|int|null $scopeIdentifier = null): bool` method that tells whether a setting has its own stored value in the scope, ignoring the changes scheduled with `set()`.
+* Added the `action` key (`create`, `update` or `remove`) to every item of the change set carried by `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent`, with the `Oro\Bundle\ConfigBundle\Config\ConfigChangeSet::ACTION_*` constants.
+* Added `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent::getUseParentScopeChanges()` and `setUseParentScopeChanges()` methods that carry the settings which only started or stopped using the value of the parent scope, while their own value stayed the same.
+
+#### DataAuditBundle
+* Added recording of system configuration changes: every change made on behalf of a user is stored as an audit entry whose entity type is the configuration level it was made at, and is shown in the **System > Data Audit** grid.
+* Added recording of every configuration scope of the application as its own audit entity type. The scopes are taken from the `oro_config.scope` tags, so a scope contributed by any bundle is covered automatically.
+* Added the `oro_data_audit.configuration_level_entities` configuration option that tells the audit which entity the id of a configuration scope refers to, so that a record can be named after what was configured.
+* Added masking of secret configuration settings in the audit: the value of a setting rendered as a password field is stored as `***`.
+* Added the `audit-data` datagrid filter (`Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter`) that searches within the changed data of the audit grid.
+* Added `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::setTranslator()` and `setLevelProvider()` methods, as the entity type list now also contains the configuration levels.
+
 #### DraftSession Component
 * Added `\Oro\Component\DraftSession\Entity\NoopEntityDraftAwareTrait` — a reusable no-op implementation of `\Oro\Component\DraftSession\Entity\EntityDraftAwareInterface`. Use it on entities that are not draft-aware themselves but must satisfy the interface to be accepted as a draft source entity by the draft factory chain.
  
@@ -41,6 +54,9 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue. The message producer and the user logging info provider are injected into it with the `setMessageProducer()` and `setUserLoggingInfoProvider()` methods.
 
 ### Changed
+
+#### DataAuditBundle
+* Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
 
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener` to support preloading many-to-many collections whose items are shared by several owners. A collection item is now assigned to all of its owners (owner ids are aggregated per item) instead of a single owner.

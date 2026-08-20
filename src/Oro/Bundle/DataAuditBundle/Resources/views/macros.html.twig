@@ -58,8 +58,13 @@
 {%- endmacro -%}
 
 {%- macro renderFieldName(objectClass, fieldKey, fieldValue) -%}
-    {%- set fieldLabel = oro_field_config_value(fieldKey|split('::')|first, fieldKey|split('::')|last, 'label')|default(fieldKey) -%}
-    {{- oro_field_config_value(objectClass, fieldKey, 'label')|default(fieldLabel)|trans({}, fieldValue.translationDomain|default('messages')) -}}:
+    {%- set configLabel = oro_dataaudit_config_field_label(objectClass, fieldKey) -%}
+    {%- if configLabel is not null -%}
+        {{- configLabel -}}:
+    {%- else -%}
+        {%- set fieldLabel = oro_field_config_value(fieldKey|split('::')|first, fieldKey|split('::')|last, 'label')|default(fieldKey) -%}
+        {{- oro_field_config_value(objectClass, fieldKey, 'label')|default(fieldLabel)|trans({}, fieldValue.translationDomain|default('messages')) -}}:
+    {%- endif -%}
 {%- endmacro -%}
 
 {%- macro renderCollection(objectClass, fieldKey, fieldValue, allowedDiffTypes) -%}
