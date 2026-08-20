@@ -58,6 +58,7 @@ services:
             - '%oro_user.reset.ttl%'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
+            - [setMessageProducer, ['@oro_message_queue.client.message_producer']]
 
     oro_user.form.emailsettings:
         class: Symfony\Component\Form\Form
