@@ -41,6 +41,11 @@ The current file describes significant changes in the code that may affect the u
 #### SearchBundle
 * Added the optional `synonyms_enabled` boolean option to the entity search mapping configuration (`Resources/config/oro/search.yml`). Defaults to `false`; used by the back-office Elasticsearch engine to enable search synonyms for an entity index.
 
+#### UserBundle
+* Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.
+* Added `Oro\Bundle\UserBundle\Async\UserPasswordResetRequestProcessor` that resolves the user account and sends the reset password email.
+* Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue. The message producer and the user logging info provider are injected into it with the `setMessageProducer()` and `setUserLoggingInfoProvider()` methods.
+
 ### Changed
 
 #### EntityBundle
@@ -50,6 +55,16 @@ The current file describes significant changes in the code that may affect the u
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
 * Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value.
 * Changed `DbalMessageConsumer::receive()` to bound each poll sleep by the time remaining until the receive timeout, so the DBAL `polling_interval` no longer imposes a de-facto minimum receive timeout.
+
+#### UserBundle
+* Changed `Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler` so it extends `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` and only schedules the processing of the submitted value instead of resolving the user account and sending the reset password email within the request. Its constructor and the `setEventDispatcher()` method are kept as is for backward compatibility, but `$userManager`, `$translator`, `$ttl` and the event dispatcher are not used anymore; the message producer is injected with the `setMessageProducer()` method. This way the forgot password form does the same amount of work for every submitted value, so the response time no longer discloses whether the value belongs to an existing account. A message queue consumer must be running for the reset password emails to be sent.
+* Changed the guard that prevents sending the reset password email more than once within the reset token lifetime: it is skipped now when the password was never requested before, regardless of the `frontend` field of the `Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType` form (the field is not used anymore).
+
+### Removed
+
+#### UserBundle
+* Deprecated `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE` and `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE` constants, they are not used anymore and are kept for backward compatibility only.
+* Removed the `resetUnavailable` and `resetUnavailableMessage` variables of the `@OroUser/Reset/checkEmail_form.html.twig` template and the `oro.user.password.reset_password.unavailable.title` and `oro.user.password.reset_password.unavailable.message` translations. The reason why the reset password email is not sent is written to the log only, because exposing it to an unauthenticated visitor discloses that the submitted value belongs to an existing account.
 
 ## 6.1.9
 
