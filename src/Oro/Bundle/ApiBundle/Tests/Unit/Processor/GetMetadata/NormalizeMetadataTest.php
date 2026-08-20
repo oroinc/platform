@@ -454,6 +454,111 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
+    public function testProcessLinkedPropertiesForFieldWithPropertyPathContainsNullableAssociation(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field5' => [
+                    'property_path' => 'association51.field511'
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
+
+        $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
+        $association51ClassMetadata->fieldMappings = ['field511' => ['type' => 'string']];
+        $association51ClassMetadata->associationMappings = [];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->fieldMappings = [];
+        $classMetadata->associationMappings = [
+            'association51' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\Association51Target',
+                'joinColumns'  => [['nullable' => true]]
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('findEntityMetadataByPath')
+            ->with(self::TEST_CLASS_NAME, ['association51'])
+            ->willReturn($association51ClassMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, false)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $expectedField5 = $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
+        $expectedField5->setPropertyPath('association51.field511');
+        $expectedField5->setIsNullable(true);
+
+        self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testProcessLinkedPropertiesForFieldWithPropertyPathContainsNotNullableAssociation(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field5' => [
+                    'property_path' => 'association51.field511'
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
+
+        $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
+        $association51ClassMetadata->fieldMappings = ['field511' => ['type' => 'string']];
+        $association51ClassMetadata->associationMappings = [];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->fieldMappings = [];
+        $classMetadata->associationMappings = [
+            'association51' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\Association51Target',
+                'joinColumns'  => [['nullable' => false]]
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('findEntityMetadataByPath')
+            ->with(self::TEST_CLASS_NAME, ['association51'])
+            ->willReturn($association51ClassMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, false)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $expectedField5 = $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
+        $expectedField5->setPropertyPath('association51.field511');
+
+        self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
     public function testProcessLinkedPropertiesWithPropertyPathButWhenIntermediateFieldIsNotAssociation(): void
     {
         $config = [
@@ -552,6 +657,91 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedLinkedField1 = $this->createFieldMetadata('linkedField1', 'integer');
         $expectedLinkedField1->setIsNullable(false);
+        $expectedMetadata->addField($expectedLinkedField1);
+
+        self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessRenamedLinkedPropertyWhenItIsFieldAndAssociationIsNullable(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'linkedField1' => [
+                    'property_path' => 'realAssociation1.realField11'
+                ],
+                'association1'       => [
+                    'exclude'       => true,
+                    'property_path' => 'realAssociation1',
+                    'target_class'  => 'Test\AssociationTarget',
+                    'fields'        => [
+                        'field11' => [
+                            'property_path' => 'realField11'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $metadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association1Target']
+            )
+        );
+
+        $association1TargetMetadata = new EntityMetadata('Test\Association11Target');
+        $field11Metadata = $this->createFieldMetadata('field11', 'integer');
+        $field11Metadata->setPropertyPath('realField11');
+        $association1TargetMetadata->addField($field11Metadata);
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->fieldMappings = [];
+        $classMetadata->associationMappings = [
+            'realAssociation1' => [
+                'type'         => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Test\AssociationTarget',
+                'joinColumns'  => [['nullable' => true]]
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, false)
+            ->willReturn($classMetadata);
+
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                'Test\AssociationTarget',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $configObject->getField('association1')->getTargetEntity(),
+                $this->context->getExtras(),
+                false
+            )
+            ->willReturn($association1TargetMetadata);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $expectedLinkedField1 = $this->createFieldMetadata('linkedField1', 'integer');
+        $expectedLinkedField1->setIsNullable(true);
         $expectedMetadata->addField($expectedLinkedField1);
 
         self::assertEquals($expectedMetadata, $this->context->getResult());

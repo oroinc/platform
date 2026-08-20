@@ -29,13 +29,34 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ConfigBundle
+* Added `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager::hasSettingValue(string $name, object|int|null $scopeIdentifier = null): bool` method that tells whether a setting has its own stored value in the scope, ignoring the changes scheduled with `set()`.
+* Added the `action` key (`create`, `update` or `remove`) to every item of the change set carried by `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent`, with the `Oro\Bundle\ConfigBundle\Config\ConfigChangeSet::ACTION_*` constants.
+* Added `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent::getUseParentScopeChanges()` and `setUseParentScopeChanges()` methods that carry the settings which only started or stopped using the value of the parent scope, while their own value stayed the same.
+
+#### DataAuditBundle
+* Added recording of system configuration changes: every change made on behalf of a user is stored as an audit entry whose entity type is the configuration level it was made at, and is shown in the **System > Data Audit** grid.
+* Added recording of every configuration scope of the application as its own audit entity type. The scopes are taken from the `oro_config.scope` tags, so a scope contributed by any bundle is covered automatically.
+* Added the `oro_data_audit.configuration_level_entities` configuration option that tells the audit which entity the id of a configuration scope refers to, so that a record can be named after what was configured.
+* Added masking of secret configuration settings in the audit: the value of a setting rendered as a password field is stored as `***`.
+* Added the `audit-data` datagrid filter (`Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter`) that searches within the changed data of the audit grid.
+* Added `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::setTranslator()` and `setLevelProvider()` methods, as the entity type list now also contains the configuration levels.
+
 #### DraftSession Component
 * Added `\Oro\Component\DraftSession\Entity\NoopEntityDraftAwareTrait` — a reusable no-op implementation of `\Oro\Component\DraftSession\Entity\EntityDraftAwareInterface`. Use it on entities that are not draft-aware themselves but must satisfy the interface to be accepted as a draft source entity by the draft factory chain.
  
 #### MessageQueueBundle
 * Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
 
+#### UserBundle
+* Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.
+* Added `Oro\Bundle\UserBundle\Async\UserPasswordResetRequestProcessor` that resolves the user account and sends the reset password email.
+* Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue. The message producer and the user logging info provider are injected into it with the `setMessageProducer()` and `setUserLoggingInfoProvider()` methods.
+
 ### Changed
+
+#### DataAuditBundle
+* Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
 
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener` to support preloading many-to-many collections whose items are shared by several owners. A collection item is now assigned to all of its owners (owner ids are aggregated per item) instead of a single owner.
@@ -44,6 +65,16 @@ The current file describes significant changes in the code that may affect the u
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.
 * Changed `Oro\Component\MessageQueue\Consumption\QueueConsumer` to use a configurable receive timeout instead of the previously hardcoded 1 second value.
 * Changed `DbalMessageConsumer::receive()` to bound each poll sleep by the time remaining until the receive timeout, so the DBAL `polling_interval` no longer imposes a de-facto minimum receive timeout.
+
+#### UserBundle
+* Changed `Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler` so it extends `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` and only schedules the processing of the submitted value instead of resolving the user account and sending the reset password email within the request. Its constructor is kept as is for backward compatibility, but `$userManager`, `$translator`, `$ttl` and `$eventDispatcher` are not used anymore; the message producer is injected with the `setMessageProducer()` method. This way the forgot password form does the same amount of work for every submitted value, so the response time no longer discloses whether the value belongs to an existing account. A message queue consumer must be running for the reset password emails to be sent.
+* Changed the guard that prevents sending the reset password email more than once within the reset token lifetime: it is skipped now when the password was never requested before, regardless of the `frontend` field of the `Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType` form (the field is not used anymore).
+
+### Removed
+
+#### UserBundle
+* Deprecated `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE` and `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE` constants, they are not used anymore and are kept for backward compatibility only.
+* Removed the `resetUnavailable` and `resetUnavailableMessage` variables of the `@OroUser/Reset/checkEmail_form.html.twig` template and the `oro.user.password.reset_password.unavailable.title` and `oro.user.password.reset_password.unavailable.message` translations. The reason why the reset password email is not sent is written to the log only, because exposing it to an unauthenticated visitor discloses that the submitted value belongs to an existing account.
 
 ## 7.0.3
 

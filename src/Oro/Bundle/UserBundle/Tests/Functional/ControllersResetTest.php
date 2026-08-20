@@ -53,7 +53,10 @@ class ControllersResetTest extends WebTestCase
         $this->assertNotEquals($oldPassword, $newPassword);
     }
 
-    public function testRequestAction()
+    /**
+     * @dataProvider requestActionDataProvider
+     */
+    public function testRequestAction(string $submittedValue)
     {
         $crawler = $this->client->request(
             'GET',
@@ -67,16 +70,24 @@ class ControllersResetTest extends WebTestCase
         self::assertStringContainsString('_token', $content);
 
         $form = $crawler->selectButton('Request')->form();
-        $form['oro_user_password_request[username]'] = LoadUserData::SIMPLE_USER_EMAIL;
+        $form['oro_user_password_request[username]'] = $submittedValue;
 
         $this->client->submit($form);
         $result = $this->client->getResponse();
 
         $this->assertResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString(
-            'If there is a user account associated with simple_user@example.com',
+            sprintf('If there is a user account associated with %s', $submittedValue),
             $result->getContent()
         );
+    }
+
+    public function requestActionDataProvider(): array
+    {
+        return [
+            'existing user' => ['submittedValue' => LoadUserData::SIMPLE_USER_EMAIL],
+            'non-existing user' => ['submittedValue' => 'nonexisting_user@example.com'],
+        ];
     }
 
     public function testSendForcedResetEmailAction()

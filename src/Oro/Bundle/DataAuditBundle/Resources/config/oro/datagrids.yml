@@ -93,6 +93,7 @@ datagrids:
                     data_name: a.objectClass
                     options:
                           field_options:
+                              multiple: true
                               choices: "@oro_dataaudit.datagrid.entity_type_provider->getEntityTypes"
                 objectId:
                     type: string
@@ -113,6 +114,10 @@ datagrids:
                 loggedAt:
                     type: datetime
                     data_name: a.loggedAt
+                data:
+                    label: oro.dataaudit.datagrid.data
+                    type: audit-data
+                    data_name: a.id
 
     audit-history-grid:
         acl_resource: oro_dataaudit_view

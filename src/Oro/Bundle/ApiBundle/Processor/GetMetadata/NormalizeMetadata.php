@@ -6,8 +6,10 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
+use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
@@ -172,8 +174,11 @@ class NormalizeMetadata implements ProcessorInterface
                     $fieldName,
                     $targetEntityMetadata
                 );
-                if ($result && $field->hasDirection()) {
-                    $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+                if ($result) {
+                    if ($field->hasDirection()) {
+                        $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+                    }
+                    $this->normalizeLinkedPropertyNullable($entityMetadata, $fieldName, $associationPath);
                 }
 
                 return $result;
@@ -197,11 +202,48 @@ class NormalizeMetadata implements ProcessorInterface
             $targetClassMetadata,
             $context
         );
-        if ($result && $field->hasDirection()) {
-            $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+        if ($result) {
+            if ($field->hasDirection()) {
+                $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+            }
+            $this->normalizeLinkedPropertyNullable($entityMetadata, $fieldName, $associationPath);
         }
 
         return $result;
+    }
+
+    /**
+     * A value of a property that is accessed via a path that contains a nullable association
+     * can be NULL even if the target property itself is not nullable.
+     *
+     * @param EntityMetadata $entityMetadata
+     * @param string         $fieldName
+     * @param string[]       $associationPath
+     */
+    private function normalizeLinkedPropertyNullable(
+        EntityMetadata $entityMetadata,
+        string $fieldName,
+        array $associationPath
+    ): void {
+        if (!$associationPath) {
+            return;
+        }
+
+        $property = $entityMetadata->getProperty($fieldName);
+        if (!$property instanceof FieldMetadata && !$property instanceof AssociationMetadata) {
+            return;
+        }
+
+        if ($property->isNullable()) {
+            return;
+        }
+
+        if ($this->entityMetadataFactory->isNullableAssociationPath(
+            $entityMetadata->getClassName(),
+            $associationPath
+        )) {
+            $property->setIsNullable(true);
+        }
     }
 
     private function copyLinkedProperty(

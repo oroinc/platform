@@ -163,6 +163,36 @@ abstract class AbstractScopeManagerTestCase extends TestCase
         self::assertNull($this->manager->getSettingValue('noservice.nosetting'));
     }
 
+    public function testHasStoredValue(): void
+    {
+        $config = new Config();
+        $config->getValues()->add($this->getConfigValue('oro_user', 'level', 'scalar', 2000));
+
+        $this->cache->expects(self::any())
+            ->method('get')
+            ->with($this->getScopedEntityName() . '_0')
+            ->willReturn($this->getCachedConfig($config));
+
+        // A setting is "stored" in this scope only when it has its own value here.
+        self::assertTrue($this->manager->hasSettingValue('oro_user.level'));
+        self::assertFalse($this->manager->hasSettingValue('oro_user.greeting'));
+    }
+
+    public function testHasStoredValueIgnoresNotFlushedChanges(): void
+    {
+        $this->cache->expects(self::any())
+            ->method('get')
+            ->willReturn($this->getCachedConfig(new Config()));
+        $this->configBag->expects(self::any())
+            ->method('getConfig')
+            ->willReturn(['fields' => []]);
+
+        $this->manager->set('oro_user.greeting', 'test');
+
+        // set() only schedules a change, so nothing is stored yet.
+        self::assertFalse($this->manager->hasSettingValue('oro_user.greeting'));
+    }
+
     /**
      * @dataProvider getInfoLoadedWithNormalizationProvider
      */
