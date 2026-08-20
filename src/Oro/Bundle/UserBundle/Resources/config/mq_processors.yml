@@ -1,0 +1,12 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    Oro\Bundle\UserBundle\Async\UserPasswordResetRequestProcessor:
+        arguments:
+            - '@oro_user.manager'
+            - '@event_dispatcher'
+            - '@oro_user.provider.user_logging_info_provider'
+            - '@logger'
+            - '%oro_user.reset.ttl%'
