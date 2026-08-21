@@ -300,12 +300,17 @@
         display: none;
     }
 
-    .tree-boundary > a {
-        border-bottom: $side-menu-overlay-tree-boundary-border-bottom;
-    }
+    /* Show divider lines only if a category has visible subcategories, ignoring hidden search results and structural dividers. */
+    &:has(li:not(.divider):not([style*='display: none']) .title-level-3) {
+        .tree-boundary > a,
+        /* Add a divider to the last visible third-level subcategory when search hides the group boundary item. */
+        li:has(.title-level-3):not([style*='none']):not(:has(~ li:not([style*='none']) .title-level-3)) > a {
+            border-bottom: $side-menu-overlay-tree-boundary-border-bottom;
+        }
 
-    .last-item-in-group > a {
-        padding-bottom: $side-menu-overlay-last-item-in-group-padding-bottom;
+        .last-item-in-group > a {
+            padding-bottom: $side-menu-overlay-last-item-in-group-padding-bottom;
+        }
     }
 }
 
