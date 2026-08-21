@@ -62,6 +62,7 @@ use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
         'grid' => ['default' => 'users-grid', 'context' => 'users-for-context-grid'],
         'tag' => ['enabled' => true],
         'email' => ['available_in_template' => true],
+        'integration' => ['webhook_accessible' => true],
     ]
 )]
 class User extends AbstractUser implements

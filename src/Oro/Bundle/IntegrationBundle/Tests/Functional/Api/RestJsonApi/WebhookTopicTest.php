@@ -4,12 +4,16 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
+use Oro\Bundle\ApiBundle\Tests\Functional\JsonApiDocContainsConstraint;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookTopicTest extends RestJsonApiTestCase
 {
+    /** Topics of any other entity, including the entities accessible by webhooks by default, are ignored. */
+    private const array TEST_ENTITY_TOPIC_PREFIXES = ['testdepartment.', 'testemployee.'];
+
     #[\Override]
     protected function setUp(): void
     {
@@ -48,11 +52,34 @@ class WebhookTopicTest extends RestJsonApiTestCase
         $configManager->flush();
     }
 
+    private static function filterResponseContent(Response $response): array
+    {
+        $responseContent = self::jsonToArray($response->getContent());
+        $filteredResponseContent = ['data' => []];
+        foreach ($responseContent['data'] as $item) {
+            foreach (self::TEST_ENTITY_TOPIC_PREFIXES as $prefix) {
+                if (str_starts_with($item['id'], $prefix)) {
+                    $filteredResponseContent['data'][] = $item;
+                    break;
+                }
+            }
+        }
+
+        return $filteredResponseContent;
+    }
+
+    private static function assertResponseContent(array $expectedContent, array $content): void
+    {
+        self::assertThat($content, new JsonApiDocContainsConstraint($expectedContent, false, false));
+    }
+
     public function testGetList(): void
     {
         $response = $this->cget(['entity' => 'webhooktopics']);
 
-        $this->assertResponseContains(
+        // the response is reduced to the topics of the test entities, so that the assertion is not
+        // affected by the entities that are accessible by webhooks by default
+        self::assertResponseContent(
             [
                 'data' => [
                     ['type' => 'webhooktopics', 'id' => 'testdepartment.created'],
@@ -63,8 +90,7 @@ class WebhookTopicTest extends RestJsonApiTestCase
                     ['type' => 'webhooktopics', 'id' => 'testemployee.deleted']
                 ]
             ],
-            $response,
-            true
+            self::filterResponseContent($response)
         );
 
         // verify structure of webhook topic items
