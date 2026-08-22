@@ -75,6 +75,27 @@ class ContentDecoderTest extends TestCase
                 'toEncode' => 'ISO-8859-1',
                 'expected' => 'This is the Euro symbol: EUR.'
             ],
+            'charset alias' => [
+                'string' => "\xC7\xD1\xB1\xDB",
+                'contentTransferEncoding' => null,
+                'fromEncode' => 'ks_c_5601-1987',
+                'toEncode' => 'UTF-8',
+                'expected' => '한글'
+            ],
+            'charset alias in upper case' => [
+                'string' => "\xC7\xD1\xB1\xDB",
+                'contentTransferEncoding' => null,
+                'fromEncode' => 'KS_C_5601-1987',
+                'toEncode' => 'UTF-8',
+                'expected' => '한글'
+            ],
+            'unknown encoding' => [
+                'string' => 'raw content',
+                'contentTransferEncoding' => null,
+                'fromEncode' => 'x-totally-unknown-charset',
+                'toEncode' => 'UTF-8',
+                'expected' => 'raw content'
+            ],
         ];
     }
 }
