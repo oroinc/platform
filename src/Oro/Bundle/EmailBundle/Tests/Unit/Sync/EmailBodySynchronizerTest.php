@@ -210,7 +210,10 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->syncOneEmailBody($email);
     }
 
-    public function testSyncOneEmailBodyFailure(): void
+    /**
+     * @dataProvider loadBodyFailureDataProvider
+     */
+    public function testSyncOneEmailBodyFailure(\Throwable $exception): void
     {
         $email = new Email();
         ReflectionUtil::setId($email, 123);
@@ -231,8 +234,6 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
-
-        $exception = new \Exception('some exception');
 
         $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
@@ -267,9 +268,9 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('info');
         $this->notificationAlertManager->expects(self::once())
             ->method('addNotificationAlert')
-            ->willReturnCallback(function (NotificationAlertInterface $notificationAlert) {
+            ->willReturnCallback(function (NotificationAlertInterface $notificationAlert) use ($exception) {
                 self::assertEquals(
-                    'Load email body failed. Exception message:some exception',
+                    'Load email body failed. Exception message:' . $exception->getMessage(),
                     $notificationAlert->toArray()['message']
                 );
 
@@ -281,6 +282,20 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
 
         $this->synchronizer->syncOneEmailBody($email);
+    }
+
+    public function loadBodyFailureDataProvider(): array
+    {
+        return [
+            'exception' => [new \Exception('some exception')],
+            'value error' => [
+                new \ValueError(
+                    'mb_convert_encoding(): Argument #3 ($from_encoding)'
+                    . ' contains invalid encoding "ks_c_5601-1987"'
+                )
+            ],
+            'error' => [new \Error('some error')],
+        ];
     }
 
     public function testSyncOneEmailBodyNotFound(): void
@@ -443,7 +458,10 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->syncOneEmailBody($email);
     }
 
-    public function testSyncOneEmailBodyWithExceptionDuringSave(): void
+    /**
+     * @dataProvider saveFailureDataProvider
+     */
+    public function testSyncOneEmailBodyWithExceptionDuringSave(\Throwable $exception): void
     {
         $email = new Email();
         ReflectionUtil::setId($email, 789);
@@ -465,7 +483,6 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
-        $exception = new \Exception('test exception');
 
         $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
@@ -503,7 +520,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects(self::once())
             ->method('warning')
             ->with(
-                'Load email body failed. Email id: 789. Error: test exception',
+                'Load email body failed. Email id: 789. Error: ' . $exception->getMessage(),
                 ['exception' => $exception]
             );
         $this->notificationAlertManager->expects(self::never())
@@ -514,6 +531,14 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
 
         $this->synchronizer->syncOneEmailBody($email);
+    }
+
+    public function saveFailureDataProvider(): array
+    {
+        return [
+            'exception' => [new \Exception('test exception')],
+            'error' => [new \Error('test error')],
+        ];
     }
 
     public function testSyncOnEmptyData(): void
