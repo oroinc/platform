@@ -10,6 +10,7 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -64,7 +65,7 @@ class AuditDataFilter extends StringFilter
             return false;
         }
 
-        [$rootAlias] = $ds->getQueryBuilder()->getRootAliases();
+        $rootAlias = QueryBuilderUtil::getSingleRootAlias($ds->getQueryBuilder());
         $fieldAlias = $ds->generateParameterName('adf');
 
         // The columns that hold the changed data as searchable text.
