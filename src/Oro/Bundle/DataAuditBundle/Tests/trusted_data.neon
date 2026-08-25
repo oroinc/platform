@@ -7,10 +7,7 @@ trusted_data:
                 dql: true
         Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter:
             apply:
-                rootAlias: true
-                fieldAlias: true
                 conditions: true
-                expr: true
     properties:
         Oro\Bundle\DataAuditBundle\Filter\AuditFilter:
             apply:
