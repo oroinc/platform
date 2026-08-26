@@ -24,13 +24,6 @@ interface PasswordRecoveryInterface
     public function setConfirmationToken($token);
 
     /**
-     * Generate unique confirmation token
-     *
-     * @return string Token value
-     */
-    public function generateToken();
-
-    /**
      * @return \DateTime|null
      */
     public function getPasswordRequestedAt();

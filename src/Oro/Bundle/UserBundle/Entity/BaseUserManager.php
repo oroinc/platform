@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Symfony\Component\PasswordHasher\Hasher\MigratingPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -188,6 +189,6 @@ class BaseUserManager
 
     protected function generateToken(): string
     {
-        return rtrim(strtr(base64_encode(hash('sha256', uniqid(mt_rand(), true), true)), '+/', '-_'), '=');
+        return RandomTokenGenerator::generate();
     }
 }

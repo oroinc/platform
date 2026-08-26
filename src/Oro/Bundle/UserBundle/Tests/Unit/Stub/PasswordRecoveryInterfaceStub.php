@@ -117,12 +117,6 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     #[\Override]
-    public function generateToken()
-    {
-        return '';
-    }
-
-    #[\Override]
     public function getPasswordRequestedAt()
     {
         return $this->passwordRequestedAt;

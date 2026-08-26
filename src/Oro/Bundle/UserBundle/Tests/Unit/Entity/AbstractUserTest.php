@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 use Oro\Bundle\SecurityBundle\Model\Role as SecurityRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -60,9 +61,9 @@ class AbstractUserTest extends TestCase
     public function testConfirmationToken(): void
     {
         $user = $this->getUser();
-        $token = $user->generateToken();
+        $token = RandomTokenGenerator::generate();
 
-        self::assertNotEmpty($token);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $token);
 
         $user->setConfirmationToken($token);
 

@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 use Oro\Bundle\SecurityBundle\Model\Role;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
@@ -134,7 +135,7 @@ abstract class AbstractUser implements
 
     public function __construct()
     {
-        $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
+        $this->salt = RandomTokenGenerator::generate(128);
         $this->userRoles = new ArrayCollection();
     }
 
@@ -473,12 +474,6 @@ abstract class AbstractUser implements
         $this->confirmationToken = $token;
 
         return $this;
-    }
-
-    #[\Override]
-    public function generateToken()
-    {
-        return base_convert(bin2hex(hash('sha256', uniqid(mt_rand(), true), true)), 16, 36);
     }
 
     #[\Override]
