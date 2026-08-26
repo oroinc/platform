@@ -60,7 +60,7 @@ class UserManager extends BaseUserManager
 
     public function sendResetPasswordEmail(User $user): void
     {
-        $user->setConfirmationToken($user->generateToken());
+        $user->setConfirmationToken($this->generateToken());
         $this->getEmailProcessor()->sendResetPasswordEmail($user);
         $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
     }

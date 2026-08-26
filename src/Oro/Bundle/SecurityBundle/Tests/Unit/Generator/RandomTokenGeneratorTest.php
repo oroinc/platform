@@ -6,22 +6,25 @@ use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 
 class RandomTokenGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RandomTokenGenerator */
-    private $generator;
-
-    #[\Override]
-    protected function setUp(): void
+    public function testGenerateToken(): void
     {
-        $this->generator = new RandomTokenGenerator();
+        $generator = new RandomTokenGenerator();
+        $token = $generator->generateToken();
+
+        self::assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $token);
+        self::assertNotSame($token, $generator->generateToken());
     }
 
-    public function testGenerateToken()
+    public function testGenerateWithCustomEntropy(): void
     {
-        $token = $this->generator->generateToken();
+        self::assertMatchesRegularExpression('/^[a-f0-9]{32}$/', RandomTokenGenerator::generate(128));
+    }
 
-        $this->assertTrue(ctype_print($token), 'is printable');
-        $this->assertStringNotMatchesFormat('%S+%S', $token, 'is URI safe');
-        $this->assertStringNotMatchesFormat('%S/%S', $token, 'is URI safe');
-        $this->assertStringNotMatchesFormat('%S=%S', $token, 'is URI safe');
+    public function testGenerateTokenRejectsInvalidEntropy(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The token entropy must be a positive multiple of 8 bits.');
+
+        RandomTokenGenerator::generate(7);
     }
 }
