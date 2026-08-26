@@ -63,7 +63,7 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         $user = $this->getUser();
         $token = $user->generateToken();
 
-        self::assertNotEmpty($token);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $token);
 
         $user->setConfirmationToken($token);
 
