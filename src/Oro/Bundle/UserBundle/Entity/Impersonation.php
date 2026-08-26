@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 
 /**
  * Store user impersonations
@@ -118,7 +119,7 @@ class Impersonation
 
     public function __construct()
     {
-        $this->token = bin2hex(hash('sha1', uniqid(mt_rand(), true), true));
+        $this->token = RandomTokenGenerator::generate();
         $this->expireAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->notify = true;
         $this->ipAddress = '127.0.0.1';
