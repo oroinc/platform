@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Generator;
 
+/**
+ * Generates cryptographically secure random tokens.
+ */
 class RandomTokenGenerator implements RandomTokenGeneratorInterface
 {
     /**
@@ -9,9 +12,15 @@ class RandomTokenGenerator implements RandomTokenGeneratorInterface
      */
     public function generateToken($entropy = 256)
     {
-        // Generate an URI safe base64 encoded string.
-        $bytes = random_bytes($entropy / 8);
+        return self::generate($entropy);
+    }
 
-        return bin2hex($bytes);
+    public static function generate($entropy = 256): string
+    {
+        if (!\is_int($entropy) || $entropy < 8 || 0 !== $entropy % 8) {
+            throw new \InvalidArgumentException('The token entropy must be a positive multiple of 8 bits.');
+        }
+
+        return bin2hex(random_bytes(intdiv($entropy, 8)));
     }
 }
