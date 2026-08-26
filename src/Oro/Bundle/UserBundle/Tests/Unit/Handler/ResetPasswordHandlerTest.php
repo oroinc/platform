@@ -165,7 +165,8 @@ class ResetPasswordHandlerTest extends TestCase
 
         $result = $this->handler->resetPasswordAndNotify($user);
         self::assertTrue($result);
-        self::assertEquals($token, $user->getConfirmationToken());
+        self::assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $user->getConfirmationToken());
+        self::assertNotSame($token, $user->getConfirmationToken());
     }
 
     public function testResetPasswordAndNotifyWhenEventDenies(): void

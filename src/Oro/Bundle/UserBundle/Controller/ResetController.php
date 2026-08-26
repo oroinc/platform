@@ -175,9 +175,7 @@ class ResetController extends AbstractController
         $session = $request->getSession();
 
         if (null === $user) {
-            throw $this->createNotFoundException(
-                sprintf('The user with "confirmation token" does not exist for value "%s"', $token)
-            );
+            throw $this->createNotFoundException('The user with a confirmation token does not exist.');
         }
 
         if (!$user->isPasswordRequestNonExpired($this->getParameter('oro_user.reset.ttl'))) {
