@@ -285,7 +285,7 @@ class ConnectionController extends AbstractController
 
     private function getLogger(): LoggerInterface
     {
-        return $this->container->get('logger');
+        return $this->container->get(LoggerInterface::class);
     }
 
     private function getEntityManager(string $entityClass): EntityManagerInterface
@@ -308,6 +308,7 @@ class ConnectionController extends AbstractController
                 AuthorizationCheckerInterface::class,
                 TokenAccessorInterface::class,
                 ManagerRegistry::class,
+                LoggerInterface::class
             ]
         );
     }
