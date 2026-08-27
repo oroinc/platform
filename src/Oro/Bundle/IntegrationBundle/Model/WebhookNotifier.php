@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Async\Topic\SendWebhookNotificationTopic;
 use Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings;
 use Oro\Bundle\IntegrationBundle\Provider\WebhookEventDataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -25,7 +26,8 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
     public function __construct(
         private DoctrineHelper $doctrineHelper,
         private WebhookEventDataProviderInterface $eventDataProvider,
-        private MessageProducerInterface $messageProducer
+        private MessageProducerInterface $messageProducer,
+        private EntityOwnerAccessor $ownerAccessor
     ) {
     }
 
@@ -39,7 +41,6 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
         try {
             $eventData = $this->eventDataProvider->getEventData($entityClass, $entityId);
-            $this->peformNotificationSend($topic, $eventData, $entityClass, $entityId);
         } catch (\Throwable $e) {
             $this->logger?->error(
                 'Failed to serialize entity for webhook',
@@ -49,7 +50,20 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
                     'error' => $e->getMessage()
                 ]
             );
+
+            return;
         }
+
+        [$entityOwnerId, $entityOrganizationId] = $this->getEntityOwnership($entity, $entityClass, $entityId);
+
+        $this->peformNotificationSend(
+            $topic,
+            $eventData,
+            $entityClass,
+            $entityId,
+            $entityOwnerId,
+            $entityOrganizationId
+        );
     }
 
     public function sendNotification(string $topic, array $eventData): void
@@ -59,6 +73,35 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
         }
 
         $this->peformNotificationSend($topic, $eventData);
+    }
+
+    /**
+     * Gets the entity ownership that allows to check permissions for the entity that is already removed.
+     *
+     * @return array [owner ID, organization ID]
+     */
+    private function getEntityOwnership(
+        object $entity,
+        string $entityClass,
+        string|int|null $entityId
+    ): array {
+        try {
+            return [
+                $this->ownerAccessor->getOwner($entity)?->getId(),
+                $this->ownerAccessor->getOrganization($entity)?->getId()
+            ];
+        } catch (\Throwable $e) {
+            $this->logger?->error(
+                'Failed to get the entity ownership for webhook',
+                [
+                    'entity_class' => $entityClass,
+                    'entity_id' => $entityId,
+                    'exception' => $e
+                ]
+            );
+
+            return [null, null];
+        }
     }
 
     private function hasActiveNotifications(string $topic): bool
@@ -76,7 +119,9 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
         string $topic,
         array $eventData,
         ?string $entityClass = null,
-        string|int|null $entityId = null
+        string|int|null $entityId = null,
+        int|null $entityOwnerId = null,
+        int|null $entityOrganizationId = null
     ) {
         $messageId = UUIDGenerator::v4();
         try {
@@ -88,7 +133,9 @@ class WebhookNotifier implements WebhookNotifierInterface, LoggerAwareInterface
                     'timestamp' => time(),
                     'event_data' => $eventData,
                     'entity_class' => $entityClass,
-                    'entity_id' => $entityId
+                    'entity_id' => $entityId,
+                    'entity_owner_id' => $entityOwnerId,
+                    'entity_organization_id' => $entityOrganizationId
                 ]
             );
 

@@ -10,6 +10,9 @@ use Oro\Bundle\IntegrationBundle\Async\WebhookNotificationProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\WebhookProducerSettingsRepository;
 use Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -35,6 +38,8 @@ class WebhookNotificationProcessorTest extends TestCase
     private JobRunner&MockObject $jobRunner;
     private TokenStorageInterface&MockObject $tokenStorage;
     private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private UsernamePasswordOrganizationTokenFactoryInterface&MockObject $tokenFactory;
+
     private WebhookNotificationProcessor $processor;
 
     #[\Override]
@@ -45,13 +50,15 @@ class WebhookNotificationProcessorTest extends TestCase
         $this->jobRunner = $this->createMock(JobRunner::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenFactory = $this->createMock(UsernamePasswordOrganizationTokenFactoryInterface::class);
 
         $this->processor = new WebhookNotificationProcessor(
             $this->registry,
             $this->messageProducer,
             $this->jobRunner,
             $this->tokenStorage,
-            $this->authorizationChecker
+            $this->authorizationChecker,
+            $this->tokenFactory,
         );
     }
 
@@ -87,6 +94,12 @@ class WebhookNotificationProcessorTest extends TestCase
             ->method('getRepository')
             ->with(WebhookProducerSettings::class)
             ->willReturn($repository);
+
+        $this->tokenFactory->expects(self::never())
+            ->method('create');
+
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
 
         $childJob = $this->setupJobRunnerMock($message);
         $this->jobRunner->expects(self::exactly(2))
@@ -156,12 +169,18 @@ class WebhookNotificationProcessorTest extends TestCase
             ->method('getToken')
             ->willReturn($originalToken);
 
+        $webhookToken = $this->expectTokenCreatedForWebhook($webhook);
+
+        $setTokenCalls = [];
         $this->tokenStorage->expects(self::exactly(3))
-            ->method('setToken');
+            ->method('setToken')
+            ->willReturnCallback(function ($token) use (&$setTokenCalls) {
+                $setTokenCalls[] = $token;
+            });
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', $entity)
+            ->with('VIEW', self::identicalTo($entity))
             ->willReturn(true);
 
         $this->messageProducer->expects(self::once())
@@ -190,32 +209,29 @@ class WebhookNotificationProcessorTest extends TestCase
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertSame([$webhookToken, $originalToken, $originalToken], $setTokenCalls);
     }
 
-    public function testProcessRejectWhenEntityNotFound(): void
+    public function testProcessSuccessfullyWithRemovedEntity(): void
     {
-        $message = $this->createMessage('msg_not_found', [
-            'topic' => 'order.updated',
+        $message = $this->createMessage('msg_removed', [
+            'topic' => 'order.deleted',
             'event_data' => ['id' => 99],
             'timestamp' => 1234567800,
             'entity_class' => 'App\Entity\Order',
             'entity_id' => 99,
-            'message_id' => 'test-message-id-not-found',
+            'entity_owner_id' => 7,
+            'entity_organization_id' => 3,
+            'message_id' => 'test-message-id-removed',
         ]);
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(self::once())
-            ->method('warning')
-            ->with(
-                'Entity was passed to webhook notification but not found',
-                [
-                    'entity_class' => 'App\Entity\Order',
-                    'entity_id' => 99,
-                    'message_id' => 'test-message-id-not-found'
-                ]
-            );
+        $webhook = $this->createWebhook(1);
 
-        $this->processor->setLogger($logger);
+        $repository = $this->createMock(WebhookProducerSettingsRepository::class);
+        $repository->expects(self::once())
+            ->method('getActiveWebhooks')
+            ->with('order.deleted')
+            ->willReturn([$webhook]);
 
         $entityRepository = $this->createMock(ObjectRepository::class);
         $entityRepository->expects(self::once())
@@ -223,17 +239,491 @@ class WebhookNotificationProcessorTest extends TestCase
             ->with(99)
             ->willReturn(null);
 
-        $this->registry->expects(self::once())
+        $this->registry->expects(self::exactly(2))
             ->method('getRepository')
-            ->with('App\Entity\Order')
-            ->willReturn($entityRepository);
+            ->willReturnCallback(function ($class) use ($entityRepository, $repository) {
+                return match ($class) {
+                    'App\Entity\Order' => $entityRepository,
+                    default => $repository,
+                };
+            });
 
+        $originalToken = $this->createMock(TokenInterface::class);
+        $this->tokenStorage->expects(self::exactly(2))
+            ->method('getToken')
+            ->willReturn($originalToken);
+
+        $webhookToken = $this->expectTokenCreatedForWebhook($webhook);
+
+        $setTokenCalls = [];
+        $this->tokenStorage->expects(self::exactly(3))
+            ->method('setToken')
+            ->willReturnCallback(function ($token) use (&$setTokenCalls) {
+                $setTokenCalls[] = $token;
+            });
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with(
+                'VIEW',
+                self::callback(static function ($aclEntity) {
+                    return $aclEntity instanceof DomainObjectReference
+                        && $aclEntity->getType() === 'App\Entity\Order'
+                        && $aclEntity->getIdentifier() === 99
+                        && $aclEntity->getOwnerId() === 7
+                        && $aclEntity->getOrganizationId() === 3;
+                })
+            )
+            ->willReturn(true);
+
+        $this->messageProducer->expects(self::once())
+            ->method('send')
+            ->with(
+                ProcessSingleWebhookNotificationTopic::getName(),
+                self::callback(function ($body) {
+                    return $body['webhook_id'] === '1'
+                        && $body['event_data'] === ['id' => 99]
+                        && $body['job_id'] === 42
+                        && $body['message_id'] === 'test-message-id-removed'
+                        && $body['metadata'] === [
+                            'entity_class' => 'App\Entity\Order',
+                            'entity_id' => 99,
+                        ];
+                })
+            );
+
+        $childJob = $this->setupJobRunnerMock($message);
+        $this->jobRunner->expects(self::once())
+            ->method('createDelayed')
+            ->willReturnCallback(function ($name, $closure) use ($childJob) {
+                return $closure($this->jobRunner, $childJob);
+            });
+
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertSame([$webhookToken, $originalToken, $originalToken], $setTokenCalls);
+    }
+
+    public function testProcessSuccessfullyWithRemovedEntityWhenBodyHasNoOwnershipData(): void
+    {
+        $message = $this->createMessage('msg_removed_no_ownership', [
+            'topic' => 'order.deleted',
+            'event_data' => ['id' => 99],
+            'timestamp' => 1234567800,
+            'entity_class' => 'App\Entity\Order',
+            'entity_id' => 99,
+            'entity_owner_id' => null,
+            'entity_organization_id' => null,
+            'message_id' => 'test-message-id-removed-no-ownership',
+        ]);
+
+        $webhook = $this->createWebhook(1);
+
+        $repository = $this->createMock(WebhookProducerSettingsRepository::class);
+        $repository->expects(self::once())
+            ->method('getActiveWebhooks')
+            ->with('order.deleted')
+            ->willReturn([$webhook]);
+
+        $entityRepository = $this->createMock(ObjectRepository::class);
+        $entityRepository->expects(self::once())
+            ->method('find')
+            ->with(99)
+            ->willReturn(null);
+
+        $this->registry->expects(self::exactly(2))
+            ->method('getRepository')
+            ->willReturnCallback(function ($class) use ($entityRepository, $repository) {
+                return match ($class) {
+                    'App\Entity\Order' => $entityRepository,
+                    default => $repository,
+                };
+            });
+
+        $originalToken = $this->createMock(TokenInterface::class);
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn($originalToken);
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('setToken');
+
+        $this->expectTokenCreatedForWebhook($webhook);
+
+        // A removed entity is always checked through a reference, no matter whether its class is owned:
+        // with no ownership data in the body the reference carries neither an owner nor an organization,
+        // so it stays accessible only on the global and system access levels
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with(
+                'VIEW',
+                self::callback(static function ($aclEntity) {
+                    return $aclEntity instanceof DomainObjectReference
+                        && $aclEntity->getType() === 'App\Entity\Order'
+                        && $aclEntity->getIdentifier() === 99
+                        && $aclEntity->getOwnerId() === 0
+                        && $aclEntity->getOrganizationId() === null;
+                })
+            )
+            ->willReturn(true);
+
+        $childJob = $this->setupJobRunnerMock($message);
+        $this->jobRunner->expects(self::once())
+            ->method('createDelayed')
+            ->willReturnCallback(function ($name, $closure) use ($childJob) {
+                return $closure($this->jobRunner, $childJob);
+            });
+
+        $this->messageProducer->expects(self::once())
+            ->method('send')
+            ->with(
+                ProcessSingleWebhookNotificationTopic::getName(),
+                self::callback(function ($body) {
+                    return $body['webhook_id'] === '1'
+                        && $body['metadata'] === [
+                            'entity_class' => 'App\Entity\Order',
+                            'entity_id' => 99,
+                        ];
+                })
+            );
+
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+    }
+
+    public function testProcessSuccessfullyWithRemovedOwnedEntityWithoutOwnerButWithOrganization(): void
+    {
+        $message = $this->createMessage('msg_removed_no_owner', [
+            'topic' => 'order.deleted',
+            'event_data' => ['id' => 99],
+            'timestamp' => 1234567800,
+            'entity_class' => 'App\Entity\Order',
+            'entity_id' => 99,
+            'entity_owner_id' => null,
+            'entity_organization_id' => 3,
+            'message_id' => 'test-message-id-removed-no-owner',
+        ]);
+
+        $webhook = $this->createWebhook(1);
+
+        $repository = $this->createMock(WebhookProducerSettingsRepository::class);
+        $repository->expects(self::once())
+            ->method('getActiveWebhooks')
+            ->with('order.deleted')
+            ->willReturn([$webhook]);
+
+        $entityRepository = $this->createMock(ObjectRepository::class);
+        $entityRepository->expects(self::once())
+            ->method('find')
+            ->with(99)
+            ->willReturn(null);
+
+        $this->registry->expects(self::exactly(2))
+            ->method('getRepository')
+            ->willReturnCallback(function ($class) use ($entityRepository, $repository) {
+                return match ($class) {
+                    'App\Entity\Order' => $entityRepository,
+                    default => $repository,
+                };
+            });
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('setToken');
+
+        $this->expectTokenCreatedForWebhook($webhook);
+
+        // The owner value is null, but the reference still carries the organization, so it must be enforced
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with(
+                'VIEW',
+                self::callback(static function ($aclEntity) {
+                    return $aclEntity instanceof DomainObjectReference
+                        && $aclEntity->getType() === 'App\Entity\Order'
+                        && $aclEntity->getIdentifier() === 99
+                        && $aclEntity->getOwnerId() === 0
+                        && $aclEntity->getOrganizationId() === 3;
+                })
+            )
+            ->willReturn(true);
+
+        $childJob = $this->setupJobRunnerMock($message);
+        $this->jobRunner->expects(self::once())
+            ->method('createDelayed')
+            ->willReturnCallback(function ($name, $closure) use ($childJob) {
+                return $closure($this->jobRunner, $childJob);
+            });
+
+        $this->messageProducer->expects(self::once())
+            ->method('send');
+
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+    }
+
+    public function testProcessFiltersWebhooksWithoutViewPermissionForRemovedEntity(): void
+    {
+        $message = $this->createMessage('msg_removed_acl', [
+            'topic' => 'order.deleted',
+            'event_data' => ['id' => 99],
+            'timestamp' => 1234567800,
+            'entity_class' => 'App\Entity\Order',
+            'entity_id' => 99,
+            'entity_owner_id' => 7,
+            'entity_organization_id' => 3,
+            'message_id' => 'test-message-id-removed-acl',
+        ]);
+
+        $webhook = $this->createWebhook(1);
+
+        $repository = $this->createMock(WebhookProducerSettingsRepository::class);
+        $repository->expects(self::once())
+            ->method('getActiveWebhooks')
+            ->with('order.deleted')
+            ->willReturn([$webhook]);
+
+        $entityRepository = $this->createMock(ObjectRepository::class);
+        $entityRepository->expects(self::once())
+            ->method('find')
+            ->with(99)
+            ->willReturn(null);
+
+        $this->registry->expects(self::exactly(2))
+            ->method('getRepository')
+            ->willReturnCallback(function ($class) use ($entityRepository, $repository) {
+                return match ($class) {
+                    'App\Entity\Order' => $entityRepository,
+                    default => $repository,
+                };
+            });
+
+        $originalToken = $this->createMock(TokenInterface::class);
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn($originalToken);
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('setToken');
+
+        $this->expectTokenCreatedForWebhook($webhook);
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with(
+                'VIEW',
+                self::callback(static function ($aclEntity) {
+                    return $aclEntity instanceof DomainObjectReference
+                        && $aclEntity->getOwnerId() === 7
+                        && $aclEntity->getOrganizationId() === 3;
+                })
+            )
+            ->willReturn(false);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::exactly(2))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    'Webhook ID {webhook_id} was skipped because of insufficient permissions',
+                    [
+                        'webhook_id' => '1',
+                        'topic' => 'order.deleted',
+                        'message_id' => 'test-message-id-removed-acl',
+                    ]
+                ],
+                [
+                    'No applicable active webhooks found for the given topic',
+                    [
+                        'topic' => 'order.deleted',
+                        'event_data' => ['id' => 99],
+                        'message_id' => 'test-message-id-removed-acl',
+                    ]
+                ]
+            );
+        $this->processor->setLogger($logger);
+
+        $this->setupJobRunnerMock($message);
         $this->messageProducer->expects(self::never())
             ->method('send');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+    }
+
+    /**
+     * @dataProvider invalidWebhookOwnershipDataProvider
+     */
+    public function testProcessSkipsWebhookWithInvalidOwnershipData(bool $hasOwner, bool $hasOrganization): void
+    {
+        // The webhook ownership columns are "ON DELETE SET NULL", so the row can be orphaned at any time
+        $message = $this->createMessage('msg_orphan', [
+            'topic' => 'product.updated',
+            'event_data' => ['id' => 10],
+            'timestamp' => 1234567600,
+            'entity_class' => 'App\Entity\Secure',
+            'entity_id' => 10,
+            'message_id' => 'test-integrity-id-orphan',
+        ]);
+
+        $entity = new \stdClass();
+        $entity->id = 10;
+
+        $orphanedWebhook = $this->createWebhookWithOwnership(1, $hasOwner, $hasOrganization);
+        $healthyWebhook = $this->createWebhook(2);
+
+        $repository = $this->createMock(WebhookProducerSettingsRepository::class);
+        $repository->expects(self::once())
+            ->method('getActiveWebhooks')
+            ->with('product.updated')
+            ->willReturn([$orphanedWebhook, $healthyWebhook]);
+
+        $entityRepository = $this->createMock(ObjectRepository::class);
+        $entityRepository->expects(self::once())
+            ->method('find')
+            ->with(10)
+            ->willReturn($entity);
+
+        $this->registry->expects(self::exactly(2))
+            ->method('getRepository')
+            ->willReturnCallback(function ($class) use ($entityRepository, $repository) {
+                return match ($class) {
+                    'App\Entity\Secure' => $entityRepository,
+                    default => $repository,
+                };
+            });
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('setToken');
+
+        // No token can be built for the orphaned webhook, so only the healthy one gets one
+        $this->expectTokenCreatedForWebhook($healthyWebhook);
+
+        // The orphaned webhook never reaches the ACL check, the healthy one is still evaluated
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($entity))
+            ->willReturn(true);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('warning')
+            ->with(
+                'Webhook ID {webhook_id} has invalid ownership data',
+                ['webhook_id' => '1']
+            );
+        $logger->expects(self::once())
+            ->method('info')
+            ->with(
+                'Webhook ID {webhook_id} was skipped because of insufficient permissions',
+                [
+                    'webhook_id' => '1',
+                    'topic' => 'product.updated',
+                    'message_id' => 'test-integrity-id-orphan',
+                ]
+            );
+        $this->processor->setLogger($logger);
+
+        $childJob = $this->setupJobRunnerMock($message);
+        $this->jobRunner->expects(self::once())
+            ->method('createDelayed')
+            ->willReturnCallback(function ($name, $closure) use ($childJob) {
+                return $closure($this->jobRunner, $childJob);
+            });
+
+        $this->messageProducer->expects(self::once())
+            ->method('send')
+            ->with(
+                ProcessSingleWebhookNotificationTopic::getName(),
+                self::callback(function ($body) {
+                    return $body['webhook_id'] === '2';
+                })
+            );
+
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+    }
+
+    public function invalidWebhookOwnershipDataProvider(): array
+    {
+        return [
+            'the owning user is removed' => [
+                'hasOwner' => false,
+                'hasOrganization' => true,
+            ],
+            'the owning organization is removed' => [
+                'hasOwner' => true,
+                'hasOrganization' => false,
+            ],
+        ];
+    }
+
+    public function testProcessDeliversToWebhookWithInvalidOwnershipDataWhenThereIsNoAclEntity(): void
+    {
+        // A payload-only notification needs no token, so the ownership guard must not reject it
+        $message = $this->createMessage('msg_orphan_no_entity', [
+            'topic' => 'product.updated',
+            'event_data' => ['id' => 10],
+            'timestamp' => 1234567600,
+            'entity_class' => null,
+            'entity_id' => null,
+            'message_id' => 'test-integrity-id-orphan-no-entity',
+        ]);
+
+        $webhook = $this->createWebhookWithOwnership(1, false, false);
+
+        $repository = $this->createMock(WebhookProducerSettingsRepository::class);
+        $repository->expects(self::once())
+            ->method('getActiveWebhooks')
+            ->with('product.updated')
+            ->willReturn([$webhook]);
+
+        $this->registry->expects(self::once())
+            ->method('getRepository')
+            ->with(WebhookProducerSettings::class)
+            ->willReturn($repository);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::never())
+            ->method('warning');
+        $logger->expects(self::never())
+            ->method('info');
+        $this->processor->setLogger($logger);
+
+        $this->tokenFactory->expects(self::never())
+            ->method('create');
+
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $childJob = $this->setupJobRunnerMock($message);
+        $this->jobRunner->expects(self::once())
+            ->method('createDelayed')
+            ->willReturnCallback(function ($name, $closure) use ($childJob) {
+                return $closure($this->jobRunner, $childJob);
+            });
+
+        $this->messageProducer->expects(self::once())
+            ->method('send')
+            ->with(
+                ProcessSingleWebhookNotificationTopic::getName(),
+                self::callback(function ($body) {
+                    return $body['webhook_id'] === '1'
+                        && $body['metadata'] === [];
+                })
+            );
+
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     public function testProcessSkipsEntityLookupWhenEntityClassIsNull(): void
@@ -265,9 +755,9 @@ class WebhookNotificationProcessorTest extends TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessSkipsEntityLookupWhenEventDataIsEmpty(): void
+    public function testProcessRejectWhenEventDataIsEmpty(): void
     {
-        // Entity lookup is skipped when event_data is empty (falsy)
+        // A webhook notification without event data is an impossible message, so it is rejected
         $message = $this->createMessage('msg_empty_data', [
             'topic' => 'order.updated',
             'event_data' => [],
@@ -277,28 +767,82 @@ class WebhookNotificationProcessorTest extends TestCase
             'message_id' => 'test-integrity-id-empty-data',
         ]);
 
-        $repository = $this->createMock(WebhookProducerSettingsRepository::class);
-        $repository->expects(self::once())
-            ->method('getActiveWebhooks')
-            ->with('order.updated')
-            ->willReturn([]);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('warning')
+            ->with(
+                'Webhook notification has no event data',
+                [
+                    'topic' => 'order.updated',
+                    'entity_class' => 'App\Entity\Order',
+                    'entity_id' => 55,
+                    'message_id' => 'test-integrity-id-empty-data'
+                ]
+            );
+        $this->processor->setLogger($logger);
 
-        $this->registry->expects(self::once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        $this->registry->expects(self::never())
+            ->method('getRepository');
 
-        $this->setupJobRunnerMock($message);
+        $this->jobRunner->expects(self::never())
+            ->method('runUniqueByMessage');
+
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $this->messageProducer->expects(self::never())
+            ->method('send');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::REJECT, $result);
+    }
+
+    public function testProcessRejectWhenEventDataIsEmptyAndThereIsNoEntity(): void
+    {
+        // The empty event data guard applies to payload-only notifications as well
+        $message = $this->createMessage('msg_empty_data_no_entity', [
+            'topic' => 'order.updated',
+            'event_data' => [],
+            'timestamp' => 1234567800,
+            'entity_class' => null,
+            'entity_id' => null,
+            'message_id' => 'test-integrity-id-empty-data-no-entity',
+        ]);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('warning')
+            ->with(
+                'Webhook notification has no event data',
+                [
+                    'topic' => 'order.updated',
+                    'entity_class' => null,
+                    'entity_id' => null,
+                    'message_id' => 'test-integrity-id-empty-data-no-entity'
+                ]
+            );
+        $this->processor->setLogger($logger);
+
+        $this->registry->expects(self::never())
+            ->method('getRepository');
+
+        $this->jobRunner->expects(self::never())
+            ->method('runUniqueByMessage');
+
+        $this->messageProducer->expects(self::never())
+            ->method('send');
+
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testProcessAckWhenNoActiveWebhooks(): void
     {
         $message = $this->createMessage('msg_empty', [
             'topic' => 'order.empty',
-            'event_data' => [],
+            'event_data' => ['id' => 77],
             'timestamp' => 1234567700,
             'entity_class' => null,
             'entity_id' => null,
@@ -323,7 +867,7 @@ class WebhookNotificationProcessorTest extends TestCase
                 'No applicable active webhooks found for the given topic',
                 [
                     'topic' => 'order.empty',
-                    'event_data' => [],
+                    'event_data' => ['id' => 77],
                     'message_id' => 'test-integrity-id-no-webhooks'
                 ]
             );
@@ -591,7 +1135,7 @@ class WebhookNotificationProcessorTest extends TestCase
     {
         $message = $this->createMessage('msg_token', [
             'topic' => 'order.created',
-            'event_data' => [],
+            'event_data' => ['id' => 1],
             'timestamp' => 1234567400,
             'entity_class' => null,
             'entity_id' => null,
@@ -635,7 +1179,7 @@ class WebhookNotificationProcessorTest extends TestCase
     {
         $message = $this->createMessage('msg_exception', [
             'topic' => 'order.error',
-            'event_data' => [],
+            'event_data' => ['id' => 1],
             'timestamp' => 1234567300,
             'entity_class' => null,
             'entity_id' => null,
@@ -712,13 +1256,47 @@ class WebhookNotificationProcessorTest extends TestCase
 
     private function createWebhook(int $id): WebhookProducerSettings
     {
+        return $this->createWebhookWithOwnership($id, true, true);
+    }
+
+    private function createWebhookWithOwnership(
+        int $id,
+        bool $hasOwner,
+        bool $hasOrganization
+    ): WebhookProducerSettings {
         $webhook = $this->getEntity(WebhookProducerSettings::class, ['id' => (string)$id]);
-        $webhook->setOwner(new User());
-        $webhook->setOrganization(new Organization());
+        if ($hasOwner) {
+            $owner = new User();
+            $owner->addUserRole(new Role('ROLE_WEBHOOK_' . $id));
+            $webhook->setOwner($owner);
+        }
+        if ($hasOrganization) {
+            $webhook->setOrganization(new Organization());
+        }
 
         return $webhook;
     }
 
+    private function expectTokenCreatedForWebhook(WebhookProducerSettings $webhook): TokenInterface&MockObject
+    {
+        $token = $this->createMock(TokenInterface::class);
+        $this->tokenFactory->expects(self::once())
+            ->method('create')
+            ->with(
+                $webhook->getOwner(),
+                'main',
+                $webhook->getOrganization(),
+                $webhook->getOwner()->getUserRoles()
+            )
+            ->willReturn($token);
+
+        return $token;
+    }
+
+    /**
+     * The body is resolved against {@see SendWebhookNotificationTopic} before the processor is invoked,
+     * so every optional entity option is defaulted and always present in the body the processor receives.
+     */
     private function createMessage(string $messageId, array $body): Message
     {
         $message = new Message();
@@ -726,7 +1304,15 @@ class WebhookNotificationProcessorTest extends TestCase
         $message->setProperties([
             JobAwareTopicInterface::UNIQUE_JOB_NAME => SendWebhookNotificationTopic::getName() . ':' . $messageId
         ]);
-        $message->setBody($body);
+        $message->setBody(array_merge(
+            [
+                'entity_class' => null,
+                'entity_id' => null,
+                'entity_owner_id' => null,
+                'entity_organization_id' => null
+            ],
+            $body
+        ));
 
         return $message;
     }
