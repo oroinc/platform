@@ -28,6 +28,8 @@ class SendWebhookNotificationTopicTest extends AbstractTopicTestCase
                     'timestamp' => 1234567890,
                     'entity_class' => 'App\Entity\Product',
                     'entity_id' => 42,
+                    'entity_owner_id' => 7,
+                    'entity_organization_id' => 3,
                     'message_id' => 'test-integrity-id-1',
                 ],
                 'expectedBody' => [
@@ -36,7 +38,28 @@ class SendWebhookNotificationTopicTest extends AbstractTopicTestCase
                     'timestamp' => 1234567890,
                     'entity_class' => 'App\Entity\Product',
                     'entity_id' => 42,
+                    'entity_owner_id' => 7,
+                    'entity_organization_id' => 3,
                     'message_id' => 'test-integrity-id-1',
+                ],
+            ],
+            'required options only' => [
+                'body' => [
+                    'topic' => 'order.created',
+                    'event_data' => ['id' => 1],
+                    'timestamp' => 1234567700,
+                    'message_id' => 'test-integrity-id-2',
+                ],
+                // Every optional entity option is defaulted, so the resolved body always carries all of them
+                'expectedBody' => [
+                    'topic' => 'order.created',
+                    'event_data' => ['id' => 1],
+                    'timestamp' => 1234567700,
+                    'entity_class' => null,
+                    'entity_id' => null,
+                    'entity_owner_id' => null,
+                    'entity_organization_id' => null,
+                    'message_id' => 'test-integrity-id-2',
                 ],
             ],
             'with entity_class only' => [
@@ -45,14 +68,17 @@ class SendWebhookNotificationTopicTest extends AbstractTopicTestCase
                     'event_data' => [],
                     'timestamp' => 1234567700,
                     'entity_class' => 'App\Entity\Order',
-                    'message_id' => 'test-integrity-id-2',
+                    'message_id' => 'test-integrity-id-3',
                 ],
                 'expectedBody' => [
                     'topic' => 'order.created',
                     'event_data' => [],
                     'timestamp' => 1234567700,
                     'entity_class' => 'App\Entity\Order',
-                    'message_id' => 'test-integrity-id-2',
+                    'entity_id' => null,
+                    'entity_owner_id' => null,
+                    'entity_organization_id' => null,
+                    'message_id' => 'test-integrity-id-3',
                 ],
             ],
             'with string entity_id' => [
@@ -61,14 +87,39 @@ class SendWebhookNotificationTopicTest extends AbstractTopicTestCase
                     'event_data' => ['uuid' => 'abc-123'],
                     'timestamp' => 1234567600,
                     'entity_id' => 'uuid-string',
-                    'message_id' => 'test-integrity-id-3',
+                    'message_id' => 'test-integrity-id-4',
                 ],
                 'expectedBody' => [
                     'topic' => 'product.updated',
                     'event_data' => ['uuid' => 'abc-123'],
                     'timestamp' => 1234567600,
+                    'entity_class' => null,
                     'entity_id' => 'uuid-string',
-                    'message_id' => 'test-integrity-id-3',
+                    'entity_owner_id' => null,
+                    'entity_organization_id' => null,
+                    'message_id' => 'test-integrity-id-4',
+                ],
+            ],
+            'with entity ownership of an entity without owner' => [
+                'body' => [
+                    'topic' => 'product.deleted',
+                    'event_data' => ['id' => 5],
+                    'timestamp' => 1234567500,
+                    'entity_class' => 'App\Entity\Product',
+                    'entity_id' => 5,
+                    'entity_owner_id' => null,
+                    'entity_organization_id' => null,
+                    'message_id' => 'test-integrity-id-5',
+                ],
+                'expectedBody' => [
+                    'topic' => 'product.deleted',
+                    'event_data' => ['id' => 5],
+                    'timestamp' => 1234567500,
+                    'entity_class' => 'App\Entity\Product',
+                    'entity_id' => 5,
+                    'entity_owner_id' => null,
+                    'entity_organization_id' => null,
+                    'message_id' => 'test-integrity-id-5',
                 ],
             ]
         ];
@@ -202,6 +253,30 @@ class SendWebhookNotificationTopicTest extends AbstractTopicTestCase
                 'exceptionMessage' =>
                     '/The option "entity_id" with value array is expected to be of type "int" or "string" or "null", '
                     . 'but is of type "array"\./',
+            ],
+            'wrong entity_owner_id type - string' => [
+                'body' => [
+                    'topic' => 'product.created',
+                    'event_data' => [],
+                    'entity_owner_id' => 'not an int',
+                    'message_id' => 'test-id',
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' =>
+                    '/The option "entity_owner_id" with value "not an int" is expected to be of type "int" or "null", '
+                    . 'but is of type "string"\./',
+            ],
+            'wrong entity_organization_id type - string' => [
+                'body' => [
+                    'topic' => 'product.created',
+                    'event_data' => [],
+                    'entity_organization_id' => 'not an int',
+                    'message_id' => 'test-id',
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' =>
+                    '/The option "entity_organization_id" with value "not an int" is expected to be of type '
+                    . '"int" or "null", but is of type "string"\./',
             ],
             'wrong message_id type - integer' => [
                 'body' => [

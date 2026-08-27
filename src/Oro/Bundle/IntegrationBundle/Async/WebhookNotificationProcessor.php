@@ -7,7 +7,8 @@ use Oro\Bundle\IntegrationBundle\Async\Topic\ProcessSingleWebhookNotificationTop
 use Oro\Bundle\IntegrationBundle\Async\Topic\SendWebhookNotificationTopic;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\WebhookProducerSettingsRepository;
 use Oro\Bundle\IntegrationBundle\Entity\WebhookProducerSettings;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -33,7 +34,8 @@ class WebhookNotificationProcessor implements MessageProcessorInterface, TopicSu
         private MessageProducerInterface $messageProducer,
         private JobRunner $jobRunner,
         private TokenStorageInterface $tokenStorage,
-        private AuthorizationCheckerInterface $authorizationChecker
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
     ) {
         $this->logger = new NullLogger();
     }
@@ -44,29 +46,29 @@ class WebhookNotificationProcessor implements MessageProcessorInterface, TopicSu
         $originalToken = $this->tokenStorage->getToken();
         try {
             $body = $message->getBody();
+            if (empty($body['event_data'])) {
+                $this->logger->warning(
+                    'Webhook notification has no event data',
+                    [
+                        'topic' => $body['topic'],
+                        'entity_class' => $body['entity_class'],
+                        'entity_id' => $body['entity_id'],
+                        'message_id' => $body['message_id']
+                    ]
+                );
 
-            $entity = null;
-            if ($body['entity_class'] && $body['event_data']) {
-                $entityClass = $body['entity_class'];
-                $entity = $this->registry->getRepository($entityClass)->find($body['entity_id']);
-                if (!$entity) {
-                    $this->logger->warning(
-                        'Entity was passed to webhook notification but not found',
-                        [
-                            'entity_class' => $body['entity_class'],
-                            'entity_id' => $body['entity_id'],
-                            'message_id' => $body['message_id']
-                        ]
-                    );
+                return self::REJECT;
+            }
 
-                    return self::REJECT;
-                }
+            $aclEntity = null;
+            if (!empty($body['entity_class'])) {
+                $aclEntity = $this->getAclEntity($body);
             }
 
             $result = $this->jobRunner->runUniqueByMessage(
                 $message,
-                function (JobRunner $jobRunner, Job $job) use ($body, $entity) {
-                    $webhooks = $this->getWebhooks($body['topic'], $body, $entity);
+                function (JobRunner $jobRunner, Job $job) use ($body, $aclEntity) {
+                    $webhooks = $this->getWebhooks($body['topic'], $body, $aclEntity);
 
                     // Create a child job for each webhook endpoint
                     foreach ($webhooks as $webhook) {
@@ -76,10 +78,10 @@ class WebhookNotificationProcessor implements MessageProcessorInterface, TopicSu
                                 $job->getName(),
                                 $webhook->getId()
                             ),
-                            function (JobRunner $jobRunner, Job $child) use ($webhook, $body, $entity) {
+                            function (JobRunner $jobRunner, Job $child) use ($webhook, $body, $aclEntity) {
                                 // Send an MQ message to process a single webhook
                                 $metadata = [];
-                                if ($entity) {
+                                if (!empty($body['entity_class'])) {
                                     $metadata['entity_class'] = $body['entity_class'];
                                     $metadata['entity_id'] = $body['entity_id'];
                                 }
@@ -127,18 +129,37 @@ class WebhookNotificationProcessor implements MessageProcessorInterface, TopicSu
         return [SendWebhookNotificationTopic::getName()];
     }
 
+    private function getAclEntity(array $body): object
+    {
+        $entityClass = $body['entity_class'];
+        $aclEntity = $this->registry->getRepository($entityClass)->find($body['entity_id']);
+        if ($aclEntity) {
+            return $aclEntity;
+        }
+
+        // The entity is already removed, so the permissions are checked by its class and ownership.
+        // An unknown owner is not associated with any user, business unit or organization,
+        // so such an entity stays accessible only on the global and system access levels.
+        return new DomainObjectReference(
+            $entityClass,
+            $body['entity_id'],
+            $body['entity_owner_id'],
+            $body['entity_organization_id']
+        );
+    }
+
     /**
      * Get all active webhooks for this topic
      */
-    private function getWebhooks(string $topic, array $body, ?object $entity): array
+    private function getWebhooks(string $topic, array $body, ?object $aclEntity): array
     {
         /** @var WebhookProducerSettingsRepository $repository */
         $repository = $this->registry->getRepository(WebhookProducerSettings::class);
         $webhooks = $repository->getActiveWebhooks($topic);
         $webhooks = array_filter(
             $webhooks,
-            function (WebhookProducerSettings $webhook) use ($entity, $body) {
-                if (!$this->isTargetEntityViewAllowed($webhook, $entity)) {
+            function (WebhookProducerSettings $webhook) use ($aclEntity, $body) {
+                if (!$this->isTargetEntityViewAllowed($webhook, $aclEntity)) {
                     $this->logger->info(
                         'Webhook ID {webhook_id} was skipped because of insufficient permissions',
                         [
@@ -169,22 +190,37 @@ class WebhookNotificationProcessor implements MessageProcessorInterface, TopicSu
         return $webhooks;
     }
 
-    private function isTargetEntityViewAllowed(WebhookProducerSettings $webhook, ?object $entity): bool
-    {
-        if (!$entity) {
+    private function isTargetEntityViewAllowed(
+        WebhookProducerSettings $webhook,
+        ?object $aclEntity,
+    ): bool {
+        if (!$aclEntity) {
             return true;
         }
 
+        $webhookOwner = $webhook->getOwner();
+        $webhookOrganization = $webhook->getOrganization();
+        if (!$webhookOwner || !$webhookOrganization) {
+            $this->logger->warning(
+                'Webhook ID {webhook_id} has invalid ownership data',
+                [
+                    'webhook_id' => $webhook->getId()
+                ]
+            );
+
+            return false;
+        }
+
         $oldToken = $this->tokenStorage->getToken();
-        $newToken = new UsernamePasswordOrganizationToken(
-            $webhook->getOwner(),
+        $newToken = $this->tokenFactory->create(
+            $webhookOwner,
             'main',
-            $webhook->getOrganization(),
-            $webhook->getOwner()?->getUserRoles()
+            $webhookOrganization,
+            $webhookOwner->getUserRoles()
         );
 
         $this->tokenStorage->setToken($newToken);
-        $result = $this->authorizationChecker->isGranted('VIEW', $entity);
+        $result = $this->authorizationChecker->isGranted('VIEW', $aclEntity);
         $this->tokenStorage->setToken($oldToken);
 
         return $result;

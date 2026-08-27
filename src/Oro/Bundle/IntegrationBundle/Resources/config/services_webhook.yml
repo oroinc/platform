@@ -73,6 +73,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_integration.webhook_event_data_provider.json_api'
             - '@oro_message_queue.client.message_producer'
+            - '@oro_security.owner.entity_owner_accessor'
 
     # Webhook Notification Sender (handles actual HTTP delivery with retry)
     oro_integration.webhook_notification_sender:
@@ -152,6 +153,7 @@ services:
             - '@oro_message_queue.job.runner'
             - '@oro_security.token_accessor'
             - '@oro_security.authorization_checker'
+            - '@oro_security.token.factory.username_password_organization'
         tags:
             - { name: oro_message_queue.client.message_processor }
 
