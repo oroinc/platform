@@ -48,13 +48,27 @@ class SendWebhookNotificationTopic extends AbstractTopic implements JobAwareTopi
 
         $resolver
             ->define('entity_class')
+            ->default(null)
             ->allowedTypes('string', 'null')
             ->info('Optional Entity class name for ACL purposes');
 
         $resolver
             ->define('entity_id')
+            ->default(null)
             ->allowedTypes('int', 'string', 'null')
             ->info('Optional Entity ID for ACL purposes');
+
+        $resolver
+            ->define('entity_owner_id')
+            ->default(null)
+            ->allowedTypes('int', 'null')
+            ->info('Optional Entity owner ID for ACL purposes');
+
+        $resolver
+            ->define('entity_organization_id')
+            ->default(null)
+            ->allowedTypes('int', 'null')
+            ->info('Optional Entity organization ID for ACL purposes');
 
         $resolver->define('message_id')
             ->required()
