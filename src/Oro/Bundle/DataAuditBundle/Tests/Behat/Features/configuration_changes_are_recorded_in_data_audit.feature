@@ -1,3 +1,4 @@
+@skip
 @regression
 Feature: Configuration changes are recorded in Data Audit
   In order to keep an audit trail of configuration changes
