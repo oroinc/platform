@@ -24,6 +24,13 @@ The current file describes significant changes in the code that may affect the u
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
 
+## UNRELEASED
+
+### Added
+
+#### SecurityBundle
+* Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with an unconfigured organization field that make AclHelper compile invalid SQL.
+
 ## 6.1.10
 
 ### Added
