@@ -37,6 +37,11 @@ services:
         tags:
             - { name: 'cache.pool', namespace: 'oro_acl_entity_ownership' }
 
+    oro_security.orm.entities_without_organization_field_detector:
+        class: Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField
+        arguments:
+            - '@oro_security.owner.ownership_metadata_provider'
+
     oro_security.owner.ownership_config_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigListener
         arguments:
