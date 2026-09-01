@@ -47,6 +47,7 @@ The current file describes significant changes in the code that may affect the u
 * Added `\Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension`, `\Oro\Bundle\EmailBundle\Twig\NodeVisitor\SafeGetAttrNodeVisitor`, and `\Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode` to enable more graceful handling of non-allowed properties and methods in email templates by replacing them with `null`.
 
 #### EntityBundle
+* Added `\Oro\Bundle\EntityBundle\ORM\DoctrineHelper::findOneBy()` to load a single entity by criteria without fetching the repository first.
 * Added `\Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessAnalyzer` introducing the mechanism of static analysis of a Twig template to extract all property and method accesses on typed variables.
 * Added `\Oro\Bundle\EntityBundle\Twig\SecurityPolicy\TemplateSecurityPolicyChecker` introducing the mechanism of checking a Twig template against a security policy based on the results of static analysis.
 
@@ -96,6 +97,9 @@ The current file describes significant changes in the code that may affect the u
 
 #### NavigationBundle
 * Added `dropdown-menu-level-last` CSS class to the top menu template (`Resources/views/Menu/application_menu_desktop_top.html.twig`) for the deepest dropdown level, enabling targeted styling of leaf-level submenus.
+
+#### SecurityBundle
+* Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with unconfigured organization fields causing invalid ACL SQL.
 
 #### UserBundle
 * Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.

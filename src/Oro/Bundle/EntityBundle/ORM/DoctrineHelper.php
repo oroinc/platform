@@ -415,6 +415,11 @@ class DoctrineHelper implements ResetInterface
         );
     }
 
+    public function findOneBy(string $entityClass, array $criteria, ?array $orderBy = null): ?object
+    {
+        return $this->getEntityRepositoryForClass($entityClass)->findOneBy($criteria, $orderBy);
+    }
+
     /**
      * Gets the repository for the given entity class.
      *
