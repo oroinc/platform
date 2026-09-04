@@ -212,6 +212,20 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_datagrid.extension.feature.datagrid:
+        class: Oro\Bundle\DataGridBundle\Extension\Feature\DatagridFeatureExtension
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.feature.entity:
+        class: Oro\Bundle\DataGridBundle\Extension\Feature\EntityFeatureExtension
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_datagrid.extension }
+
     oro_datagrid.extension.no_data_messages:
         class: Oro\Bundle\DataGridBundle\Extension\NoDataMessages\NoDataMessagesExtension
         arguments:

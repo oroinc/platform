@@ -124,6 +124,9 @@ class GridController extends AbstractController
     #[AclAncestor('oro_datagrid_gridview_export')]
     public function exportAction(Request $request, $gridName)
     {
+        // ensures that the datagrid exists and is not disabled by a feature, otherwise the response is 404
+        $this->container->get(ManagerInterface::class)->getDatagrid($gridName);
+
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
         $gridParameters = $this->container->get(RequestParameterBagFactory::class)->fetchParameters($gridName);
