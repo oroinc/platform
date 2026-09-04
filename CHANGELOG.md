@@ -94,6 +94,11 @@ The current file describes significant changes in the code that may affect the u
 
 #### DataGridBundle
 * Added `$cell->focus()` call before `mouseOver()` in `GridRow::startInlineEditing()` to ensure cell interactability during Behat tests.
+* Added the `datagrids` section to `Resources/config/oro/features.yml` configuration file. It contains a list of datagrid names that are bound to a feature, so these datagrids are not available when the feature is disabled. See `Oro\Bundle\DataGridBundle\Configuration\FeatureConfigurationExtension`.
+* Added `Oro\Bundle\DataGridBundle\Extension\Feature\DatagridFeatureExtension` that prevents building of a datagrid bound to a disabled feature via the `datagrids` section of `Resources/config/oro/features.yml`.
+* Added `Oro\Bundle\DataGridBundle\Extension\Feature\EntityFeatureExtension` that prevents building of a datagrid when the entity declared by its `extended_entity_name` option is bound to a disabled feature via the `entities` section of `Resources/config/oro/features.yml`. Both extensions have the lowest priority, so they are executed after all other datagrid extensions.
+* Added the `features.ignore_entity_state` datagrid option (see `Oro\Bundle\DataGridBundle\Extension\Feature\Configuration`). Set it to `true` to keep a datagrid available even if a feature the entity declared by the `extended_entity_name` option belongs to is disabled.
+* Added `Oro\Bundle\DataGridBundle\Exception\DatagridDisabledException` that is thrown when a datagrid disabled by a feature is being built. It extends `Symfony\Component\HttpKernel\Exception\NotFoundHttpException`, so datagrid endpoints respond with 404. Catch it in places that should degrade gracefully instead of failing.
 
 #### NavigationBundle
 * Added `dropdown-menu-level-last` CSS class to the top menu template (`Resources/views/Menu/application_menu_desktop_top.html.twig`) for the deepest dropdown level, enabling targeted styling of leaf-level submenus.
@@ -111,6 +116,11 @@ The current file describes significant changes in the code that may affect the u
 #### DataAuditBundle
 * Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Symfony\Contracts\Translation\TranslatorInterface` and `Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider` arguments, as the entity type list now also contains the configuration levels.
 * Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
+
+#### DataGridBundle
+* Changed `Oro\Bundle\DataGridBundle\Twig\DataGridExtension::getGrid()` (the `oro_datagrid_build` TWIG function): it treats a datagrid disabled by a feature as unavailable instead of failing, so such a datagrid is not rendered.
+* Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.
+* Changed `Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`: it builds the datagrid before sending the export message, so an export of an unknown or disabled datagrid responds with 404 instead of enqueueing a message that cannot be processed.
 
 #### EmailBundle
 * Updated entity config setting `email.available_in_template` to make it `false` be default. Make sure to update this setting for your custom fields if you want to use them in email templates. You can do this using `\Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery` in a schema migration.
