@@ -41,6 +41,13 @@ The current file describes significant changes in the code that may affect the u
 * Added the `action` key (`create`, `update` or `remove`) to every item of the change set carried by `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent`, with the `Oro\Bundle\ConfigBundle\Config\ConfigChangeSet::ACTION_*` constants.
 * Added `Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent::getUseParentScopeChanges()` and `setUseParentScopeChanges()` methods that carry the settings which only started or stopped using the value of the parent scope, while their own value stayed the same.
 
+#### DataGridBundle
+* Added the `datagrids` section to `Resources/config/oro/features.yml` configuration file. It contains a list of datagrid names that are bound to a feature, so these datagrids are not available when the feature is disabled. See `Oro\Bundle\DataGridBundle\Configuration\FeatureConfigurationExtension`.
+* Added `Oro\Bundle\DataGridBundle\Extension\Feature\DatagridFeatureExtension` that prevents building of a datagrid bound to a disabled feature via the `datagrids` section of `Resources/config/oro/features.yml`.
+* Added `Oro\Bundle\DataGridBundle\Extension\Feature\EntityFeatureExtension` that prevents building of a datagrid when the entity declared by its `extended_entity_name` option is bound to a disabled feature via the `entities` section of `Resources/config/oro/features.yml`. Both extensions have the lowest priority, so they are executed after all other datagrid extensions.
+* Added the `features.ignore_entity_state` datagrid option (see `Oro\Bundle\DataGridBundle\Extension\Feature\Configuration`). Set it to `true` to keep a datagrid available even if a feature the entity declared by the `extended_entity_name` option belongs to is disabled.
+* Added `Oro\Bundle\DataGridBundle\Exception\DatagridDisabledException` that is thrown when a datagrid disabled by a feature is being built. It extends `Symfony\Component\HttpKernel\Exception\NotFoundHttpException`, so datagrid endpoints respond with 404. Catch it in places that should degrade gracefully instead of failing.
+
 #### DataAuditBundle
 * Added recording of system configuration changes: every change made on behalf of a user is stored as an audit entry whose entity type is the configuration level it was made at, and is shown in the **System > Data Audit** grid.
 * Added recording of every configuration scope of the application as its own audit entity type. The scopes are taken from the `oro_config.scope` tags, so a scope contributed by any bundle is covered automatically.
@@ -61,6 +68,11 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue. The message producer and the user logging info provider are injected into it with the `setMessageProducer()` and `setUserLoggingInfoProvider()` methods.
 
 ### Changed
+
+#### DataGridBundle
+* Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Only the explicitly declared entity is taken into account, the root entity of the datasource query is not. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.
+* Changed `Oro\Bundle\DataGridBundle\Twig\DataGridExtension::getGrid()` (the `oro_datagrid_build` TWIG function): it treats a datagrid disabled by a feature as unavailable instead of failing, so such a datagrid is not rendered.
+* Changed `Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`: it builds the datagrid before sending the export message, so an export of an unknown or disabled datagrid responds with 404 instead of enqueueing a message that cannot be processed.
 
 #### DataAuditBundle
 * Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
