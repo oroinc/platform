@@ -123,6 +123,11 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_datagrid.configuration.feature_configuration_extension:
+        class: Oro\Bundle\DataGridBundle\Configuration\FeatureConfigurationExtension
+        tags:
+            - { name: oro_feature.config_extension }
+
     oro_datagrid.event_listener.datasource_bind_parameters:
         class: Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener
         tags:

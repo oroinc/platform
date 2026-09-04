@@ -21,6 +21,12 @@ class Configuration implements ConfigurationInterface
         $builder->getRootNode()
             ->children()
                 ->scalarNode('entity_class_name_path')->end()
+                ->booleanNode('ignore_entity_state')
+                    ->info(
+                        'Whether this datagrid should stay available even if a feature the entity declared'
+                        . ' by the "extended_entity_name" option belongs to is disabled.'
+                    )
+                ->end()
             ->end();
 
         return $builder;

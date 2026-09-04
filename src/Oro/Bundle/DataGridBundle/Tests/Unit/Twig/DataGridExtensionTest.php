@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Exception\DatagridDisabledException;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -108,6 +109,22 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getConfigurationForGrid')
             ->with($gridName)
             ->willReturn(null);
+
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_datagrid_build', [$gridName])
+        );
+    }
+
+    public function testGetGridReturnsNullWhenDatagridIsDisabledByFeature()
+    {
+        $gridName = 'test-grid';
+
+        $this->manager->expects($this->once())
+            ->method('getConfigurationForGrid')
+            ->with($gridName)
+            ->willThrowException(new DatagridDisabledException('The datagrid is disabled.'));
+        $this->manager->expects($this->never())
+            ->method('getDatagridByRequestParams');
 
         $this->assertNull(
             self::callTwigFunction($this->extension, 'oro_datagrid_build', [$gridName])
