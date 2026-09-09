@@ -128,6 +128,10 @@ class SegmentController extends AbstractController
      */
     public function cloneAction(Segment $entity, Request $request)
     {
+        if (!$this->isGranted('VIEW', $entity)) {
+            throw $this->createAccessDeniedException();
+        }
+
         $this->checkSegment($entity);
 
         $clonedEntity = clone $entity;
