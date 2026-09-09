@@ -164,13 +164,13 @@ datagrids:
                         target: _blank
             renew:
                 type: ajax
-                acl_resource: oro_openapi_specification_create
+                acl_resource: oro_openapi_specification_update
                 label: oro.api.open_api.specification.renew_button.label
                 icon: refresh
                 link: renew_link
             publish:
                 type: ajax
-                acl_resource: oro_openapi_specification_create
+                acl_resource: oro_openapi_specification_update
                 label: oro.api.open_api.specification.publish_public_button.label
                 icon: share-square-o
                 link: publish_link
