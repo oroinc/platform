@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\AttachmentBundle\Controller\FileController;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistryInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadFileData;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadImageData;
@@ -326,5 +327,54 @@ class FileControllerTest extends WebTestCase
         self::assertNotEquals(0, $result->headers->getCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, $file->getMimeType());
         self::assertResponseStatusCodeEquals($result, 200);
+    }
+
+    public function testGetResizedAttachmentImageStoresImageUnderDecodedPath(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_JPG_NON_ASCII_NAME);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getResizedImageUrl($file, 42, 142, '');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseContentTypeEquals($result, $file->getMimeType());
+        self::assertResponseStatusCodeEquals($result, 200);
+        $this->assertImageStoredUnderDecodedPath($file, $url);
+    }
+
+    public function testGetFilteredImageStoresImageUnderDecodedPath(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_JPG_NON_ASCII_NAME);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getFilteredImageUrl($file, 'avatar_med', '');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseContentTypeEquals($result, $file->getMimeType());
+        self::assertResponseStatusCodeEquals($result, 200);
+        $this->assertImageStoredUnderDecodedPath($file, $url);
+    }
+
+    private function assertImageStoredUnderDecodedPath(File $file, string $url): void
+    {
+        $encodedPath = preg_replace('~^.*?/media/cache/~', '', $url);
+        $decodedPath = rawurldecode($encodedPath);
+        self::assertNotEquals($encodedPath, $decodedPath, 'The URL is expected to contain encoded characters.');
+        self::assertStringContainsString('фото-кафе.jpg', $decodedPath);
+
+        /** @var MediaCacheManagerRegistryInterface $registry */
+        $registry = self::getContainer()->get('oro_attachment.tests.media_cache_manager_registry');
+        $mediaCacheManager = $registry->getManagerForFile($file);
+
+        self::assertTrue(
+            $mediaCacheManager->hasFile($decodedPath),
+            sprintf('The image is expected to be stored under the decoded path "%s".', $decodedPath)
+        );
+        self::assertFalse(
+            $mediaCacheManager->hasFile($encodedPath),
+            sprintf('The image is not expected to be stored under the encoded path "%s".', $encodedPath)
+        );
     }
 }
