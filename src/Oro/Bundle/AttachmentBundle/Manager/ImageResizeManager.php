@@ -7,6 +7,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
+use Oro\Bundle\AttachmentBundle\Tools\LegacyMediaCachePathHelper;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Symfony\Component\Lock\LockFactory;
 
@@ -61,8 +62,11 @@ class ImageResizeManager implements ImageResizeManagerInterface
         $mediaCacheManager = $this->mediaCacheManagerRegistry->getManagerForFile($file);
         $storagePath = $this->resizedImagePathProvider->getPathForResizedImage($file, $width, $height, $format);
 
-        if (!$forceUpdate && $rawResizedImage = $mediaCacheManager->getFileContent($storagePath, false)) {
-            return $this->imagineBinaryByFileContentFactory->createImagineBinary($rawResizedImage);
+        if (!$forceUpdate) {
+            $storedImageBinary = $this->getStoredImage($mediaCacheManager, $storagePath);
+            if (null !== $storedImageBinary) {
+                return $storedImageBinary;
+            }
         }
 
         $resizedImageBinary = $this->resizedImageProvider->getResizedImage($file, $width, $height, $format);
@@ -87,8 +91,11 @@ class ImageResizeManager implements ImageResizeManagerInterface
         $mediaCacheManager = $this->mediaCacheManagerRegistry->getManagerForFile($file);
         $storagePath = $this->resizedImagePathProvider->getPathForFilteredImage($file, $filterName, $format);
 
-        if (!$forceUpdate && $rawResizedImage = $mediaCacheManager->getFileContent($storagePath, false)) {
-            return $this->imagineBinaryByFileContentFactory->createImagineBinary($rawResizedImage);
+        if (!$forceUpdate) {
+            $storedImageBinary = $this->getStoredImage($mediaCacheManager, $storagePath);
+            if (null !== $storedImageBinary) {
+                return $storedImageBinary;
+            }
         }
 
         $resizedImageBinary = $this->resizedImageProvider->getFilteredImage($file, $filterName, $format);
@@ -119,12 +126,76 @@ class ImageResizeManager implements ImageResizeManagerInterface
             }
 
             $mediaCacheManager->writeToStorage($resizedImageBinary->getContent(), $storagePath);
+            if ($forceUpdate) {
+                $this->deleteLegacyImage($mediaCacheManager, $storagePath);
+            }
 
             return $resizedImageBinary;
         } finally {
             if (isset($lock)) {
                 $lock->release();
             }
+        }
+    }
+
+    /**
+     * Returns an image that is already stored in the media cache.
+     * An image stored under the legacy (percent-encoded) path is moved to the current path first,
+     * so that the web server can serve it directly from the storage afterwards.
+     */
+    private function getStoredImage(GaufretteFileManager $mediaCacheManager, string $storagePath): ?BinaryInterface
+    {
+        $rawResizedImage = $mediaCacheManager->getFileContent($storagePath, false);
+        if ($rawResizedImage) {
+            return $this->imagineBinaryByFileContentFactory->createImagineBinary($rawResizedImage);
+        }
+
+        $legacyStoragePath = LegacyMediaCachePathHelper::getLegacyPath($storagePath);
+        if ($legacyStoragePath === $storagePath) {
+            return null;
+        }
+
+        $rawResizedImage = $mediaCacheManager->getFileContent($legacyStoragePath, false);
+        if (!$rawResizedImage) {
+            return null;
+        }
+
+        $this->moveLegacyImage($mediaCacheManager, $legacyStoragePath, $storagePath, $rawResizedImage);
+
+        return $this->imagineBinaryByFileContentFactory->createImagineBinary($rawResizedImage);
+    }
+
+    private function moveLegacyImage(
+        GaufretteFileManager $mediaCacheManager,
+        string $legacyStoragePath,
+        string $storagePath,
+        string $rawResizedImage
+    ): void {
+        if ($this->lockFactory instanceof LockFactory) {
+            $lock = $this->lockFactory->createLock(
+                $this->getLockKey($mediaCacheManager, $storagePath),
+                self::LOCK_TTL
+            );
+            $lock->acquire(true);
+        }
+
+        try {
+            if (!$mediaCacheManager->hasFile($storagePath)) {
+                $mediaCacheManager->writeToStorage($rawResizedImage, $storagePath);
+            }
+            $mediaCacheManager->deleteFile($legacyStoragePath);
+        } finally {
+            if (isset($lock)) {
+                $lock->release();
+            }
+        }
+    }
+
+    private function deleteLegacyImage(GaufretteFileManager $mediaCacheManager, string $storagePath): void
+    {
+        $legacyStoragePath = LegacyMediaCachePathHelper::getLegacyPath($storagePath);
+        if ($legacyStoragePath !== $storagePath) {
+            $mediaCacheManager->deleteFile($legacyStoragePath);
         }
     }
 

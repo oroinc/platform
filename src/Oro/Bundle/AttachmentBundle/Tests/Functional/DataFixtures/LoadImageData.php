@@ -16,6 +16,7 @@ class LoadImageData extends AbstractFixture
     public const IMAGE_JPG = 'image_jpg';
     public const IMAGE_WEBP = 'image_webp';
     public const IMAGE_EXTERNAL = 'image_external';
+    public const IMAGE_JPG_NON_ASCII_NAME = 'image_jpg_non_ascii_name';
 
     /**
      * {@inheritdoc}
@@ -46,6 +47,15 @@ class LoadImageData extends AbstractFixture
         $file->setExternalUrl('https://example.org/child.file');
         $manager->persist($file);
         $this->setReference(self::IMAGE_EXTERNAL, $file);
+
+        $file = new File();
+        $file->setFile(new ComponentFile(__DIR__ . '/files/image.jpg'));
+        $file->setOriginalFilename('фото кафе.jpg');
+        $file->setParentEntityClass(User::class);
+        $file->setParentEntityId($this->getFirstUser($manager)->getId());
+        $file->setParentEntityFieldName('avatar');
+        $manager->persist($file);
+        $this->setReference(self::IMAGE_JPG_NON_ASCII_NAME, $file);
 
         $manager->flush();
     }
