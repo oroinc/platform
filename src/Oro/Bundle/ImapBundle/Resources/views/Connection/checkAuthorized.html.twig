@@ -24,8 +24,10 @@
 {{ form_row(form.imapAccountType.userEmailOrigin.folders) }}
 
 {{ form_row(form.imapAccountType.userEmailOrigin.user) }}
-{{ form_row(form.imapAccountType.userEmailOrigin.accessToken) }}
-{{ form_row(form.imapAccountType.userEmailOrigin.refreshToken) }}
+{% if form.imapAccountType.userEmailOrigin.vars.data.id is empty %}
+    {{ form_row(form.imapAccountType.userEmailOrigin.accessToken) }}
+    {{ form_row(form.imapAccountType.userEmailOrigin.refreshToken) }}
+{% endif %}
 {{ form_row(form.imapAccountType.userEmailOrigin.clientId) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.imapPort) }}
 {{ form_row(form.imapAccountType.userEmailOrigin.imapHost) }}
