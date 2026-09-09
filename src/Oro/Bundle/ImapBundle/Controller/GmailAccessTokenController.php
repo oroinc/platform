@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Provider\GoogleOAuthProvider;
 use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
 
@@ -14,6 +15,12 @@ class GmailAccessTokenController extends AbstractAccessTokenController
     protected function getOAuthProvider(): OAuthProviderInterface
     {
         return $this->container->get(GoogleOAuthProvider::class);
+    }
+
+    #[\Override]
+    protected function getAccountType(): string
+    {
+        return AccountTypeModel::ACCOUNT_TYPE_GMAIL;
     }
 
     #[\Override]

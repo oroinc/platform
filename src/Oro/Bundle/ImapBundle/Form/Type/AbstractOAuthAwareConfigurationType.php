@@ -10,12 +10,13 @@ use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OAuthSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthTokenStorage;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -52,7 +53,8 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
         ConfigManager $userConfigManager,
         TokenAccessorInterface $tokenAccessor,
         RequestStack $requestStack,
-        OAuthManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry,
+        protected OAuthTokenStorage $oauthTokenStorage
     ) {
         $this->translator = $translator;
         $this->userConfigManager = $userConfigManager;
@@ -77,7 +79,7 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
         $builder->addEventSubscriber(new CleanupSubscriber());
         $this->addOwnerOrganizationEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
-        $this->addPrepopulateRefreshTokenEventListener($builder);
+        $this->addOAuthTokenEventListener($builder);
         $builder->addEventSubscriber(new OriginFolderSubscriber());
         $builder->addEventSubscriber(new ApplySyncSubscriber());
 
@@ -86,35 +88,10 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
                 'label' => $this->translator->trans('oro.imap.configuration.connect'),
                 'attr' => ['class' => 'btn btn-primary']
             ])
-            ->add('accessToken', HiddenType::class)
-            ->add('refreshToken', HiddenType::class)
-            ->add('accessTokenExpiresAt', HiddenType::class)
+            ->add('oauthTokenHandle', HiddenType::class, ['mapped' => false])
             ->add('accountType', HiddenType::class, [
                 'required'    => false
             ]);
-
-        $builder->get('accessTokenExpiresAt')
-            ->addModelTransformer(new CallbackTransformer(
-                function ($originalAccessTokenExpiresAt) {
-                    if ($originalAccessTokenExpiresAt === null) {
-                        return '';
-                    }
-
-                    $now = new \DateTime('now', new \DateTimeZone('UTC'));
-                    return $originalAccessTokenExpiresAt->format('U') - $now->format('U');
-                },
-                function ($submittedAccessTokenExpiresAt) {
-                    if ($submittedAccessTokenExpiresAt instanceof \DateTime) {
-                        return $submittedAccessTokenExpiresAt;
-                    }
-
-                    $utcTimeZone = new \DateTimeZone('UTC');
-                    $newExpireDate =
-                        new \DateTime('+' . (int)$submittedAccessTokenExpiresAt . ' seconds', $utcTimeZone);
-
-                    return $newExpireDate;
-                }
-            ));
     }
 
     #[\Override]
@@ -186,33 +163,40 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
         );
     }
 
-    protected function addPrepopulateRefreshTokenEventListener(FormBuilderInterface $builder)
+    protected function addOAuthTokenEventListener(FormBuilderInterface $builder): void
     {
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
                 $data = (array) $event->getData();
                 $data['accountType'] = $this->getAccountType();
-                /** @var UserEmailOrigin|null $entity */
-                $entity = $event->getForm()->getData();
-                $filtered = array_filter(
-                    $data,
-                    function ($item) {
-                        return !empty($item);
-                    }
-                );
-                if (count($filtered) > 0) {
-                    $refreshToken = $event->getForm()->get('refreshToken')->getData();
-                    if (empty($data['refreshToken']) && $refreshToken) {
-                        // populate refreshToken
-                        $data['refreshToken'] = $refreshToken;
-                    }
-                    $event->setData($data);
-                } elseif ($entity instanceof UserEmailOrigin) {
-                    $event->getForm()->setData(null);
-                }
+                $event->setData($data);
             },
             4
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = (array) $event->getData();
+                $oauthTokenHandle = $data['oauthTokenHandle'] ?? null;
+                if (empty($oauthTokenHandle)) {
+                    return;
+                }
+
+                /** @var UserEmailOrigin|null $entity */
+                $entity = $form->getData();
+                if (!$entity instanceof UserEmailOrigin) {
+                    $entity = new UserEmailOrigin();
+                    $form->setData($entity);
+                }
+
+                if (!$this->oauthTokenStorage->applyToOrigin($oauthTokenHandle, $this->getAccountType(), $entity)) {
+                    $form->addError(new FormError('Invalid or expired OAuth credentials.'));
+                }
+            },
+            2
         );
     }
 
