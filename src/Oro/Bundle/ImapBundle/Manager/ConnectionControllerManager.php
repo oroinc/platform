@@ -9,12 +9,16 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * This class handle connection forms for IMAP
@@ -26,6 +30,7 @@ class ConnectionControllerManager
     private ManagerRegistry $doctrine;
     private ImapConnectorFactory $imapConnectorFactory;
     private OAuthManagerRegistry $oauthManagerRegistry;
+    private AuthorizationCheckerInterface $authorizationChecker;
     private string $userFormName;
     private string $userFormType;
     private string $emailMailboxFormName;
@@ -53,6 +58,11 @@ class ConnectionControllerManager
         $this->emailMailboxFormType = $emailMailboxFormType;
     }
 
+    public function setAuthorizationChecker(AuthorizationCheckerInterface $authorizationChecker): void
+    {
+        $this->authorizationChecker = $authorizationChecker;
+    }
+
     /**
      * Gets a form to check connection.
      */
@@ -71,7 +81,7 @@ class ConnectionControllerManager
         $form->setData($data);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && !$form->isValid()) {
+        if (!$form->isSubmitted() || !$form->isValid()) {
             throw new Exception('Incorrect setting for IMAP authentication');
         }
 
@@ -191,6 +201,37 @@ class ConnectionControllerManager
             return null;
         }
 
-        return $this->doctrine->getRepository(UserEmailOrigin::class)->find((int)$id);
+        $origin = $this->doctrine->getRepository(UserEmailOrigin::class)->find((int)$id);
+        if ($origin && !$this->isUserEmailOriginAccessGranted($origin)) {
+            throw new AccessDeniedException();
+        }
+
+        return $origin;
+    }
+
+    private function isUserEmailOriginAccessGranted(UserEmailOrigin $origin): bool
+    {
+        // System mailbox case: the origin is linked to a Mailbox and must belong to the same organization.
+        $mailbox = $origin->getMailbox();
+        if (null !== $mailbox) {
+            $mailboxOrganization = $mailbox->getOrganization();
+            $originOrganization = $origin->getOrganization();
+
+            // System mailbox configuration is allowed to users who can edit the mailbox itself.
+            return null !== $mailboxOrganization
+                && null !== $originOrganization
+                && $mailboxOrganization === $originOrganization
+                && $this->authorizationChecker->isGranted(BasicPermission::EDIT, $mailbox);
+        }
+
+        // Personal mailbox case: the origin is owned by a user and belongs to one of the owner's organizations.
+        $owner = $origin->getOwner();
+        $originOrganization = $origin->getOrganization();
+
+        // Personal mailbox configuration is allowed to users who can configure the origin owner.
+        return null !== $owner
+            && $originOrganization instanceof Organization
+            && $owner->hasOrganization($originOrganization)
+            && $this->authorizationChecker->isGranted('CONFIGURE', $owner);
     }
 }

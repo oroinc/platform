@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
@@ -13,13 +14,19 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Office365Imap;
 use Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOAuthManager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailMicrosoftOAuthManager;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -41,6 +48,10 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConnectionControllerManager */
     private $controllerManager;
 
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject  */
+    private $authorizationChecker;
+
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
@@ -48,6 +59,7 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->imapConnectorFactory = $this->createMock(ImapConnectorFactory::class);
         $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->controllerManager = new ConnectionControllerManager(
             $this->formFactory,
@@ -60,6 +72,7 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
             'mailboxForm',
             'mailboxFormType',
         );
+        $this->controllerManager->setAuthorizationChecker($this->authorizationChecker);
     }
 
     public function testGetImapConnectionFormWithoutExistingOriginAndMsFormTypeOnUserPage(): void
@@ -116,7 +129,7 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
             null
         );
 
-        self::assertSame($form, $resultForm);
+        self::assertEquals($form, $resultForm);
     }
 
     public function testGetImapConnectionFormWitExistingOriginAndGoogleFormTypeOnUserPage(): void
@@ -130,10 +143,16 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
         $oauthEmailOrigin->setSmtpHost(GmailImap::DEFAULT_GMAIL_SMTP_HOST);
         $oauthEmailOrigin->setSmtpPort(GmailImap::DEFAULT_GMAIL_SMTP_PORT);
         $oauthEmailOrigin->setSmtpEncryption(GmailImap::DEFAULT_GMAIL_SMTP_SSL);
+        $expectedOauthEmailOrigin = clone $oauthEmailOrigin;
+        $owner = new User();
+        $organization = new Organization();
+        $owner->addOrganization($organization);
+        $oauthEmailOrigin->setOwner($owner);
+        $oauthEmailOrigin->setOrganization($organization);
 
         $accountTypeModel = new AccountTypeModel();
         $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
-        $accountTypeModel->setUserEmailOrigin($oauthEmailOrigin);
+        $accountTypeModel->setUserEmailOrigin($expectedOauthEmailOrigin);
 
         $expectedData = new User();
         $expectedData->setImapAccountType($accountTypeModel);
@@ -148,6 +167,11 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->with(UserEmailOrigin::class)
             ->willReturn($repo);
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CONFIGURE', $owner)
+            ->willReturn(true);
 
         $this->oauthManagerRegistry->expects(self::once())
             ->method('getManager')
@@ -181,6 +205,153 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
             12
         );
 
-        self::assertSame($form, $resultForm);
+        self::assertEquals($form, $resultForm);
+    }
+
+    public function testGetCheckConnectionFormRejectsForeignOriginBeforeCreatingForm(): void
+    {
+        $owner = new User();
+        $organization = new Organization();
+        $owner->addOrganization($organization);
+        $origin = new UserEmailOrigin();
+        $origin->setOwner($owner);
+        $origin->setOrganization($organization);
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects(self::once())
+            ->method('find')
+            ->with(42)
+            ->willReturn($origin);
+
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
+            ->with(UserEmailOrigin::class)
+            ->willReturn($repository);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CONFIGURE', $owner)
+            ->willReturn(false);
+        $this->oauthManagerRegistry->expects(self::never())
+            ->method('getManager');
+        $this->formFactory->expects(self::never())
+            ->method('create');
+        $this->imapConnectorFactory->expects(self::never())
+            ->method('createImapConnector');
+
+        $this->expectException(AccessDeniedException::class);
+
+        $this->controllerManager->getCheckConnectionForm(
+            new Request(request: ['id' => '42']),
+            'userForm'
+        );
+    }
+
+    public function testGetCheckConnectionFormRejectsMailboxOriginWithoutEditPermission(): void
+    {
+        $organization = new Organization();
+        $mailbox = new Mailbox();
+        $mailbox->setOrganization($organization);
+
+        $origin = new UserEmailOrigin();
+        $origin->setOrganization($organization);
+        $origin->setMailbox($mailbox);
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects(self::once())
+            ->method('find')
+            ->with(42)
+            ->willReturn($origin);
+
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
+            ->with(UserEmailOrigin::class)
+            ->willReturn($repository);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with(BasicPermission::EDIT, $mailbox)
+            ->willReturn(false);
+        $this->oauthManagerRegistry->expects(self::never())
+            ->method('getManager');
+
+        $this->expectException(AccessDeniedException::class);
+
+        $this->controllerManager->getCheckConnectionForm(
+            new Request(request: ['id' => '42']),
+            'mailboxForm'
+        );
+    }
+
+    /**
+     * @dataProvider oauthAccountTypeProvider
+     */
+    public function testGetCheckConnectionFormRejectsMissingNamedFormRoot(string $accountType): void
+    {
+        $owner = new User();
+        $organization = new Organization();
+        $owner->addOrganization($organization);
+        $origin = new UserEmailOrigin();
+        $origin->setOwner($owner);
+        $origin->setOrganization($organization);
+        $origin->setAccountType($accountType);
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects(self::once())
+            ->method('find')
+            ->with(42)
+            ->willReturn($origin);
+
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
+            ->with(UserEmailOrigin::class)
+            ->willReturn($repository);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('CONFIGURE', $owner)
+            ->willReturn(true);
+
+        $oauthManager = $this->createMock(OAuthManagerInterface::class);
+        $oauthManager->expects(self::once())
+            ->method('getConnectionFormTypeClass')
+            ->willReturn('connectionFormType');
+        $this->oauthManagerRegistry->expects(self::once())
+            ->method('getManager')
+            ->with($accountType)
+            ->willReturn($oauthManager);
+
+        $form = $this->createMock(FormInterface::class);
+        $this->formFactory->expects(self::once())
+            ->method('create')
+            ->with('connectionFormType', null, ['csrf_protection' => false])
+            ->willReturn($form);
+        $form->expects(self::once())
+            ->method('setData')
+            ->with($origin)
+            ->willReturn($form);
+        $form->expects(self::once())
+            ->method('handleRequest')
+            ->willReturn($form);
+        $form->expects(self::once())
+            ->method('isSubmitted')
+            ->willReturn(false);
+        $form->expects(self::never())
+            ->method('getData');
+        $this->imapConnectorFactory->expects(self::never())
+            ->method('createImapConnector');
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Incorrect setting for IMAP authentication');
+
+        $this->controllerManager->getCheckConnectionForm(
+            new Request(request: ['id' => '42', 'formParentName' => 'userForm']),
+            'userForm'
+        );
+    }
+
+    public function oauthAccountTypeProvider(): array
+    {
+        return [
+            'Gmail' => [AccountTypeModel::ACCOUNT_TYPE_GMAIL],
+            'Microsoft' => [AccountTypeModel::ACCOUNT_TYPE_MICROSOFT]
+        ];
     }
 }

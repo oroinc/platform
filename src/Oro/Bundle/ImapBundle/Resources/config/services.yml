@@ -252,6 +252,8 @@ services:
             - Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
             - oro_email_mailbox
             - Oro\Bundle\EmailBundle\Form\Type\MailboxType
+        calls:
+            - [setAuthorizationChecker, ['@security.authorization_checker']]
 
     oro_imap.async.clear_inactive_mailbox_processor:
         class: Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor
