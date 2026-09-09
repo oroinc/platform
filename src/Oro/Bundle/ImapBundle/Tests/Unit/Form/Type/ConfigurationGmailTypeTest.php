@@ -3,8 +3,10 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
@@ -147,5 +149,23 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         self::assertEquals($accessTokenExpiresAt, $entity->getAccessTokenExpiresAt());
         self::assertEquals('1', $entity->getAccessToken());
         self::assertEquals('111', $entity->getRefreshToken());
+    }
+
+    public function testStoredOAuthTokensAreNotExposedInFormView(): void
+    {
+        $entity = new UserEmailOrigin();
+        $entity->setAccessToken('stored-access-token');
+        $entity->setRefreshToken('stored-refresh-token');
+
+        $idProperty = new \ReflectionProperty(EmailOrigin::class, 'id');
+        $idProperty->setValue($entity, 42);
+
+        $form = $this->factory->create(ConfigurationGmailType::class, $entity);
+        $view = $form->createView();
+
+        self::assertEquals('', $view->children['accessToken']->vars['value']);
+        self::assertEquals('', $view->children['refreshToken']->vars['value']);
+        self::assertEquals('stored-access-token', $entity->getAccessToken());
+        self::assertEquals('stored-refresh-token', $entity->getRefreshToken());
     }
 }
