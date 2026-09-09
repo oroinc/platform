@@ -74,4 +74,47 @@ class ImageFileNamesProviderTest extends TestCase
             $this->fileNamesProvider->getFileNames($file)
         );
     }
+
+    public function testGetFileNamesAddsLegacyFileNamesForNonAsciiFileName(): void
+    {
+        $file = $this->createMock(File::class);
+
+        $this->filterConfiguration->expects(self::once())
+            ->method('all')
+            ->willReturn(['filter1' => []]);
+        $this->imagePathProvider->expects(self::exactly(2))
+            ->method('getPathForFilteredImage')
+            ->withConsecutive(
+                [$file, 'filter1'],
+                [$file, 'filter1', 'webp']
+            )
+            ->willReturnOnConsecutiveCalls(
+                '/attachment/filter/filter1/café.jpg',
+                '/attachment/filter/filter1/café.jpg.webp'
+            );
+        $this->imagePathProvider->expects(self::exactly(2))
+            ->method('getPathForResizedImage')
+            ->withConsecutive(
+                [$file, 1, 1],
+                [$file, 1, 1, 'webp']
+            )
+            ->willReturnOnConsecutiveCalls(
+                '/attachment/resize/1/1/café.jpg',
+                '/attachment/resize/1/1/café.jpg.webp'
+            );
+
+        self::assertSame(
+            [
+                'attachment/filter/filter1/café.jpg',
+                'attachment/filter/filter1/café.jpg.webp',
+                'attachment/resize/1/1/café.jpg',
+                'attachment/resize/1/1/café.jpg.webp',
+                'attachment/filter/filter1/caf%C3%A9.jpg',
+                'attachment/filter/filter1/caf%C3%A9.jpg.webp',
+                'attachment/resize/1/1/caf%C3%A9.jpg',
+                'attachment/resize/1/1/caf%C3%A9.jpg.webp',
+            ],
+            $this->fileNamesProvider->getFileNames($file)
+        );
+    }
 }
