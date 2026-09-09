@@ -188,6 +188,16 @@ class ResizedImagePathProviderDecoratorTest extends TestCase
                 'path'         => '/sample/foo-baz/bar/file.jpg',
                 'prefix'       => '/sample/foo',
                 'expectedPath' => '/sample/foo-baz/bar/file.jpg'
+            ],
+            [
+                'path'         => '/media/cache/attachment/filter/avatar_med/1/файл.jpg',
+                'prefix'       => 'media/cache',
+                'expectedPath' => '/attachment/filter/avatar_med/1/файл.jpg'
+            ],
+            [
+                'path'         => '/admin/media/cache/attachment/filter/avatar_med/1/café.jpg',
+                'prefix'       => '/admin/media/cache/',
+                'expectedPath' => '/attachment/filter/avatar_med/1/café.jpg'
             ]
         ];
     }

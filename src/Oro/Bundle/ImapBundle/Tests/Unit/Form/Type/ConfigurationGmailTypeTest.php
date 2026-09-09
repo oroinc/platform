@@ -5,10 +5,12 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthTokenStorage;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -26,6 +28,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
     private ConfigManager&MockObject $userConfigManager;
     private RequestStack&MockObject $requestStack;
     private OAuthManagerRegistry&MockObject $oauthManagerRegistry;
+    private OAuthTokenStorage&MockObject $oauthTokenStorage;
 
     #[\Override]
     protected function setUp(): void
@@ -34,6 +37,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         $this->userConfigManager = $this->createMock(ConfigManager::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
+        $this->oauthTokenStorage = $this->createMock(OAuthTokenStorage::class);
 
         $user = $this->createMock(User::class);
         $organization = $this->createMock(Organization::class);
@@ -76,7 +80,8 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                             $this->userConfigManager,
                             $this->tokenAccessor,
                             $this->requestStack,
-                            $this->oauthManagerRegistry
+                            $this->oauthManagerRegistry,
+                            $this->oauthTokenStorage
                         )
                     ],
                     [
@@ -103,6 +108,19 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
     {
         $accessTokenExpiresAt = new \DateTime();
 
+        $this->oauthTokenStorage->expects(self::once())
+            ->method('applyToOrigin')
+            ->with('oauth-token-handle', 'gmail', self::isInstanceOf(UserEmailOrigin::class))
+            ->willReturnCallback(
+                function (string $handle, string $type, UserEmailOrigin $origin) use ($accessTokenExpiresAt) {
+                    $origin->setAccessToken('1');
+                    $origin->setRefreshToken('111');
+                    $origin->setAccessTokenExpiresAt($accessTokenExpiresAt);
+
+                    return true;
+                }
+            );
+
         $form = $this->factory->create(ConfigurationGmailType::class);
         $form->submit([
             'user' => 'test',
@@ -112,9 +130,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
             'smtpHost' => 'smtp.gmail.com',
             'smtpPort' => '993',
             'smtpEncryption' => 'ssl',
-            'accessTokenExpiresAt' => $accessTokenExpiresAt,
-            'accessToken' => '1',
-            'refreshToken' => '111'
+            'oauthTokenHandle' => 'oauth-token-handle'
         ]);
 
         self::assertEquals('test', $form->get('user')->getData());
@@ -124,9 +140,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         self::assertEquals('smtp.gmail.com', $form->get('smtpHost')->getData());
         self::assertEquals('993', $form->get('smtpPort')->getData());
         self::assertEquals('ssl', $form->get('smtpEncryption')->getData());
-        self::assertEquals($accessTokenExpiresAt, $form->get('accessTokenExpiresAt')->getData());
-        self::assertEquals('1', $form->get('accessToken')->getData());
-        self::assertEquals('111', $form->get('refreshToken')->getData());
+        self::assertEquals('oauth-token-handle', $form->get('oauthTokenHandle')->getData());
 
         $entity = $form->getData();
 
@@ -140,5 +154,43 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         self::assertEquals($accessTokenExpiresAt, $entity->getAccessTokenExpiresAt());
         self::assertEquals('1', $entity->getAccessToken());
         self::assertEquals('111', $entity->getRefreshToken());
+    }
+
+    public function testStoredOAuthTokensAreNotExposedInFormView(): void
+    {
+        $entity = new UserEmailOrigin();
+        $entity->setAccessToken('stored-access-token');
+        $entity->setRefreshToken('stored-refresh-token');
+
+        $form = $this->factory->create(ConfigurationGmailType::class, $entity);
+        $view = $form->createView();
+
+        self::assertArrayNotHasKey('accessToken', $view->children);
+        self::assertArrayNotHasKey('refreshToken', $view->children);
+        self::assertArrayNotHasKey('accessTokenExpiresAt', $view->children);
+        self::assertEquals('', $view->children['oauthTokenHandle']->vars['value']);
+        self::assertEquals('stored-access-token', $entity->getAccessToken());
+        self::assertEquals('stored-refresh-token', $entity->getRefreshToken());
+    }
+
+    public function testStoredOAuthTokensArePreservedWhenNotSubmitted(): void
+    {
+        $entity = new UserEmailOrigin();
+        $entity->setAccessToken('stored-access-token');
+        $entity->setRefreshToken('stored-refresh-token');
+
+        $form = $this->factory->create(ConfigurationGmailType::class, $entity);
+        $form->submit([
+            'user' => 'test',
+            'imapHost' => 'imap.gmail.com',
+            'imapPort' => '993',
+            'imapEncryption' => 'ssl',
+            'smtpHost' => 'smtp.gmail.com',
+            'smtpPort' => '993',
+            'smtpEncryption' => 'ssl',
+        ]);
+
+        self::assertEquals('stored-access-token', $entity->getAccessToken());
+        self::assertEquals('stored-refresh-token', $entity->getRefreshToken());
     }
 }

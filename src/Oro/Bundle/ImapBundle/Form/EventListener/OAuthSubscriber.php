@@ -34,26 +34,17 @@ class OAuthSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::PRE_SUBMIT    => 'setToken',
+            FormEvents::PRE_SUBMIT    => 'updateFormOnSubmit',
             FormEvents::PRE_SET_DATA  => 'extendForm',
             FormEvents::POST_SET_DATA => 'disableFoldersButton'
         ];
     }
 
-    public function setToken(FormEvent $formEvent)
+    public function updateFormOnSubmit(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
         /** @var UserEmailOrigin $emailOrigin */
         $emailOrigin = $form->getData();
-
-        if (null === $emailOrigin || null === $emailOrigin->getAccessToken()) {
-            $data = $formEvent->getData();
-            if (null === $data || !isset($data['accessToken'])) {
-                return;
-            }
-            $emailOrigin = new UserEmailOrigin();
-            $emailOrigin->setAccessToken($data['accessToken']);
-        }
 
         if ($emailOrigin instanceof UserEmailOrigin) {
             $this->updateForm($form, $emailOrigin);

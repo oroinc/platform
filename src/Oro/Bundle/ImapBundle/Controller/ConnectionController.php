@@ -71,18 +71,18 @@ class ConnectionController extends AbstractController
     public function getFormAction(Request $request): JsonResponse
     {
         $type = $request->get('type');
-        $token = $request->get('accessToken');
+        $oauthTokenHandle = $request->get('oauthTokenHandle');
         $formParentName = $request->get('formParentName');
 
         $connectionControllerManager = $this->container->get(ConnectionControllerManager::class);
         $form = $connectionControllerManager->getImapConnectionForm(
             $type,
-            $token,
+            $oauthTokenHandle,
             $formParentName,
             $request->get('id')
         );
 
-        if ($token) {
+        if ($oauthTokenHandle) {
             $html = $this->renderView('@OroImap/Form/accountTypeAuthorized.html.twig', [
                 'form' => $form->createView(),
             ]);
