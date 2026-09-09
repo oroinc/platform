@@ -85,6 +85,10 @@ class EmailTemplateController extends AbstractController
      */
     public function cloneAction(EmailTemplate $entity, Request $request)
     {
+        if (!$this->isGranted('VIEW', $entity)) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->update(clone $entity, $request, true);
     }
 
