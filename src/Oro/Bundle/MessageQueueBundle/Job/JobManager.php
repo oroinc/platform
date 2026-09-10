@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Job;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -200,9 +201,21 @@ class JobManager implements JobManagerInterface
                 'jobProgress' => Type::FLOAT,
             ]);
 
-        $qb->execute();
+        if ($connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            // RETURNING is used instead of lastInsertId(): LASTVAL() returns the last value of any sequence
+            // in the session, so a trigger on the table (e.g. replication) makes it return a foreign id.
+            $id = $connection->fetchOne(
+                sprintf('%s RETURNING id', $qb->getSQL()),
+                $qb->getParameters(),
+                $qb->getParameterTypes()
+            );
+        } else {
+            // MySQL restores LAST_INSERT_ID() after a trigger, so it is not affected.
+            $qb->execute();
+            $id = $connection->lastInsertId();
+        }
 
-        $job->setId($connection->lastInsertId());
+        $job->setId($id);
     }
 
     private function updateJob(Job $job, EntityManager $em): void
