@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
@@ -242,8 +243,11 @@ class ConfigLoader
         }
 
         if ($hasChanges) {
-            $this->connection->executeStatement($sql, $params, $types);
-            $entityConfigId = $entityConfigId ?: (int) $this->connection->lastInsertId();
+            if (null === $entityConfigId) {
+                $entityConfigId = $this->executeInsertAndGetId($sql, $params, $types);
+            } else {
+                $this->connection->executeStatement($sql, $params, $types);
+            }
             $this->prepareEntityIndexQueries($entityConfigId, $className, $data);
         }
 
@@ -256,6 +260,23 @@ class ConfigLoader
             $associationType = $metadata->isSingleValuedAssociation($associationName) ? 'ref-one' : 'ref-many';
             $this->loadFieldConfigs($entityConfigId, $className, $associationName, $associationType, $classMetadata);
         }
+    }
+
+    /**
+     * Executes the given INSERT statement and returns the identifier of the inserted record.
+     */
+    private function executeInsertAndGetId(string $sql, array $params, array $types): int
+    {
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            // lastInsertId() relies on LASTVAL() on PostgreSQL, which returns an ID of another sequence
+            // when a trigger on the table inserts into other tables (e.g. SymmetricDS replication).
+            return (int) $this->connection->fetchOne(sprintf('%s RETURNING id', $sql), $params, $types);
+        }
+
+        // MySQL is not affected: LAST_INSERT_ID() is restored when a trigger ends.
+        $this->connection->executeStatement($sql, $params, $types);
+
+        return (int) $this->connection->lastInsertId();
     }
 
     private function loadFieldConfigs(
