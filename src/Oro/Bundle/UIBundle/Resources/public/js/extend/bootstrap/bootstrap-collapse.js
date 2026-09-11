@@ -198,7 +198,7 @@ $(document)
     .on('initLayout', function(event) {
         $(event.target).find('[data-toggle="collapse"]').each(function(index, el) {
             const $collapse = $($(el).attr('data-target') || $(el).attr('href'));
-            const state = persistentStorage.getItem($collapse.attr('data-sate-id'));
+            const state = persistentStorage.getItem($collapse.attr('data-state-id'));
 
             if ($collapse.data('check-overflow')) {
                 $collapse.attr('data-toggle', false);
