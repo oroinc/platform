@@ -26,7 +26,7 @@
         'route': 'oro_user_view',
         'params': {'id': '$id'}
     }) %}
-    {% if is_granted('oro_user_create') %}
+    {% if is_granted('oro_user_user_create') %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_user_create'
         }) %}
