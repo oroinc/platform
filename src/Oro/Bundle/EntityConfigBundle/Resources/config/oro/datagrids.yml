@@ -136,7 +136,7 @@ datagrids:
     # Attribute fields datagrid
     attributes-grid:
         extends: base-entityfields-grid
-        acl_resource: oro_attributes_manage
+        acl_resource: oro_entityconfig_manage
         options:
             entityHint: oro.entity_config.attribute.entity_plural_label
         source:
@@ -266,7 +266,7 @@ datagrids:
                     is_entity: false
                     field_name: ~ # set from buildBefore in event listener
     attribute-family-grid:
-        acl_resource: oro_attribute_family_manage
+        acl_resource: oro_attribute_family_view
         source:
             type:         orm
             query:
