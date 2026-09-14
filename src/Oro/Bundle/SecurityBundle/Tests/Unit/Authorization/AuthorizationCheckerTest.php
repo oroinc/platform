@@ -12,7 +12,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AuthorizationCheckerTest extends TestCase
 {
@@ -242,6 +245,58 @@ class AuthorizationCheckerTest extends TestCase
         self::assertTrue($result);
     }
 
+    public function testIsGrantedLogsWarningWhenAllVotersAbstained(): void
+    {
+        $subject = new \stdClass();
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $subject, self::isInstanceOf(AccessDecision::class))
+            ->willReturnCallback(function (mixed $attribute, mixed $subject, AccessDecision $accessDecision): bool {
+                $accessDecision->votes = [
+                    $this->createVote(VoterInterface::ACCESS_ABSTAIN),
+                    $this->createVote(VoterInterface::ACCESS_ABSTAIN)
+                ];
+
+                return true;
+            });
+        $this->logger->expects(self::once())
+            ->method('warning')
+            ->with(
+                'All security voters abstained from voting.',
+                ['attribute' => 'PERMISSION', 'subject' => $subject]
+            );
+
+        self::assertTrue($this->authorizationChecker->isGranted('PERMISSION', $subject));
+    }
+
+    public function testIsGrantedDoesNotLogWarningWhenNotAllVotersAbstained(): void
+    {
+        $subject = new \stdClass();
+        $this->attributeProvider->expects(self::once())
+            ->method('findAttributeById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $subject, self::isInstanceOf(AccessDecision::class))
+            ->willReturnCallback(function (mixed $attribute, mixed $subject, AccessDecision $accessDecision): bool {
+                $accessDecision->votes = [
+                    $this->createVote(VoterInterface::ACCESS_ABSTAIN),
+                    $this->createVote(VoterInterface::ACCESS_GRANTED)
+                ];
+
+                return true;
+            });
+        $this->logger->expects(self::never())
+            ->method('warning');
+
+        self::assertTrue($this->authorizationChecker->isGranted('PERMISSION', $subject));
+    }
+
     public function testIsGrantedForNotAclProtectedClass(): void
     {
         $obj = 'Test\Class';
@@ -263,5 +318,13 @@ class AuthorizationCheckerTest extends TestCase
 
         $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
         self::assertTrue($result);
+    }
+
+    private function createVote(int $result): Vote
+    {
+        $vote = new Vote();
+        $vote->result = $result;
+
+        return $vote;
     }
 }
