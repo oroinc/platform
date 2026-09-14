@@ -58,6 +58,10 @@ class EmailTemplateController extends AbstractController
     #[AclAncestor('oro_email_emailtemplate_create')]
     public function cloneAction(EmailTemplate $entity, Request $request)
     {
+        if (!$this->isGranted('VIEW', $entity)) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->update(clone $entity, $request, true);
     }
 

@@ -173,6 +173,10 @@ class ReportController extends AbstractController
     #[AclAncestor('oro_report_create')]
     public function cloneAction(Report $entity, Request $request)
     {
+        if (!$this->isGranted('VIEW', $entity)) {
+            throw $this->createAccessDeniedException();
+        }
+
         $this->checkReport($entity);
 
         $clonedEntity = clone $entity;

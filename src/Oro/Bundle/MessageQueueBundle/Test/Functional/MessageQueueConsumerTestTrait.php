@@ -35,21 +35,78 @@ trait MessageQueueConsumerTestTrait
         return self::getContainer()->get('logger');
     }
 
-    protected static function purgeMessageQueue(string $queueName = 'oro.default'): void
+    /**
+     * Removes messages from the queue. When no queue name is given, every queue is purged: messages left in a queue
+     * the test does not consume from would otherwise survive the test and leak into the next one.
+     */
+    protected static function purgeMessageQueue(?string $queueName = null): void
+    {
+        $connection = self::getMessageQueueDbalConnection();
+        if (null === $connection) {
+            return;
+        }
+
+        $tableName = $connection->getDBALConnection()->quoteIdentifier($connection->getTableName());
+        if (null === $queueName) {
+            $connection->getDBALConnection()->executeStatement('DELETE FROM ' . $tableName);
+
+            return;
+        }
+
+        $connection->getDBALConnection()->executeStatement(
+            'DELETE FROM ' . $tableName . ' WHERE queue = :queueName',
+            ['queueName' => $queueName],
+            ['queueName' => Types::STRING]
+        );
+    }
+
+    /**
+     * Describes what is currently in the message queue, per queue: how many messages there are in total, how many are
+     * claimed by a consumer (and are therefore invisible to any other consumer) and how many are not due yet.
+     * Meant for failure diagnostics - it tells apart "nothing was produced" from "messages are there but unreachable".
+     */
+    protected static function getMessageQueueStateDump(): string
+    {
+        $connection = self::getMessageQueueDbalConnection();
+        if (null === $connection) {
+            return 'message queue state is not available: the transport is not DBAL';
+        }
+
+        $tableName = $connection->getDBALConnection()->quoteIdentifier($connection->getTableName());
+        $rows = $connection->getDBALConnection()->fetchAllAssociative(
+            'SELECT queue, COUNT(*) AS total, COUNT(consumer_id) AS claimed,'
+            . ' SUM(CASE WHEN delayed_until > :now THEN 1 ELSE 0 END) AS delayed'
+            . ' FROM ' . $tableName . ' GROUP BY queue ORDER BY queue',
+            ['now' => time()],
+            ['now' => Types::INTEGER]
+        );
+
+        if (!$rows) {
+            return 'the message queue is empty';
+        }
+
+        $lines = [];
+        foreach ($rows as $row) {
+            $lines[] = sprintf(
+                '  %s: %d message(s), %d claimed by a consumer, %d not due yet',
+                $row['queue'],
+                $row['total'],
+                $row['claimed'],
+                (int)$row['delayed']
+            );
+        }
+
+        return implode(PHP_EOL, $lines);
+    }
+
+    private static function getMessageQueueDbalConnection(): ?DbalConnection
     {
         $connection = self::getContainer()->get(
             'oro_message_queue.transport.connection',
             ContainerInterface::NULL_ON_INVALID_REFERENCE
         );
 
-        if ($connection instanceof DbalConnection) {
-            $tableName = $connection->getDBALConnection()->quoteIdentifier($connection->getTableName());
-            $connection->getDBALConnection()->executeStatement(
-                'DELETE FROM ' . $tableName . ' WHERE queue = :queueName',
-                ['queueName' => $queueName],
-                ['queueName' => Types::STRING]
-            );
-        }
+        return $connection instanceof DbalConnection ? $connection : null;
     }
 
     protected static function sendMessage(
@@ -85,9 +142,7 @@ trait MessageQueueConsumerTestTrait
             $queueConsumer = self::getConsumer();
 
             // Unbinds queue so consumption can start more than 1 time.
-            \Closure::bind(static function (QueueConsumer $queueConsumer) {
-                unset($queueConsumer->boundQueues['oro.default']);
-            }, null, QueueConsumer::class)($queueConsumer);
+            $queueConsumer->unbindQueues('oro.default');
 
             $queueConsumer
                 ->bindQueue('oro.default')

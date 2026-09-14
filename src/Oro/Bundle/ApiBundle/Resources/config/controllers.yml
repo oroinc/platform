@@ -20,6 +20,7 @@ services:
             - '@translator'
             - '@doctrine'
             - '@oro_message_queue.client.message_producer'
+            - '@security.authorization_checker'
 
     Oro\Bundle\ApiBundle\Controller\DownloadOpenApiSpecificationController:
         arguments:

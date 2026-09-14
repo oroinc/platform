@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthProvider;
 use Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthScopeProvider;
 use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
@@ -22,16 +23,25 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
     public function accessTokenAction(Request $request): Response
     {
         if ($request->isXmlHttpRequest()) {
-            return $this->restoreResponse($request->getSession());
+            return new JsonResponse($this->createClientResponse($this->restoreResponse($request->getSession())));
         }
 
-        return $this->storeResponse($request->getSession(), parent::accessTokenAction($request));
+        return $this->storeResponse(
+            $request->getSession(),
+            new JsonResponse($this->getAccessTokenResponse($request))
+        );
     }
 
     #[\Override]
     protected function getOAuthProvider(): OAuthProviderInterface
     {
         return $this->container->get(MicrosoftOAuthProvider::class);
+    }
+
+    #[\Override]
+    protected function getAccountType(): string
+    {
+        return AccountTypeModel::ACCOUNT_TYPE_MICROSOFT;
     }
 
     #[\Override]
@@ -68,22 +78,22 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         return new Response();
     }
 
-    private function restoreResponse(SessionInterface $session): Response
+    private function restoreResponse(SessionInterface $session): array
     {
         $token = $session->get(self::ACCESS_TOKEN_DATA_SESSION_KEY);
         if (null === $token) {
-            return new JsonResponse([
+            return [
                 'error' => $this->trans('oro.imap.oauth.manager.microsoft.error.token')
-            ]);
+            ];
         }
 
         $session->remove(self::ACCESS_TOKEN_DATA_SESSION_KEY);
 
         $response = json_decode($token, true, 512, JSON_THROW_ON_ERROR);
         if (!\array_key_exists('refresh_token', $response)) {
-            return new JsonResponse([
+            return [
                 'error' => $this->trans('oro.imap.oauth.manager.microsoft.error.token')
-            ]);
+            ];
         }
 
         /**
@@ -101,7 +111,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         $userInfo = $oauthProvider->getUserInfo($accessTokenData->getAccessToken());
         $response['email_address'] = $userInfo->getEmail();
 
-        return new JsonResponse($response);
+        return $response;
     }
 
     #[\Override]

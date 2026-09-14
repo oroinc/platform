@@ -73,6 +73,17 @@ features:
         entities:
             - 'Oro\Bundle\EmailBundle\Entity\Email'
             - 'Oro\Bundle\EmailBundle\Entity\EmailUser'
+        datagrids:
+            - 'activity-email-grid'
+            - 'base-email-grid'
+            - 'dashboard-recent-emails-grid'
+            - 'dashboard-recent-emails-inbox-grid'
+            - 'dashboard-recent-emails-new-grid'
+            - 'dashboard-recent-emails-sent-grid'
+            - 'email-for-context-grid'
+            - 'email-grid'
+            - 'simplified-email-grid'
+            - 'user-email-grid'
         commands:
             - 'oro:cron:email-body-sync'
         cron_jobs:

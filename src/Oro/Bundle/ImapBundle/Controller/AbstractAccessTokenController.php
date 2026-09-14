@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Controller;
 
 use HWI\Bundle\OAuthBundle\OAuth\Exception\HttpTransportException;
+use Oro\Bundle\ImapBundle\Manager\OAuthTokenStorage;
 use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,11 +18,20 @@ abstract class AbstractAccessTokenController extends AbstractController
 {
     public function accessTokenAction(Request $request): Response
     {
+        return new JsonResponse($this->createClientResponse($this->getAccessTokenResponse($request)));
+    }
+
+    abstract protected function getOAuthProvider(): OAuthProviderInterface;
+
+    abstract protected function getAccountType(): string;
+
+    protected function getAccessTokenResponse(Request $request): array
+    {
         $code = $request->get('code');
         if (!$code) {
-            return new JsonResponse([
+            return [
                 'error' => $request->get('error_description') ?: $this->trans('oro.imap.oauth.manager.token.error')
-            ]);
+            ];
         }
 
         $scopes = null;
@@ -36,10 +46,27 @@ abstract class AbstractAccessTokenController extends AbstractController
             $response = ['error' => $e->getMessage()];
         }
 
-        return new JsonResponse($response);
+        return $response;
     }
 
-    abstract protected function getOAuthProvider(): OAuthProviderInterface;
+    protected function createClientResponse(array $response): array
+    {
+        if (isset($response['error'])) {
+            return $response;
+        }
+
+        $handle = $this->container->get(OAuthTokenStorage::class)->saveAccessTokenAndReturnHandleCode(
+            $this->getAccountType(),
+            $response['access_token'],
+            $response['refresh_token'] ?? null,
+            $response['expires_in'] ?? null
+        );
+
+        return [
+            'oauth_token_handle' => $handle,
+            'email_address' => $response['email_address']
+        ];
+    }
 
     protected function trans(string $id): string
     {
@@ -83,6 +110,7 @@ abstract class AbstractAccessTokenController extends AbstractController
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
+                OAuthTokenStorage::class,
             ]
         );
     }

@@ -145,6 +145,13 @@ class JobManagerTest extends WebTestCase
         // guard - job should be saved
         $this->assertNotEmpty($job->getId());
 
+        // the id must be the id of the inserted row, not a value derived from the session state
+        $insertedJobId = $this->getJobEntityManager()->getConnection()->fetchOne(
+            'SELECT id FROM oro_message_queue_job WHERE owner_id = :ownerId AND name = :name',
+            ['ownerId' => '2-owner-id', 'name' => '2-name']
+        );
+        $this->assertEquals($insertedJobId, $job->getId());
+
         $createdJob = $this->getJobRepository()->findJobById($job->getId());
 
         $this->assertEquals($job->getId(), $createdJob->getId());

@@ -127,6 +127,7 @@ services:
              - '@oro_security.token_accessor'
              - '@request_stack'
              - '@oro_imap.oauth_manager_registry'
+             - '@oro_imap.oauth_token_storage'
         tags:
              - { name: form.type, alias: oro_imap_configuration_gmail }
 
@@ -138,6 +139,7 @@ services:
              - '@oro_security.token_accessor'
              - '@request_stack'
              - '@oro_imap.oauth_manager_registry'
+             - '@oro_imap.oauth_token_storage'
         tags:
              - { name: form.type }
 
@@ -237,6 +239,15 @@ services:
     Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager:
         alias: oro_imap.manager.controller.connection
 
+    Oro\Bundle\ImapBundle\Manager\OAuthTokenStorage:
+        alias: oro_imap.oauth_token_storage
+
+    oro_imap.oauth_token_storage:
+        class: Oro\Bundle\ImapBundle\Manager\OAuthTokenStorage
+        arguments:
+            - '@request_stack'
+            - '@oro_security.token_accessor'
+
     oro_imap.manager.controller.connection:
         class: Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager
         public: true
@@ -246,6 +257,8 @@ services:
             - '@doctrine'
             - '@oro_imap.connector.factory'
             - '@oro_imap.oauth_manager_registry'
+            - '@security.authorization_checker'
+            - '@oro_imap.oauth_token_storage'
             - oro_user_emailsettings
             - Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
             - oro_email_mailbox

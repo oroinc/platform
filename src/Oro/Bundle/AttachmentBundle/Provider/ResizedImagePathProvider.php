@@ -34,6 +34,6 @@ class ResizedImagePathProvider implements ResizedImagePathProviderInterface
 
     private function normalizePath(string $path): string
     {
-        return '/' . ltrim($path, '/');
+        return '/' . ltrim(rawurldecode($path), '/');
     }
 }

@@ -98,18 +98,30 @@ class GridRow extends TableRow
     public function startInlineEditing($header)
     {
         $cell = $this->getCellByHeader($header);
-        $cell->focus();
-        $cell->mouseOver();
 
-        /** @var NodeElement $pencilIcon */
-        $pencilIcon = $cell->find('css', '[data-role="edit"]');
-        self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
-        self::assertTrue(
-            $pencilIcon->isValid() && $pencilIcon->isVisible(),
-            "Cell with '$header' is not inline editable"
-        );
+        $isEditingStarted = $this->spin(function () use ($cell) {
+            foreach ($this->findAll('xpath', 'child::td|child::th') as $awayCell) {
+                if ($awayCell->getXpath() !== $cell->getXpath()) {
+                    $awayCell->mouseOver();
+                    break;
+                }
+            }
 
-        $pencilIcon->click();
+            $cell->focus();
+            $cell->mouseOver();
+
+            /** @var NodeElement $pencilIcon */
+            $pencilIcon = $cell->find('css', '[data-role="edit"]');
+            if (null === $pencilIcon || !$pencilIcon->isValid() || !$pencilIcon->isVisible()) {
+                return null;
+            }
+
+            $pencilIcon->click();
+
+            return true;
+        }, 5);
+
+        self::assertNotNull($isEditingStarted, "Cell with '$header' is not inline editable");
 
         return $cell;
     }

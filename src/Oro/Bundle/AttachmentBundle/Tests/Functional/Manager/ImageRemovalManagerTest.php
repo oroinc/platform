@@ -54,4 +54,24 @@ class ImageRemovalManagerTest extends WebTestCase
         $this->removeFiles($file);
         $this->assertFilesDoNotExist($file, $fileNames);
     }
+
+    public function testRemoveFilesForImageWithNonAsciiOriginalFilename(): void
+    {
+        $file = $this->createFileEntity();
+        $file->setOriginalFilename('фото кафе.jpg');
+        $this->saveFileEntity($file);
+
+        $this->applyImageFilter($file, 'avatar_med');
+        $this->applyImageFilter($file, 'avatar_xsmall');
+
+        $fileNames = $this->getImageFileNames($file);
+        self::assertCount(4, $fileNames);
+        foreach ($fileNames as $fileName) {
+            self::assertStringContainsString('фото-кафе', $fileName);
+            self::assertStringNotContainsString('%', $fileName);
+        }
+
+        $this->removeFiles($file);
+        $this->assertFilesDoNotExist($file, $fileNames);
+    }
 }

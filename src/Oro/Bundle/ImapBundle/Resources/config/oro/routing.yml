@@ -12,6 +12,8 @@ oro_imap_gmail_connection_check:
     path: '/gmail/connection/check'
     controller: Oro\Bundle\ImapBundle\Controller\CheckConnectionController::checkAction
     methods: [POST]
+    defaults:
+        accountType: gmail
 
 oro_imap_microsoft_access_token:
     path: '/microsoft-identity/connection/access-token'
@@ -22,3 +24,5 @@ oro_imap_microsoft_connection_check:
     path: '/microsoft-identity/connection/check'
     controller: Oro\Bundle\ImapBundle\Controller\CheckConnectionController::checkAction
     methods: [POST]
+    defaults:
+        accountType: microsoft

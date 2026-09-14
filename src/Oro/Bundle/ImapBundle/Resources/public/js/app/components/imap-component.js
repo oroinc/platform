@@ -50,8 +50,7 @@ const ImapComponent = BaseComponent.extend({
         const viewConfig = this.prepareViewOptions(options);
         this.view = new this.ViewType(viewConfig);
 
-        this.view.setAccessToken(_.result(options, 'accessToken') || '');
-        this.view.setExpiredAt(_.result(options, 'accessTokenExpiresAt') || '');
+        this.view.setOAuthTokenHandle(_.result(options, 'oauthTokenHandle') || '');
         this.view.setEmail(_.result(options, 'user') || '');
 
         this.listenTo(this.view, 'getFolders', this.onGetFolders);
@@ -149,9 +148,7 @@ const ImapComponent = BaseComponent.extend({
             }
         } else if (response) {
             this.view.setEmail(response.email_address);
-            this.view.setAccessToken(response.access_token);
-            this.view.setRefreshToken(response.refresh_token);
-            this.view.setExpiredAt(response.expires_in);
+            this.view.setOAuthTokenHandle(response.oauth_token_handle);
             this.view.render();
             mediator.trigger('change:systemMailBox:email', {email: response.email_address});
 

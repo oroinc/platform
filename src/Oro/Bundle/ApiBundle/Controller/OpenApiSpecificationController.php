@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -34,7 +36,8 @@ class OpenApiSpecificationController
         private EntityDeleteHandlerRegistry $deleteHandlerRegistry,
         private TranslatorInterface $translator,
         private ManagerRegistry $doctrine,
-        private MessageProducerInterface $producer
+        private MessageProducerInterface $producer,
+        private AuthorizationCheckerInterface $authorizationChecker
     ) {
     }
 
@@ -120,6 +123,8 @@ class OpenApiSpecificationController
     #[Template('@OroApi/OpenApiSpecification/create.html.twig')]
     public function cloneAction(OpenApiSpecification $entity, Request $request): array|Response
     {
+        $this->assertGranted('VIEW', $entity);
+
         $newEntity = new OpenApiSpecification();
         $newEntity->setOrganization($entity->getOrganization());
         $newEntity->setOwner($entity->getOwner());
@@ -144,9 +149,11 @@ class OpenApiSpecificationController
         requirements: ['id' => '\d+'],
         methods: ['POST']
     )]
-    #[AclAncestor('oro_openapi_specification_create')]
+    #[AclAncestor('oro_openapi_specification_update')]
     public function renewAction(OpenApiSpecification $entity): Response
     {
+        $this->assertGranted('EDIT', $entity);
+
         if ($entity->getStatus() === OpenApiSpecification::STATUS_CREATING) {
             return new JsonResponse(['successful' => false]);
         }
@@ -172,9 +179,11 @@ class OpenApiSpecificationController
         requirements: ['id' => '\d+'],
         methods: ['POST']
     )]
-    #[AclAncestor('oro_openapi_specification_create')]
+    #[AclAncestor('oro_openapi_specification_update')]
     public function publishAction(OpenApiSpecification $entity): Response
     {
+        $this->assertGranted('EDIT', $entity);
+
         if ($entity->isPublished() || null === $entity->getSpecificationCreatedAt()) {
             return new JsonResponse(['successful' => false]);
         }
@@ -194,5 +203,12 @@ class OpenApiSpecificationController
     private function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass(OpenApiSpecification::class);
+    }
+
+    private function assertGranted(string $permission, OpenApiSpecification $entity): void
+    {
+        if (!$this->authorizationChecker->isGranted($permission, $entity)) {
+            throw new AccessDeniedException();
+        }
     }
 }

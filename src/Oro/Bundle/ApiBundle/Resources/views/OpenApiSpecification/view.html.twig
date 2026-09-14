@@ -17,7 +17,7 @@
             'title': 'oro.api.open_api.specification.download_button.tooltip'|trans
         }) }}
     {% endif %}
-    {% if not entity.published and entity.specificationCreatedAt %}
+    {% if not entity.published and entity.specificationCreatedAt and is_granted('EDIT', entity) %}
         {% set publishType = entity.publicSlug ? 'public' : 'private' %}
         {{ UI.clientButton({
             'dataUrl': path('oro_openapi_specification_publish', {'id': entity.id}),
@@ -39,7 +39,7 @@
     {% endif %}
 
     {% set moreButtons %}
-        {% if entity.status != constant('Oro\\Bundle\\ApiBundle\\Entity\\OpenApiSpecification::STATUS_CREATING') and is_granted('oro_openapi_specification_create') %}
+        {% if entity.status != constant('Oro\\Bundle\\ApiBundle\\Entity\\OpenApiSpecification::STATUS_CREATING') and is_granted('EDIT', entity) %}
             {{ UI.clientLink({
                 'dataUrl': path('oro_openapi_specification_renew', {'id': entity.id}),
                 'dataAttributes': {

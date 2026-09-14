@@ -16,11 +16,7 @@ const ImapView = BaseView.extend({
 
     html: '',
 
-    accessToken: '',
-
-    refreshToken: '',
-
-    expiredAt: '',
+    oauthTokenHandle: '',
 
     email: '',
 
@@ -46,10 +42,8 @@ const ImapView = BaseView.extend({
             this.$el.html(this.html);
         }
 
-        this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val(this.accessToken);
-        this.$el.find('input[name$="[userEmailOrigin][refreshToken]"]').val(this.refreshToken);
+        this.$el.find('input[name$="[userEmailOrigin][oauthTokenHandle]"]').val(this.oauthTokenHandle);
         this.$el.find('input[name$="[userEmailOrigin][user]"]').val(this.email);
-        this.$el.find('input[name$="[userEmailOrigin][accessTokenExpiresAt]"]').val(this.expiredAt);
 
         if (this.errorMessage.length > 0) {
             this.showErrorMessage();
@@ -115,23 +109,15 @@ const ImapView = BaseView.extend({
 
     /**
      * Return values from types of form
-     * @returns {{type: string, accessToken: *, clientId: *, user: *, imapPort: *, imapHost: *, imapEncryption: *, smtpPort: *, smtpHost: *, smtpEncryption: *, accessTokenExpiresAt: *, refreshToken: *}}
+     * @returns {{type: string, oauthTokenHandle: *, clientId: *, user: *, imapPort: *, imapHost: *, imapEncryption: *, smtpPort: *, smtpHost: *, smtpEncryption: *}}
      */
     getData: function() {
-        let accessToken = this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val();
-        let refreshToken = this.$el.find('input[name$="[userEmailOrigin][refreshToken]"]').val();
-
-        if (!accessToken) {
-            accessToken = this.accessToken;
-        }
-        if (!refreshToken) {
-            refreshToken = this.refreshToken;
-        }
+        let oauthTokenHandle = this.$el.find('input[name$="[userEmailOrigin][oauthTokenHandle]"]').val();
+        oauthTokenHandle = oauthTokenHandle || this.oauthTokenHandle;
 
         return {
             type: this.type,
-            accessToken: accessToken,
-            refreshToken: refreshToken,
+            oauthTokenHandle: oauthTokenHandle,
             clientId: this.$el.find('input[name$="[userEmailOrigin][clientId]"]').val(),
             user: this.$el.find('input[name$="[userEmailOrigin][user]"]').val(),
             imapPort: this.$el.find('input[name$="[userEmailOrigin][imapPort]"]').val(),
@@ -139,25 +125,16 @@ const ImapView = BaseView.extend({
             imapEncryption: this.$el.find('input[name$="[userEmailOrigin][imapEncryption]"]').val(),
             smtpPort: this.$el.find('input[name$="[userEmailOrigin][smtpPort]"]').val(),
             smtpHost: this.$el.find('input[name$="[userEmailOrigin][smtpHost]"]').val(),
-            smtpEncryption: this.$el.find('input[name$="[userEmailOrigin][smtpEncryption]"]').val(),
-            accessTokenExpiresAt: this.$el.find('input[name$="[userEmailOrigin][accessTokenExpiresAt]"]').val()
+            smtpEncryption: this.$el.find('input[name$="[userEmailOrigin][smtpEncryption]"]').val()
         };
     },
 
     /**
-     * Set access token
+     * Set OAuth token handle
      * @param {string} value
      */
-    setAccessToken: function(value) {
-        this.accessToken = value;
-    },
-
-    /**
-     * Set refresh token
-     * @param {string} value
-     */
-    setRefreshToken: function(value) {
-        this.refreshToken = value;
+    setOAuthTokenHandle: function(value) {
+        this.oauthTokenHandle = value;
     },
 
     /**
@@ -166,14 +143,6 @@ const ImapView = BaseView.extend({
      */
     setEmail: function(value) {
         this.email = value;
-    },
-
-    /**
-     * Set expiredAt
-     * @param {string} value
-     */
-    setExpiredAt: function(value) {
-        this.expiredAt = value;
     },
 
     /**

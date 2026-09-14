@@ -927,6 +927,74 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
+    public function testFindOneBy(): void
+    {
+        $class = 'ItemStub';
+        $entity = new \stdClass();
+
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->expects(self::once())
+            ->method('findOneBy')
+            ->with(['a' => 1], null)
+            ->willReturn($entity);
+
+        $this->registry->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($this->em);
+        $this->em->expects(self::once())
+            ->method('getRepository')
+            ->with($class)
+            ->willReturn($repo);
+
+        self::assertSame($entity, $this->doctrineHelper->findOneBy($class, ['a' => 1]));
+    }
+
+    public function testFindOneByWithOrderBy(): void
+    {
+        $class = 'ItemStub';
+        $entity = new \stdClass();
+
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->expects(self::once())
+            ->method('findOneBy')
+            ->with(['a' => 1], ['id' => 'DESC'])
+            ->willReturn($entity);
+
+        $this->registry->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($this->em);
+        $this->em->expects(self::once())
+            ->method('getRepository')
+            ->with($class)
+            ->willReturn($repo);
+
+        self::assertSame($entity, $this->doctrineHelper->findOneBy($class, ['a' => 1], ['id' => 'DESC']));
+    }
+
+    public function testFindOneByWhenEntityNotFound(): void
+    {
+        $class = 'ItemStub';
+
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->expects(self::once())
+            ->method('findOneBy')
+            ->with(['a' => 1], null)
+            ->willReturn(null);
+
+        $this->registry->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->willReturn($this->em);
+        $this->em->expects(self::once())
+            ->method('getRepository')
+            ->with($class)
+            ->willReturn($repo);
+
+        self::assertNull($this->doctrineHelper->findOneBy($class, ['a' => 1]));
+    }
+
     public function testGetEntityRepositoryByClass(): void
     {
         $class = 'ItemStubProxy';
