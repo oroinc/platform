@@ -114,7 +114,7 @@ class EmailTemplateController extends RestController
      *
      * @return Response
      */
-    #[AclAncestor('oro_email_emailtemplate_view')]
+    #[Acl(id: 'oro_email_emailtemplate_view', type: 'entity', class: EmailTemplate::class, permission: 'VIEW')]
     public function getVariablesAction()
     {
         /** @var VariablesProvider $provider */

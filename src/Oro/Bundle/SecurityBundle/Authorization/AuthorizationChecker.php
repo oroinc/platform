@@ -13,6 +13,7 @@ use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -64,7 +65,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthori
                 $this->logger->debug(
                     sprintf('Check class based an access using "%s" ACL attribute.', $aclAttribute->getId())
                 );
-                $isGranted = $this->authorizationChecker->isGranted(
+                $isGranted = $this->isGrantedByAuthorizationChecker(
                     $aclAttribute->getPermission(),
                     $this->objectIdentityFactory->get($aclAttribute)
                 );
@@ -72,13 +73,13 @@ class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthori
                 $this->logger->debug(
                     sprintf('Check object based an access using "%s" ACL attribute.', $aclAttribute->getId())
                 );
-                $isGranted = $this->authorizationChecker->isGranted(
+                $isGranted = $this->isGrantedByAuthorizationChecker(
                     $aclAttribute->getPermission(),
                     $subject
                 );
             }
         } elseif (\is_string($subject)) {
-            $isGranted = $this->authorizationChecker->isGranted(
+            $isGranted = $this->isGrantedByAuthorizationChecker(
                 $attribute,
                 $this->tryGetObjectIdentity($subject) ?? $subject
             );
@@ -92,7 +93,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthori
                 }
             }
 
-            $isGranted = $this->authorizationChecker->isGranted($attribute, $subject);
+            $isGranted = $this->isGrantedByAuthorizationChecker($attribute, $subject);
         }
 
         return $isGranted;
@@ -114,6 +115,36 @@ class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthori
         }
 
         return $this->authorizationChecker->isGrantedForUser($user, $attribute, $subject, $accessDecision);
+    }
+
+    private function isGrantedByAuthorizationChecker(mixed $attribute, mixed $subject): bool
+    {
+        $accessDecision = new AccessDecision();
+        $isGranted = $this->authorizationChecker->isGranted($attribute, $subject, $accessDecision);
+
+        if ($this->didAllVotersAbstain($accessDecision)) {
+            $this->logger->warning(
+                'All security voters abstained from voting.',
+                ['attribute' => $attribute, 'subject' => $subject]
+            );
+        }
+
+        return $isGranted;
+    }
+
+    private function didAllVotersAbstain(AccessDecision $accessDecision): bool
+    {
+        if (!$accessDecision->votes) {
+            return false;
+        }
+
+        foreach ($accessDecision->votes as $vote) {
+            if (VoterInterface::ACCESS_ABSTAIN !== $vote->result) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function getAttribute(string $attributeId): ?AclAttribute
