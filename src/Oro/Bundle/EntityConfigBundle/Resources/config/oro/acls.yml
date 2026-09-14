@@ -1,0 +1,6 @@
+acls:
+    oro_attribute_family_view:
+        type: entity
+        class: Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily
+        permission: VIEW
+        group_name: ""
