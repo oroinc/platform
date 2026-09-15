@@ -61,7 +61,7 @@
         "symfony/runtime": "~7.4.0",
         "symfony/security-core": "~7.4.0",
         "symfony/security-csrf": "~7.4.0",
-        "symfony/security-http": "7.4.14",
+        "symfony/security-http": "~7.4.0",
         "symfony/security-bundle": "~7.4.0",
         "symfony/password-hasher": "~7.4.0",
         "symfony/serializer": "~7.4.0",
