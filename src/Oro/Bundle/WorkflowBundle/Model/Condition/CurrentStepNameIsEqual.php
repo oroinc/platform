@@ -64,7 +64,7 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
         if (array_key_exists('workflow', $options)) {
             $this->workflowName = $options['workflow'];
         } elseif (array_key_exists(2, $options)) {
-            $this->mainEntity = $options[2];
+            $this->workflowName = $options[2];
         } else {
             throw new InvalidArgumentException('Missing "workflow" option');
         }
