@@ -48,9 +48,14 @@ class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldExecuteAllSuitableQueryModifiers()
+    /**
+     * @dataProvider executeAllSuitableQueryModifiersDataProvider
+     */
+    public function testShouldExecuteAllSuitableQueryModifiers(array $options)
     {
-        $options = ['key' => 'value'];
+        $requestType = new RequestType(['rest', 'json_api']);
+        $optionsPassedToQueryModifiers = $options;
+        $optionsPassedToQueryModifiers['requestType'] = $requestType;
 
         $qb = $this->createMock(QueryBuilder::class);
         $skipRootEntity = true;
@@ -63,12 +68,20 @@ class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($qb), $skipRootEntity);
         $this->queryModifier3->expects(self::exactly(2))
             ->method('setOptions')
-            ->withConsecutive([$options], [null]);
+            ->withConsecutive([$optionsPassedToQueryModifiers], [null]);
         $this->queryModifier3->expects(self::once())
             ->method('modify')
             ->with(self::identicalTo($qb), $skipRootEntity);
 
-        $this->registry->modifyQuery($qb, $skipRootEntity, new RequestType(['rest', 'json_api']), $options);
+        $this->registry->modifyQuery($qb, $skipRootEntity, $requestType, $options);
+    }
+
+    public static function executeAllSuitableQueryModifiersDataProvider(): array
+    {
+        return [
+            [[]],
+            [['key' => 'value']]
+        ];
     }
 
     public function testShouldSkipNotSuitableQueryModifiers()
