@@ -538,6 +538,10 @@ const PageStateView = BaseView.extend({
      * compares just name-value pairs
      * (comparison of JSON strings is not in use, because field items can contain extra-data)
      *
+     * Fields are matched by name rather than by position: widgets keep relocating inputs after the
+     * initial state is taken (the region text input is moved next to the region select, for example),
+     * and such a reorder is not a change made by the user.
+     *
      * @param {Array} state
      * @returns {boolean}
      * @protected
@@ -557,12 +561,37 @@ const PageStateView = BaseView.extend({
         }
 
         const isSame = initialState && _.every(initialState, function(form, i) {
-            return Array.isArray(state[i]) && _.every(form, function(field, j) {
-                return _.isObject(state[i][j]) &&
-                    state[i][j].name === field.name && state[i][j].value === field.value;
-            });
-        });
+            if (!Array.isArray(state[i])) {
+                return false;
+            }
+
+            // Whole name-to-values maps are compared, so a field added to (or removed from) the form
+            // counts as a change as well -- iterating over the initial state alone would never reach
+            // a name that only exists in the current state.
+            return _.isEqual(this._groupValuesByName(form), this._groupValuesByName(state[i]));
+        }, this);
         return !isSame;
+    },
+
+    /**
+     * Groups values of a single form state by field name, keeping duplicates (checkbox groups,
+     * collections) so that adding or removing one of them is still recognized as a change
+     *
+     * @param {Array<{name: string, value: string}>} formState
+     * @returns {Object<string, Array<string>>}
+     * @protected
+     */
+    _groupValuesByName: function(formState) {
+        const values = {};
+
+        _.each(formState, function(field) {
+            if (!_.isObject(field)) {
+                return;
+            }
+            (values[field.name] = values[field.name] || []).push(field.value);
+        });
+
+        return values;
     }
 });
 

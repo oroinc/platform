@@ -56,23 +56,10 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
     }
 
     /*
-     * If behat tests failed, the last cursor position when moving the mouse is added to the screenshot,
-     * except for situations when there are alerts on the page
+     * If behat tests failed, the last cursor position when moving the mouse is added to the screenshot.
     */
     public function beforeStep(BeforeStepTested $scope)
     {
-        /*
-         * Because alert is synchronous in JS, no code can be executed while an alert is displayed.
-         * Steps that expect an alert to appear, because the data was changed, not saved,
-         * and went to another page, get an alert.
-         * Since the alert blocks this beforeStep, the cursor is not fixed for such steps.
-         * */
-        if (
-            str_contains($scope->getStep()->getText(), 'should see alert with message')
-            || str_contains($scope->getStep()->getText(), 'accept alert')
-        ) {
-            return;
-        }
         $script = <<<EOF
             document.head.insertAdjacentHTML('beforeend', `<style>
                 body {
@@ -102,11 +89,17 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
                 }
             });
             EOF;
-        $this->mink
-            ->getSession()
-            ->getDriver()
-            ->getWebDriverSession()
-            ->execute(['script' => $script, 'args' => []]);
+        try {
+            $this->mink
+                ->getSession()
+                ->getDriver()
+                ->getWebDriverSession()
+                ->execute(['script' => $script, 'args' => []]);
+        } catch (\Throwable $e) {
+            // The cursor marker only decorates failure screenshots. Whenever the browser refuses to run
+            // the script - an open JS alert blocks it, the session is gone - the step itself must still run,
+            // otherwise an unrelated artifact concern aborts the whole suite.
+        }
     }
 
     public function afterStep(AfterStepTested $scope)

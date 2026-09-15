@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -28,6 +29,7 @@ class LocaleListener implements EventSubscriberInterface
     private TranslatorInterface $translator;
     private RequestContextAwareInterface $router;
     private ApplicationState $applicationState;
+    private ?LocaleSwitcher $localeSwitcher;
     private ?bool $installed = null;
     private ?string $currentLanguage = null;
 
@@ -37,7 +39,8 @@ class LocaleListener implements EventSubscriberInterface
         TranslatableListener $translatableListener,
         TranslatorInterface $translator,
         RequestContextAwareInterface $router,
-        ApplicationState $applicationState
+        ApplicationState $applicationState,
+        ?LocaleSwitcher $localeSwitcher = null
     ) {
         $this->localeSettings = $localeSettings;
         $this->currentLocalizationProvider = $currentLocalizationProvider;
@@ -45,6 +48,7 @@ class LocaleListener implements EventSubscriberInterface
         $this->translator = $translator;
         $this->router = $router;
         $this->applicationState = $applicationState;
+        $this->localeSwitcher = $localeSwitcher;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -55,16 +59,22 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         $language = $this->getCurrentLanguage();
-        if (!$request->attributes->get('_locale')) {
+        $routeLocale = $request->attributes->get('_locale');
+        if (!$routeLocale) {
             $request->setLocale($language);
             $this->router->getContext()->setParameter('_locale', $language);
         }
 
+        $this->switchLocale($language);
+        if ($routeLocale) {
+            // LocaleSwitcher::setLocale() overrides the router context parameter,
+            // but a route-provided locale must stay authoritative for URL generation.
+            $this->router->getContext()->setParameter('_locale', $routeLocale);
+        }
+        // after switchLocale(): LocaleSwitcher sets the PHP default locale to the language code,
+        // while the formatting locale (e.g. de_DE) must win.
         $this->setPhpDefaultLocale($this->localeSettings->getLocale());
         $this->translatableListener->setTranslatableLocale($language);
-        if ($this->translator instanceof LocaleAwareInterface) {
-            $this->translator->setLocale($language);
-        }
     }
 
     public function setPhpDefaultLocale(string $locale): void
@@ -113,11 +123,9 @@ class LocaleListener implements EventSubscriberInterface
             return;
         }
 
+        $this->switchLocale($language);
         $this->setPhpDefaultLocale($locale);
         $this->translatableListener->setTranslatableLocale($language);
-        if ($this->translator instanceof LocaleAwareInterface) {
-            $this->translator->setLocale($language);
-        }
     }
 
     #[\Override]
@@ -128,6 +136,21 @@ class LocaleListener implements EventSubscriberInterface
             KernelEvents::REQUEST => [['onKernelRequest', 7]],
             ConsoleEvents::COMMAND => [['onConsoleCommand']],
         ];
+    }
+
+    /**
+     * Switches the language through the LocaleSwitcher so that the switcher's own locale is updated
+     * as well: since symfony/http-kernel 7.4.17 (and 6.4.x counterpart) LocaleAwareListener restores
+     * every kernel.locale_aware service to its own stored locale after a sub-request, and a switcher
+     * left at the default locale would cascade that default back to the translator.
+     */
+    private function switchLocale(string $language): void
+    {
+        if (null !== $this->localeSwitcher) {
+            $this->localeSwitcher->setLocale($language);
+        } elseif ($this->translator instanceof LocaleAwareInterface) {
+            $this->translator->setLocale($language);
+        }
     }
 
     private function getCurrentLanguage(): string

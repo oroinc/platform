@@ -179,13 +179,22 @@ class OroMainContext extends MinkContext implements
 
         $textIsInFlashMessage = false;
         foreach ($this->findAllElements('Flash Message') as $flashMessage) {
-            if (false === $flashMessage->isVisible()) {
-                continue;
-            }
+            try {
+                if (false === $flashMessage->isVisible()) {
+                    continue;
+                }
 
-            if (false !== mb_stripos($flashMessage->getText(), $searchText)) {
-                $textIsInFlashMessage = true;
-                break;
+                if (false !== mb_stripos($flashMessage->getText(), $searchText)) {
+                    $textIsInFlashMessage = true;
+                    break;
+                }
+            } catch (NoSuchElement | StaleElementReference $e) {
+                /*
+                 * Flash messages dismiss themselves, so one located a moment ago can already be gone
+                 * when it is read. This check only improves the message of an assertion that has not
+                 * run yet, so a vanished message is skipped rather than failing the step.
+                 */
+                continue;
             }
         }
 
@@ -3373,12 +3382,19 @@ JS;
     //phpcs:enable
     public function assertPageNotContainsTextWithWait($number, $text)
     {
-        $result = $this->spin(function (OroMainContext $context) use ($text) {
+        $startedAt = microtime(true);
+        $attempts = 0;
+        $lastError = null;
+
+        $result = $this->spin(function (OroMainContext $context) use ($text, &$attempts, &$lastError) {
+            $attempts++;
+
             try {
                 $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
 
                 return true;
             } catch (\Exception $e) {
+                $lastError = $e->getMessage();
                 $this->getSession()->reload();
 
                 return false;
@@ -3387,7 +3403,14 @@ JS;
 
         self::assertTrue(
             $result,
-            sprintf('The text "%s" was found in the text of the current page.', $text)
+            sprintf(
+                'The text "%s" was found in the text of the current page'
+                . ' after %s (%d attempts). Last error: %s',
+                $text,
+                $this->formatWaitedTime($startedAt),
+                $attempts,
+                $lastError ?? 'none'
+            )
         );
     }
 
@@ -3400,12 +3423,19 @@ JS;
     //phpcs:enable
     public function assertPageContainsTextWithWait($number, $text)
     {
-        $result = $this->spin(function (OroMainContext $context) use ($text) {
+        $startedAt = microtime(true);
+        $attempts = 0;
+        $lastError = null;
+
+        $result = $this->spin(function (OroMainContext $context) use ($text, &$attempts, &$lastError) {
+            $attempts++;
+
             try {
                 $context->assertSession()->pageTextContains($this->fixStepArgument($text));
 
                 return true;
             } catch (\Exception $e) {
+                $lastError = $e->getMessage();
                 $this->getSession()->reload();
 
                 return false;
@@ -3414,8 +3444,20 @@ JS;
 
         self::assertTrue(
             $result,
-            sprintf('The text "%s" was not found in the text of the current page.', $text)
+            sprintf(
+                'The text "%s" was not found in the text of the current page'
+                . ' after %s (%d attempts). Last error: %s',
+                $text,
+                $this->formatWaitedTime($startedAt),
+                $attempts,
+                $lastError ?? 'none'
+            )
         );
+    }
+
+    private function formatWaitedTime(float $startedAt): string
+    {
+        return sprintf('%.1fs', microtime(true) - $startedAt);
     }
 
     /**
