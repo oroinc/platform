@@ -45,7 +45,10 @@ class QueryModifierRegistry
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 /** @var QueryModifierInterface $queryModifier */
                 $queryModifier = $this->container->get($serviceId);
-                if ($options && $queryModifier instanceof QueryModifierOptionsAwareInterface) {
+                if ($queryModifier instanceof QueryModifierOptionsAwareInterface) {
+                    if (!isset($options['requestType'])) {
+                        $options['requestType'] = $requestType;
+                    }
                     $queryModifier->setOptions($options);
                     try {
                         $queryModifier->modify($qb, $skipRootEntity);
