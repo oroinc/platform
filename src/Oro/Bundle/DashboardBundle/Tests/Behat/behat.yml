@@ -1,5 +1,20 @@
 oro_behat_extension:
   elements:
+    Enter keyword:
+      selector:
+        locator: '//input[contains(@class,"widget-picker__filter-search")]'
+        type: xpath
+
+    First Widget Add Button:
+      selector:
+        locator: '(//div[(contains(@class,"widget-picker__results"))]//details[@style="opacity: 1;"]//button[contains(text(),"Add")])[1]'
+        type: xpath
+
+    Widget Save Button:
+      selector:
+        type: 'xpath'
+        locator: '//div[@class="widget-actions-section"]/..//button[contains(text(),"Save")]'
+
     Widget Config Data:
       selector: '.widget-config-data'
 
