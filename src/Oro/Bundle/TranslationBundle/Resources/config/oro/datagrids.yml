@@ -1,6 +1,6 @@
 datagrids:
     oro-translation-language-grid:
-        acl_resource: oro_translation_language_index
+        acl_resource: oro_translation_language_view
         source:
             type: orm
             query:
@@ -94,7 +94,7 @@ datagrids:
                     - code
 
     oro-translation-translations-grid:
-        acl_resource: oro_translation_translation_index
+        acl_resource: oro_translation_language_view
         extended_entity_name: 'Oro\Bundle\TranslationBundle\Entity\Translation'
         source:
             type: orm

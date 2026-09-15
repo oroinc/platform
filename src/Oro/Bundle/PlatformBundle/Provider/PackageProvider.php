@@ -67,8 +67,10 @@ class PackageProvider
         foreach (InstalledVersions::getAllRawData() as $installed) {
             $rootPackageName = isset($installed['root']) ? $installed['root']['name'] : null;
             foreach ($installed['versions'] as $packageName => $packageData) {
+                // "pretty_version" tells an installed package from a virtual "replaced"/"provided" entry.
+                // "reference" cannot: packages served by a mirroring repository as plain zips have none.
                 if (
-                    isset($packageData['reference'])
+                    isset($packageData['pretty_version'])
                     && $packageName !== $rootPackageName
                     && !isset($packages[$packageName])
                 ) {

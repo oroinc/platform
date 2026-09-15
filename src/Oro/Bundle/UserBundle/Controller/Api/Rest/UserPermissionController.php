@@ -30,7 +30,7 @@ class UserPermissionController extends RestGetController
      * @return \Symfony\Component\HttpFoundation\Response
      */
     #[QueryParam(name: 'entities', requirements: '.+', description: '"Theentityclassname', nullable: true)]
-    #[AclAncestor('oro_user_permission_view')]
+    #[AclAncestor('oro_user_user_view')]
     public function cgetAction(int $id)
     {
         $manager = $this->getManager();
@@ -38,6 +38,9 @@ class UserPermissionController extends RestGetController
         $user = $manager->find($id);
         if (!$user) {
             return $this->buildNotFoundResponse();
+        }
+        if (!$this->isGranted('VIEW', $user)) {
+            throw $this->createAccessDeniedException();
         }
 
         $criteria = $this->getFilterCriteria(

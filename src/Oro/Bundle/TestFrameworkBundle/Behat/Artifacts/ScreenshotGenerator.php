@@ -21,9 +21,17 @@ class ScreenshotGenerator
 
     public function take(): array
     {
+        try {
+            $screenshot = $this->mink->getSession()->getScreenshot();
+        } catch (\Throwable $e) {
+            // The browser can refuse to produce a screenshot - an open JS alert blocks it, the session died.
+            // Reporting that is preferable to letting a diagnostic aid abort the run that produced the failure.
+            return [sprintf('Screenshot is not available: %s', $e->getMessage())];
+        }
+
         $urls = [];
         foreach ($this->artifactsHandlers as $artifactsHandler) {
-            $urls[] = $artifactsHandler->save($this->mink->getSession()->getScreenshot());
+            $urls[] = $artifactsHandler->save($screenshot);
         }
 
         return $urls;

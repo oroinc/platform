@@ -36,9 +36,7 @@ trait UnchangeableAddressOwnerTestTrait
         $data['data']['relationships']['addresses']['data'] = [
             ['type' => self::ENTITY_TYPE, 'id' => 'new_address']
         ];
-        $data['included'] = [
-            $addressData['data']
-        ];
+        $data['included'][] = $addressData['data'];
         $response = $this->post(
             ['entity' => self::OWNER_ENTITY_TYPE],
             $data
@@ -70,9 +68,7 @@ trait UnchangeableAddressOwnerTestTrait
         ];
         $data = $this->getRequestData(self::OWNER_CREATE_MIN_REQUEST_DATA);
         $data['data']['id'] = 'new_owner';
-        $data['included'] = [
-            $addressData['data']
-        ];
+        $data['included'][] = $addressData['data'];
         $response = $this->post(
             ['entity' => self::OWNER_ENTITY_TYPE],
             $data
@@ -169,18 +165,12 @@ trait UnchangeableAddressOwnerTestTrait
         $owner = $this->getOwner($address);
         self::assertSame($ownerId, $owner->getId());
         self::assertCount(3, $owner->getAddresses());
-        self::assertTrue(
-            in_array(
-                $addressId,
-                array_map(
-                    function (AbstractAddress $a) {
-                        return $a->getId();
-                    },
-                    $owner->getAddresses()->toArray()
-                ),
-                true
-            )
-        );
+        self::assertContains($addressId, array_map(
+            function (AbstractAddress $a) {
+                return $a->getId();
+            },
+            $owner->getAddresses()->toArray()
+        ));
     }
 
     public function testTryToChangeOwnerViaOwnerCreateResource()
@@ -201,9 +191,7 @@ trait UnchangeableAddressOwnerTestTrait
             ['type' => self::ENTITY_TYPE, 'id' => 'new_address'],
             ['type' => self::ENTITY_TYPE, 'id' => (string)$address2Id]
         ];
-        $data['included'] = [
-            $addressData['data']
-        ];
+        $data['included'][] = $addressData['data'];
         $response = $this->post(
             ['entity' => self::OWNER_ENTITY_TYPE],
             $data,

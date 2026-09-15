@@ -31,7 +31,7 @@
         }) }}
     {% endif %}
 
-    {% if form.vars.value.id and is_granted('oro_email_emailtemplate_clone') %}
+    {% if form.vars.value.id and is_granted('oro_email_emailtemplate_create') %}
         {{ UI.button({
             'path':  path('oro_email_emailtemplate_clone', {'id': form.vars.value.id}),
             'title': 'oro.email.emailtemplate.action.clone'|trans,
