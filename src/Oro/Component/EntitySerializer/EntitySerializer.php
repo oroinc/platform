@@ -626,7 +626,7 @@ class EntitySerializer
         $targetEntityClass = $associationQuery->getTargetEntityClass();
         $targetConfig = $this->configAccessor->getTargetEntity($config, $field);
 
-        if (!$associationQuery->isCollection() || $this->isSingleStepLoading($targetEntityClass, $targetConfig)) {
+        if ($this->isSingleStepLoading($targetEntityClass, $targetConfig)) {
             $dataQb = clone $associationQuery->getQueryBuilder();
             $this->queryFactory->initializeAssociationQueryBuilder(
                 $dataQb,

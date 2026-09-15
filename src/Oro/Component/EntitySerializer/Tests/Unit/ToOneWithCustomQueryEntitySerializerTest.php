@@ -9,16 +9,10 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
 class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
 {
-    public function hasLimitDataProvider(): array
-    {
-        return [[false], [true]];
-    }
-
     /**
-     * @dataProvider hasLimitDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToOneCustomAssociationWhenOnlyIdentifierFieldIsRequested(bool $hasLimit): void
+    public function testToOneCustomAssociationWhenOnlyIdentifierFieldIsRequested(): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -79,9 +73,6 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         ];
-        if ($hasLimit) {
-            $config['fields']['category']['max_results'] = 5;
-        }
         $result = $this->serializer->serialize($qb, $config);
 
         $this->assertArrayEquals(
@@ -104,10 +95,9 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
     }
 
     /**
-     * @dataProvider hasLimitDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToOneCustomAssociationWhenOnlyScalarFieldsAreRequested(bool $hasLimit): void
+    public function testToOneCustomAssociationWhenOnlyScalarFieldsAreRequested(): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -170,9 +160,6 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         ];
-        if ($hasLimit) {
-            $config['fields']['category']['max_results'] = 5;
-        }
         $result = $this->serializer->serialize($qb, $config);
 
         $this->assertArrayEquals(
