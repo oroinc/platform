@@ -283,6 +283,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
     {
         $userRoleForm = $this->getRoleViewFormElement();
         $permissionNames = $table->getColumn(0);
+
         $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
         $this->seePermissions($table, $permissionsArray);
     }
