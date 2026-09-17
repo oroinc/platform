@@ -69,6 +69,25 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessibleAsAssociation')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setParentClassName('Test\Class');
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWhenAlreadyNormalizedParentClassIsNotAccessible(): void
+    {
+        $this->expectException(ResourceNotAccessibleException::class);
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessibleAsAssociation')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
 
         $this->context->setParentClassName('Test\Class');
         $this->processor->process($this->context);

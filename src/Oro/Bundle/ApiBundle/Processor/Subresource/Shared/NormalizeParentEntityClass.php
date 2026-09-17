@@ -44,40 +44,36 @@ class NormalizeParentEntityClass implements ProcessorInterface
             return;
         }
 
-        if (str_contains($parentEntityClass, '\\')) {
-            // the parent entity class is already normalized
-            return;
+        if (!str_contains($parentEntityClass, '\\')) {
+            $normalizedEntityClass = $this->getEntityClass($parentEntityClass, $context->getRequestType());
+            $context->setParentClassName($normalizedEntityClass);
+            if (null === $normalizedEntityClass) {
+                $context->addError(Error::createValidationError(
+                    Constraint::ENTITY_TYPE,
+                    sprintf('Unknown parent entity type: %s.', $parentEntityClass),
+                    Response::HTTP_NOT_FOUND
+                ));
+
+                return;
+            }
+            $parentEntityClass = $normalizedEntityClass;
         }
 
-        $normalizedEntityClass = $this->getEntityClass(
+        if (!$this->resourcesProvider->isResourceAccessibleAsAssociation(
             $parentEntityClass,
             $context->getVersion(),
             $context->getRequestType()
-        );
-        $context->setParentClassName($normalizedEntityClass);
-        if (null === $normalizedEntityClass) {
-            $context->addError(Error::createValidationError(
-                Constraint::ENTITY_TYPE,
-                sprintf('Unknown parent entity type: %s.', $parentEntityClass),
-                Response::HTTP_NOT_FOUND
-            ));
+        )) {
+            throw new ResourceNotAccessibleException();
         }
     }
 
-    private function getEntityClass(string $entityType, string $version, RequestType $requestType): ?string
+    private function getEntityClass(string $entityType, RequestType $requestType): ?string
     {
-        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
+        return ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
             $requestType
         );
-        if (!$entityClass) {
-            return null;
-        }
-        if (!$this->resourcesProvider->isResourceAccessibleAsAssociation($entityClass, $version, $requestType)) {
-            throw new ResourceNotAccessibleException();
-        }
-
-        return $entityClass;
     }
 }
