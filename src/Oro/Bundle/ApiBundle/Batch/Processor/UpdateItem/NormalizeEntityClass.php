@@ -50,6 +50,14 @@ class NormalizeEntityClass implements ProcessorInterface
 
         if (str_contains($entityClass, '\\')) {
             // the entity class is already normalized
+            if (!$this->resourcesProvider->isResourceAccessible(
+                $entityClass,
+                $context->getVersion(),
+                $context->getRequestType()
+            )) {
+                throw new ResourceNotAccessibleException();
+            }
+
             return;
         }
 

@@ -51,6 +51,14 @@ class NormalizeParentEntityClass implements ProcessorInterface
 
         if (str_contains($parentEntityClass, '\\')) {
             // the parent entity class is already normalized
+            if (!$this->resourcesProvider->isResourceAccessibleAsAssociation(
+                $parentEntityClass,
+                $context->getVersion(),
+                $context->getRequestType()
+            )) {
+                throw new ResourceNotAccessibleException();
+            }
+
             return;
         }
 
