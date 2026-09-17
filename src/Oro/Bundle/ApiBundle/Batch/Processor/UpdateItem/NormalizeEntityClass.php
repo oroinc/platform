@@ -43,39 +43,35 @@ class NormalizeEntityClass implements ProcessorInterface
             return;
         }
 
-        if (str_contains($entityClass, '\\')) {
-            // the entity class is already normalized
-            return;
+        if (!str_contains($entityClass, '\\')) {
+            $normalizedEntityClass = $this->getEntityClass($entityClass, $context->getRequestType());
+            $context->setClassName($normalizedEntityClass);
+            if (null === $normalizedEntityClass) {
+                $context->addError(Error::createValidationError(
+                    Constraint::ENTITY_TYPE,
+                    sprintf('Unknown entity type: %s.', $entityClass)
+                ));
+
+                return;
+            }
+            $entityClass = $normalizedEntityClass;
         }
 
-        $normalizedEntityClass = $this->getEntityClass(
+        if (!$this->resourcesProvider->isResourceAccessible(
             $entityClass,
             $context->getVersion(),
             $context->getRequestType()
-        );
-        $context->setClassName($normalizedEntityClass);
-        if (null === $normalizedEntityClass) {
-            $context->addError(Error::createValidationError(
-                Constraint::ENTITY_TYPE,
-                sprintf('Unknown entity type: %s.', $entityClass)
-            ));
+        )) {
+            throw new ResourceNotAccessibleException();
         }
     }
 
-    private function getEntityClass(string $entityType, string $version, RequestType $requestType): ?string
+    private function getEntityClass(string $entityType, RequestType $requestType): ?string
     {
-        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
+        return ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
             $requestType
         );
-        if (!$entityClass) {
-            return null;
-        }
-        if (!$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
-            throw new ResourceNotAccessibleException();
-        }
-
-        return $entityClass;
     }
 }

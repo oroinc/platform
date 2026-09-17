@@ -69,6 +69,25 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessible')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setClassName('Test\Class');
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWhenAlreadyNormalizedClassIsNotAccessible(): void
+    {
+        $this->expectException(ResourceNotAccessibleException::class);
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessible')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
 
         $this->context->setClassName('Test\Class');
         $this->processor->process($this->context);
