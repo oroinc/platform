@@ -36,7 +36,7 @@ const CheckConnectionView = BaseView.extend({
     },
 
     checkSmtpConnection: function(event) {
-        const data = this.$el.find('[data-class="smtp_settings"]').serializeArray();
+        const data = this.getSettingsData();
         const $messageContainer = this.$el.find('.check-smtp-connection-messages');
         mediator.execute('showLoading');
         this.clear();
@@ -61,6 +61,19 @@ const CheckConnectionView = BaseView.extend({
         });
 
         return false;
+    },
+
+    /**
+     * Collects the SMTP settings fields values.
+     * Unlike jQuery serializeArray(), it includes disabled fields as well: a field disabled by the
+     * "Use Default" checkbox holds the resolved parent scope value that has to be checked too.
+     *
+     * @return {Array.<{name: string, value: string}>}
+     */
+    getSettingsData: function() {
+        return this.$el.find('[data-class="smtp_settings"]').map(function() {
+            return {name: this.name, value: $(this).val()};
+        }).get();
     },
 
     showMessage: function(type, message, container) {
