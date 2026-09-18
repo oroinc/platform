@@ -51,12 +51,15 @@ class SmtpConnectionConfigurationValidator extends ConstraintValidator
             || $this->getSmtpUser($value);
     }
 
+    /**
+     * Only the host and the port are required to check the connection.
+     * Username and password can be empty in certain setups and still have a valid connection (eg. localhost).
+     */
     private function hasDataToCheckConnection(array $value): bool
     {
         return
             $this->getSmtpHost($value)
-            && $this->getSmtpPort($value) > 0
-            && $this->getSmtpUser($value);
+            && $this->getSmtpPort($value) > 0;
     }
 
     private function checkConnection(array $value): bool
