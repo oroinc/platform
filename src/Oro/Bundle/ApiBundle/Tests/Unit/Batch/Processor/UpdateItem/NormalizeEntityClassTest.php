@@ -68,11 +68,30 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessible')
+            ->with('Test\Entity', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
 
         $this->context->setClassName('Test\Entity');
         $this->processor->process($this->context);
 
         self::assertEquals('Test\Entity', $this->context->getClassName());
+    }
+
+    public function testProcessWhenAlreadyNormalizedClassIsNotAccessible(): void
+    {
+        $this->expectException(ResourceNotAccessibleException::class);
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessible')
+            ->with('Test\Entity', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
+
+        $this->context->setClassName('Test\Entity');
+        $this->processor->process($this->context);
     }
 
     public function testProcessWhenEntityClassIsNotNormalized(): void
