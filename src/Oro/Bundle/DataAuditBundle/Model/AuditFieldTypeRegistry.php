@@ -41,7 +41,7 @@ class AuditFieldTypeRegistry
         'date_immutable' => false,
         'dateinterval' => false,
         'datetime_immutable' => false,
-        'datetimeyz_immutable' => false,
+        'datetimetz_immutable' => false,
         'time_immutable' => false,
 
         // collection types
@@ -65,6 +65,11 @@ class AuditFieldTypeRegistry
         'blob' => false,
         'crypted_string' => false,
         'crypted_text' => false,
+        'multiFile' => false,
+        'multiImage' => false,
+        'secure_array' => false,
+        'wysiwyg_properties' => false,
+        'wysiwyg_style' => false,
         'wysiwyg' => 'text',
     ];
 
