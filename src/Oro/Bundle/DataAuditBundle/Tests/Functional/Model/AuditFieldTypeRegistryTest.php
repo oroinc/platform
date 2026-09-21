@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Model;
 
-use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @dbIsolationPerTest
+ * Makes sure the registry declares the type of every auditable field.
+ *
+ * ChangeSetToAuditFieldsConverter skips a field of an undeclared type without any error, so each
+ * type must be in the registry, if only as not auditable.
  */
 class AuditFieldTypeRegistryTest extends WebTestCase
 {
@@ -21,43 +22,43 @@ class AuditFieldTypeRegistryTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testTypesRegistered()
+    public function testEveryAuditableFieldTypeIsDeclaredInRegistry(): void
     {
-        $doctrineTypes = Type::getTypesMap();
-        foreach ($doctrineTypes as $doctrineType => $doctrineTypeClass) {
-            AuditFieldTypeRegistry::isType($doctrineType);
+        /** @var ConfigManager $configManager */
+        $configManager = self::getContainer()->get('oro_entity_config.config_manager');
+        /** @var AuditConfigProvider $auditConfigProvider */
+        $auditConfigProvider = self::getContainer()->get('oro_dataaudit.audit_config_provider');
+
+        // The application audits the hidden entities and the hidden fields also. Thus include them.
+        $withHidden = true;
+        $scope = AuditConfigProvider::DATA_AUDIT_SCOPE;
+
+        $violations = [];
+        foreach ($configManager->getConfigs($scope, null, $withHidden) as $entityConfig) {
+            $className = $entityConfig->getId()->getClassName();
+            if (!$auditConfigProvider->isAuditableEntity($className)) {
+                continue;
+            }
+
+            foreach ($configManager->getConfigs($scope, $className, $withHidden) as $fieldConfig) {
+                /** @var FieldConfigId $fieldConfigId */
+                $fieldConfigId = $fieldConfig->getId();
+                $fieldName = $fieldConfigId->getFieldName();
+                if (!$auditConfigProvider->isAuditableField($className, $fieldName)) {
+                    continue;
+                }
+
+                $fieldType = $fieldConfigId->getFieldType();
+                if (!AuditFieldTypeRegistry::isType($fieldType)) {
+                    $violations[] = sprintf('%s::%s (%s)', $className, $fieldName, $fieldType);
+                }
+            }
         }
 
-        foreach (RelationType::$anyToAnyRelations as $doctrineType) {
-            AuditFieldTypeRegistry::isType($doctrineType);
-        }
-
-        foreach (RelationType::$toAnyRelations as $doctrineType) {
-            AuditFieldTypeRegistry::isType($doctrineType);
-        }
-
-        /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
-
-        /** @var FieldConfigModel[] $fields */
-        $fields = $doctrineHelper
-            ->getEntityManager(FieldConfigModel::class)
-            ->getRepository(FieldConfigModel::class)
-            ->findAll();
-
-        /** @var ConfigManager $configProvider */
-        $configProvider = $this->getContainer()->get('oro_entity_config.config_manager');
-
-        foreach ($fields as $field) {
-            AuditFieldTypeRegistry::isType($field->getType());
-
-            $configProvider
-                ->getEntityConfig('dataaudit', $field->getEntity()->getClassName())
-                ->set('auditable', true);
-            $configProvider
-                ->getFieldConfig('dataaudit', $field->getEntity()->getClassName(), $field->getFieldName())
-                ->set('auditable', true);
-            $configProvider->flush();
-        }
+        self::assertSame(
+            [],
+            $violations,
+            'Changes of an auditable field whose type is not declared in AuditFieldTypeRegistry are never audited.'
+        );
     }
 }

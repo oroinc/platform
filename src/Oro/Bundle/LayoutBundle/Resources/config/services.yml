@@ -341,6 +341,7 @@ services:
             - !tagged_iterator warmup_page_request_provider
             - '@http_kernel'
             - '@logger'
+            - '@services_resetter'
         tags:
             - { name: kernel.cache_warmer, priority: -2000 } # Warming caches for pages should be called at the end
 

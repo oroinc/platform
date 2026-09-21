@@ -114,4 +114,26 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
             Response::HTTP_NOT_FOUND
         );
     }
+
+    /**
+     * @dataProvider entityClassNameUriProvider
+     */
+    public function testEntityClassNameIsNotAllowed(string $uri): void
+    {
+        $response = $this->request('GET', $this->getApiBaseUrl() . $uri);
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function entityClassNameUriProvider(): array
+    {
+        $entityClass = 'Test%5CEntity';
+
+        return [
+            ['/' . $entityClass],
+            ['/' . $entityClass . '/1'],
+            ['/' . $entityClass . '/1/association'],
+            ['/' . $entityClass . '/1/relationships/association']
+        ];
+    }
 }
