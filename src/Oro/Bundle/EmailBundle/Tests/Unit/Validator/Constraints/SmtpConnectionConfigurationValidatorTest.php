@@ -16,6 +16,13 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
+    private const HOST = 'smtp.host';
+    private const PORT = 123;
+    private const ENCRYPTION = 'ssl';
+    private const USERNAME = 'user';
+    private const ENCRYPTED_PASSWORD = 'encrypted_password';
+    private const DECRYPTED_PASSWORD = 'decrypted_password';
+
     private SmtpSettingsChecker&MockObject $checker;
     private SmtpSettingsFactory&MockObject $smtpSettingsFactory;
     private SymmetricCrypterInterface&MockObject $encryptor;
@@ -48,6 +55,9 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
 
     public function testValidateWithUnsupportedType(): void
     {
+        $this->checker->expects(self::never())
+            ->method('checkConnection');
+
         $constraint = new SmtpConnectionConfiguration();
         $this->validator->validate(new \stdClass(), $constraint);
 
@@ -67,14 +77,15 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         $this->assertNoViolation();
     }
 
-    public function testValidateWhenNoDataToCheckConnection(): void
+    /**
+     * @dataProvider noDataToCheckConnectionDataProvider
+     */
+    public function testValidateWhenNoDataToCheckConnection(array $value): void
     {
-        $encryptedPassword = 'encrypted_password';
-        $value = $this->getConfiguredSettings($encryptedPassword);
-        $value['oro_email___smtp_settings_host'][ConfigManager::VALUE_KEY] = '';
-
         $this->checker->expects(self::never())
             ->method('checkConnection');
+        $this->smtpSettingsFactory->expects(self::never())
+            ->method('createFromArray');
 
         $constraint = new SmtpConnectionConfiguration();
         $this->validator->validate($value, $constraint);
@@ -83,14 +94,46 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
             ->assertRaised();
     }
 
+    public function noDataToCheckConnectionDataProvider(): array
+    {
+        return [
+            'empty host' => [
+                $this->getConfiguredSettings(host: ''),
+            ],
+            'empty host, no credentials' => [
+                $this->getConfiguredSettings(host: '', username: '', password: ''),
+            ],
+            'null port' => [
+                $this->getConfiguredSettings(port: null),
+            ],
+            'null port, no credentials' => [
+                $this->getConfiguredSettings(port: null, username: '', password: ''),
+            ],
+            'zero port' => [
+                $this->getConfiguredSettings(port: 0),
+            ],
+            'zero port, no credentials' => [
+                $this->getConfiguredSettings(port: 0, username: '', password: ''),
+            ],
+            'non-numeric port' => [
+                $this->getConfiguredSettings(port: 'abc'),
+            ],
+            'non-numeric port, no credentials' => [
+                $this->getConfiguredSettings(port: 'abc', username: '', password: ''),
+            ],
+            'only username' => [
+                $this->getConfiguredSettings(host: '', port: null, encryption: '', password: ''),
+            ],
+        ];
+    }
+
     public function testValidateFailedConnection(): void
     {
-        $encryptedPassword = 'encrypted_password';
-        $value = $this->getConfiguredSettings($encryptedPassword);
+        $value = $this->getConfiguredSettings();
 
         $this->checker->expects(self::once())
             ->method('checkConnection')
-            ->with($this->getSmtpSettings($encryptedPassword))
+            ->with($this->expectSmtpSettings())
             ->willReturn(false);
 
         $constraint = new SmtpConnectionConfiguration();
@@ -102,12 +145,11 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
 
     public function testValidateSuccessfulConnection(): void
     {
-        $encryptedPassword = 'encrypted_password';
-        $value = $this->getConfiguredSettings($encryptedPassword);
+        $value = $this->getConfiguredSettings();
 
         $this->checker->expects(self::once())
             ->method('checkConnection')
-            ->with($this->getSmtpSettings($encryptedPassword))
+            ->with($this->expectSmtpSettings())
             ->willReturn(true);
 
         $constraint = new SmtpConnectionConfiguration();
@@ -116,35 +158,93 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         $this->assertNoViolation();
     }
 
-    private function getConfiguredSettings(string $encryptedPassword): array
+    public function testValidateFailedConnectionWithoutCredentials(): void
     {
+        $value = $this->getConfiguredSettings(username: '', password: '');
+
+        $this->checker->expects(self::once())
+            ->method('checkConnection')
+            ->with($this->expectSmtpSettings(username: '', encryptedPassword: '', decryptedPassword: ''))
+            ->willReturn(false);
+
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
+    }
+
+    public function testValidateSuccessfulConnectionWithoutCredentials(): void
+    {
+        $value = $this->getConfiguredSettings(username: '', password: '');
+
+        $this->checker->expects(self::once())
+            ->method('checkConnection')
+            ->with($this->expectSmtpSettings(username: '', encryptedPassword: '', decryptedPassword: ''))
+            ->willReturn(true);
+
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateSuccessfulConnectionWithoutCredentialsAndEncryption(): void
+    {
+        $value = $this->getConfiguredSettings(encryption: '', username: '', password: '');
+
+        $this->checker->expects(self::once())
+            ->method('checkConnection')
+            ->with($this->expectSmtpSettings(
+                encryption: '',
+                username: '',
+                encryptedPassword: '',
+                decryptedPassword: ''
+            ))
+            ->willReturn(true);
+
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    private function getConfiguredSettings(
+        ?string $host = self::HOST,
+        mixed $port = self::PORT,
+        ?string $encryption = self::ENCRYPTION,
+        ?string $username = self::USERNAME,
+        ?string $password = self::ENCRYPTED_PASSWORD
+    ): array {
         return [
-            'oro_email___smtp_settings_host' => [ConfigManager::VALUE_KEY => 'smtp.host'],
-            'oro_email___smtp_settings_port' => [ConfigManager::VALUE_KEY => 123],
-            'oro_email___smtp_settings_encryption' => [ConfigManager::VALUE_KEY => 'ssl'],
-            'oro_email___smtp_settings_username' => [ConfigManager::VALUE_KEY => 'user'],
-            'oro_email___smtp_settings_password' => [ConfigManager::VALUE_KEY => $encryptedPassword]
+            'oro_email___smtp_settings_host' => [ConfigManager::VALUE_KEY => $host],
+            'oro_email___smtp_settings_port' => [ConfigManager::VALUE_KEY => $port],
+            'oro_email___smtp_settings_encryption' => [ConfigManager::VALUE_KEY => $encryption],
+            'oro_email___smtp_settings_username' => [ConfigManager::VALUE_KEY => $username],
+            'oro_email___smtp_settings_password' => [ConfigManager::VALUE_KEY => $password]
         ];
     }
 
-    private function getSmtpSettings(string $encryptedPassword): SmtpSettings
-    {
+    /**
+     * Expects the settings model to be built from the given parameters and returns it.
+     */
+    private function expectSmtpSettings(
+        string $host = self::HOST,
+        int $port = self::PORT,
+        ?string $encryption = self::ENCRYPTION,
+        ?string $username = self::USERNAME,
+        ?string $encryptedPassword = self::ENCRYPTED_PASSWORD,
+        ?string $decryptedPassword = self::DECRYPTED_PASSWORD
+    ): SmtpSettings {
         $this->encryptor->expects(self::once())
             ->method('decryptData')
             ->with($encryptedPassword)
-            ->willReturn('decrypted_password');
+            ->willReturn($decryptedPassword);
 
-        $data = [
-            'smtp.host',
-            123,
-            'ssl',
-            'user',
-            'decrypted_password'
-        ];
         $smtpSettings = new SmtpSettings();
         $this->smtpSettingsFactory->expects(self::once())
             ->method('createFromArray')
-            ->with($data)
+            ->with([$host, $port, $encryption, $username, $decryptedPassword])
             ->willReturn($smtpSettings);
 
         return $smtpSettings;

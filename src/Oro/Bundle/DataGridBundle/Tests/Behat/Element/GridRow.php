@@ -92,6 +92,12 @@ class GridRow extends TableRow
     /**
      * Start inline editing on the cell without changing the value and without saving
      *
+     * Double click is used instead of the edit icon: the icon is appended to a cell lazily, on
+     * `mouseenter` only (see inline-editing-plugin.js), so a pointer that already rests on the cell
+     * renders no icon at all, and re-hovering a cell that sits behind a horizontal grid scroll is
+     * unreliable. Double click is bound to the same `isEditable` gate and lets the plugin scroll the
+     * cell into view on its own, which makes this step independent of the pointer position.
+     *
      * @param string $header Column header name
      * @return NodeElement
      */
@@ -100,6 +106,38 @@ class GridRow extends TableRow
         $cell = $this->getCellByHeader($header);
 
         $isEditingStarted = $this->spin(function () use ($cell) {
+            if ($cell->hasClass('edit-mode')) {
+                return true;
+            }
+
+            if (!$cell->hasClass('editable')) {
+                // Double click on a non-editable cell is handled as a row click and opens the record,
+                // so leave such a cell alone and let the assertion below report it.
+                return null;
+            }
+
+            $cell->doubleClick();
+
+            return $cell->hasClass('edit-mode') ? true : null;
+        }, 5);
+
+        if (null === $isEditingStarted) {
+            // Fallback for editors that do not switch the cell into the `edit-mode` state.
+            $isEditingStarted = $this->startInlineEditingByIcon($cell);
+        }
+
+        self::assertNotNull($isEditingStarted, "Cell with '$header' is not inline editable");
+
+        return $cell;
+    }
+
+    /**
+     * @param NodeElement $cell
+     * @return bool|null
+     */
+    private function startInlineEditingByIcon(NodeElement $cell)
+    {
+        return $this->spin(function () use ($cell) {
             foreach ($this->findAll('xpath', 'child::td|child::th') as $awayCell) {
                 if ($awayCell->getXpath() !== $cell->getXpath()) {
                     $awayCell->mouseOver();
@@ -120,10 +158,6 @@ class GridRow extends TableRow
 
             return true;
         }, 5);
-
-        self::assertNotNull($isEditingStarted, "Cell with '$header' is not inline editable");
-
-        return $cell;
     }
 
     /**
