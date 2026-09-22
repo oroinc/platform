@@ -30,6 +30,13 @@ The current file describes significant changes in the code that may affect the u
 
 #### SecurityBundle
 * Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with an unconfigured organization field that make AclHelper compile invalid SQL.
+* Added `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent` dispatched by `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository::savePrivileges()` after the ACL privileges of a security identity are flushed. The event is dispatched only when at least one entity-level or field-level permission has been actually changed and carries only the changed privileges.
+* Added `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclChangeSet` that collects object identities whose ACLs have been actually changed by `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager::flush()`; pass an instance to the new `flushAndCollectChanges()` method to receive them.
+
+### Changed
+
+#### SecurityBundle
+* Added the `\Symfony\Contracts\EventDispatcher\EventDispatcherInterface` to the `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository` to dispatch `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent`.
 
 ## 6.1.10
 

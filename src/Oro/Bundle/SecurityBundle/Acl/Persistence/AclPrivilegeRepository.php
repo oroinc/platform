@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
@@ -20,6 +21,7 @@ use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -38,10 +40,17 @@ class AclPrivilegeRepository
     /** @var TranslatorInterface */
     private $translator;
 
+    protected ?EventDispatcherInterface $eventDispatcher = null;
+
     public function __construct(AclManager $manager, TranslatorInterface $translator)
     {
         $this->manager = $manager;
         $this->translator = $translator;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -251,6 +260,9 @@ class AclPrivilegeRepository
      */
     public function savePrivileges(SID $sid, ArrayCollection $privileges)
     {
+        // Snapshot before the collection is mutated below (root privileges get removed).
+        $savedPrivileges = new ArrayCollection($privileges->toArray());
+
         /**
          * @var array $rootKeys [<ExtensionKey> => <a key in $privilege collection>]
          */
@@ -333,7 +345,29 @@ class AclPrivilegeRepository
             }
         }
 
-        $this->manager->flush();
+        $changeSet = new AclChangeSet();
+        $this->manager->flushAndCollectChanges($changeSet);
+
+        $changedPrivileges = $this->filterChangedPrivileges($savedPrivileges, $changeSet);
+        if (null !== $this->eventDispatcher && !$changedPrivileges->isEmpty()) {
+            $this->eventDispatcher->dispatch(
+                new AclPrivilegesSavedEvent($sid, $changedPrivileges),
+                AclPrivilegesSavedEvent::NAME
+            );
+        }
+    }
+
+    /**
+     * Keeps only privileges whose ACL has been actually changed; field-level permissions
+     * belong to the ACL of their entity, so a field-only change keeps the entity privilege.
+     */
+    private function filterChangedPrivileges(ArrayCollection $privileges, AclChangeSet $changeSet): ArrayCollection
+    {
+        return $privileges->filter(function (AclPrivilege $privilege) use ($changeSet) {
+            $type = ObjectIdentityHelper::getClassFromIdentityString($privilege->getIdentity()->getId());
+
+            return $changeSet->isChanged($type);
+        });
     }
 
     /**
