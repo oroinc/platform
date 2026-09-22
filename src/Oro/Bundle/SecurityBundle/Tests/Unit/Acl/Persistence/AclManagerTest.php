@@ -8,6 +8,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclChangeSet;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\Batch\BatchItem;
 use Oro\Component\Testing\ReflectionUtil;
@@ -939,6 +940,77 @@ class AclManagerTest extends TestCase
             ->with($this->identicalTo($oid4));
 
         $this->manager->flush();
+    }
+
+    public function testFlushCollectsChangedOidsIntoChangeSet(): void
+    {
+        $unchangedOid = new ObjectIdentity('entity', 'Acme\Unchanged');
+        $createdOid = new ObjectIdentity('entity', 'Acme\Created');
+        $updatedOid = new ObjectIdentity('entity', 'Acme\Updated');
+        $deletedOid = new ObjectIdentity('entity', 'Acme\Deleted');
+
+        $newItem = new BatchItem($createdOid, BatchItem::STATE_CREATE);
+        $newItem->addAce(
+            AclManager::OBJECT_ACE,
+            null,
+            $this->createMock(SecurityIdentityInterface::class),
+            true,
+            123,
+            'all'
+        );
+
+        $this->setItems([
+            new BatchItem($unchangedOid, BatchItem::STATE_NONE),
+            $newItem,
+            new BatchItem($updatedOid, BatchItem::STATE_UPDATE, $this->createMock(MutableAclInterface::class)),
+            new BatchItem($deletedOid, BatchItem::STATE_DELETE, $this->createMock(MutableAclInterface::class)),
+        ]);
+
+        $this->aclProvider->expects(self::once())
+            ->method('createAcl')
+            ->willReturn($this->createMock(MutableAclInterface::class));
+        $this->aceProvider->expects(self::once())
+            ->method('setPermission')
+            ->willReturn(true);
+
+        $changeSet = new AclChangeSet();
+        $this->manager->flush($changeSet);
+
+        $this->assertFalse($changeSet->isChanged('Acme\Unchanged'));
+        $this->assertTrue($changeSet->isChanged('Acme\Created'));
+        $this->assertTrue($changeSet->isChanged('Acme\Updated'));
+        $this->assertTrue($changeSet->isChanged('Acme\Deleted'));
+    }
+
+    public function testFlushDoesNotReportCreatedAclWithoutPermissionChanges(): void
+    {
+        $createdOid = new ObjectIdentity('entity', 'Acme\Created');
+
+        $newItem = new BatchItem($createdOid, BatchItem::STATE_CREATE);
+        $newItem->addAce(
+            AclManager::OBJECT_ACE,
+            null,
+            $this->createMock(SecurityIdentityInterface::class),
+            true,
+            123,
+            'all'
+        );
+
+        $this->setItems([$newItem]);
+
+        $this->aclProvider->expects(self::once())
+            ->method('createAcl')
+            ->willReturn($this->createMock(MutableAclInterface::class));
+        $this->aceProvider->expects(self::once())
+            ->method('setPermission')
+            ->willReturn(false);
+        $this->aclProvider->expects(self::never())
+            ->method('updateAcl');
+
+        $changeSet = new AclChangeSet();
+        $this->manager->flush($changeSet);
+
+        $this->assertTrue($changeSet->isEmpty());
     }
 
     private function setItem(ObjectIdentity $oid, $state, ?MutableAclInterface $acl = null)

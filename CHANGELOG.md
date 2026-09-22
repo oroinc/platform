@@ -111,7 +111,14 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\UserBundle\Async\UserPasswordResetRequestProcessor` that resolves the user account and sends the reset password email.
 * Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue.
 
+#### SecurityBundle
+* Added `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent` dispatched by `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository::savePrivileges()` after the ACL privileges of a security identity are flushed. The event is dispatched only when at least one entity-level or field-level permission has been actually changed and carries only the changed privileges.
+* Added `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclChangeSet` that collects object identities whose ACLs have been actually changed by `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager::flush()`; pass an instance as the new optional `$changeSet` argument of `flush()` to receive them.
+
 ### Changed
+
+#### SecurityBundle
+* Added the `\Symfony\Contracts\EventDispatcher\EventDispatcherInterface` argument to the `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository` constructor to dispatch `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent`.
 
 #### DataAuditBundle
 * Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Symfony\Contracts\Translation\TranslatorInterface` and `Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider` arguments, as the entity type list now also contains the configuration levels.
