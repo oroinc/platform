@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-16241
 
 Feature: Form label for extended relation
