@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -48,7 +49,7 @@ class OpenApiSpecificationController
     }
 
     /**
-     * @Route("/", name="oro_openapi_specification_index")
+     * @Route("/", name="oro_openapi_specification_index", methods={"GET"})
      * @AclAncestor("oro_openapi_specification_view")
      * @Template("@OroApi/OpenApiSpecification/index.html.twig")
      */
@@ -58,7 +59,12 @@ class OpenApiSpecificationController
     }
 
     /**
-     * @Route("/view/{id}", name="oro_openapi_specification_view", requirements={"id"="\d+"})
+     * @Route(
+     *      "/view/{id}",
+     *      name="oro_openapi_specification_view",
+     *      requirements={"id"="\d+"},
+     *      methods={"GET"}
+     * )
      * @Acl(
      *      id="oro_openapi_specification_view",
      *      type="entity",
@@ -73,7 +79,11 @@ class OpenApiSpecificationController
     }
 
     /**
-     * @Route("/create", name="oro_openapi_specification_create")
+     * @Route(
+     *      "/create",
+     *      name="oro_openapi_specification_create",
+     *      methods={"GET", "POST"}
+     * )
      * @Acl(
      *      id="oro_openapi_specification_create",
      *      type="entity",
@@ -95,7 +105,12 @@ class OpenApiSpecificationController
     }
 
     /**
-     * @Route("/update/{id}", name="oro_openapi_specification_update", requirements={"id"="\d+"})
+     * @Route(
+     *      "/update/{id}",
+     *      name="oro_openapi_specification_update",
+     *      requirements={"id"="\d+"},
+     *      methods={"GET", "POST"}
+     * )
      * @Acl(
      *      id="oro_openapi_specification_update",
      *      type="entity",
@@ -119,13 +134,19 @@ class OpenApiSpecificationController
     }
 
     /**
-     * @Route("/delete/{id}", name="oro_openapi_specification_delete", requirements={"id"="\d+"})
+     * @Route(
+     *      "/delete/{id}",
+     *      name="oro_openapi_specification_delete",
+     *      requirements={"id"="\d+"},
+     *      methods={"DELETE"}
+     * )
      * @Acl(
      *      id="oro_openapi_specification_delete",
      *      type="entity",
      *      class="OroApiBundle:OpenApiSpecification",
      *      permission="DELETE"
      * )
+     * @CsrfProtection()
      */
     public function deleteAction(OpenApiSpecification $entity): Response
     {
@@ -135,7 +156,12 @@ class OpenApiSpecificationController
     }
 
     /**
-     * @Route("/clone/{id}", name="oro_openapi_specification_clone", requirements={"id"="\d+"})
+     * @Route(
+     *      "/clone/{id}",
+     *      name="oro_openapi_specification_clone",
+     *      requirements={"id"="\d+"},
+     *      methods={"GET", "POST"}
+     * )
      * @AclAncestor("oro_openapi_specification_create")
      * @Template("@OroApi/OpenApiSpecification/create.html.twig")
      */
@@ -169,6 +195,7 @@ class OpenApiSpecificationController
      *      methods={"POST"}
      * )
      * @AclAncestor("oro_openapi_specification_update")
+     * @CsrfProtection()
      */
     public function renewAction(OpenApiSpecification $entity): Response
     {
@@ -201,6 +228,7 @@ class OpenApiSpecificationController
      *      methods={"POST"}
      * )
      * @AclAncestor("oro_openapi_specification_update")
+     * @CsrfProtection()
      */
     public function publishAction(OpenApiSpecification $entity): Response
     {

@@ -24,7 +24,8 @@ class DownloadPublicOpenApiSpecificationController
      * @Route(
      *      "/public-openapi-specification/{organizationId}/{slug}",
      *      name="oro_public_openapi_specification_download",
-     *      requirements={"organizationId"="\d+", "slug"="[a-zA-Z0-9_\-]+"}
+     *      requirements={"organizationId"="\d+", "slug"="[a-zA-Z0-9_\-]+"},
+     *      methods={"GET"}
      * )
      */
     public function downloadPublicAction(int $organizationId, string $slug): Response
