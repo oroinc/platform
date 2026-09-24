@@ -92,6 +92,7 @@ class LoadUserData extends AbstractFixture implements
             ->setEmail(self::USER_WITH_CONFIRMATION_TOKEN_EMAIL)
             ->setOrganization($organization)
             ->setConfirmationToken(self::CONFIRMATION_TOKEN)
+            ->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')))
             ->addOrganization($organization)
             ->addBusinessUnit($organizationBusinessUnit)
             ->addUserRole($role)
