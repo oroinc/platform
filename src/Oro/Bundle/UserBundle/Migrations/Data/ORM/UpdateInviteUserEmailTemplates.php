@@ -19,6 +19,8 @@ class UpdateInviteUserEmailTemplates extends AbstractHashEmailMigration implemen
             'invite_user' => [
                 'c6c227715b6ffbfac9ad5bda0fcf933b', // 1.0.0.0
                 'fce0c4e51e10159be7bb180579d48b17', // 5.1.17.0
+                'dd74f49c3083e85e287a729ee3e6d478', // 5.1.17.0 content actually shipped
+                'ebce3e31cae498eeebaadb6a6bcd6ef8', // 5.1.17.1
             ]
         ];
     }
@@ -28,7 +30,7 @@ class UpdateInviteUserEmailTemplates extends AbstractHashEmailMigration implemen
      */
     public function getVersion()
     {
-        return '5.1.17.0';
+        return '5.1.17.1';
     }
 
     /**

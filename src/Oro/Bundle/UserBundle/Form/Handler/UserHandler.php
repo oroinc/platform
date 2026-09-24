@@ -7,7 +7,6 @@ use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
-use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LoggerInterface;
@@ -129,7 +128,7 @@ class UserHandler extends AbstractUserHandler
             $this->userConfigManager->get('oro_user.send_password_in_invitation_email');
 
         if (!$sendPasswordInEmail && !$user->getConfirmationToken()) {
-            $user->setConfirmationToken(RandomTokenGenerator::generate());
+            $user->renewConfirmationToken();
         }
 
         if ($this->form->has('passwordGenerate') && $this->form->get('passwordGenerate')->getData()) {

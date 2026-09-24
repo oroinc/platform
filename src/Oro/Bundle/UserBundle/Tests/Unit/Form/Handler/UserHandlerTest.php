@@ -155,6 +155,9 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         $this->assertTrue($this->handler->process($user));
+
+        self::assertNull($user->getConfirmationToken());
+        self::assertNull($user->getPasswordRequestedAt());
     }
 
     public function testProcessWithoutEmailAndWithPassword()
@@ -207,5 +210,8 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('sendTemplateEmail');
 
         $this->assertTrue($this->handler->process($user));
+
+        self::assertNotEmpty($user->getConfirmationToken());
+        self::assertNotNull($user->getPasswordRequestedAt());
     }
 }

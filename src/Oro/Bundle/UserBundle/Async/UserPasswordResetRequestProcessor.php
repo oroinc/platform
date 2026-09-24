@@ -45,10 +45,6 @@ class UserPasswordResetRequestProcessor extends AbstractPasswordResetRequestProc
             return self::ACK;
         }
 
-        if ($this->isPasswordAlreadyRequested($user)) {
-            return self::ACK;
-        }
-
         try {
             $this->userManager->sendResetPasswordEmail($user);
         } catch (\Exception $e) {
