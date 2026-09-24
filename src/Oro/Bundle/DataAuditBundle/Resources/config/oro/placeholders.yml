@@ -3,6 +3,7 @@ placeholders:
         change_history_block:
             items:
                 change_history_link: ~
+                menu_change_history_link: ~
         segment_criteria_list:
             items:
                 data_audit_condition: ~
@@ -13,6 +14,11 @@ placeholders:
             applicable:
                 - "@oro_dataaudit.placeholder.filter->isEntityAuditable($entity$, $audit_show_change_history$)"
                 - "@oro_user.placeholder.filter->isUserApplicable()"
+            acl: oro_dataaudit_view
+        menu_change_history_link:
+            template: '@@OroDataAudit/menu_change_history_link.html.twig'
+            applicable:
+                - "@oro_dataaudit.placeholder.menu_filter->isMenuItemAuditable($entity$)"
             acl: oro_dataaudit_view
         data_audit_condition:
             acl: oro_dataaudit_view

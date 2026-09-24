@@ -26,14 +26,6 @@ class EntityAuditFieldSearchProvider extends AbstractAuditFieldNameProvider
         parent::__construct($translator);
     }
 
-    /**
-     * @return array{classes: string[], fields: string[]}
-     */
-    public function getMatchingFields(string $term): array
-    {
-        return $this->matchFields($term);
-    }
-
     #[\Override]
     protected function getObjectClasses(): array
     {

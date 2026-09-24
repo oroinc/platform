@@ -591,6 +591,20 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBuild }
 
+    oro_navigation.event_listener.entity_config_grid_listener:
+        class: Oro\Bundle\NavigationBundle\Datagrid\ExcludedEntitiesConfigGridListener
+        arguments:
+            - ['Oro\Bundle\NavigationBundle\Entity\MenuUpdate']
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entityconfig-grid, method: onBuildAfter }
+
+    oro_navigation.event_listener.entity_config_request_listener:
+        class: Oro\Bundle\NavigationBundle\EventListener\ExcludedEntitiesConfigRequestListener
+        arguments:
+            - ['Oro\Bundle\NavigationBundle\Entity\MenuUpdate']
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller_arguments, method: onKernelControllerArguments }
+
     oro_navigation.provider.menu_update_provider:
         class: Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider
         arguments:

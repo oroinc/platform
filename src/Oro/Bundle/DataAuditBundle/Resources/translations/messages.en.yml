@@ -41,6 +41,8 @@ oro:
         menu:
             audit_list.label:       "Data Audit"
             audit_list.description: "Data Audit"
+            field:
+                parentKey: Parent
 
         collection:
             added: '%record% "%entity_name%" added'
@@ -63,6 +65,12 @@ oro:
             author_impersonation: " (impersonated from %ipAddress% using %token%)"
             author_impersonation_filter: "Impersonated from %ipAddress% using %token%"
             impersonation: Impersonation
+
+        back_office_menu:
+            type:
+                global: 'Back-Office Menu: Global'
+                organization: 'Back-Office Menu: Organization'
+                user: 'Back-Office Menu: User'
 
         config:
             type:
