@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -59,7 +60,11 @@ class ResetPasswordHandler
         $this->userManager->updateUser($user);
 
         try {
-            $this->mailManager->processSingle($this->getNotification($user), [], $this->logger);
+            $this->mailManager->processSingle(
+                $this->getNotification($user),
+                [Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM => $user->getConfirmationToken() ?: null],
+                $this->logger
+            );
 
             return true;
         } catch (\Exception $e) {

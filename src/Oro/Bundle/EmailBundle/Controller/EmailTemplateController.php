@@ -79,6 +79,12 @@ class EmailTemplateController extends AbstractController
             $emailTemplate = new EmailTemplate();
         } else {
             $emailTemplate = $this->container->get('doctrine')->getRepository(EmailTemplate::class)->find($id);
+            if (null === $emailTemplate) {
+                throw $this->createNotFoundException();
+            }
+            if (!$this->isGranted('VIEW', $emailTemplate)) {
+                throw $this->createAccessDeniedException();
+            }
         }
 
         /** @var FormInterface $form */
