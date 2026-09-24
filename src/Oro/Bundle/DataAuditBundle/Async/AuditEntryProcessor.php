@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\DataAuditBundle\Async\Topic\ConfigChangeAuditTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditEntryTopic;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
@@ -17,11 +17,10 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
- * Builds and stores a Data Audit entry for a system configuration change from the normalized payload
- * published (at change time, with the acting user / level already resolved) by the config-change
- * audit listener.
+ * Stores a Data Audit entry from the payload published by
+ * {@see \Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder}.
  */
-class ConfigChangeAuditProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
+class AuditEntryProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
     public function __construct(
         private readonly ManagerRegistry $doctrine,
@@ -71,14 +70,9 @@ class ConfigChangeAuditProcessor extends AbstractAuditProcessor implements Topic
     #[\Override]
     public static function getSubscribedTopics(): array
     {
-        return [ConfigChangeAuditTopic::getName()];
+        return [AuditEntryTopic::getName()];
     }
 
-    /**
-     * Loads a referenced entity, but only when it is of the expected class: the payload may reference an
-     * author that is not a back-office user (e.g. a storefront customer user), which the audit cannot
-     * hold.
-     */
     private function getEntity(EntityReference $reference, string $expectedClass): ?object
     {
         $class = $reference->getClassName();

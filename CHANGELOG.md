@@ -64,6 +64,12 @@ The current file describes significant changes in the code that may affect the u
 * Added the `oro_data_audit.configuration_level_entities` configuration option that tells the audit which entity the id of a configuration scope refers to, so that a record can be named after what was configured.
 * Added masking of secret configuration settings in the audit: the value of a setting rendered as a password field is stored as `***`.
 * Added the `audit-data` datagrid filter (`Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter`) that searches within the changed data of the audit grid.
+* Added `Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder` and `Oro\Bundle\DataAuditBundle\Model\AuditEntry`: the way for a bundle to record an audit entry for a change the audit cannot discover on its own, i.e. a change that is not a change of an auditable entity (a system configuration setting, a storefront menu). The recorder resolves the author, checks whether anything is audited at all and stores the entry asynchronously, so a producer only describes what changed.
+* Added `Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface` and the `oro_dataaudit.audit_type` tag: describes an audit type whose object class is not an entity of the application and provides everything the audit grid shows for it (the Entity Type column and filter, the name of a changed field, and what the `audit-data` filter matches). `Oro\Bundle\DataAuditBundle\Provider\LevelAuditType` implements it for any domain that is recorded per level — the configuration levels, the menu levels — so such a domain is added by registering services only, and `Oro\Bundle\DataAuditBundle\Provider\AuditTypeRegistry` combines all of them. A bundle can now add an audited domain without changing the Data Audit bundle.
+* Added the `oro_dataaudit_field_label` Twig function that names a changed field the way the audited domain wants it shown.
+* Added recording of menu changes: every change an administrator makes in a back-office menu (**System > Menus**) is stored as an audit record of the changed menu item, whose entity type is the level the menu was customized on (global, organization, user). Every menu item the action changed gets a record of its own with only the properties of that item that changed, the items hidden together with the item that was acted on and the items a deleted item held included, and the records of one action share a transaction.
+* Added recording of everything a menu item owns: the file a menu item shows and the collections a menu item holds are recorded as a change of the menu item they belong to, whether they were replaced, edited in place or taken away. What a menu item owns is read from its Doctrine metadata, so a menu that brings a relation of its own is recorded without changing the Data Audit bundle.
+* Added the change history of a menu item to the page of that menu item, next to the change history of an auditable entity. See `Oro\Bundle\DataAuditBundle\Provider\MenuAuditObjectProviderInterface` and the `oro_dataaudit.menu_audit_object` tag, `Oro\Bundle\DataAuditBundle\Model\MenuAuditObject` and the `oro_dataaudit_menu_item_audit` Twig function. A menu item is now recorded under an identifier that tells the item apart from an item of another menu and from the same item customized for somebody else, so that its history and its version numbers are its own.
 
 #### MessageQueueBundle
 * Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
@@ -102,6 +108,9 @@ The current file describes significant changes in the code that may affect the u
 
 #### NavigationBundle
 * Added `dropdown-menu-level-last` CSS class to the top menu template (`Resources/views/Menu/application_menu_desktop_top.html.twig`) for the deepest dropdown level, enabling targeted styling of leaf-level submenus.
+* Added `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager::deleteMenuUpdate()` and `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository::findChildren()`: deleting a menu item now moves the items nested into it to the top level of the menu, instead of leaving them with a parent key that no longer exists. The menu showed such an item at the top level anyway, and the move is recorded in the Data Audit now.
+* Added `Oro\Bundle\NavigationBundle\Datagrid\ExcludedEntitiesConfigGridListener` that hides the given entities from a config grid, so a bundle can keep its system entity out of the entity management grid.
+* Added `Oro\Bundle\NavigationBundle\EventListener\ExcludedEntitiesConfigRequestListener` that makes the entity config pages of the given entities respond with 404, so a system entity kept out of the entity management cannot be opened by a direct URL.
 
 #### SecurityBundle
 * Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with unconfigured organization fields causing invalid ACL SQL.
@@ -121,13 +130,16 @@ The current file describes significant changes in the code that may affect the u
 * Added the `\Symfony\Contracts\EventDispatcher\EventDispatcherInterface` argument to the `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository` constructor to dispatch `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent`.
 
 #### DataAuditBundle
-* Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Symfony\Contracts\Translation\TranslatorInterface` and `Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider` arguments, as the entity type list now also contains the configuration levels.
+* Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface` argument, as the entity type list now also contains the audit types that are not entities of the application (the configuration levels, the storefront menu levels).
 * Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
 
 #### DataGridBundle
 * Changed `Oro\Bundle\DataGridBundle\Twig\DataGridExtension::getGrid()` (the `oro_datagrid_build` TWIG function): it treats a datagrid disabled by a feature as unavailable instead of failing, so such a datagrid is not rendered.
 * Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.
 * Changed `Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`: it builds the datagrid before sending the export message, so an export of an unknown or disabled datagrid responds with 404 instead of enqueueing a message that cannot be processed.
+
+#### NavigationBundle
+* Changed the `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity configuration: a menu item is a system record managed on the page of its menu, so the entity is hidden from the entity management grid, its entity config pages respond with 404, excluded from the lists of entities (`oro_entity: exclusions`) and its entity audit is turned off and locked (`dataaudit: {auditable: false, immutable: true}`) — the changes of a menu item are recorded by the menu audit, so the entity audit of the same rows would only duplicate them.
 
 #### EmailBundle
 * Updated entity config setting `email.available_in_template` to make it `false` be default. Make sure to update this setting for your custom fields if you want to use them in email templates. You can do this using `\Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery` in a schema migration.
@@ -199,6 +211,9 @@ The current file describes significant changes in the code that may affect the u
 * Changed the guard that prevents sending the reset password email more than once within the reset token lifetime: it is skipped now when the password was never requested before, regardless of the `frontend` field of the `Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType` form (the field is not used anymore).
 
 ### Removed
+
+#### DataAuditBundle
+* Removed `Oro\Bundle\DataAuditBundle\Async\Topic\ConfigChangeAuditTopic`, `Oro\Bundle\DataAuditBundle\Async\ConfigChangeAuditProcessor` and `Oro\Bundle\DataAuditBundle\Twig\ConfigAuditExtension`; use `Oro\Bundle\DataAuditBundle\Async\Topic\AuditEntryTopic`, `Oro\Bundle\DataAuditBundle\Async\AuditEntryProcessor` and `Oro\Bundle\DataAuditBundle\Twig\AuditFieldLabelExtension` instead, which record any audit entry built by a bundle and not only a configuration change. The message queue topic changed accordingly from `oro.data_audit.config_changed` to `oro.data_audit.audit_entry`, and the `oro_dataaudit_config_field_label` Twig function was replaced with `oro_dataaudit_field_label`.
 
 #### EmailBundle
 * Removed `\Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator`, added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` instead.
