@@ -32,6 +32,17 @@ final class AjaxEmailControllerTest extends WebTestCase
         $this->loadFixtures([LoadAjaxEmailControllerData::class]);
     }
 
+    /**
+     * Sets the CSRF cookie with the domain and path the application uses in its responses, so it
+     * replaces the token rotated by the previous response. Since symfony/browser-kit 6.4.44 the
+     * cookie jar returns the most specific cookie, and a domain-less one no longer shadows it.
+     */
+    private function setCsrfCookie(string $value): void
+    {
+        $this->client->getCookieJar()
+            ->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $value, null, '/', 'localhost'));
+    }
+
     public function testCompileEmailActionWithValidEmailTemplate(): void
     {
         $user = $this->getReference('simple_user');
@@ -49,7 +60,7 @@ final class AjaxEmailControllerTest extends WebTestCase
         ];
 
         $csrfToken = $this->getCsrfToken(CsrfRequestManager::CSRF_TOKEN_ID);
-        $this->client->getCookieJar()->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $csrfToken->getValue()));
+        $this->setCsrfCookie($csrfToken->getValue());
 
         $this->client->request(
             'POST',
@@ -89,7 +100,7 @@ final class AjaxEmailControllerTest extends WebTestCase
         ];
 
         $csrfToken = $this->getCsrfToken(CsrfRequestManager::CSRF_TOKEN_ID);
-        $this->client->getCookieJar()->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $csrfToken->getValue()));
+        $this->setCsrfCookie($csrfToken->getValue());
 
         $this->client->request(
             'POST',
@@ -126,7 +137,7 @@ final class AjaxEmailControllerTest extends WebTestCase
         ];
 
         $csrfToken = $this->getCsrfToken(CsrfRequestManager::CSRF_TOKEN_ID);
-        $this->client->getCookieJar()->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $csrfToken->getValue()));
+        $this->setCsrfCookie($csrfToken->getValue());
 
         $this->client->request(
             'POST',
@@ -156,7 +167,7 @@ final class AjaxEmailControllerTest extends WebTestCase
     public function testCompileEmailActionWithGetMethod(): void
     {
         $csrfToken = $this->getCsrfToken(CsrfRequestManager::CSRF_TOKEN_ID);
-        $this->client->getCookieJar()->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $csrfToken->getValue()));
+        $this->setCsrfCookie($csrfToken->getValue());
 
         $this->client->request(
             'GET',
@@ -184,7 +195,7 @@ final class AjaxEmailControllerTest extends WebTestCase
         ];
 
         $csrfToken = $this->getCsrfToken(CsrfRequestManager::CSRF_TOKEN_ID);
-        $this->client->getCookieJar()->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $csrfToken->getValue()));
+        $this->setCsrfCookie($csrfToken->getValue());
 
         $this->client->request(
             'POST',

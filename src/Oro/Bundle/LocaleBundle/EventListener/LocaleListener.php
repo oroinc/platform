@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -28,6 +29,7 @@ class LocaleListener implements EventSubscriberInterface
     private TranslatorInterface $translator;
     private RequestContextAwareInterface $router;
     private ApplicationState $applicationState;
+    private ?LocaleSwitcher $localeSwitcher = null;
     private ?bool $installed = null;
     private ?string $currentLanguage = null;
 
@@ -47,6 +49,11 @@ class LocaleListener implements EventSubscriberInterface
         $this->applicationState = $applicationState;
     }
 
+    public function setLocaleSwitcher(?LocaleSwitcher $localeSwitcher): void
+    {
+        $this->localeSwitcher = $localeSwitcher;
+    }
+
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -55,16 +62,22 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         $language = $this->getCurrentLanguage();
-        if (!$request->attributes->get('_locale')) {
+        $routeLocale = $request->attributes->get('_locale');
+        if (!$routeLocale) {
             $request->setLocale($language);
             $this->router->getContext()->setParameter('_locale', $language);
         }
 
+        $this->switchLocale($language);
+        if ($routeLocale) {
+            // LocaleSwitcher::setLocale() changes the "_locale" parameter in the router context.
+            // The route gives the locale for the URL generation. Set this locale again.
+            $this->router->getContext()->setParameter('_locale', $routeLocale);
+        }
+        // LocaleSwitcher sets the PHP default locale to the language code, for example "de".
+        // The application must use the format locale, for example "de_DE". Set this locale again.
         $this->setPhpDefaultLocale($this->localeSettings->getLocale());
         $this->translatableListener->setTranslatableLocale($language);
-        if ($this->translator instanceof LocaleAwareInterface) {
-            $this->translator->setLocale($language);
-        }
     }
 
     public function setPhpDefaultLocale(string $locale): void
@@ -113,11 +126,9 @@ class LocaleListener implements EventSubscriberInterface
             return;
         }
 
+        $this->switchLocale($language);
         $this->setPhpDefaultLocale($locale);
         $this->translatableListener->setTranslatableLocale($language);
-        if ($this->translator instanceof LocaleAwareInterface) {
-            $this->translator->setLocale($language);
-        }
     }
 
     #[\Override]
@@ -128,6 +139,22 @@ class LocaleListener implements EventSubscriberInterface
             KernelEvents::REQUEST => [['onKernelRequest', 7]],
             ConsoleEvents::COMMAND => [['onConsoleCommand']],
         ];
+    }
+
+    /**
+     * Sets the language through the LocaleSwitcher, so the switcher gets the locale too.
+     *
+     * Since symfony/http-kernel 6.4.44, LocaleAwareListener restores every kernel.locale_aware
+     * service to its own stored locale after a sub-request. A switcher left at the default locale
+     * would push that default back to the translator.
+     */
+    private function switchLocale(string $language): void
+    {
+        if (null !== $this->localeSwitcher) {
+            $this->localeSwitcher->setLocale($language);
+        } elseif ($this->translator instanceof LocaleAwareInterface) {
+            $this->translator->setLocale($language);
+        }
     }
 
     private function getCurrentLanguage(): string
