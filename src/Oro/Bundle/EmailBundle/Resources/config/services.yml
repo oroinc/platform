@@ -518,6 +518,15 @@ services:
             - '@oro_email.cache'
             - 'oro_email.available_in_template_fields'
 
+    oro_email.twig.email_template_entity_access_checker:
+        class: Oro\Bundle\EmailBundle\Twig\EmailTemplateEntityAccessChecker
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.reset, method: reset }
+
     oro_email.twig.email_security_policy:
         class: Twig\Sandbox\SecurityPolicy
         # @bc-layer These arguments are retained for BC reasons. The actual allowed tags, filters, methods,
@@ -548,6 +557,7 @@ services:
             - '@.inner'
             - '@oro_email.email_renderer_configuration'
         calls:
+            - [ setEntityAccessChecker, [ '@oro_email.twig.email_template_entity_access_checker' ] ]
             - [ setAllowedTags, [ [ 'app', 'for', 'if', 'apply', 'set', 'block' ] ] ]
             - [ setAllowedFunctions, [ [ '_entity_var', 'date' ] ] ]
             - [ setAllowedFilters, [ [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper', 'oro_html_sanitize', 'slice', 'spaceless' ] ] ]
@@ -608,6 +618,9 @@ services:
     oro_email.twig.sandbox.safe_get_attribute_node_extension:
         class: Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension
         calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
+            # @bc-layer setLogger() and the channel tag are retained so that LoggerAwareInterface keeps working;
+            # the violation itself is logged by oro_email.event_listener.email_template_security_policy_violation.
             - [setLogger, ['@logger']]
         tags:
             - { name: monolog.logger, channel: oro_email }
@@ -1589,6 +1602,14 @@ services:
             - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\EmailTemplateRenderBeforeEvent, method: onRenderBefore }
             - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\EmailTemplateRenderAfterEvent, method: onRenderAfter }
 
+    oro_email.event_listener.email_template_security_policy_violation:
+        class: 'Oro\Bundle\EmailBundle\EventListener\EmailTemplateSecurityPolicyViolationListener'
+        arguments:
+            - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent, method: onSecurityPolicyViolation, priority: -100 }
+            - { name: monolog.logger, channel: oro_email }
+
     oro_email.provider.url_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\UrlProvider'
         arguments:
@@ -1846,6 +1867,11 @@ services:
             - '@oro_email.twig.email_environment'
             - '@oro_email.twig.analyzer.template_access_analyzer'
 
+    oro_email.provider.substitutable_email_template_attribute:
+        class: Oro\Bundle\EmailBundle\Provider\SubstitutableEmailTemplateAttributeProvider
+        arguments:
+            - !tagged_iterator { tag: oro_email.email_template_substitutable_attribute }
+
     oro_email.twig.security_policy.email_template_checker:
         class: Oro\Bundle\EmailBundle\Twig\SecurityPolicy\EmailTemplateSecurityPolicyChecker
         arguments:
@@ -1861,6 +1887,8 @@ services:
             - '@oro_locale.manager.localization'
             - '@oro_entity_config.provider.entity'
             - '@translator'
+        calls:
+            - [ setSubstitutableAttributeProvider, [ '@oro_email.provider.substitutable_email_template_attribute' ] ]
         tags:
             - { name: validator.constraint_validator }
 

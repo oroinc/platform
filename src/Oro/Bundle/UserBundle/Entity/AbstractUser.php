@@ -110,7 +110,7 @@ abstract class AbstractUser implements
     #[ORM\Column(name: 'confirmation_token', type: Types::STRING, nullable: true)]
     #[ConfigField(defaultValues: [
         'importexport' => ['excluded' => true],
-        'email' => ['available_in_template' => true],
+        'email' => ['available_in_template' => false, 'immutable' => true],
     ])]
     protected ?string $confirmationToken = null;
 

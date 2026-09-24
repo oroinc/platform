@@ -489,4 +489,135 @@ final class EnableAvailableInTemplatesForFieldsInTemplatesTaskTest extends TestC
             $result->getMessage()
         );
     }
+
+    public function testExecuteSkipsImmutableFieldEvenWhenNotEnabled(): void
+    {
+        $entityClass = \stdClass::class;
+        $fieldName = 'confirmationToken';
+
+        $this->entityFieldsUsedInEmailTemplatesProvider
+            ->expects(self::once())
+            ->method('getEntityFieldsUsedInEmailTemplates')
+            ->willReturn([
+                0 => ['entity' => $entityClass, 'field' => $fieldName],
+            ]);
+
+        $this->configProvider
+            ->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass, $fieldName)
+            ->willReturn(true);
+
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
+        $entityFieldConfig
+            ->expects(self::once())
+            ->method('is')
+            ->with('immutable')
+            ->willReturn(true);
+        $entityFieldConfig
+            ->expects(self::never())
+            ->method('get');
+        $entityFieldConfig
+            ->expects(self::never())
+            ->method('set');
+
+        $this->configProvider
+            ->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $fieldName)
+            ->willReturn($entityFieldConfig);
+
+        $this->entityConfigManager
+            ->expects(self::never())
+            ->method('persist');
+
+        $this->entityConfigManager
+            ->expects(self::never())
+            ->method('flush');
+
+        $result = $this->task->execute($this->input, $this->output, $this->io);
+
+        self::assertSame(true, $result->isExecuted());
+        self::assertSame(
+            'All entity fields present in email templates were already enabled for use.',
+            $result->getMessage()
+        );
+    }
+
+    public function testExecuteSkipsImmutableFieldAndEnablesOtherFields(): void
+    {
+        $entityClass = \stdClass::class;
+        $immutableFieldName = 'confirmationToken';
+        $enabledFieldName = 'name';
+
+        $this->entityFieldsUsedInEmailTemplatesProvider
+            ->expects(self::once())
+            ->method('getEntityFieldsUsedInEmailTemplates')
+            ->willReturn([
+                0 => ['entity' => $entityClass, 'field' => $immutableFieldName],
+                1 => ['entity' => $entityClass, 'field' => $enabledFieldName],
+            ]);
+
+        $this->configProvider
+            ->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [$entityClass, $immutableFieldName, true],
+                [$entityClass, $enabledFieldName, true],
+            ]);
+
+        $immutableFieldConfig = $this->createMock(ConfigInterface::class);
+        $immutableFieldConfig
+            ->expects(self::once())
+            ->method('is')
+            ->with('immutable')
+            ->willReturn(true);
+        $immutableFieldConfig
+            ->expects(self::never())
+            ->method('get');
+        $immutableFieldConfig
+            ->expects(self::never())
+            ->method('set');
+
+        $enabledFieldConfig = $this->createMock(ConfigInterface::class);
+        $enabledFieldConfig
+            ->expects(self::once())
+            ->method('is')
+            ->with('immutable')
+            ->willReturn(false);
+        $enabledFieldConfig
+            ->expects(self::once())
+            ->method('get')
+            ->with('available_in_template')
+            ->willReturn(false);
+        $enabledFieldConfig
+            ->expects(self::once())
+            ->method('set')
+            ->with('available_in_template', true);
+
+        $this->configProvider
+            ->expects(self::exactly(2))
+            ->method('getConfig')
+            ->willReturnMap([
+                [$entityClass, $immutableFieldName, $immutableFieldConfig],
+                [$entityClass, $enabledFieldName, $enabledFieldConfig],
+            ]);
+
+        $this->entityConfigManager
+            ->expects(self::once())
+            ->method('persist')
+            ->with($enabledFieldConfig);
+
+        $this->entityConfigManager
+            ->expects(self::once())
+            ->method('flush');
+
+        $result = $this->task->execute($this->input, $this->output, $this->io);
+
+        self::assertSame(true, $result->isExecuted());
+        self::assertSame(
+            '1 entity fields are now enabled for use in email templates: stdClass::name',
+            $result->getMessage()
+        );
+    }
 }

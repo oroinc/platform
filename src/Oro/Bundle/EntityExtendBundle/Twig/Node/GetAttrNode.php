@@ -13,6 +13,7 @@ use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
 use Twig\Node\Expression\GetAttrExpression;
 use Twig\Node\Node;
+use Twig\Sandbox\SecurityError;
 use Twig\Source;
 use Twig\Template;
 
@@ -88,7 +89,7 @@ class GetAttrNode extends GetAttrExpression
             ->raw(', ')->repr($this->getAttribute('ignore_strict_check'))
             ->raw(', ')->repr($env->hasExtension(SandboxExtension::class))
             ->raw(', ')->repr($this->getNode('node')->getTemplateLine())
-            ->raw(')');
+            ->raw(', $context)');
     }
 
     /**
@@ -104,6 +105,7 @@ class GetAttrNode extends GetAttrExpression
      * @param bool $ignoreStrictCheck Whether to ignore the strict attribute check or not
      * @param bool $sandboxed
      * @param int $lineno The template line where the attribute was called
+     * @param array $context The Twig context the template is being rendered with
      *
      * @return mixed The attribute value, or a Boolean when $isDefinedTest is true, or null when the attribute is not
      *               set and $ignoreStrictCheck is true
@@ -123,6 +125,11 @@ class GetAttrNode extends GetAttrExpression
         $sandboxed = false,
         int $lineno = -1
     ) {
+        // @bc-layer The Twig context is read positionally instead of being declared as an eleventh parameter,
+        // because declaring it would break every class that overrides this method with the published signature.
+        // A compiled template that predates the extra argument simply resolves to an empty context.
+        $context = \func_get_args()[10] ?? [];
+
         if ($object instanceof ExtendEntityInterface) {
             $basePropertyExists = EntityPropertyInfo::propertyExists($object, $item);
             $baseMethodExists = EntityPropertyInfo::methodExists($object, $item);
@@ -159,7 +166,8 @@ class GetAttrNode extends GetAttrExpression
             $isDefinedTest,
             $ignoreStrictCheck,
             $sandboxed,
-            $lineno
+            $lineno,
+            $context
         );
     }
 
@@ -178,6 +186,10 @@ class GetAttrNode extends GetAttrExpression
         $sandboxed = false,
         int $lineno = -1
     ) {
+        // @bc-layer The Twig context is read positionally rather than declared, for the same reason as in
+        // attribute() above: an eleventh parameter would break the classes that override this method.
+        $context = \func_get_args()[10] ?? [];
+
         if (/* Template::METHOD_CALL */ 'method' !== $type) {
             $arrayItem = \is_bool($item) || \is_float($item) ? (int)$item : $item;
 
@@ -275,8 +287,23 @@ class GetAttrNode extends GetAttrExpression
         if (/* Template::METHOD_CALL */ 'method' !== $type) {
             if (isset($object->$item) || \array_key_exists((string)$item, (array)$object)) {
                 if ($sandboxed) {
-                    $env->getExtension(SandboxExtension::class)
-                        ->checkPropertyAllowed($object, $item, $lineno, $source);
+                    try {
+                        $env->getExtension(SandboxExtension::class)
+                            ->checkPropertyAllowed($object, $item, $lineno, $source);
+                    } catch (SecurityError $error) {
+                        return static::onSecurityError(
+                            $error,
+                            $env,
+                            $source,
+                            $object,
+                            $item,
+                            $arguments,
+                            $type,
+                            $isDefinedTest,
+                            $lineno,
+                            $context
+                        );
+                    }
                 }
 
                 if ($isDefinedTest) {
@@ -355,7 +382,22 @@ class GetAttrNode extends GetAttrExpression
             throw new RuntimeError(sprintf($format, $item, $class), $lineno, $source);
         }
         if ($sandboxed) {
-            $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
+            try {
+                $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
+            } catch (SecurityError $error) {
+                return static::onSecurityError(
+                    $error,
+                    $env,
+                    $source,
+                    $object,
+                    $item,
+                    $arguments,
+                    $type,
+                    $isDefinedTest,
+                    $lineno,
+                    $context
+                );
+            }
         }
         if ($isDefinedTest) {
             return true;
@@ -372,6 +414,50 @@ class GetAttrNode extends GetAttrExpression
         }
 
         return $ret;
+    }
+
+    /**
+     * Decides what an attribute access denied by the Twig sandbox resolves to.
+     *
+     * The default is the behaviour of the Twig core: a denied attribute is an error, except when it is only tested
+     * for existence, which is answered with false. Override this method to resolve a denied attribute to a value of
+     * your own - the returned value becomes the result of the attribute access.
+     *
+     * @param SecurityError $error The sandbox error that denied the access.
+     * @param Environment $env
+     * @param Source $source
+     * @param mixed $object The object the attribute was read from
+     * @param mixed $item The name of the denied property or method
+     * @param array $arguments The arguments the denied method was called with
+     * @param string $type The type of attribute (@see \Twig\Template constants)
+     * @param bool $isDefinedTest Whether this is only a defined check
+     * @param int $lineno The template line where the attribute was called
+     * @param array $context The Twig context the template is being rendered with
+     *
+     * @return mixed The value the denied attribute resolves to, or a Boolean when $isDefinedTest is true
+     *
+     * @throws SecurityError
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function onSecurityError(
+        SecurityError $error,
+        Environment $env,
+        Source $source,
+        mixed $object,
+        mixed $item,
+        array $arguments,
+        string $type,
+        bool $isDefinedTest,
+        int $lineno,
+        array $context = []
+    ): mixed {
+        if ($isDefinedTest) {
+            return false;
+        }
+
+        throw $error;
     }
 
     private static function isMethodWithPrefixExists(

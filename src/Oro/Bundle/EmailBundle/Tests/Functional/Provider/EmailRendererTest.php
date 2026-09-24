@@ -3,9 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Provider;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
@@ -22,7 +24,7 @@ use Twig\Sandbox\SecurityNotAllowedTagError;
  */
 class EmailRendererTest extends WebTestCase
 {
-    private ConfigManager $configManager;
+    use RolePermissionExtension;
 
     private EmailRenderer $emailRenderer;
 
@@ -36,23 +38,8 @@ class EmailRendererTest extends WebTestCase
         $this->emailRenderer = self::getContainer()->get('oro_email.email_renderer');
         $this->entity = $this->createTestEntity();
 
-        $this->configManager = self::getContainer()->get('oro_entity_config.config_manager');
-
-        $emailConfigProvider = $this->configManager->getProvider('email');
-        $entityConfig = $emailConfigProvider->getConfig(User::class, 'organizations');
-        $entityConfig->set('available_in_template', false);
-        $this->configManager->persist($entityConfig);
-        $this->configManager->flush();
-    }
-
-    #[\Override]
-    protected function tearDown(): void
-    {
-        $emailConfigProvider = $this->configManager->getProvider('email');
-        $entityConfig = $emailConfigProvider->getConfig(User::class, 'organizations');
-        $entityConfig->set('available_in_template', true);
-        $this->configManager->persist($entityConfig);
-        $this->configManager->flush();
+        self::getContainer()->get('security.token_storage')->setToken(null);
+        self::getContainer()->get('oro_email.twig.email_template_entity_access_checker')->reset();
     }
 
     /**
@@ -189,6 +176,71 @@ class EmailRendererTest extends WebTestCase
         );
     }
 
+    /**
+     * The templates in this test use a "user" root rather than "entity", because an "entity"-rooted path
+     * is rewritten into a variable processor call before rendering and so never reaches the Twig sandbox.
+     *
+     * @dataProvider notAllowedPropertyTemplateDataProvider
+     *
+     * @see \Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode
+     */
+    public function testRenderTemplateWithNotAllowedPropertyRendersNothing(
+        string $template,
+        string $expected
+    ): void {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        self::assertSame($expected, $this->emailRenderer->renderTemplate($template, ['user' => $entity]));
+    }
+
+    /**
+     * The templates in this test use a "user" root rather than "entity", because an "entity"-rooted path
+     * is rewritten into a variable processor call before rendering and so never reaches the Twig sandbox.
+     *
+     * @dataProvider notAllowedPropertyTemplateDataProvider
+     */
+    public function testRenderTemplateWithNotAllowedPropertyUsesValueSubstitutedByListener(string $template): void
+    {
+        $this->loadFixtures([LoadUser::class]);
+        $entity = $this->getReference(LoadUser::USER);
+
+        $listener = static function (EmailTemplateSecurityPolicyViolationEvent $event) {
+            $event->setValue('REDACTED ' . $event->getItem());
+        };
+
+        $eventDispatcher = self::getContainer()->get('event_dispatcher');
+        $eventDispatcher->addListener(EmailTemplateSecurityPolicyViolationEvent::class, $listener);
+        try {
+            self::assertSame(
+                '[REDACTED password]',
+                $this->emailRenderer->renderTemplate($template, ['user' => $entity])
+            );
+        } finally {
+            $eventDispatcher->removeListener(EmailTemplateSecurityPolicyViolationEvent::class, $listener);
+        }
+    }
+
+    public function notAllowedPropertyTemplateDataProvider(): array
+    {
+        return [
+            'read' => [
+                'template' => '[{{ user.password }}]',
+                'expected' => '[]',
+            ],
+            // The "default" filter compiles the attribute access into an is-defined test, which the denied
+            // attribute answers with false unless a listener substitutes a value for it.
+            'read with the default filter' => [
+                'template' => '[{{ user.password|default(\'REDACTED password\') }}]',
+                'expected' => '[REDACTED password]',
+            ],
+            'is defined test' => [
+                'template' => '[{{ user.password is defined ? \'REDACTED password\' : \'\' }}]',
+                'expected' => '[]',
+            ],
+        ];
+    }
+
     public function testRenderTemplateWithNotAllowedPropertyReplacesWithNulll(): void
     {
         $this->loadFixtures([LoadUser::class]);
@@ -207,6 +259,7 @@ class EmailRendererTest extends WebTestCase
     {
         $this->loadFixtures([LoadUser::class]);
         $entity = $this->getReference(LoadUser::USER);
+        $this->denyFieldInEmailTemplates(User::class, 'organizations');
 
         self::assertSame(
             'Text that must be rendered.',
@@ -225,6 +278,7 @@ TWIG,
     {
         $this->loadFixtures([LoadUser::class]);
         $entity = $this->getReference(LoadUser::USER);
+        $this->denyFieldInEmailTemplates(User::class, 'organizations');
 
         self::assertSame(
             'Text that must be rendered.',
@@ -244,6 +298,7 @@ TWIG,
     {
         $this->loadFixtures([LoadUser::class]);
         $entity = $this->getReference(LoadUser::USER);
+        $this->denyFieldInEmailTemplates(User::class, 'organizations');
 
         $this->expectException(RuntimeError::class);
         $this->expectExceptionMessageMatches('/Impossible to access a key \("0"\) on a null variable in/');
@@ -258,6 +313,7 @@ TWIG,
     {
         $this->loadFixtures([LoadUser::class]);
         $entity = $this->getReference(LoadUser::USER);
+        $this->denyFieldInEmailTemplates(User::class, 'organizations');
 
         $this->expectException(RuntimeError::class);
         $this->expectExceptionMessageMatches('/Impossible to access a key \("0"\) on a null variable in/');
@@ -266,6 +322,140 @@ TWIG,
             '{{ entity.organizations[0].name }}',
             ['entity' => $entity]
         );
+    }
+
+    /**
+     * The templates below use an "activity" root rather than "entity", because an "entity"-rooted path is
+     * rewritten into an _entity_var() call before rendering and so never reaches the Twig sandbox.
+     *
+     * @see \Oro\Bundle\EmailBundle\Twig\EmailTemplateEntityAccessChecker
+     */
+    public function testRenderTemplateRendersFieldOfRelatedRecordAllowedToView(): void
+    {
+        $activity = $this->createTestEntityInOrganizationOf(self::AUTH_USER);
+        $this->updateUserSecurityToken(self::AUTH_USER);
+
+        self::assertSame(
+            '[test][' . $activity->getOrganization()->getName() . ']',
+            $this->emailRenderer->renderTemplate(
+                '[{{ activity.description }}][{{ activity.organization.name }}]',
+                ['activity' => $activity]
+            )
+        );
+    }
+
+    public function testRenderTemplateRedactsFieldOfRelatedRecordNotAllowedToView(): void
+    {
+        $activity = $this->createTestEntityInOrganizationOf(self::AUTH_USER);
+        $this->updateRolePermission(User::ROLE_ADMINISTRATOR, Organization::class, AccessLevel::NONE_LEVEL);
+        $this->updateUserSecurityToken(self::AUTH_USER);
+
+        self::assertSame(
+            '[test][]',
+            $this->emailRenderer->renderTemplate(
+                '[{{ activity.description }}][{{ activity.organization.name }}]',
+                ['activity' => $activity]
+            )
+        );
+    }
+
+    /**
+     * String coercion of a record is checked by Twig\Extension\SandboxExtension::ensureToStringAllowed(), which
+     * sits outside {@see \Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode}. It is brought back under the
+     * violation event by {@see \Oro\Bundle\EmailBundle\Twig\Node\SafeCheckToStringNode}, so a denial resolves
+     * to the empty value rather than aborting the render.
+     */
+    public function testRenderTemplateRedactsStringCoercionOfRelatedRecordNotAllowedToView(): void
+    {
+        $activity = $this->createTestEntityInOrganizationOf(self::AUTH_USER);
+        $organizationName = $activity->getOrganization()->getName();
+        $this->updateRolePermission(User::ROLE_ADMINISTRATOR, Organization::class, AccessLevel::NONE_LEVEL);
+        $this->updateUserSecurityToken(self::AUTH_USER);
+
+        $rendered = $this->emailRenderer->renderTemplate(
+            '[{{ activity.organization }}]',
+            ['activity' => $activity]
+        );
+
+        self::assertSame('[]', $rendered);
+        self::assertStringNotContainsString($organizationName, $rendered);
+    }
+
+    public function testRenderTemplateUsesValueSubstitutedByListenerForDeniedStringCoercion(): void
+    {
+        $activity = $this->createTestEntityInOrganizationOf(self::AUTH_USER);
+        $this->updateRolePermission(User::ROLE_ADMINISTRATOR, Organization::class, AccessLevel::NONE_LEVEL);
+        $this->updateUserSecurityToken(self::AUTH_USER);
+
+        $listener = static function (EmailTemplateSecurityPolicyViolationEvent $event) {
+            $event->setValue('REDACTED ' . $event->getItem());
+        };
+
+        $eventDispatcher = self::getContainer()->get('event_dispatcher');
+        $eventDispatcher->addListener(EmailTemplateSecurityPolicyViolationEvent::class, $listener);
+        try {
+            self::assertSame(
+                '[REDACTED __toString]',
+                $this->emailRenderer->renderTemplate(
+                    '[{{ activity.organization }}]',
+                    ['activity' => $activity]
+                )
+            );
+        } finally {
+            $eventDispatcher->removeListener(EmailTemplateSecurityPolicyViolationEvent::class, $listener);
+        }
+    }
+
+    public function testRenderTemplateWithoutSecurityTokenReadsRelatedRecordRegardlessOfPermissions(): void
+    {
+        $activity = $this->createTestEntityInOrganizationOf(self::AUTH_USER);
+        $organizationName = $activity->getOrganization()->getName();
+        $this->updateRolePermission(User::ROLE_ADMINISTRATOR, Organization::class, AccessLevel::NONE_LEVEL);
+
+        self::assertSame(
+            sprintf('[test][%s][%s]', $organizationName, $organizationName),
+            $this->emailRenderer->renderTemplate(
+                '[{{ activity.description }}][{{ activity.organization.name }}][{{ activity.organization }}]',
+                ['activity' => $activity]
+            )
+        );
+    }
+
+    /**
+     * Makes an entity field unavailable in email templates, so that the email templates rendering sandbox denies it.
+     *
+     * A field is available in email templates unless it is explicitly disabled
+     * (@see \Oro\Bundle\EmailBundle\EntityConfig\EmailFieldConfiguration), so a test that needs a denied
+     * attribute has to disable it itself rather than rely on a field that happens to be disabled.
+     */
+    private function denyFieldInEmailTemplates(string $entityClass, string $fieldName): void
+    {
+        $configManager = self::getContainer()->get('oro_entity_config.config_manager');
+
+        $fieldConfig = $configManager->getProvider('email')->getConfig($entityClass, $fieldName);
+        $fieldConfig->set('available_in_template', false);
+        $configManager->persist($fieldConfig);
+        $configManager->flush();
+        $configManager->clear();
+
+        self::getContainer()->get('oro_email.email_renderer_configuration')->clearCache();
+    }
+
+    private function createTestEntityInOrganizationOf(string $userEmail): TestActivity
+    {
+        $em = $this->getEntityManager(TestActivity::class);
+        $user = $em->getRepository(User::class)->findOneBy(['email' => $userEmail]);
+
+        $testEntity = new TestActivity();
+        $testEntity->setMessage('test message');
+        $testEntity->setDescription('test');
+        $testEntity->setOrganization($user->getOrganization());
+        $testEntity->setOwner($user);
+
+        $em->persist($testEntity);
+        $em->flush();
+
+        return $testEntity;
     }
 
     private function createTestEntity(): TestActivity

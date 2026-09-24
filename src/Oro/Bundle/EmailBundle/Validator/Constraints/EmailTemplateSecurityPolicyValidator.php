@@ -7,6 +7,7 @@ namespace Oro\Bundle\EmailBundle\Validator\Constraints;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Provider\SubstitutableEmailTemplateAttributeProvider;
 use Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider;
 use Oro\Bundle\EmailBundle\Twig\SecurityPolicy\EmailTemplateSecurityPolicyCheckerInterface;
 use Oro\Bundle\EmailBundle\Twig\SecurityPolicy\Violation\EmailTemplateSecurityPolicyFilterViolation;
@@ -33,9 +34,13 @@ use Twig\Error\SyntaxError;
  *
  * Collects security policy violations from {@see EmailTemplateSecurityPolicyCheckerInterface},
  * and reports each one as a Symfony constraint violation with a message tailored to the violation kind.
+ * A denied property or method that {@see SubstitutableEmailTemplateAttributeProvider} resolves from an email template
+ * parameter is reported with a message naming that parameter, so that the author knows what to read instead.
  */
 class EmailTemplateSecurityPolicyValidator extends ConstraintValidator
 {
+    private ?SubstitutableEmailTemplateAttributeProvider $substitutableAttributeProvider = null;
+
     public function __construct(
         private readonly EmailTemplateSecurityPolicyCheckerInterface $securityPolicyChecker,
         private readonly TranslatedEmailTemplateProvider $translatedEmailTemplateProvider,
@@ -43,6 +48,18 @@ class EmailTemplateSecurityPolicyValidator extends ConstraintValidator
         private readonly ConfigProvider $entityConfigProvider,
         private readonly TranslatorInterface $translator,
     ) {
+    }
+
+    /**
+     * Supplies the provider that tells which denied accesses are resolved from an email template parameter.
+     *
+     * @bc-layer The provider is supplied with a setter instead of a constructor argument, because adding a
+     *           constructor argument would break the classes that already extend or instantiate this one.
+     */
+    public function setSubstitutableAttributeProvider(
+        SubstitutableEmailTemplateAttributeProvider $substitutableAttributeProvider
+    ): void {
+        $this->substitutableAttributeProvider = $substitutableAttributeProvider;
     }
 
     #[\Override]
@@ -162,6 +179,8 @@ class EmailTemplateSecurityPolicyValidator extends ConstraintValidator
         ?Localization $localization,
         ?Localization $defaultLocalization
     ): void {
+        $substitutionTemplateParameter = $this->getSubstitutionTemplateParameter($violation);
+
         switch (true) {
             case $violation instanceof EmailTemplateSecurityPolicyTagViolation:
                 $message = $constraint->tagMessage;
@@ -176,11 +195,15 @@ class EmailTemplateSecurityPolicyValidator extends ConstraintValidator
                 $errorCode = $constraint::NOT_ALLOWED_FUNCTION_ERROR;
                 break;
             case $violation instanceof EmailTemplateSecurityPolicyPropertyViolation:
-                $message = $constraint->propertyMessage;
+                $message = $substitutionTemplateParameter !== null
+                    ? $constraint->substitutablePropertyMessage
+                    : $constraint->propertyMessage;
                 $errorCode = $constraint::NOT_ALLOWED_PROPERTY_ERROR;
                 break;
             case $violation instanceof EmailTemplateSecurityPolicyMethodViolation:
-                $message = $constraint->methodMessage;
+                $message = $substitutionTemplateParameter !== null
+                    ? $constraint->substitutableMethodMessage
+                    : $constraint->methodMessage;
                 $errorCode = $constraint::NOT_ALLOWED_METHOD_ERROR;
                 break;
             default:
@@ -189,16 +212,49 @@ class EmailTemplateSecurityPolicyValidator extends ConstraintValidator
                 );
         }
 
+        $parameters = [
+            '{{ field }}' => $this->getFieldLabel($entityClass, $violation->getTemplateField()),
+            '{{ locale }}' => (string)$localization?->getTitle($defaultLocalization),
+            '{{ name }}' => $violation->getName(),
+            '{{ variable }}' => $violation->getVariableName(),
+        ];
+
+        if ($substitutionTemplateParameter !== null) {
+            $parameters['{{ replacement }}'] = $substitutionTemplateParameter;
+        }
+
         $this->context
-            ->buildViolation($message, [
-                '{{ field }}' => $this->getFieldLabel($entityClass, $violation->getTemplateField()),
-                '{{ locale }}' => (string)$localization?->getTitle($defaultLocalization),
-                '{{ name }}' => $violation->getName(),
-                '{{ variable }}' => $violation->getVariableName(),
-            ])
+            ->buildViolation($message, $parameters)
             ->setCode($errorCode)
             ->setCause($violation)
             ->addViolation();
+    }
+
+    /**
+     * Returns the email template parameter the denied property or method is substituted from at render time,
+     * or NULL when the access is not substituted.
+     */
+    private function getSubstitutionTemplateParameter(
+        EmailTemplateSecurityPolicyViolationInterface $violation
+    ): ?string {
+        if ($this->substitutableAttributeProvider === null) {
+            // @bc-layer No provider means the validator was built by code that predates
+            // setSubstitutableAttributeProvider(), so every denied access is reported as it was before.
+            return null;
+        }
+
+        if (!$violation instanceof EmailTemplateSecurityPolicyPropertyViolation
+            && !$violation instanceof EmailTemplateSecurityPolicyMethodViolation) {
+            return null;
+        }
+
+        $violationEntityClass = $violation->getEntityClass();
+        if ($violationEntityClass === null) {
+            return null;
+        }
+
+        return $this->substitutableAttributeProvider
+            ->getSubstitutionTemplateParameter($violationEntityClass, $violation->getName());
     }
 
     /**

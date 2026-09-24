@@ -10,7 +10,9 @@ use Symfony\Component\Validator\Constraint;
  * Validates that all fields of an email template comply with the Twig sandbox security policy.
  *
  * Five distinct messages are defined — one per violation kind — so that
- * the reported error precisely names what is disallowed and where it was found.
+ * the reported error precisely names what is disallowed and where it was found. A property or a method that is
+ * substituted from an email template parameter at render time gets a message of its own, naming the parameter
+ * the template should read instead.
  */
 class EmailTemplateSecurityPolicy extends Constraint
 {
@@ -33,6 +35,10 @@ class EmailTemplateSecurityPolicy extends Constraint
     public string $functionMessage = 'oro.email.validator.security_policy.disallowed_function';
     public string $propertyMessage = 'oro.email.validator.security_policy.disallowed_property';
     public string $methodMessage = 'oro.email.validator.security_policy.disallowed_method';
+    public string $substitutablePropertyMessage =
+        'oro.email.validator.security_policy.disallowed_substitutable_property';
+    public string $substitutableMethodMessage =
+        'oro.email.validator.security_policy.disallowed_substitutable_method';
 
     #[\Override]
     public function getTargets(): string|array

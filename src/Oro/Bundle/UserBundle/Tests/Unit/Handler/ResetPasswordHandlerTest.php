@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -92,6 +93,31 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
+    public function testResetPasswordAndNotifyPassesGeneratedConfirmationTokenAsTemplateParameter(): void
+    {
+        $user = new User();
+        $user->setEmail('example@test.com');
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->willReturnArgument(0);
+
+        $this->emailNotificationManager->expects(self::once())
+            ->method('processSingle')
+            ->willReturnCallback(function (
+                TemplateEmailNotification $notification,
+                array $params
+            ) use ($user): void {
+                self::assertSame(
+                    $user->getConfirmationToken(),
+                    $params[Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM]
+                );
+                self::assertNotEmpty($params[Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM]);
+            });
+
+        self::assertTrue($this->handler->resetPasswordAndNotify($user));
+    }
+
     public function testResetPasswordAndNotifyWhenNoConfirmationToken(): void
     {
         $email = 'example@test.com';
@@ -162,7 +188,12 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
         );
         $this->emailNotificationManager->expects(self::once())
             ->method('processSingle')
-            ->with($expectedNotification, [], $this->logger);
+            ->with(
+                $expectedNotification,
+                self::callback(static fn (array $params): bool => \array_keys($params)
+                    === [Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM]),
+                $this->logger
+            );
 
         $result = $this->handler->resetPasswordAndNotify($user);
         self::assertTrue($result);

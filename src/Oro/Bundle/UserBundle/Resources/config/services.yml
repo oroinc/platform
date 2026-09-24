@@ -640,3 +640,13 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-grid, method: onBuildAfter }
+
+    oro_user.event_listener.user_confirmation_token_email_template:
+        class: Oro\Bundle\EmailBundle\EventListener\EmailTemplateAttributeSubstitutionListener
+        arguments:
+            - Oro\Bundle\UserBundle\Entity\AbstractUser
+            - 'confirmationToken'
+            - !php/const Oro\Bundle\UserBundle\Mailer\Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM
+        tags:
+            - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent, method: onSecurityPolicyViolation }
+            - { name: oro_email.email_template_substitutable_attribute }
