@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\UserBundle\Entity\User as RealUserEntity;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
@@ -150,7 +151,11 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
                 From::emailAddress('admin@example.com', 'John Doe'),
                 [$user],
                 new EmailTemplateCriteria(UserHandler::INVITE_USER_TEMPLATE, RealUserEntity::class),
-                ['user' => $user, 'password' => $plainPassword]
+                [
+                    'user' => $user,
+                    'password' => $plainPassword,
+                    Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM => $user->getConfirmationToken() ?: null,
+                ]
             )
             ->willReturn(1);
 

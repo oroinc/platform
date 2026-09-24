@@ -8,6 +8,7 @@ use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 use Psr\Log\LoggerInterface;
 
 class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
@@ -132,7 +133,18 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
         );
         $this->emailNotificationManager->expects(self::once())
             ->method('processSingle')
-            ->with($expectedNotification, [], $this->logger);
+            ->with(
+                $expectedNotification,
+                self::callback(static function (array $params) use ($user) {
+                    self::assertSame(
+                        [Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM => $user->getConfirmationToken()],
+                        $params
+                    );
+
+                    return true;
+                }),
+                $this->logger
+            );
 
         $result = $this->handler->resetPasswordAndNotify($user);
         self::assertTrue($result);

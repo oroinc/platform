@@ -620,3 +620,13 @@ services:
             - '@oro_security.orm.ownership_sql_walker_builder'
         tags:
             - { name: oro_security.acl_helper.condition }
+
+    oro_user.event_listener.user_confirmation_token_email_template:
+        class: Oro\Bundle\EmailBundle\EventListener\EmailTemplateAttributeSubstitutionListener
+        arguments:
+            - Oro\Bundle\UserBundle\Entity\AbstractUser
+            - 'confirmationToken'
+            - !php/const Oro\Bundle\UserBundle\Mailer\Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM
+        tags:
+            - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent, method: onSecurityPolicyViolation }
+            - { name: oro_email.email_template_substitutable_attribute }

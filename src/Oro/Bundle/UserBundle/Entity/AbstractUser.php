@@ -172,6 +172,10 @@ abstract class AbstractUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false,
+     *              "immutable"=true
      *          }
      *      }
      * )

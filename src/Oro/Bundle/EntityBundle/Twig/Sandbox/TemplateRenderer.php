@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Twig\GetAttributeNodeExtension;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\SandboxExtension;
@@ -48,6 +49,8 @@ abstract class TemplateRenderer implements LoggerAwareInterface
     /** @var EntityDataAccessor */
     private $entityDataAccessor;
     private Inflector $inflector;
+
+    private ?EventDispatcherInterface $eventDispatcher = null;
 
     public function __construct(
         TwigEnvironment $environment,
@@ -130,6 +133,14 @@ abstract class TemplateRenderer implements LoggerAwareInterface
 
     abstract protected function getVariableNotFoundMessage(): ?string;
 
+    /**
+     * Sets the event dispatcher the sandbox reports a security policy violation to.
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     protected function ensureSandboxConfigured(): void
     {
         if (!$this->sandboxConfigured) {
@@ -156,6 +167,11 @@ abstract class TemplateRenderer implements LoggerAwareInterface
         $this->environment->addExtension($getAttrNodeExtension);
         $safeGetAttrNodeExtension = new SafeGetAttributeNodeExtension();
         $safeGetAttrNodeExtension->setLogger($this->logger);
+        if (null !== $this->eventDispatcher) {
+            $safeGetAttrNodeExtension->setEventDispatcher($this->eventDispatcher);
+        }
+        // @bc-layer Without an event dispatcher the extension keeps the standalone one it creates for itself,
+        // so a sandbox security policy violation resolves to the previous default instead of a substituted value.
         $this->environment->addExtension($safeGetAttrNodeExtension);
     }
 

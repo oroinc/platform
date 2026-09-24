@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -158,7 +159,11 @@ class UserHandler extends AbstractUserHandler
             From::emailAddress($senderEmail, $senderName),
             [$user],
             new EmailTemplateCriteria(self::INVITE_USER_TEMPLATE, User::class),
-            ['user' => $user, 'password' => $plainPassword]
+            [
+                'user' => $user,
+                'password' => $plainPassword,
+                Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM => $user->getConfirmationToken() ?: null,
+            ]
         );
     }
 }
