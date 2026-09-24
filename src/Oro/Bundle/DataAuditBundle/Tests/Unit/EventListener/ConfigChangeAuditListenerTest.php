@@ -5,12 +5,13 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\EventListener;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
-use Oro\Bundle\DataAuditBundle\Async\Topic\ConfigChangeAuditTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditEntryTopic;
 use Oro\Bundle\DataAuditBundle\EventListener\ConfigChangeAuditListener;
 use Oro\Bundle\DataAuditBundle\Model\ConfigAuditValueNormalizer;
 use Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider;
 use Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider;
 use Oro\Bundle\DataAuditBundle\Provider\SensitiveConfigFieldProvider;
+use Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -44,6 +45,7 @@ class ConfigChangeAuditListenerTest extends TestCase
             ->willReturnCallback(fn (): bool => $this->installed);
 
         $entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $messageBodyProvider = new AuditMessageBodyProvider($entityNameResolver);
         $this->listener = new ConfigChangeAuditListener(
             $this->createMock(ManagerRegistry::class),
             $this->tokenStorage,
@@ -52,7 +54,7 @@ class ConfigChangeAuditListenerTest extends TestCase
             $this->messageProducer,
             $applicationState,
             new ConfigAuditValueNormalizer($this->configBag, $this->createMock(SensitiveConfigFieldProvider::class)),
-            new AuditMessageBodyProvider($entityNameResolver),
+            $messageBodyProvider,
             new ConfigAuditLevelProvider([
                 'customer' => 'Oro\\Bundle\\CustomerBundle\\Entity\\Customer',
                 'customer_group' => 'Oro\\Bundle\\CustomerBundle\\Entity\\CustomerGroup',
@@ -61,6 +63,15 @@ class ConfigChangeAuditListenerTest extends TestCase
                 'organization' => 'Oro\\Bundle\\OrganizationBundle\\Entity\\Organization',
                 'global' => null,
             ])
+        );
+        $this->listener->setAuditEntryRecorder(
+            new AuditEntryRecorder(
+                $this->messageProducer,
+                $this->tokenStorage,
+                $messageBodyProvider,
+                $this->featureChecker,
+                $applicationState
+            )
         );
     }
 
@@ -125,7 +136,7 @@ class ConfigChangeAuditListenerTest extends TestCase
             ['oro_test.foo' => ['old' => 'a', 'new' => 'b', 'action' => 'update']]
         );
 
-        self::assertSame(ConfigChangeAuditTopic::getName(), $this->sentTopic);
+        self::assertSame(AuditEntryTopic::getName(), $this->sentTopic);
         self::assertSame('Oro\Bundle\ConfigBundle\SystemConfiguration', $message['object_class']);
         self::assertSame('0', $message['object_id']);
         self::assertSame('Global', $message['object_name']);

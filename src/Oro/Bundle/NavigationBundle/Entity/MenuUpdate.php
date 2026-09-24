@@ -68,7 +68,10 @@ use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 #[ORM\HasLifecycleCallbacks]
 #[Config(
     routeName: 'oro_navigation_global_menu_index',
-    defaultValues: ['entity' => ['icon' => 'fa-th']]
+    defaultValues: [
+        'entity' => ['icon' => 'fa-th'],
+        'dataaudit' => ['auditable' => false, 'immutable' => true],
+    ]
 )]
 class MenuUpdate implements
     MenuUpdateInterface,
