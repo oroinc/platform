@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Provider\SubstitutableEmailTemplateAttributeProvider;
 use Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider;
 use Oro\Bundle\EmailBundle\Twig\SecurityPolicy\EmailTemplateSecurityPolicyCheckerInterface;
 use Oro\Bundle\EmailBundle\Twig\SecurityPolicy\Violation\EmailTemplateSecurityPolicyFilterViolation;
@@ -40,6 +41,7 @@ final class EmailTemplateSecurityPolicyValidatorTest extends ConstraintValidator
     private LocalizationManager&MockObject $localizationManager;
     private ConfigProvider&MockObject $entityConfigProvider;
     private TranslatorInterface&MockObject $translator;
+    private SubstitutableEmailTemplateAttributeProvider&MockObject $substitutableAttributeProvider;
 
     #[\Override]
     protected function createValidator(): ConstraintValidatorInterface
@@ -49,14 +51,18 @@ final class EmailTemplateSecurityPolicyValidatorTest extends ConstraintValidator
         $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->substitutableAttributeProvider = $this->createMock(SubstitutableEmailTemplateAttributeProvider::class);
 
-        return new EmailTemplateSecurityPolicyValidator(
+        $validator = new EmailTemplateSecurityPolicyValidator(
             $this->securityPolicyChecker,
             $this->translatedEmailTemplateProvider,
             $this->localizationManager,
             $this->entityConfigProvider,
             $this->translator
         );
+        $validator->setSubstitutableAttributeProvider($this->substitutableAttributeProvider);
+
+        return $validator;
     }
 
     public function testValidateThrowsExceptionForUnsupportedConstraintType(): void
@@ -294,6 +300,187 @@ final class EmailTemplateSecurityPolicyValidatorTest extends ConstraintValidator
                 '{{ field }}' => 'content',
                 '{{ locale }}' => '',
                 '{{ name }}' => 'dangerousProperty',
+                '{{ variable }}' => 'entity',
+            ])
+            ->setCode(EmailTemplateSecurityPolicy::NOT_ALLOWED_PROPERTY_ERROR)
+            ->setCause($violation)
+            ->assertRaised();
+    }
+
+    public function testValidateBuildViolationNamesTheTemplateParameterForSubstitutableProperty(): void
+    {
+        $cause = new \RuntimeException('cause');
+        $violation = new EmailTemplateSecurityPolicyPropertyViolation(
+            name: 'confirmationToken',
+            variableName: 'entity',
+            entityClass: \stdClass::class,
+            templateLine: 1,
+            cause: $cause,
+            templateField: 'content'
+        );
+
+        $this->localizationManager
+            ->method('getDefaultLocalization')
+            ->willReturn(null);
+
+        $this->securityPolicyChecker
+            ->expects(self::once())
+            ->method('checkSecurityPolicy')
+            ->willReturn([$violation]);
+
+        $this->entityConfigProvider
+            ->method('hasConfig')
+            ->willReturn(false);
+
+        $this->substitutableAttributeProvider
+            ->expects(self::once())
+            ->method('getSubstitutionTemplateParameter')
+            ->with(\stdClass::class, 'confirmationToken')
+            ->willReturn('confirmationToken');
+
+        $this->validator->validate(new EmailTemplate(), new EmailTemplateSecurityPolicy());
+
+        $this->buildViolation('oro.email.validator.security_policy.disallowed_substitutable_property')
+            ->setParameters([
+                '{{ field }}' => 'content',
+                '{{ locale }}' => '',
+                '{{ name }}' => 'confirmationToken',
+                '{{ variable }}' => 'entity',
+                '{{ replacement }}' => 'confirmationToken',
+            ])
+            ->setCode(EmailTemplateSecurityPolicy::NOT_ALLOWED_PROPERTY_ERROR)
+            ->setCause($violation)
+            ->assertRaised();
+    }
+
+    public function testValidateBuildViolationNamesTheTemplateParameterForSubstitutableMethod(): void
+    {
+        $cause = new \RuntimeException('cause');
+        $violation = new EmailTemplateSecurityPolicyMethodViolation(
+            name: 'getConfirmationToken',
+            variableName: 'entity',
+            entityClass: \stdClass::class,
+            templateLine: 1,
+            cause: $cause,
+            templateField: 'content'
+        );
+
+        $this->localizationManager
+            ->method('getDefaultLocalization')
+            ->willReturn(null);
+
+        $this->securityPolicyChecker
+            ->expects(self::once())
+            ->method('checkSecurityPolicy')
+            ->willReturn([$violation]);
+
+        $this->entityConfigProvider
+            ->method('hasConfig')
+            ->willReturn(false);
+
+        $this->substitutableAttributeProvider
+            ->expects(self::once())
+            ->method('getSubstitutionTemplateParameter')
+            ->with(\stdClass::class, 'getConfirmationToken')
+            ->willReturn('confirmationToken');
+
+        $this->validator->validate(new EmailTemplate(), new EmailTemplateSecurityPolicy());
+
+        $this->buildViolation('oro.email.validator.security_policy.disallowed_substitutable_method')
+            ->setParameters([
+                '{{ field }}' => 'content',
+                '{{ locale }}' => '',
+                '{{ name }}' => 'getConfirmationToken',
+                '{{ variable }}' => 'entity',
+                '{{ replacement }}' => 'confirmationToken',
+            ])
+            ->setCode(EmailTemplateSecurityPolicy::NOT_ALLOWED_METHOD_ERROR)
+            ->setCause($violation)
+            ->assertRaised();
+    }
+
+    public function testValidateDoesNotLookUpTheTemplateParameterForViolationWithoutEntityClass(): void
+    {
+        $cause = new \RuntimeException('cause');
+        $violation = new EmailTemplateSecurityPolicyFunctionViolation(
+            name: 'dump',
+            templateLine: 1,
+            cause: $cause,
+            templateField: 'content'
+        );
+
+        $this->localizationManager
+            ->method('getDefaultLocalization')
+            ->willReturn(null);
+
+        $this->securityPolicyChecker
+            ->expects(self::once())
+            ->method('checkSecurityPolicy')
+            ->willReturn([$violation]);
+
+        $this->entityConfigProvider
+            ->method('hasConfig')
+            ->willReturn(false);
+
+        $this->substitutableAttributeProvider
+            ->expects(self::never())
+            ->method('getSubstitutionTemplateParameter');
+
+        $this->validator->validate(new EmailTemplate(), new EmailTemplateSecurityPolicy());
+
+        $this->buildViolation('oro.email.validator.security_policy.disallowed_function')
+            ->setParameters([
+                '{{ field }}' => 'content',
+                '{{ locale }}' => '',
+                '{{ name }}' => 'dump',
+                '{{ variable }}' => null,
+            ])
+            ->setCode(EmailTemplateSecurityPolicy::NOT_ALLOWED_FUNCTION_ERROR)
+            ->setCause($violation)
+            ->assertRaised();
+    }
+
+    public function testValidateKeepsThePlainMessageWhenNoSubstitutableAttributeProviderIsSet(): void
+    {
+        $cause = new \RuntimeException('cause');
+        $violation = new EmailTemplateSecurityPolicyPropertyViolation(
+            name: 'confirmationToken',
+            variableName: 'entity',
+            entityClass: \stdClass::class,
+            templateLine: 1,
+            cause: $cause,
+            templateField: 'content'
+        );
+
+        $this->localizationManager
+            ->method('getDefaultLocalization')
+            ->willReturn(null);
+
+        $this->securityPolicyChecker
+            ->expects(self::once())
+            ->method('checkSecurityPolicy')
+            ->willReturn([$violation]);
+
+        $this->entityConfigProvider
+            ->method('hasConfig')
+            ->willReturn(false);
+
+        $validator = new EmailTemplateSecurityPolicyValidator(
+            $this->securityPolicyChecker,
+            $this->translatedEmailTemplateProvider,
+            $this->localizationManager,
+            $this->entityConfigProvider,
+            $this->translator
+        );
+        $validator->initialize($this->context);
+
+        $validator->validate(new EmailTemplate(), new EmailTemplateSecurityPolicy());
+
+        $this->buildViolation('oro.email.validator.security_policy.disallowed_property')
+            ->setParameters([
+                '{{ field }}' => 'content',
+                '{{ locale }}' => '',
+                '{{ name }}' => 'confirmationToken',
                 '{{ variable }}' => 'entity',
             ])
             ->setCode(EmailTemplateSecurityPolicy::NOT_ALLOWED_PROPERTY_ERROR)

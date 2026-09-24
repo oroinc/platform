@@ -2,7 +2,7 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## UNRELEASED
+## 6.0.12
 
 ### Added
 
@@ -21,11 +21,41 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\NavigationBundle\Datagrid\ExcludedEntitiesConfigGridListener` that hides the given entities from a config grid, so a bundle can keep its system entity out of the entity management grid.
 * Added `Oro\Bundle\NavigationBundle\EventListener\ExcludedEntitiesConfigRequestListener` that makes the entity config pages of the given entities respond with 404, so a system entity kept out of the entity management cannot be opened by a direct URL.
 
+#### EmailBundle
+* Added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateEntityAccessChecker` (service `oro_email.twig.email_template_entity_access_checker`) that authorizes every record an email template render walks to against the `VIEW` permission of the current user. Only persisted Doctrine entities are checked, and a render performed without a logged-in user, such as by a cron job, a message queue consumer, a CLI command or an anonymous request, reads every allowlisted attribute regardless of ownership.
+* Added `\Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent`, dispatched when the email templates rendering sandbox denies an attribute. Listen to it and call `setValue()` to make the denied attribute resolve to something other than `null`. It is dispatched for an is-defined test, where a non-null substituted value makes the test resolve to `true`, and for a denied string coercion, with `__toString` as the item.
+    * `getContext()` returns the Twig context of the render, including sensitive data, so it should never be included in logs.
+* Added `\Oro\Bundle\EmailBundle\EventListener\EmailTemplateSecurityPolicyViolationListener` that logs such a violation on the `oro_email` channel at priority `-100`. It stays silent when another listener already substituted a value.
+* Added `\Oro\Bundle\EmailBundle\EventListener\EmailTemplateAttributeSubstitutionListener` that resolves an attribute denied by the sandbox from an email template parameter the sending code passed. Register one service per attribute, with the entity class, the attribute name and the template parameter name as its arguments. The value is taken from the Twig context of the render, so a template renders it only in an email whose sending code passed that parameter.
+* Added `\Oro\Bundle\EmailBundle\Provider\SubstitutableEmailTemplateAttributeProvider` (service `oro_email.provider.substitutable_email_template_attribute`) and `\Oro\Bundle\EmailBundle\Provider\SubstitutableEmailTemplateAttributesInterface`. Register a substitution listener with the `oro_email.email_template_substitutable_attribute` tag: the email template security policy check then names the email template parameter a declared attribute is resolved from, so the author is told which variable to read instead.
+* Added `\Oro\Bundle\EmailBundle\Twig\Node\SafeCheckToStringNode` and `\Oro\Bundle\EmailBundle\Twig\NodeVisitor\SafeCheckToStringNodeVisitor`. String coercion of a record denied by the email templates rendering sandbox, such as `{{ record }}` or `{{ record|upper }}`, now resolves to the substituted value instead of aborting the render.
+* Added the `oro_email_emailtemplate_view` ACL identifier, an entity ACL granting `VIEW` on `\Oro\Bundle\EmailBundle\Entity\EmailTemplate`. The email template REST actions that already referenced it, `getVariablesAction()` and `getCompiledAction()` of `\Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController`, resolve it now, so a role without View on Email Template is refused. Review the roles used by integrations that call these actions.
+
+#### EntityExtendBundle
+* Added `\Oro\Bundle\EntityExtendBundle\Twig\Node\GetAttrNode::onSecurityError()`, a protected hook that decides what an attribute access denied by the Twig sandbox resolves to. The default keeps the Twig core behaviour. The Twig context of the render is passed to `attribute()` as an extra eleventh argument, read with `func_get_args()` so that the published signature stays unchanged.
+
+#### UserBundle
+* Added `\Oro\Bundle\UserBundle\Mailer\Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM`, the name of the `confirmationToken` email template parameter. The confirmation token is not an email template variable anymore, so the password reset and invitation flows pass it as this parameter and the `oro_user.event_listener.user_confirmation_token_email_template` listener resolves `entity.confirmationToken` from it while the email is rendered. Custom code that sends one of these emails must pass the same parameter, otherwise the rendered link carries no token.
 
 ### Changed
 
 #### NavigationBundle
 * Changed the `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity configuration: a menu item is a system record managed on the page of its menu, so the entity is hidden from the entity management grid, its entity config pages respond with 404, excluded from the lists of entities (`oro_entity: exclusions`) and its entity audit is turned off and locked (`dataaudit: {auditable: false, immutable: true}`) — the changes of a menu item are recorded by the menu audit, so the entity audit of the same rows would only duplicate them.
+
+#### EmailBundle
+* Changed the email template compilation entry points so they authorize the caller before a template is rendered: `\Oro\Bundle\EmailBundle\Controller\AjaxEmailController::compileEmailAction()` requires View on Email Template and View on the target record, `\Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::getCompiledAction()` requires View on the target record before it is passed to the template, and `\Oro\Bundle\EmailBundle\Controller\EmailTemplateController::previewAction()` requires View on the template itself. A role that compiles email templates needs both permissions.
+* Changed `\Oro\Bundle\EmailBundle\Controller\EmailTemplateController::previewAction()` so it responds with 404 for an email template that does not exist, instead of failing with a fatal error.
+* Changed `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` so it denies an attribute of a record the current user is not allowed to view. The access checker is supplied with `setEntityAccessChecker()`; a policy built without it keeps the previous behaviour and performs no per-record authorization.
+* Changed how the email templates rendering sandbox resolves a property or method it denies: `\Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode` now resolves it to the value a listener of `\Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent` substituted, and to `null` only when no listener substituted one.
+    * `\Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension` carries the event dispatcher those nodes report a violation through, because a Twig node has no other way to reach a service; it is supplied with `setEventDispatcher()`. Its `getLogger()` is deprecated: the violation is logged by `\Oro\Bundle\EmailBundle\EventListener\EmailTemplateSecurityPolicyViolationListener` now.
+* Changed `\Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicyValidator` so it reports a denied property or method that the substitutable attribute provider declares with a message naming the email template parameter the template should read instead. The provider is supplied with `setSubstitutableAttributeProvider()`; a validator built without it keeps the previous messages.
+    * `\Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy` carries the two messages of that case in `$substitutablePropertyMessage` and `$substitutableMethodMessage`. The error codes are unchanged.
+* Changed `\Oro\Bundle\EmailBundle\PostUpgrade\EnableAvailableInTemplatesForFieldsInTemplatesTask` so it skips a field marked immutable, which would otherwise re-enable a field that is deliberately kept out of email templates.
+
+#### UserBundle
+* Changed `\Oro\Bundle\UserBundle\Entity\AbstractUser::$confirmationToken` so it is not available in email templates and is marked immutable, and therefore cannot be enabled from the Entity Management UI. `\Oro\Bundle\UserBundle\Migrations\Schema\v6_0_12_0\DisableFieldsInEmailTemplates` applies the same to an existing installation.
+* Changed the sanitize rules of the `oro_user` table: `confirmation_token` is replaced with an `md5` value now, so a database dump produced by `php bin/console oro:sanitize:dump-sql` carries no usable password reset token. A dump produced by any other means is unaffected.
+* Changed the shipped `user_reset_password`, `force_reset_password` and `invite_user` email templates so they read the `confirmationToken` email template parameter instead of `entity.confirmationToken`. `\Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateEmailTemplates` and `\Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateInviteUserEmailTemplates` apply the new content to an installation that has not customised them.
 
 ## 6.0.11
 
