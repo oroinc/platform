@@ -236,6 +236,26 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($authStatus, $user->getAuthStatus());
     }
 
+    public function testSendResetPasswordEmail(): void
+    {
+        $user = new User();
+        $user->setUserIdentifier('test');
+
+        $this->emailProcessor->expects(self::once())
+            ->method('sendResetPasswordEmail')
+            ->with(self::callback(function (User $user) {
+                self::assertNotEmpty($user->getConfirmationToken());
+                self::assertNotNull($user->getPasswordRequestedAt());
+
+                return true;
+            }));
+
+        $this->userManager->sendResetPasswordEmail($user);
+
+        self::assertNotEmpty($user->getConfirmationToken());
+        self::assertNotNull($user->getPasswordRequestedAt());
+    }
+
     public function testSetAuthStatus(): void
     {
         $user = new User();
