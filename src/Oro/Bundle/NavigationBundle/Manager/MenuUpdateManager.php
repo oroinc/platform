@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Exception\LogicException;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Factory\MenuUpdateFactoryInterface;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\MenuItemToMenuUpdatePropagatorInterface;
@@ -128,6 +129,26 @@ class MenuUpdateManager
         }
 
         return $menuUpdate;
+    }
+
+    public function deleteMenuUpdate(MenuUpdateInterface $menuUpdate): void
+    {
+        $scope = $menuUpdate->getScope();
+        if (null !== $scope) {
+            /** @var MenuUpdateRepository $repository */
+            $repository = $this->getRepository();
+            $children = $repository->findChildren(
+                (string)$menuUpdate->getMenu(),
+                $scope,
+                (string)$menuUpdate->getKey()
+            );
+
+            foreach ($children as $child) {
+                $child->setParentKey(null);
+            }
+        }
+
+        $this->getEntityManager()->remove($menuUpdate);
     }
 
     public function deleteMenuUpdates(Scope $scope, ?string $menuName = null): void

@@ -13,7 +13,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion(): string
     {
-        return 'v1_12';
+        return 'v1_13';
     }
 
     /**

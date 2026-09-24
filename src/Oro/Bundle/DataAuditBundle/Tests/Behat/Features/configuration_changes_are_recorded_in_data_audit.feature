@@ -13,6 +13,7 @@ Feature: Configuration changes are recorded in Data Audit
     And I fill in "Recipients email addresses" with "test@oroinc.com"
     And I submit form
     Then I should see "Configuration saved" flash message
+    And should be 1 audit record for "oro_logger.email_notification_recipients" configuration option
     When I go to System/ Data Audit
     Then I should see "Configuration: System" in grid
     And I should see "Recipients email addresses" in grid
@@ -24,6 +25,7 @@ Feature: Configuration changes are recorded in Data Audit
     And I fill in "Record Pagination limit" with "42"
     And I submit form
     Then I should see "Configuration saved" flash message
+    And should be 1 audit record for "oro_entity_pagination.limit" configuration option
     When I go to System/ Data Audit
     Then I should see "Configuration: User" in grid
     And I should see "Record Pagination limit" in grid
@@ -52,6 +54,7 @@ Feature: Configuration changes are recorded in Data Audit
     And uncheck "Use default" for "Recipients email addresses" field
     And I submit form
     Then I should see "Configuration saved" flash message
+    And should be 3 audit records for "oro_logger.email_notification_recipients" configuration option
     When I go to System/ Data Audit
     And I filter "Data" as contains "Recipients email addresses"
     Then the number of records greater than or equal to 3
@@ -65,6 +68,7 @@ Feature: Configuration changes are recorded in Data Audit
     And check "Use default" for "Recipients email addresses" field
     And I submit form
     Then I should see "Configuration saved" flash message
+    And should be 4 audit records for "oro_logger.email_notification_recipients" configuration option
     When I go to System/ Data Audit
     And I filter "Data" as contains "Recipients email addresses"
     Then the number of records greater than or equal to 4

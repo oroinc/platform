@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Async\Topic;
 
-use Oro\Bundle\DataAuditBundle\Async\Topic\ConfigChangeAuditTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditEntryTopic;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
-class ConfigChangeAuditTopicTest extends AbstractTopicTestCase
+class AuditEntryTopicTest extends AbstractTopicTestCase
 {
     #[\Override]
     protected function getTopic(): TopicInterface
     {
-        return new ConfigChangeAuditTopic();
+        return new AuditEntryTopic();
     }
 
     #[\Override]
