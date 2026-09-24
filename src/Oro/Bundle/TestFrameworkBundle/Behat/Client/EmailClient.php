@@ -6,7 +6,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Client;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Utils;
 use Laminas\Mime\Decode;
 use Laminas\Mime\Message;
 
@@ -69,6 +68,6 @@ class EmailClient
     {
         $response = $this->client->get($url);
 
-        return Utils::jsonDecode((string)$response->getBody(), true);
+        return json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
     }
 }

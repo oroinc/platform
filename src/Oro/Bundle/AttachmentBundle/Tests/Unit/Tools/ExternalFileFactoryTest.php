@@ -293,7 +293,7 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
                     [
                         'Content-Disposition' => 'inline;filename="image.png"',
                         'Content-Type' => 'image/png',
-                        'Content-Length' => 4242,
+                        'Content-Length' => '4242',
                     ]
                 )),
                 'externalFile' => new ExternalFile(self::URL, 'image.png', 4242, 'image/png'),
@@ -315,7 +315,7 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
                     [
                         'Content-Disposition' => 'inline;filename="image.png"',
                         'Content-Type' => 'image/png',
-                        'Content-Length' => -42,
+                        'Content-Length' => '-42',
                     ]
                 )),
                 'externalFile' => new ExternalFile(self::URL, 'image.png', 0, 'image/png'),

@@ -8,7 +8,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Utils;
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
 use Oro\Component\Log\LogAndThrowExceptionTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -269,8 +268,8 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
         $responseBodyContents = $response->getBody()->getContents();
 
         try {
-            $result = Utils::jsonDecode($responseBodyContents, true);
-        } catch (\GuzzleHttp\Exception\InvalidArgumentException $e) {
+            $result = json_decode($responseBodyContents, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
             $this->throwErrorException(
                 TranslationServiceAdapterException::class,
                 'Cannot decode the translation metrics response.',
