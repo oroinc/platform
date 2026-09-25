@@ -487,8 +487,8 @@ abstract class AbstractUser implements
     {
         $passwordRequestAt = $this->getPasswordRequestedAt();
 
-        return $passwordRequestAt === null || ($passwordRequestAt instanceof \DateTime
-        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time());
+        return $passwordRequestAt instanceof \DateTime
+            && $passwordRequestAt->getTimestamp() + $ttl > time();
     }
 
     /**
@@ -510,6 +510,12 @@ abstract class AbstractUser implements
         $this->passwordRequestedAt = $time;
 
         return $this;
+    }
+
+    public function renewConfirmationToken(): void
+    {
+        $this->setConfirmationToken($this->generateToken());
+        $this->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
     }
 
     #[\Override]

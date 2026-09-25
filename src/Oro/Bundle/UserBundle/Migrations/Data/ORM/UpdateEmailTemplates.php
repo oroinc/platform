@@ -18,6 +18,7 @@ class UpdateEmailTemplates extends AbstractHashEmailMigration implements Version
             'force_reset_password' => [
                 '94bf65b402a50c53b3bef0f88c2cf121', // 1.0
                 '8b20e309a90df86959f66f7b2016cacb', // 6.1.11.0
+                '9c8ec7e9d5ee2bd090db23b3d3511536', // 6.1.11.1
             ],
             'user_reset_password' => [
                 '1e707aadaa5524244233001c2850c6f8', // 1.0
@@ -29,7 +30,7 @@ class UpdateEmailTemplates extends AbstractHashEmailMigration implements Version
     #[\Override]
     public function getVersion(): string
     {
-        return '6.1.11.0';
+        return '6.1.11.1';
     }
 
     #[\Override]
