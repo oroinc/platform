@@ -474,6 +474,94 @@ class ImportExportControllerTest extends WebTestCase
         self::assertMessagesEmpty(PreImportTopic::getName());
     }
 
+    public function testTemplateExportActionReturnsTemplate(): void
+    {
+        $this->client->useHashNavigation(false);
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_export_template', ['processorAlias' => 'oro_user'])
+        );
+
+        $response = $this->client->getResponse();
+        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertStringContainsString('text/csv', $response->headers->get('Content-Type'));
+    }
+
+    public function testTemplateExportActionRejectsReservedOption(): void
+    {
+        $testPath = $this->getTempDir('import_export_security') . DIRECTORY_SEPARATOR . 'test.csv';
+
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_export_template',
+                [
+                    'processorAlias' => 'oro_user',
+                    'options' => ['filePath' => $testPath, 'header' => ['PROBE']],
+                ]
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+        self::assertFileDoesNotExist($testPath);
+    }
+
+    public function testInstantExportActionRejectsReservedOptions(): void
+    {
+        $this->ajaxRequest(
+            'POST',
+            $this->getUrl(
+                'oro_importexport_export_instant',
+                [
+                    'processorAlias' => 'oro_account',
+                    'options' => ['filePath' => '/tmp/test.csv', 'delimiter' => ';', 'price_list_id' => 1],
+                ]
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+        self::assertMessagesEmpty(PreExportTopic::getName());
+    }
+
+    public function testInstantExportActionPassesBusinessOptionsThrough(): void
+    {
+        // query parameters arrive as strings, exactly as the back-office UI sends them
+        $options = ['price_list_id' => '1', 'writer_skip_clear' => 'true'];
+
+        $this->ajaxRequest(
+            'POST',
+            $this->getUrl(
+                'oro_importexport_export_instant',
+                ['processorAlias' => 'oro_account', 'options' => $options]
+            )
+        );
+
+        self::assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
+        self::assertMessageSent(PreExportTopic::getName());
+        self::assertSame($options, self::getSentMessage(PreExportTopic::getName())['options']);
+    }
+
+    public function testImportProcessActionRejectsReservedOption(): void
+    {
+        $this->updateRolePermissionForAction(User::ROLE_ADMINISTRATOR, 'oro_importexport_import', true);
+
+        $this->ajaxRequest(
+            'POST',
+            $this->getUrl(
+                'oro_importexport_import_process',
+                [
+                    'processorAlias' => 'oro_account',
+                    'fileName' => 'test_file',
+                    'originFileName' => 'test_file_original',
+                    'options' => ['filePath' => '/tmp/test.csv'],
+                ]
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+        self::assertMessagesEmpty(PreImportTopic::getName());
+    }
+
     private function getImportExportFileManager(): FileManager
     {
         return self::getContainer()->get('oro_importexport.file.file_manager');
