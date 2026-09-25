@@ -4,11 +4,21 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Controller\Api\Rest;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateData;
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateWithTestActivityData;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @dbIsolationPerTest
+ */
 class EmailTemplateControllerTest extends WebTestCase
 {
+    use RolePermissionExtension;
+
     #[\Override]
     protected function setUp(): void
     {
@@ -222,5 +232,100 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $this->assertIsArray($data);
         $this->assertArrayHasKey('reason', $data);
+    }
+
+    public function testGetCompiledEmailTemplateWhenNoEmailTemplatePermission(): void
+    {
+        $emailTemplate = $this->getReference(LoadEmailTemplateData::NO_ENTITY_NAME_TEMPLATE_REFERENCE);
+
+        $this->updateRolePermission('ROLE_ADMINISTRATOR', EmailTemplate::class, AccessLevel::NONE_LEVEL);
+
+        $this->client->jsonRequest(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_emailtemplate_compiled',
+                ['id' => $emailTemplate->getId(), 'entityId' => '']
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), Response::HTTP_FORBIDDEN);
+    }
+
+    public function testGetCompiledEmailTemplateWhenBasicPermissionAndEmailTemplateOwnedByAnotherUser(): void
+    {
+        $emailTemplate = $this->getReference(LoadEmailTemplateData::NO_ENTITY_NAME_TEMPLATE_REFERENCE);
+
+        $this->updateRolePermission('ROLE_ADMINISTRATOR', EmailTemplate::class, AccessLevel::BASIC_LEVEL);
+
+        $this->client->jsonRequest(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_emailtemplate_compiled',
+                ['id' => $emailTemplate->getId(), 'entityId' => '']
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), Response::HTTP_FORBIDDEN);
+    }
+
+    public function testGetVariables(): void
+    {
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_emailtemplate_variables'));
+
+        $data = self::getJsonResponseContent($this->client->getResponse(), Response::HTTP_OK);
+
+        self::assertArrayHasKey('system', $data);
+        self::assertArrayHasKey('entity', $data);
+    }
+
+    public function testGetVariablesWhenNoEmailTemplatePermission(): void
+    {
+        $this->updateRolePermission('ROLE_ADMINISTRATOR', EmailTemplate::class, AccessLevel::NONE_LEVEL);
+
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_emailtemplate_variables'));
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), Response::HTTP_FORBIDDEN);
+    }
+
+    public function testGetCompiledEmailTemplateWhenNoTargetEntityPermission(): void
+    {
+        $this->loadFixtures([LoadEmailTemplateWithTestActivityData::class]);
+
+        $emailTemplate = $this->getReference(LoadEmailTemplateWithTestActivityData::TEST_ACTIVITY_TEMPLATE);
+        $testActivity = $this->getReference(LoadEmailTemplateWithTestActivityData::TEST_ACTIVITY);
+
+        $this->updateRolePermission('ROLE_ADMINISTRATOR', TestActivity::class, AccessLevel::NONE_LEVEL);
+
+        $this->client->jsonRequest(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_emailtemplate_compiled',
+                ['id' => $emailTemplate->getId(), 'entityId' => $testActivity->getId()]
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Guards that the target record access check does not turn a missing record into "access denied".
+     */
+    public function testGetCompiledEmailTemplateWhenTargetEntityDoesNotExist(): void
+    {
+        $this->loadFixtures([LoadEmailTemplateWithTestActivityData::class]);
+
+        $emailTemplate = $this->getReference(LoadEmailTemplateWithTestActivityData::TEST_ACTIVITY_TEMPLATE);
+
+        $this->client->jsonRequest(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_emailtemplate_compiled',
+                ['id' => $emailTemplate->getId(), 'entityId' => self::BIGINT]
+            )
+        );
+
+        $data = self::getJsonResponseContent($this->client->getResponse(), Response::HTTP_NOT_FOUND);
+
+        self::assertArrayHasKey('message', $data);
     }
 }

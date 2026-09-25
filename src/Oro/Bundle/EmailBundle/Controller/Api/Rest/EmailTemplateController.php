@@ -154,6 +154,10 @@ class EmailTemplateController extends RestController
                 ->getRepository($emailTemplate->getEntityName())
                 ->find($entityId);
             if ($entity) {
+                if (!$this->isGranted('VIEW', $entity)) {
+                    throw $this->createAccessDeniedException();
+                }
+
                 $templateParams['entity'] = $entity;
             }
         }
