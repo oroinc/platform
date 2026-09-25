@@ -4,6 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Formatter;
 
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
 use Oro\Component\MessageQueue\Client\Config;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
 {
@@ -45,10 +46,14 @@ class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expectedResult' => '2018-07-06 09:16:02 <fg=white>app.NOTICE</>: Message processed: <comment>ACK</> '
-                    . '["status" => "ACK"] ["processor" => "TestProcessor","message_body" => "message body",'
-                    . '"message_properties" => ["oro.message_queue.client.topic_name" => "test topic"],'
-                    . '"message_id" => 1,"elapsed_time" => "1 ms","time_taken" => 1,'
-                    . '"memory_usage" => "1 MB","memory_taken" => "1 MB","peak_memory" => "1 MB"]'
+                    . OutputFormatter::escape('["status" => "ACK"]')
+                    . ' '
+                    . OutputFormatter::escape(
+                        '["processor" => "TestProcessor","message_body" => "message body",'
+                        . '"message_properties" => ["oro.message_queue.client.topic_name" => "test topic"],'
+                        . '"message_id" => 1,"elapsed_time" => "1 ms","time_taken" => 1,'
+                        . '"memory_usage" => "1 MB","memory_taken" => "1 MB","peak_memory" => "1 MB"]'
+                    )
                     . "\n"
             ],
             'without context and with extra' => [
@@ -64,7 +69,7 @@ class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expectedResult' => '2018-07-06 09:16:03 <fg=white>app.INFO</>: Start consuming '
-                    . '["memory_usage" => "1 MB"]'
+                    . OutputFormatter::escape('["memory_usage" => "1 MB"]')
                     . "\n"
             ],
             'with context and without extra' => [
@@ -80,7 +85,7 @@ class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
                     'extra'      => []
                 ],
                 'expectedResult' => '2018-07-06 09:16:04 <fg=white>app.NOTICE</>: Message processed: <comment>ACK</> '
-                    . '["status" => "ACK"]'
+                    . OutputFormatter::escape('["status" => "ACK"]')
                     . "\n"
             ],
             'without context and without extra' => [

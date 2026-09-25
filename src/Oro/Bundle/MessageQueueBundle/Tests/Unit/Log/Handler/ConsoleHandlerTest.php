@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Log\ConsumerState;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -77,7 +78,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('write')
             ->with(
                 '2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message '
-                . '["key" => "value"] ["processor" => "Test\Processor"]'
+                . OutputFormatter::escape('["key" => "value"] ["processor" => "Test\Processor"]')
                 . "\n"
             );
 

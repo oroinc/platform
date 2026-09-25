@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle;
 
-use GuzzleHttp\Utils;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -142,7 +141,15 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function json()
     {
-        return Utils::jsonDecode($this->getBodyAsString(), true);
+        try {
+            return json_decode($this->getBodyAsString(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            throw new GuzzleRestException(
+                'Unable to parse response body into JSON: ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
+        }
     }
 
     /**

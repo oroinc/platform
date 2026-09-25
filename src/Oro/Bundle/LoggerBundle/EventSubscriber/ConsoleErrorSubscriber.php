@@ -24,7 +24,7 @@ class ConsoleErrorSubscriber implements EventSubscriberInterface
     {
         if ($this->logger && $event->getCommand()) {
             $handler = set_exception_handler('var_dump');
-            $handler = $handler[0] ?? null;
+            $handler = is_array($handler) ? $handler[0] : null;
 
             restore_exception_handler();
             if ($handler instanceof ErrorHandler) {

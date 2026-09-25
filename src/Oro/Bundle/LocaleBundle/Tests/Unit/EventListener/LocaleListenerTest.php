@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\Translator;
 
 class LocaleListenerTest extends \PHPUnit\Framework\TestCase
@@ -57,9 +58,9 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    private function getListener(): LocaleListener
+    private function getListener(?LocaleSwitcher $localeSwitcher = null): LocaleListener
     {
-        return new LocaleListener(
+        $listener = new LocaleListener(
             $this->localeSettings,
             $this->currentLocalizationProvider,
             $this->transListener,
@@ -67,6 +68,9 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
             $this->router,
             $this->applicationState
         );
+        $listener->setLocaleSwitcher($localeSwitcher);
+
+        return $listener;
     }
 
     /**
@@ -179,5 +183,99 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $this->getListener()->onConsoleCommand($event);
+    }
+
+    public function testOnKernelRequestSwitchesLocaleThroughLocaleSwitcher(): void
+    {
+        $language = 'de';
+        $customLocale = 'de_DE';
+
+        $request = new Request();
+        $context = new RequestContext();
+        $request->setDefaultLocale($this->defaultLocale);
+
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(true);
+        $this->currentLocalizationProvider->expects(self::once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
+        $this->localeSettings->expects(self::once())
+            ->method('getLanguage')
+            ->willReturn($language);
+        $this->localeSettings->expects(self::once())
+            ->method('getLocale')
+            ->willReturn($customLocale);
+        $this->router->expects(self::once())
+            ->method('getContext')
+            ->willReturn($context);
+
+        $localeSwitcher = $this->createMock(LocaleSwitcher::class);
+        $localeSwitcher->expects(self::once())
+            ->method('setLocale')
+            ->with($language)
+            ->willReturnCallback(static function (string $locale) {
+                // The real switcher sets the PHP default locale to the language code.
+                \Locale::setDefault($locale);
+            });
+        // The switcher sends the locale to the translator. A direct call sets the locale two times.
+        $this->translator->expects(self::never())
+            ->method('setLocale');
+
+        $event = $this->createMock(RequestEvent::class);
+        $event->expects(self::once())
+            ->method('getRequest')
+            ->willReturn($request);
+
+        $this->getListener($localeSwitcher)->onKernelRequest($event);
+
+        self::assertEquals($language, $request->getLocale());
+        self::assertEquals($language, $context->getParameter('_locale'));
+        self::assertEquals($customLocale, \Locale::getDefault());
+    }
+
+    public function testOnKernelRequestKeepsRouteProvidedLocaleInRouterContext(): void
+    {
+        $language = 'de';
+        $routeLocale = 'fr';
+
+        $request = new Request();
+        $request->attributes->set('_locale', $routeLocale);
+        $context = new RequestContext();
+        $context->setParameter('_locale', $routeLocale);
+
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(true);
+        $this->currentLocalizationProvider->expects(self::once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
+        $this->localeSettings->expects(self::once())
+            ->method('getLanguage')
+            ->willReturn($language);
+        $this->localeSettings->expects(self::once())
+            ->method('getLocale')
+            ->willReturn('de_DE');
+        $this->router->expects(self::once())
+            ->method('getContext')
+            ->willReturn($context);
+
+        $localeSwitcher = $this->createMock(LocaleSwitcher::class);
+        $localeSwitcher->expects(self::once())
+            ->method('setLocale')
+            ->with($language)
+            ->willReturnCallback(static function (string $locale) use ($context) {
+                // The real switcher changes the parameter in the router context.
+                $context->setParameter('_locale', $locale);
+            });
+
+        $event = $this->createMock(RequestEvent::class);
+        $event->expects(self::once())
+            ->method('getRequest')
+            ->willReturn($request);
+
+        $this->getListener($localeSwitcher)->onKernelRequest($event);
+
+        self::assertEquals($routeLocale, $context->getParameter('_locale'));
     }
 }
