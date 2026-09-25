@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Topic;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Context\ReservedOptions;
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
@@ -47,6 +48,14 @@ abstract class AbstractImportTopic extends AbstractTopic
                 'options' => [],
             ])
             ->setNormalizer('options', static function (Options $options, $value) use ($batchSize) {
+                $reservedOptions = ReservedOptions::detect($value);
+                if ($reservedOptions) {
+                    throw new InvalidOptionsException(sprintf(
+                        'The option "options" must not contain reserved keys: "%s".',
+                        implode('", "', $reservedOptions)
+                    ));
+                }
+
                 if (!array_key_exists(Context::OPTION_BATCH_SIZE, $value)) {
                     $value[Context::OPTION_BATCH_SIZE] = $batchSize;
                 }
