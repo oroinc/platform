@@ -86,4 +86,38 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
         /** @var RestResponseInterface $restResponse */
         $this->assertEquals($expectedStatusCode, $restResponse->getStatusCode(), $errorMessage);
     }
+
+    public function testGetJsonDoesNotTriggerDeprecation()
+    {
+        $this->client->setDefaultResponse(new Response(200, [], '{"key":"val"}'));
+
+        $deprecations = [];
+        set_error_handler(
+            static function (int $errno, string $errstr) use (&$deprecations): bool {
+                $deprecations[] = $errstr;
+
+                return true;
+            },
+            E_USER_DEPRECATED
+        );
+
+        try {
+            $data = $this->client->getJSON(self::FAKE_RESOURCE);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(['key' => 'val'], $data);
+        self::assertSame([], $deprecations);
+    }
+
+    public function testGetJsonThrowsExceptionWhenBodyIsNotValidJson()
+    {
+        $this->client->setDefaultResponse(new Response(200, [], 'not a json'));
+
+        $this->expectException(RestException::class);
+        $this->expectExceptionMessage('Unable to parse response body into JSON');
+
+        $this->client->getJSON(self::FAKE_RESOURCE);
+    }
 }

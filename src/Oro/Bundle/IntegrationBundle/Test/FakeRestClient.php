@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Test;
 
-use GuzzleHttp\Utils;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
@@ -36,7 +35,7 @@ class FakeRestClient implements RestClientInterface
     {
         $response = $this->get($resource, $params, $headers, $options);
 
-        return Utils::jsonDecode($response->getBodyAsString(), true);
+        return $response->json();
     }
 
     /**
