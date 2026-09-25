@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
+use Oro\Bundle\ImportExportBundle\Context\ReservedOptions;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Exception\ImportExportExpiredException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -44,6 +45,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Controller for import/export actions
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  *
  * Responsible for the import and export
  */
@@ -408,7 +410,7 @@ class ImportExportController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    #[Route(path: '/export/template/{processorAlias}', name: 'oro_importexport_export_template')]
+    #[Route(path: '/export/template/{processorAlias}', name: 'oro_importexport_export_template', methods: ['GET'])]
     #[AclAncestor('oro_importexport_import')]
     public function templateExportAction($processorAlias, Request $request)
     {
@@ -509,6 +511,14 @@ class ImportExportController extends AbstractController
 
         if (!is_array($options)) {
             throw new InvalidArgumentException('Request parameter "options" must be array.');
+        }
+
+        $reservedOptions = ReservedOptions::detect($options);
+        if ($reservedOptions) {
+            throw new BadRequestHttpException(sprintf(
+                'Request parameter "options" must not contain reserved keys: "%s".',
+                implode('", "', $reservedOptions)
+            ));
         }
 
         return $options;
