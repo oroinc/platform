@@ -49,7 +49,6 @@ class ConfigAuditFieldLabelProviderTest extends TestCase
     {
         $this->givenSystemConfigurationTree();
 
-        // "commerce" root kept, "platform" (System Configuration) root dropped, label comes last.
         self::assertSame(
             'Commerce › Product › Promotions › Maximum Items',
             $this->provider->getLabel(self::SYSTEM, self::MAX_ITEMS)
@@ -81,7 +80,6 @@ class ConfigAuditFieldLabelProviderTest extends TestCase
         $this->givenTree([], [], ['oro_test.orphan' => 'label.orphan']);
         $this->translator->catalogue = ['en' => ['label.orphan' => 'Orphan Setting']];
 
-        // A setting missing from the tree still gets its own label, and an unknown key stays as it is.
         self::assertSame('Orphan Setting', $this->provider->getLabel(self::SYSTEM, 'oro_test.orphan'));
         self::assertSame('oro_test.unknown', $this->provider->getLabel(self::SYSTEM, 'oro_test.unknown'));
     }
@@ -89,11 +87,12 @@ class ConfigAuditFieldLabelProviderTest extends TestCase
     /**
      * @dataProvider matchingTermDataProvider
      */
-    public function testGetMatchingFieldKeysMatchesAnyPartOfTheBreadcrumb(string $term, array $expected): void
+    public function testGetMatchingFieldsMatchesAnyPartOfTheBreadcrumb(string $term, array $expected): void
     {
         $this->givenSystemConfigurationTree();
 
-        self::assertEqualsCanonicalizing($expected, $this->provider->getMatchingFieldKeys($term));
+        self::assertSame([], $this->provider->getMatchingFields($term)['classes']);
+        self::assertEqualsCanonicalizing($expected, $this->provider->getMatchingFields($term)['fields']);
     }
 
     public function matchingTermDataProvider(): array
@@ -121,9 +120,8 @@ class ConfigAuditFieldLabelProviderTest extends TestCase
             'label.max_items' => 'Nombre maximum',
         ];
 
-        // Searching in the language the viewer sees works; the term of another language does not leak in.
-        self::assertSame([self::MAX_ITEMS], $this->provider->getMatchingFieldKeys('Promotions'));
-        self::assertSame([], $this->provider->getMatchingFieldKeys('Offres'));
+        self::assertSame([self::MAX_ITEMS], $this->provider->getMatchingFields('Promotions')['fields']);
+        self::assertSame([], $this->provider->getMatchingFields('Offres')['fields']);
 
         $this->translator->setLocale('fr');
 
@@ -131,9 +129,9 @@ class ConfigAuditFieldLabelProviderTest extends TestCase
             'Commerce › Produit › Offres › Nombre maximum',
             $this->provider->getLabel(self::SYSTEM, self::MAX_ITEMS)
         );
-        self::assertSame([self::MAX_ITEMS], $this->provider->getMatchingFieldKeys('offres'));
-        self::assertSame([self::MAX_ITEMS], $this->provider->getMatchingFieldKeys('nombre'));
-        self::assertSame([], $this->provider->getMatchingFieldKeys('Promotions'));
+        self::assertSame([self::MAX_ITEMS], $this->provider->getMatchingFields('offres')['fields']);
+        self::assertSame([self::MAX_ITEMS], $this->provider->getMatchingFields('nombre')['fields']);
+        self::assertSame([], $this->provider->getMatchingFields('Promotions')['fields']);
     }
 
     private function givenSystemConfigurationTree(): void
@@ -176,11 +174,6 @@ class ConfigAuditFieldLabelProviderTest extends TestCase
         ];
     }
 
-    /**
-     * @param array $tree the system_configuration tree (the other levels have no tree)
-     * @param array<string, string> $groupTitles [group name => title translation key]
-     * @param array<string, string> $fieldLabels [config key => label translation key]
-     */
     private function givenTree(array $tree, array $groupTitles, array $fieldLabels): void
     {
         $this->configBag->expects(self::any())

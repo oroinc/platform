@@ -35,6 +35,12 @@ acls:
         permission: EDIT
         group_name: ""
 
+    oro_email_emailtemplate_view:
+        type: entity
+        class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
+        permission: VIEW
+        group_name: ""
+
     oro_email_autoresponserule_view:
         type: entity
         class: Oro\Bundle\EmailBundle\Entity\AutoResponseRule

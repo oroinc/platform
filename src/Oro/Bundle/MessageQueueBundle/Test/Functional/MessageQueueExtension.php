@@ -190,4 +190,16 @@ trait MessageQueueExtension
             $bufferedProducer->flushBuffer();
         }
     }
+
+    /**
+     * Makes the queue empty. {@see self::consumeAllMessages()} stops when the collector is empty,
+     * which still leaves messages from other sources in the queue. A test that must see only its own
+     * effects starts from here.
+     */
+    protected function emptyMessageQueue(): void
+    {
+        $this->consumeAllMessages();
+        self::purgeMessageQueue();
+        self::clearMessageCollector();
+    }
 }

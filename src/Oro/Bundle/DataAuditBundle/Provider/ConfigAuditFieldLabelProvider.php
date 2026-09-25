@@ -14,7 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * level the record belongs to. Being a {@see AbstractAuditFieldNameProvider}, the same breadcrumb serves
  * the grid rendering and the "Data" search, in the current locale.
  */
-class ConfigAuditFieldLabelProvider extends AbstractAuditFieldNameProvider
+class ConfigAuditFieldLabelProvider extends AbstractAuditFieldNameProvider implements
+    AuditFieldLabelProviderInterface
 {
     /** Generic "System Configuration" tree root that carries no locating information. */
     private const array HIDDEN_TREE_GROUPS = ['platform'];
@@ -29,30 +30,20 @@ class ConfigAuditFieldLabelProvider extends AbstractAuditFieldNameProvider
         parent::__construct($translator);
     }
 
-    /**
-     * Returns the breadcrumb of a configuration setting, or null when the object class is not a
-     * configuration type (so callers can fall back to their default field-name rendering).
-     */
+    #[\Override]
     public function getLabel(?string $objectClass, string $fieldKey): ?string
     {
-        if (!$this->levelProvider->isConfigType($objectClass)) {
+        if (!$this->levelProvider->isType($objectClass)) {
             return null;
         }
 
-        // A setting that is not placed in the level's tree has no breadcrumb — show its own label.
         return $this->getName($objectClass, $fieldKey) ?? $this->getFieldLabel($fieldKey);
     }
 
-    /**
-     * Configuration keys whose breadcrumb contains the term, so the "Data" filter finds a setting by any
-     * part of the path the user sees: "Promotions", "New Arrivals" and "Maximum Items" all match the
-     * same setting. Configuration keys are globally unique, hence no object class scoping.
-     *
-     * @return string[]
-     */
-    public function getMatchingFieldKeys(string $term): array
+    #[\Override]
+    public function getMatchingFields(string $term): array
     {
-        return $this->matchFields($term)['fields'];
+        return ['classes' => [], 'fields' => $this->matchFields($term)['fields']];
     }
 
     #[\Override]

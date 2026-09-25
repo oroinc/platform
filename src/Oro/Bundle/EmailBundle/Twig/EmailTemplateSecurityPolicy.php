@@ -12,6 +12,7 @@ use Twig\Sandbox\SecurityPolicyInterface;
  * Works as a decorator for Twig security policy:
  *   - Adds the allowed methods and properties for entity classes from the template renderer config provider.
  *   - Adds getters for tags, functions, filters, methods and properties.
+ *   - Authorizes every object a render walks to against the VIEW permission of the current user.
  */
 class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
 {
@@ -45,6 +46,7 @@ class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
     public function __construct(
         private SecurityPolicyInterface $securityPolicy,
         private TemplateRendererConfigProviderInterface $templateRendererConfigProvider,
+        private EmailTemplateEntityAccessChecker $entityAccessChecker,
     ) {
     }
 
@@ -167,11 +169,14 @@ class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
     {
         // __toString is a PHP string-coercion magic method, not an entity field accessor.
         if (strtolower($method) === '__tostring') {
+            $this->entityAccessChecker->assertMethodAccessGranted($obj, $method);
+
             return;
         }
         $this->ensureInitialized();
 
         $this->securityPolicy->checkMethodAllowed($obj, $method);
+        $this->entityAccessChecker->assertMethodAccessGranted($obj, $method);
     }
 
     #[\Override]
@@ -180,6 +185,7 @@ class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
         $this->ensureInitialized();
 
         $this->securityPolicy->checkPropertyAllowed($obj, $property);
+        $this->entityAccessChecker->assertPropertyAccessGranted($obj, $property);
     }
 
     private function ensureInitialized(): void

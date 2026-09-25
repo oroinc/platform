@@ -11,6 +11,7 @@ oro_sanitize:
                 birthday: date
                 salt: md5
                 password: md5
+                confirmation_token: md5
         oro_user_impersonation:
             fields:
                 token: md5

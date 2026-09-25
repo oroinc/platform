@@ -1,0 +1,27 @@
+include:
+  - '@OroUserBundle:user.yml'
+
+Oro\Bundle\UserBundle\Entity\User:
+  victor:
+    firstName: Victor
+    lastName: Target
+    username: victor
+    organization: '@organization'
+    organizations: ['@organization']
+    userRoles: ['@userRole']
+    owner: '@business_unit'
+    businessUnits: ['@business_unit']
+    email: victor@example.com
+    password: <userPassword(@victor->username)>
+    confirmationToken: 'behatstoredvalue'
+
+Oro\Bundle\EmailBundle\Entity\EmailTemplate:
+  undefined_parameter:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 0
+    name: 'undefined_parameter'
+    entity_name: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+    type: 'txt'
+    subject: 'Undefined parameter template'
+    content: 'Value start {{ confirmationToken|default(''N_A'') }} value end'

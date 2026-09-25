@@ -4,8 +4,8 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\DataAuditBundle\Async\ConfigChangeAuditProcessor;
-use Oro\Bundle\DataAuditBundle\Async\Topic\ConfigChangeAuditTopic;
+use Oro\Bundle\DataAuditBundle\Async\AuditEntryProcessor;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditEntryTopic;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Service\SetNewAuditVersionService;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -17,11 +17,11 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ConfigChangeAuditProcessorTest extends TestCase
+class AuditEntryProcessorTest extends TestCase
 {
     private ObjectManager&MockObject $em;
     private SetNewAuditVersionService&MockObject $setNewAuditVersionService;
-    private ConfigChangeAuditProcessor $processor;
+    private AuditEntryProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -34,14 +34,14 @@ class ConfigChangeAuditProcessorTest extends TestCase
             ->method('getManagerForClass')
             ->willReturn($this->em);
 
-        $this->processor = new ConfigChangeAuditProcessor($doctrine, $this->setNewAuditVersionService);
+        $this->processor = new AuditEntryProcessor($doctrine, $this->setNewAuditVersionService);
     }
 
     public function testGetSubscribedTopics(): void
     {
         self::assertSame(
-            [ConfigChangeAuditTopic::getName()],
-            ConfigChangeAuditProcessor::getSubscribedTopics()
+            [AuditEntryTopic::getName()],
+            AuditEntryProcessor::getSubscribedTopics()
         );
     }
 
@@ -90,7 +90,6 @@ class ConfigChangeAuditProcessorTest extends TestCase
         foreach ($persisted->getFields() as $field) {
             $fieldsByName[$field->getField()] = $field;
         }
-        // Each audit field keeps the configuration data type: text as text, boolean as a real boolean.
         self::assertSame('text', $fieldsByName['General › Foo']->getDataType());
         self::assertSame('boolean', $fieldsByName['Enabled']->getDataType());
         self::assertTrue($fieldsByName['Enabled']->getOldValue());
@@ -127,7 +126,6 @@ class ConfigChangeAuditProcessorTest extends TestCase
 
     public function testProcessIgnoresAuthorThatIsNotABackOfficeUser(): void
     {
-        // A storefront customer user cannot be stored in the audit's user association.
         $this->em->expects(self::any())
             ->method('find')
             ->willReturn(new \stdClass());
@@ -159,10 +157,6 @@ class ConfigChangeAuditProcessorTest extends TestCase
         self::assertSame(MessageProcessorInterface::ACK, $result);
     }
 
-    /**
-     * Processes a minimal configuration change message merged with the given author data and returns the
-     * persisted audit.
-     */
     private function process(array $authorData): Audit
     {
         $persisted = null;

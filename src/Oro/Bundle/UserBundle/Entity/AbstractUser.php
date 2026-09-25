@@ -110,7 +110,7 @@ abstract class AbstractUser implements
     #[ORM\Column(name: 'confirmation_token', type: Types::STRING, nullable: true)]
     #[ConfigField(defaultValues: [
         'importexport' => ['excluded' => true],
-        'email' => ['available_in_template' => true],
+        'email' => ['available_in_template' => false, 'immutable' => true],
     ])]
     protected ?string $confirmationToken = null;
 
@@ -481,8 +481,8 @@ abstract class AbstractUser implements
     {
         $passwordRequestAt = $this->getPasswordRequestedAt();
 
-        return $passwordRequestAt === null || ($passwordRequestAt instanceof \DateTime
-        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time());
+        return $passwordRequestAt instanceof \DateTime
+            && $passwordRequestAt->getTimestamp() + $ttl > time();
     }
 
     /**
@@ -504,6 +504,12 @@ abstract class AbstractUser implements
         $this->passwordRequestedAt = $time;
 
         return $this;
+    }
+
+    public function renewConfirmationToken(): void
+    {
+        $this->setConfirmationToken(RandomTokenGenerator::generate());
+        $this->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
     }
 
     #[\Override]

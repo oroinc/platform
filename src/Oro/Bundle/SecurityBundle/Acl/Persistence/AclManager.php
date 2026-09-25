@@ -168,9 +168,12 @@ class AclManager extends AbstractAclManager
     /**
      * Flushes all changes to ACLs that have been queued up to now to the database.
      * This synchronizes the in-memory state of managed ACLs with the database.
+     *
+     * @param AclChangeSet|null $changeSet Collects object identities whose ACLs have been actually changed
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function flush()
+    public function flush(?AclChangeSet $changeSet = null)
     {
         $this->validateAclEnabled();
 
@@ -203,13 +206,16 @@ class AclManager extends AbstractAclManager
                         }
                         if ($hasChanges) {
                             $this->aclProvider->updateAcl($acl);
+                            $changeSet?->addChangedOid($item->getOid());
                         }
                         break;
                     case BatchItem::STATE_UPDATE:
                         $this->aclProvider->updateAcl($item->getAcl());
+                        $changeSet?->addChangedOid($item->getOid());
                         break;
                     case BatchItem::STATE_DELETE:
                         $this->aclProvider->deleteAcl($item->getOid());
+                        $changeSet?->addChangedOid($item->getOid());
                         break;
                 }
             }

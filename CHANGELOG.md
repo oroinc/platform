@@ -45,6 +45,15 @@ The current file describes significant changes in the code that may affect the u
 * Added `\Oro\Bundle\EmailBundle\SecurityPolicyInspector\EmailTemplateSecurityPolicyInspector` to check multiple email templates, and loading email templates via loader notation (e.g. `@db:website=101/sample_template_name`).
 * Added `\Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy` validation constraint and validator classes to bring early security policy checking to the email template create/update page.
 * Added `\Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension`, `\Oro\Bundle\EmailBundle\Twig\NodeVisitor\SafeGetAttrNodeVisitor`, and `\Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode` to enable more graceful handling of non-allowed properties and methods in email templates by replacing them with `null`.
+* Added `\Oro\Bundle\EmailBundle\Twig\NodeVisitor\SafeCheckToStringNodeVisitor` and `\Oro\Bundle\EmailBundle\Twig\Node\SafeCheckToStringNode`. String coercion of a record denied by the email templates rendering sandbox, such as `{{ record }}` or `{{ record|upper }}`, now resolves to the substituted value instead of aborting the render.
+* Added `\Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent`, dispatched when the email templates rendering sandbox denies an attribute. Listen to it and call `setValue()` to make the denied attribute resolve to something other than `null`. It is dispatched for an is-defined test, where a non-null substituted value makes the test resolve to `true`, and for a denied string coercion, with `__toString` as the item.
+    * `getContext()` returns the Twig context of the render, including sensitive data, so it should never be included in logs.
+* Added `\Oro\Bundle\EmailBundle\EventListener\EmailTemplateSecurityPolicyViolationListener` that logs such a violation on the `oro_email` channel at priority `-100`. It stays silent when another listener already substituted a value.
+* Added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateEntityAccessChecker` (service `oro_email.twig.email_template_entity_access_checker`) that authorizes every record an email template render walks to against the `VIEW` permission of the current user. Only persisted Doctrine entities are checked, and a render performed without a logged-in user, such as by a cron job, a message queue consumer, a CLI command or an anonymous request, reads every allowlisted attribute regardless of ownership.
+* Added the `oro_email_emailtemplate_view` ACL identifier, an entity ACL granting `VIEW` on `\Oro\Bundle\EmailBundle\Entity\EmailTemplate`. The email template REST actions that already referenced it, `getVariablesAction()` and `getCompiledAction()` of `\Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController`, resolve it now, so a role without View on Email Template is refused. Review the roles used by integrations that call these actions.
+
+#### EntityExtendBundle
+* Added `\Oro\Bundle\EntityExtendBundle\Twig\Node\GetAttrNode::onSecurityError()`, a protected hook that decides what an attribute access denied by the Twig sandbox resolves to. The default keeps the Twig core behaviour.
 
 #### EntityBundle
 * Added `\Oro\Bundle\EntityBundle\ORM\DoctrineHelper::findOneBy()` to load a single entity by criteria without fetching the repository first.
@@ -64,6 +73,12 @@ The current file describes significant changes in the code that may affect the u
 * Added the `oro_data_audit.configuration_level_entities` configuration option that tells the audit which entity the id of a configuration scope refers to, so that a record can be named after what was configured.
 * Added masking of secret configuration settings in the audit: the value of a setting rendered as a password field is stored as `***`.
 * Added the `audit-data` datagrid filter (`Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter`) that searches within the changed data of the audit grid.
+* Added `Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder` and `Oro\Bundle\DataAuditBundle\Model\AuditEntry`: the way for a bundle to record an audit entry for a change the audit cannot discover on its own, i.e. a change that is not a change of an auditable entity (a system configuration setting, a storefront menu). The recorder resolves the author, checks whether anything is audited at all and stores the entry asynchronously, so a producer only describes what changed.
+* Added `Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface` and the `oro_dataaudit.audit_type` tag: describes an audit type whose object class is not an entity of the application and provides everything the audit grid shows for it (the Entity Type column and filter, the name of a changed field, and what the `audit-data` filter matches). `Oro\Bundle\DataAuditBundle\Provider\LevelAuditType` implements it for any domain that is recorded per level — the configuration levels, the menu levels — so such a domain is added by registering services only, and `Oro\Bundle\DataAuditBundle\Provider\AuditTypeRegistry` combines all of them. A bundle can now add an audited domain without changing the Data Audit bundle.
+* Added the `oro_dataaudit_field_label` Twig function that names a changed field the way the audited domain wants it shown.
+* Added recording of menu changes: every change an administrator makes in a back-office menu (**System > Menus**) is stored as an audit record of the changed menu item, whose entity type is the level the menu was customized on (global, organization, user). Every menu item the action changed gets a record of its own with only the properties of that item that changed, the items hidden together with the item that was acted on and the items a deleted item held included, and the records of one action share a transaction.
+* Added recording of everything a menu item owns: the file a menu item shows and the collections a menu item holds are recorded as a change of the menu item they belong to, whether they were replaced, edited in place or taken away. What a menu item owns is read from its Doctrine metadata, so a menu that brings a relation of its own is recorded without changing the Data Audit bundle.
+* Added the change history of a menu item to the page of that menu item, next to the change history of an auditable entity. See `Oro\Bundle\DataAuditBundle\Provider\MenuAuditObjectProviderInterface` and the `oro_dataaudit.menu_audit_object` tag, `Oro\Bundle\DataAuditBundle\Model\MenuAuditObject` and the `oro_dataaudit_menu_item_audit` Twig function. A menu item is now recorded under an identifier that tells the item apart from an item of another menu and from the same item customized for somebody else, so that its history and its version numbers are its own.
 
 #### MessageQueueBundle
 * Added the configurable consumer message receive timeout. It is set via the `oro_message_queue.consumer.receive_timeout` configuration option, taken from the `ORO_MQ_CONSUMER_RECEIVE_TIMEOUT` environment variable by default, with a fallback to the `oro_message_queue.consumer_receive_timeout_default` container parameter (defaults to `1.0` seconds). Lower values make a consumer bound to multiple queues switch between them faster.
@@ -102,6 +117,9 @@ The current file describes significant changes in the code that may affect the u
 
 #### NavigationBundle
 * Added `dropdown-menu-level-last` CSS class to the top menu template (`Resources/views/Menu/application_menu_desktop_top.html.twig`) for the deepest dropdown level, enabling targeted styling of leaf-level submenus.
+* Added `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager::deleteMenuUpdate()` and `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository::findChildren()`: deleting a menu item now moves the items nested into it to the top level of the menu, instead of leaving them with a parent key that no longer exists. The menu showed such an item at the top level anyway, and the move is recorded in the Data Audit now.
+* Added `Oro\Bundle\NavigationBundle\Datagrid\ExcludedEntitiesConfigGridListener` that hides the given entities from a config grid, so a bundle can keep its system entity out of the entity management grid.
+* Added `Oro\Bundle\NavigationBundle\EventListener\ExcludedEntitiesConfigRequestListener` that makes the entity config pages of the given entities respond with 404, so a system entity kept out of the entity management cannot be opened by a direct URL.
 
 #### SecurityBundle
 * Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with unconfigured organization fields causing invalid ACL SQL.
@@ -110,11 +128,20 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.
 * Added `Oro\Bundle\UserBundle\Async\UserPasswordResetRequestProcessor` that resolves the user account and sends the reset password email.
 * Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue.
+* Added `\Oro\Bundle\UserBundle\Mailer\Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM`, the name of the `confirmationToken` email template parameter. The confirmation token is no longer an email template variable, so a template renders a password reset or invitation link only when the sending code passes it as this parameter; the shipped `user_reset_password`, `force_reset_password` and `invite_user` templates read `{{ confirmationToken|default('N_A') }}`.
+    * A customized copy of those templates still reads `entity.confirmationToken` and no longer renders a working link. Run `php bin/console oro:email:template:security-policy-check` to find them.
+
+#### SecurityBundle
+* Added `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent` dispatched by `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository::savePrivileges()` after the ACL privileges of a security identity are flushed. The event is dispatched only when at least one entity-level or field-level permission has been actually changed and carries only the changed privileges.
+* Added `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclChangeSet` that collects object identities whose ACLs have been actually changed by `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager::flush()`; pass an instance as the new optional `$changeSet` argument of `flush()` to receive them.
 
 ### Changed
 
+#### SecurityBundle
+* Added the `\Symfony\Contracts\EventDispatcher\EventDispatcherInterface` argument to the `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository` constructor to dispatch `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent`.
+
 #### DataAuditBundle
-* Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Symfony\Contracts\Translation\TranslatorInterface` and `Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider` arguments, as the entity type list now also contains the configuration levels.
+* Changed `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider::__construct()`: added the `Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface` argument, as the entity type list now also contains the audit types that are not entities of the application (the configuration levels, the storefront menu levels).
 * Changed `Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider`: extracted `prepareAuthorData(?TokenInterface $securityToken): array` from `prepareMessageBody()` so every audit producer describes its author the same way.
 
 #### DataGridBundle
@@ -122,11 +149,19 @@ The current file describes significant changes in the code that may affect the u
 * Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.
 * Changed `Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`: it builds the datagrid before sending the export message, so an export of an unknown or disabled datagrid responds with 404 instead of enqueueing a message that cannot be processed.
 
+#### NavigationBundle
+* Changed the `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity configuration: a menu item is a system record managed on the page of its menu, so the entity is hidden from the entity management grid, its entity config pages respond with 404, excluded from the lists of entities (`oro_entity: exclusions`) and its entity audit is turned off and locked (`dataaudit: {auditable: false, immutable: true}`) — the changes of a menu item are recorded by the menu audit, so the entity audit of the same rows would only duplicate them.
+
 #### EmailBundle
 * Updated entity config setting `email.available_in_template` to make it `false` be default. Make sure to update this setting for your custom fields if you want to use them in email templates. You can do this using `\Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery` in a schema migration.
 * Updated entity config setting `email.available_in_template` to allow it for `toMany` associations.
 * Updated `\Oro\Bundle\EmailBundle\DependencyInjection\Compiler\AbstractTwigSandboxConfigurationPass` so it makes use the calls `setAllowedFunctions`, `setAllowedFilters`, `setAllowedTags` instead of constructor arguments on email templates security policy service `oro_email.twig.email_security_policy`.
 * Updated validation constraint configuration for `\Oro\Bundle\EmailBundle\Entity\EmailTemplate` with `Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSecurityPolicy` constraint.
+* Changed the email template compilation entry points so they authorize the caller before a template is rendered: `\Oro\Bundle\EmailBundle\Controller\AjaxEmailController::compileEmailAction()` requires View on Email Template and View on the target record, `\Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::getCompiledAction()` requires View on the target record before it is passed to the template, and `\Oro\Bundle\EmailBundle\Controller\EmailTemplateController::previewAction()` requires View on the template itself. A role that compiles email templates needs both permissions.
+* Changed `\Oro\Bundle\EmailBundle\Controller\EmailTemplateController::previewAction()` so it responds with 404 for an email template that does not exist, instead of failing with a fatal error.
+* Updated `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` with `\Oro\Bundle\EmailBundle\Twig\EmailTemplateEntityAccessChecker` to deny an attribute of a record the current user is not allowed to view.
+* Changed how the email templates rendering sandbox resolves a property or method it denies: `\Oro\Bundle\EmailBundle\Twig\Node\SafeGetAttrNode` now resolves it to the value a listener of `\Oro\Bundle\EmailBundle\Event\EmailTemplateSecurityPolicyViolationEvent` substituted, and to `null` only when no listener substituted one.
+    * `\Oro\Bundle\EmailBundle\Twig\SafeGetAttributeNodeExtension` carries the event dispatcher those nodes report a violation through, because a Twig node has no other way to reach a service; it is supplied with `setEventDispatcher()`.
 
 #### EntityBundle
 * Updated `\Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider` so it implements `\Oro\Component\Config\Cache\ClearableConfigCacheInterface`.
@@ -190,8 +225,13 @@ The current file describes significant changes in the code that may affect the u
 * Updated `invite_user` email template to use `system.appURL` system variable.
 * Changed `Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler` so it extends `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` and only schedules the processing of the submitted value instead of resolving the user account and sending the reset password email within the request. Its constructor accepts `Oro\Component\MessageQueue\Client\MessageProducerInterface`, `Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface` and `Psr\Log\LoggerInterface` now. This way the forgot password form does the same amount of work for every submitted value, so the response time no longer discloses whether the value belongs to an existing account. A message queue consumer must be running for the reset password emails to be sent.
 * Changed the guard that prevents sending the reset password email more than once within the reset token lifetime: it is skipped now when the password was never requested before, regardless of the `frontend` field of the `Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType` form (the field is not used anymore).
+* Changed `\Oro\Bundle\UserBundle\Entity\AbstractUser::$confirmationToken` so it is not available in email templates and is marked immutable, and therefore cannot be enabled from the Entity Management UI. `\Oro\Bundle\UserBundle\Migrations\Schema\v7_1_0_3\DisableFieldsInEmailTemplates` applies the same to an existing installation.
+* Changed the sanitize rules of the `oro_user` table: `confirmation_token` is replaced with an `md5` value now, so a database dump produced by `php bin/console oro:sanitize:dump-sql` carries no usable password reset token. A dump produced by any other means is unaffected.
 
 ### Removed
+
+#### DataAuditBundle
+* Removed `Oro\Bundle\DataAuditBundle\Async\Topic\ConfigChangeAuditTopic`, `Oro\Bundle\DataAuditBundle\Async\ConfigChangeAuditProcessor` and `Oro\Bundle\DataAuditBundle\Twig\ConfigAuditExtension`; use `Oro\Bundle\DataAuditBundle\Async\Topic\AuditEntryTopic`, `Oro\Bundle\DataAuditBundle\Async\AuditEntryProcessor` and `Oro\Bundle\DataAuditBundle\Twig\AuditFieldLabelExtension` instead, which record any audit entry built by a bundle and not only a configuration change. The message queue topic changed accordingly from `oro.data_audit.config_changed` to `oro.data_audit.audit_entry`, and the `oro_dataaudit_config_field_label` Twig function was replaced with `oro_dataaudit_field_label`.
 
 #### EmailBundle
 * Removed `\Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator`, added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateSecurityPolicy` instead.

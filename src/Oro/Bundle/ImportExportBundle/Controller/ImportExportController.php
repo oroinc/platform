@@ -9,6 +9,7 @@ use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
+use Oro\Bundle\ImportExportBundle\Context\ReservedOptions;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Exception\ImportExportExpiredException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -46,6 +47,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Controller for import/export actions
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportExportController extends AbstractController
 {
@@ -323,7 +325,7 @@ class ImportExportController extends AbstractController
         ];
     }
 
-    #[Route(path: '/export/template/{processorAlias}', name: 'oro_importexport_export_template')]
+    #[Route(path: '/export/template/{processorAlias}', name: 'oro_importexport_export_template', methods: ['GET'])]
     #[AclAncestor('oro_importexport_import')]
     public function templateExportAction(string $processorAlias, Request $request): Response
     {
@@ -441,12 +443,23 @@ class ImportExportController extends AbstractController
         );
     }
 
+    /**
+     * @throws BadRequestHttpException
+     */
     private function getOptionsFromRequest(Request $request): array
     {
         $options = $request->get('options', []);
 
         if (!is_array($options)) {
             throw new InvalidArgumentException('Request parameter "options" must be array.');
+        }
+
+        $reservedOptions = ReservedOptions::detect($options);
+        if ($reservedOptions) {
+            throw new BadRequestHttpException(sprintf(
+                'Request parameter "options" must not contain reserved keys: "%s".',
+                implode('", "', $reservedOptions)
+            ));
         }
 
         return $options;

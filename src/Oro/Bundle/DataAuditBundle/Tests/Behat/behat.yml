@@ -7,6 +7,8 @@ oro_behat_extension:
         - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
         - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
         - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\DataAuditBundle\Tests\Behat\Context\AuditContext
       paths:
         - '@OroDataAuditBundle/Tests/Behat/Features'
 

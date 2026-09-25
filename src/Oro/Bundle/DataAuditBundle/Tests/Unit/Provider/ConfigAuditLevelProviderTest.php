@@ -12,8 +12,6 @@ class ConfigAuditLevelProviderTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        // The configuration scopes of a commerce enterprise application, each with the entity its scope id
-        // refers to, as the bundles declare it.
         $this->provider = new ConfigAuditLevelProvider([
             'customer' => 'Oro\Bundle\CustomerBundle\Entity\Customer',
             'customer_group' => 'Oro\Bundle\CustomerBundle\Entity\CustomerGroup',
@@ -46,14 +44,14 @@ class ConfigAuditLevelProviderTest extends TestCase
     }
 
     /**
-     * @dataProvider isConfigTypeDataProvider
+     * @dataProvider isTypeDataProvider
      */
-    public function testIsConfigType(?string $objectClass, bool $expected): void
+    public function testIsType(?string $objectClass, bool $expected): void
     {
-        self::assertSame($expected, $this->provider->isConfigType($objectClass));
+        self::assertSame($expected, $this->provider->isType($objectClass));
     }
 
-    public function isConfigTypeDataProvider(): array
+    public function isTypeDataProvider(): array
     {
         return [
             'level of this application' => ['Oro\Bundle\ConfigBundle\WebsiteConfiguration', true],
@@ -74,7 +72,6 @@ class ConfigAuditLevelProviderTest extends TestCase
             'oro.dataaudit.config.type.customer_group',
             $this->provider->getLabelKey('Oro\Bundle\ConfigBundle\CustomerGroupConfiguration')
         );
-        // A level this application does not have is named generically instead.
         self::assertNull($this->provider->getLabelKey('Oro\Bundle\ConfigBundle\MyPortalConfiguration'));
     }
 
@@ -144,19 +141,18 @@ class ConfigAuditLevelProviderTest extends TestCase
         $all = $this->provider->all();
 
         self::assertCount(6, $all);
-        self::assertSame('oro.dataaudit.config.type.system', $all['Oro\Bundle\ConfigBundle\SystemConfiguration']);
-        self::assertSame('oro.dataaudit.config.type.website', $all['Oro\Bundle\ConfigBundle\WebsiteConfiguration']);
+        self::assertSame('system', $all['Oro\Bundle\ConfigBundle\SystemConfiguration']);
+        self::assertSame('website', $all['Oro\Bundle\ConfigBundle\WebsiteConfiguration']);
     }
 
     public function testApplicationWithFewerScopes(): void
     {
-        // A CRM installation has neither the commerce scopes nor their levels.
         $provider = new ConfigAuditLevelProvider(['user' => 'Oro\Bundle\UserBundle\Entity\User', 'global' => null]);
 
         self::assertSame(
             [
-                'Oro\Bundle\ConfigBundle\UserConfiguration' => 'oro.dataaudit.config.type.user',
-                'Oro\Bundle\ConfigBundle\SystemConfiguration' => 'oro.dataaudit.config.type.system',
+                'Oro\Bundle\ConfigBundle\UserConfiguration' => 'user',
+                'Oro\Bundle\ConfigBundle\SystemConfiguration' => 'system',
             ],
             $provider->all()
         );

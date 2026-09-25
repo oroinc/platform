@@ -1,6 +1,5 @@
 @ticket-BAP-18893
 @ticket-BAP-21015
-@regression
 Feature: Correct create schema with deleted new field
   In order to have correct schema when we have deleted new field (without update schema)
   As administrator

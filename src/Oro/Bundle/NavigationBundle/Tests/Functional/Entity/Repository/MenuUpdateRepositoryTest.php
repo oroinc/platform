@@ -216,4 +216,38 @@ class MenuUpdateRepositoryTest extends WebTestCase
             )
         );
     }
+
+    public function testFindChildren(): void
+    {
+        self::assertEqualsCanonicalizing(
+            [$this->getReference(MenuUpdateData::MENU_UPDATE_2_1)],
+            $this->getRepository()->findChildren(
+                'application_menu',
+                $this->getReference(LoadScopeData::DEFAULT_SCOPE),
+                (string)$this->getReference(MenuUpdateData::MENU_UPDATE_2)->getKey()
+            )
+        );
+    }
+
+    public function testFindChildrenWhenNothingIsNestedIntoTheItem(): void
+    {
+        self::assertEmpty(
+            $this->getRepository()->findChildren(
+                'application_menu',
+                $this->getReference(LoadScopeData::DEFAULT_SCOPE),
+                (string)$this->getReference(MenuUpdateData::MENU_UPDATE_2_1_1)->getKey()
+            )
+        );
+    }
+
+    public function testFindChildrenWhenTheItemIsCustomizedForSomebodyElse(): void
+    {
+        self::assertEmpty(
+            $this->getRepository()->findChildren(
+                'application_menu',
+                $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE),
+                (string)$this->getReference(MenuUpdateData::MENU_UPDATE_2)->getKey()
+            )
+        );
+    }
 }

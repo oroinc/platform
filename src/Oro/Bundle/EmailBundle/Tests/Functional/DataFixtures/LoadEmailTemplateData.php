@@ -42,41 +42,50 @@ class LoadEmailTemplateData extends AbstractFixture implements ContainerAwareInt
     public function load(ObjectManager $manager)
     {
         $owner = $this->getReference(self::OWNER_USER_REFERENCE);
+        assert($owner instanceof User);
 
         $emailTemplate1 = new EmailTemplate('no_entity_name', 'test Application, etc.');
+        $emailTemplate1->setOwner($owner);
         $emailTemplate1->setOrganization($owner->getOrganization());
         $emailTemplate2 = new EmailTemplate('test_template', 'test Application, etc');
         $emailTemplate2->setEntityName(User::class);
+        $emailTemplate2->setOwner($owner);
         $emailTemplate2->setOrganization($owner->getOrganization());
 
         $emailTemplate3 = new EmailTemplate('no_system', 'test Application, etc');
         $emailTemplate3->setIsSystem(false);
         $emailTemplate3->setEntityName(self::ENTITY_NAME);
+        $emailTemplate3->setOwner($owner);
         $emailTemplate3->setOrganization($owner->getOrganization());
 
         $emailTemplate4 = new EmailTemplate('system', 'test Application, etc');
         $emailTemplate4->setIsSystem(true);
         $emailTemplate4->setEntityName(self::ENTITY_NAME);
+        $emailTemplate4->setOwner($owner);
         $emailTemplate4->setOrganization($owner->getOrganization());
 
         $emailTemplate5 = new EmailTemplate('no_system_no_entity', 'test Application, etc');
         $emailTemplate5->setIsSystem(false);
+        $emailTemplate5->setOwner($owner);
         $emailTemplate5->setOrganization($owner->getOrganization());
 
         $emailTemplate6 = new EmailTemplate('system_not_visible', 'test Application etc');
         $emailTemplate6->setIsSystem(true);
         $emailTemplate6->setVisible(false);
         $emailTemplate6->setEntityName(self::ENTITY_NAME);
+        $emailTemplate6->setOwner($owner);
         $emailTemplate6->setOrganization($owner->getOrganization());
 
         $emailTemplate7 = new EmailTemplate('not_system_not_visible', 'test Application etc');
         $emailTemplate7->setIsSystem(false);
         $emailTemplate7->setVisible(false);
         $emailTemplate7->setEntityName(self::ENTITY_NAME);
+        $emailTemplate7->setOwner($owner);
         $emailTemplate7->setOrganization($owner->getOrganization());
 
         $emailTemplate8 = new EmailTemplate('system_fail_to_compile', 'test {{ entity.notExistingProperty }} etc');
         $emailTemplate8->setIsSystem(true);
+        $emailTemplate8->setOwner($owner);
         $emailTemplate8->setOrganization($owner->getOrganization());
 
         $manager->persist($emailTemplate1);

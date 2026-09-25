@@ -52,10 +52,22 @@ class AbstractUserTest extends TestCase
         $requested = new \DateTime('-10 seconds');
 
         $user->setPasswordRequestedAt(null);
-        self::assertTrue($user->isPasswordRequestNonExpired(15));
+        self::assertFalse($user->isPasswordRequestNonExpired(15));
 
         $user->setPasswordRequestedAt($requested);
         self::assertFalse($user->isPasswordRequestNonExpired(5));
+    }
+
+    public function testIsPasswordRequestNonExpiredBoundary(): void
+    {
+        $user = $this->getUser();
+        $ttl = 15;
+
+        $user->setPasswordRequestedAt(new \DateTime(sprintf('-%d seconds', $ttl + 1)));
+        self::assertFalse($user->isPasswordRequestNonExpired($ttl));
+
+        $user->setPasswordRequestedAt(new \DateTime(sprintf('-%d seconds', $ttl - 1)));
+        self::assertTrue($user->isPasswordRequestNonExpired($ttl));
     }
 
     public function testConfirmationToken(): void
