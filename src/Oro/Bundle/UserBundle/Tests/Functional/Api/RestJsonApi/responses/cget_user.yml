@@ -77,7 +77,7 @@ data:
             createdAt: '@user_with_confirmation_token->createdAt->format("Y-m-d\TH:i:s\Z")'
             updatedAt: '@user_with_confirmation_token->updatedAt->format("Y-m-d\TH:i:s\Z")'
             loginCount: 0
-            passwordRequestedAt: null
+            passwordRequestedAt: '@user_with_confirmation_token->passwordRequestedAt->format("Y-m-d\TH:i:s\Z")'
             passwordChangedAt: null
             emails: {  }
             externalId: null

@@ -273,6 +273,58 @@ class ControllersResetTest extends WebTestCase
         $this->assertNotEquals($oldPassword, $newPassword);
     }
 
+    public function testResetActionWithTokenButNoPasswordRequest()
+    {
+        // A token with no passwordRequestedAt must be treated as expired, not as valid.
+        /** @var User $user */
+        $user = $this->getReference('user_with_confirmation_token');
+        $user->setPasswordRequestedAt(null);
+        $this->getContainer()->get('doctrine')->getManagerForClass(User::class)->flush();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_reset_reset', ['token' => LoadUserData::CONFIRMATION_TOKEN]),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        self::assertStringContainsString('The reset password link has expired.', $result->getContent());
+        self::assertStringNotContainsString(
+            'name="oro_user_reset_form[plainPassword][first]"',
+            $result->getContent()
+        );
+    }
+
+    public function testResetActionWithExpiredPasswordRequest()
+    {
+        /** @var User $user */
+        $user = $this->getReference('user_with_confirmation_token');
+        $ttl = $this->getContainer()->getParameter('oro_user.reset.ttl');
+        $user->setPasswordRequestedAt(new \DateTime(sprintf('-%d seconds', $ttl + 60), new \DateTimeZone('UTC')));
+        $this->getContainer()->get('doctrine')->getManagerForClass(User::class)->flush();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_reset_reset', ['token' => LoadUserData::CONFIRMATION_TOKEN]),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        self::assertStringContainsString('The reset password link has expired.', $result->getContent());
+        self::assertStringNotContainsString(
+            'name="oro_user_reset_form[plainPassword][first]"',
+            $result->getContent()
+        );
+    }
+
     public function testResetActionWithEmptyFields()
     {
         $crawler = $this->client->request(

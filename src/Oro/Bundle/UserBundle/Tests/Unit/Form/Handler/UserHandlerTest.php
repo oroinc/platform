@@ -144,6 +144,9 @@ class UserHandlerTest extends TestCase
             ->willReturn($this->createMock(EmailUser::class));
 
         self::assertTrue($this->handler->process($user));
+
+        self::assertNull($user->getConfirmationToken());
+        self::assertNull($user->getPasswordRequestedAt());
     }
 
     public function testProcessSendsInvitationWithConfirmationTokenWhenPasswordIsNotSentInEmail(): void
@@ -274,5 +277,8 @@ class UserHandlerTest extends TestCase
             ->method('sendEmailTemplate');
 
         self::assertTrue($this->handler->process($user));
+
+        self::assertNotEmpty($user->getConfirmationToken());
+        self::assertNotNull($user->getPasswordRequestedAt());
     }
 }
