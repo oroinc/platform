@@ -20,6 +20,7 @@ use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -475,6 +476,94 @@ class ImportExportControllerTest extends WebTestCase
         );
 
         self::assertResponseStatusCodeEquals($this->client->getResponse(), 403);
+        self::assertMessagesEmpty(PreImportTopic::getName());
+    }
+
+    public function testTemplateExportActionReturnsTemplate(): void
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_export_template', ['processorAlias' => 'oro_user'])
+        );
+
+        /** @var BinaryFileResponse $response */
+        $response = $this->client->getResponse();
+        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertSame('csv', $response->getFile()->getExtension());
+    }
+
+    public function testTemplateExportActionRejectsReservedOption(): void
+    {
+        $testPath = $this->getTempDir('import_export_security') . DIRECTORY_SEPARATOR . 'test.csv';
+
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_export_template',
+                [
+                    'processorAlias' => 'oro_user',
+                    'options' => ['filePath' => $testPath, 'header' => ['PROBE']],
+                ]
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+        self::assertFileDoesNotExist($testPath);
+    }
+
+    public function testInstantExportActionRejectsReservedOptions(): void
+    {
+        $this->ajaxRequest(
+            'POST',
+            $this->getUrl(
+                'oro_importexport_export_instant',
+                [
+                    'processorAlias' => 'oro_account',
+                    'options' => ['filePath' => '/tmp/test.csv', 'delimiter' => ';', 'price_list_id' => 1],
+                ]
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+        self::assertMessagesEmpty(PreExportTopic::getName());
+    }
+
+    public function testInstantExportActionPassesBusinessOptionsThrough(): void
+    {
+        // query parameters arrive as strings, exactly as the back-office UI sends them
+        $options = ['price_list_id' => '1', 'writer_skip_clear' => 'true'];
+
+        $this->ajaxRequest(
+            'POST',
+            $this->getUrl(
+                'oro_importexport_export_instant',
+                ['processorAlias' => 'oro_account', 'options' => $options]
+            )
+        );
+
+        self::assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
+        self::assertMessageSent(PreExportTopic::getName());
+        self::assertSame($options, self::getSentMessage(PreExportTopic::getName())['options']);
+    }
+
+    public function testImportProcessActionRejectsReservedOption(): void
+    {
+        $this->updateRolePermissionForAction(User::ROLE_ADMINISTRATOR, 'oro_importexport_import', true);
+
+        $this->ajaxRequest(
+            'POST',
+            $this->getUrl(
+                'oro_importexport_import_process',
+                [
+                    'processorAlias' => 'oro_account',
+                    'fileName' => 'test_file',
+                    'originFileName' => 'test_file_original',
+                    'options' => ['filePath' => '/tmp/test.csv'],
+                ]
+            )
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
         self::assertMessagesEmpty(PreImportTopic::getName());
     }
 

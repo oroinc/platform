@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Topic;
 
+use Oro\Bundle\ImportExportBundle\Context\ReservedOptions;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -51,6 +54,17 @@ class PreExportTopic extends AbstractTopic
             ->addAllowedTypes('organizationId', ['int', 'null'])
             ->addAllowedTypes('options', 'array')
             ->addAllowedTypes('outputFilePrefix', ['string', 'null'])
-            ->addAllowedTypes('userId', 'int');
+            ->addAllowedTypes('userId', 'int')
+            ->setNormalizer('options', static function (Options $resolvedOptions, array $value): array {
+                $reservedOptions = ReservedOptions::detect($value);
+                if ($reservedOptions) {
+                    throw new InvalidOptionsException(sprintf(
+                        'The option "options" must not contain reserved keys: "%s".',
+                        implode('", "', $reservedOptions)
+                    ));
+                }
+
+                return $value;
+            });
     }
 }
