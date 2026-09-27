@@ -1,0 +1,10 @@
+{% set menuItemAudit = oro_dataaudit_menu_item_audit(entity) %}
+
+{% if menuItemAudit is not null %}
+    {{ include('@OroDataAudit/change_history_link.html.twig', {
+        'entity_class': menuItemAudit.class,
+        'id': menuItemAudit.id,
+        'title': entity.titles|length ? entity.titles|localized_value : entity.key,
+        'audit_path': 'oro_dataaudit_history'
+    }, with_context = false) }}
+{% endif %}

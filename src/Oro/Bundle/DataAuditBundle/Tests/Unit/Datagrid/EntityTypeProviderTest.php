@@ -4,7 +4,10 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
+use Oro\Bundle\DataAuditBundle\Provider\AuditTypeRegistry;
+use Oro\Bundle\DataAuditBundle\Provider\ConfigAuditFieldLabelProvider;
 use Oro\Bundle\DataAuditBundle\Provider\ConfigAuditLevelProvider;
+use Oro\Bundle\DataAuditBundle\Provider\LevelAuditType;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -37,17 +40,19 @@ class EntityTypeProviderTest extends TestCase
         );
     }
 
-    /**
-     * @param string[] $scopes the configuration scopes the application has
-     */
     private function getProvider(array $scopes): EntityTypeProvider
     {
+        $configAuditType = new LevelAuditType(
+            new ConfigAuditLevelProvider(array_fill_keys($scopes, null)),
+            $this->createMock(ConfigAuditFieldLabelProvider::class),
+            $this->translator
+        );
+
         return new EntityTypeProvider(
             $this->entityClassNameProvider,
             $this->configProvider,
             $this->featureChecker,
-            $this->translator,
-            new ConfigAuditLevelProvider(array_fill_keys($scopes, null))
+            new AuditTypeRegistry([$configAuditType])
         );
     }
 
@@ -86,18 +91,16 @@ class EntityTypeProviderTest extends TestCase
         );
     }
 
-    public function testGetEntityTypesMergesConfigLevelsAndSortsByLabel(): void
+    public function testGetEntityTypesMergesAuditTypesAndSortsByLabel(): void
     {
         $this->givenAuditableEntities();
 
         $result = $this->provider->getEntityTypes();
 
-        // 6 configuration levels + the single enabled auditable entity; the disabled one is excluded.
         self::assertCount(7, $result);
         self::assertArrayHasKey('Zebra Entity', $result);
         self::assertContains('Oro\Bundle\ConfigBundle\SystemConfiguration', $result);
 
-        // Ordered by the visible label (array key), case-insensitively.
         $keys = array_keys($result);
         $sortedKeys = $keys;
         sort($sortedKeys, SORT_STRING | SORT_FLAG_CASE);
@@ -108,7 +111,6 @@ class EntityTypeProviderTest extends TestCase
     {
         $this->givenAuditableEntities();
 
-        // A CRM-only application: the commerce configuration scopes do not exist.
         $result = $this->getProvider(['user', 'organization', 'global'])->getEntityTypes();
 
         self::assertSame(

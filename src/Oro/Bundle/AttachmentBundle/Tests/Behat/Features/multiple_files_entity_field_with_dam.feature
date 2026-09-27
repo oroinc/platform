@@ -1,5 +1,4 @@
 @ticket-BB-18228
-@regression
 
 Feature: Multiple Files entity field with DAM
   In order to manage entity field configuration

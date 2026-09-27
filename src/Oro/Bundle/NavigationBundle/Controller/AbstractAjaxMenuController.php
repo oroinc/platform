@@ -134,13 +134,13 @@ abstract class AbstractAjaxMenuController extends AbstractController
         $entityManager = $this->container->get('doctrine')->getManagerForClass($manager->getEntityClass());
 
         if ($menuUpdate->isCustom()) {
-            $entityManager->remove($menuUpdate);
+            $manager->deleteMenuUpdate($menuUpdate);
         } else {
             $menuUpdate->setActive(false);
             $entityManager->persist($menuUpdate);
         }
 
-        $entityManager->flush($menuUpdate);
+        $entityManager->flush();
 
         $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 

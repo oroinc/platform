@@ -1,5 +1,4 @@
 @ticket-BAP-18839
-@regression
 Feature: Number range filter with empty and not empty value
   In order to filter "empty" and "not empty" by list
   As administrator

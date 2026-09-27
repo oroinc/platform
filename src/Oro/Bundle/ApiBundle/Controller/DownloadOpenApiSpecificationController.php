@@ -20,7 +20,12 @@ class DownloadOpenApiSpecificationController
     ) {
     }
 
-    #[Route(path: '/download/{id}', name: 'oro_openapi_specification_download', requirements: ['id' => '\d+'])]
+    #[Route(
+        path: '/download/{id}',
+        name: 'oro_openapi_specification_download',
+        requirements: ['id' => '\d+'],
+        methods: ['GET']
+    )]
     #[AclAncestor('oro_openapi_specification_view')]
     public function downloadAction(OpenApiSpecification $entity): Response
     {

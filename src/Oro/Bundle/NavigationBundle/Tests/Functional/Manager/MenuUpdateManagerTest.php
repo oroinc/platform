@@ -13,6 +13,9 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class MenuUpdateManagerTest extends WebTestCase
 {
     private const MENU_NAME = 'application_menu';
@@ -106,6 +109,30 @@ class MenuUpdateManagerTest extends WebTestCase
         $result = $this->repository->findBy(['menu' => self::MENU_NAME, 'scope' => $scope]);
 
         self::assertCount(0, $result);
+    }
+
+    public function testDeleteMenuUpdateLeavesTheItemsNestedIntoItAtTheTopLevel(): void
+    {
+        $scope = $this->getScope();
+        $entityManager = self::getContainer()->get('doctrine')->getManagerForClass(MenuUpdate::class);
+        /** @var MenuUpdate $child */
+        $child = $this->getReference(MenuUpdateData::MENU_UPDATE_2_1);
+        /** @var MenuUpdate $grandChild */
+        $grandChild = $this->getReference(MenuUpdateData::MENU_UPDATE_2_1_1);
+
+        $this->manager->deleteMenuUpdate($this->getReference(MenuUpdateData::MENU_UPDATE_2));
+        $entityManager->flush();
+
+        $remainingKeys = array_map(
+            static fn (MenuUpdate $menuUpdate): string => (string)$menuUpdate->getKey(),
+            $this->repository->findBy(['menu' => self::MENU_NAME, 'scope' => $scope])
+        );
+
+        self::assertNotContains(MenuUpdateData::MENU_UPDATE_2, $remainingKeys);
+        self::assertContains(MenuUpdateData::MENU_UPDATE_2_1, $remainingKeys);
+        self::assertContains(MenuUpdateData::MENU_UPDATE_2_1_1, $remainingKeys);
+        self::assertNull($child->getParentKey());
+        self::assertSame(MenuUpdateData::MENU_UPDATE_2_1, (string)$grandChild->getParentKey());
     }
 
     public function testGetRepository(): void

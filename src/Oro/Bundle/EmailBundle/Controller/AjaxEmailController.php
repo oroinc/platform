@@ -5,6 +5,8 @@ namespace Oro\Bundle\EmailBundle\Controller;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Exception\EmailTemplateCompilationException;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,6 +47,8 @@ class AjaxEmailController extends AbstractController
         $emailHandler->handleRequest($emailForm, $request);
 
         if ($emailForm->isSubmitted() && $emailForm->isValid()) {
+            $this->assertCompilationGranted($emailModel);
+
             try {
                 // Builds form again using the submitted email model.
                 $emailForm = $emailHandler->createForm($emailModel);
@@ -73,6 +77,22 @@ class AjaxEmailController extends AbstractController
         );
     }
 
+    private function assertCompilationGranted(EmailModel $emailModel): void
+    {
+        if (!$this->isGranted('oro_email_emailtemplate_view', $emailModel->getTemplate())) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $entityClass = $emailModel->getEntityClass();
+        $entityId = $emailModel->getEntityId();
+        if ($entityClass && $entityId) {
+            $targetEntity = $this->container->get(EntityRoutingHelper::class)->getEntity($entityClass, $entityId);
+            if (!$this->isGranted('VIEW', $targetEntity)) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+    }
+
     private function getEmailModelBuilder(): EmailModelBuilder
     {
         return $this->container->get(EmailModelBuilder::class);
@@ -90,6 +110,7 @@ class AjaxEmailController extends AbstractController
             ...parent::getSubscribedServices(),
             EmailModelBuilder::class,
             EmailHandler::class,
+            EntityRoutingHelper::class,
             TranslatorInterface::class,
         ];
     }

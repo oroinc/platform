@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -12,6 +15,9 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
  */
 class ControllersResetTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+    use MessageQueueExtension;
+
     #[\Override]
     protected function setUp(): void
     {
@@ -121,6 +127,45 @@ class ControllersResetTest extends WebTestCase
         $this->assertEquals(UserManager::STATUS_RESET, $user->getAuthStatus()->getInternalId());
     }
 
+    public function testSendForcedResetEmailActionSendsEmailWithWorkingResetUrl()
+    {
+        /** @var User $user */
+        $user = $this->getReference(LoadUserData::SIMPLE_USER);
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_user_send_forced_password_reset_email',
+                ['id' => $user->getId(), '_widgetContainer' => 'dialog']
+            )
+        );
+        self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        $form = $crawler->selectButton('Reset')->form();
+        $this->client->submit($form);
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        $sentMessage = self::getSentMessage(SendEmailNotificationTopic::getName());
+        self::assertSame(LoadUserData::SIMPLE_USER_EMAIL, $sentMessage['toEmail']);
+        self::assertStringContainsString(
+            self::getConfigManager(null)->get('oro_notification.email_notification_sender_email'),
+            $sentMessage['from']
+        );
+
+        $confirmationToken = self::getContainer()->get('doctrine')->getRepository(User::class)
+            ->find($user->getId())
+            ->getConfirmationToken();
+        self::assertNotEmpty($confirmationToken);
+        self::assertStringContainsString(
+            $this->getUrl('oro_user_reset_reset', ['token' => $confirmationToken]),
+            $sentMessage['body']
+        );
+        self::assertStringNotContainsString(
+            $this->getUrl('oro_user_reset_reset', ['token' => 'N_A']),
+            $sentMessage['body']
+        );
+    }
+
     public function testMassPasswordResetAction()
     {
         /** @var User $user */
@@ -226,6 +271,58 @@ class ControllersResetTest extends WebTestCase
 
         $newPassword = $user->getPassword();
         $this->assertNotEquals($oldPassword, $newPassword);
+    }
+
+    public function testResetActionWithTokenButNoPasswordRequest()
+    {
+        // A token with no passwordRequestedAt must be treated as expired, not as valid.
+        /** @var User $user */
+        $user = $this->getReference('user_with_confirmation_token');
+        $user->setPasswordRequestedAt(null);
+        $this->getContainer()->get('doctrine')->getManagerForClass(User::class)->flush();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_reset_reset', ['token' => LoadUserData::CONFIRMATION_TOKEN]),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        self::assertStringContainsString('The reset password link has expired.', $result->getContent());
+        self::assertStringNotContainsString(
+            'name="oro_user_reset_form[plainPassword][first]"',
+            $result->getContent()
+        );
+    }
+
+    public function testResetActionWithExpiredPasswordRequest()
+    {
+        /** @var User $user */
+        $user = $this->getReference('user_with_confirmation_token');
+        $ttl = $this->getContainer()->getParameter('oro_user.reset.ttl');
+        $user->setPasswordRequestedAt(new \DateTime(sprintf('-%d seconds', $ttl + 60), new \DateTimeZone('UTC')));
+        $this->getContainer()->get('doctrine')->getManagerForClass(User::class)->flush();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_reset_reset', ['token' => LoadUserData::CONFIRMATION_TOKEN]),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        self::assertStringContainsString('The reset password link has expired.', $result->getContent());
+        self::assertStringNotContainsString(
+            'name="oro_user_reset_form[plainPassword][first]"',
+            $result->getContent()
+        );
     }
 
     public function testResetActionWithEmptyFields()

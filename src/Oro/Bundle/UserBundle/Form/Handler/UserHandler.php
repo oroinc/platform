@@ -8,9 +8,9 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
-use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -125,7 +125,7 @@ class UserHandler extends AbstractUserHandler
             && $this->userConfigManager->get('oro_user.send_password_in_invitation_email');
 
         if ($usePasswords && !$sendPasswordInEmail && !$user->getConfirmationToken()) {
-            $user->setConfirmationToken(RandomTokenGenerator::generate());
+            $user->renewConfirmationToken();
         }
 
         if ($this->isPasswordShouldBeGenerated($usePasswords)) {
@@ -156,7 +156,8 @@ class UserHandler extends AbstractUserHandler
      */
     protected function sendInviteMail(User $user, $plainPassword)
     {
-        if (in_array(null, [$this->userConfigManager, $this->emailTemplateSender], true)) {
+        $dependencies = [$this->userConfigManager, $this->emailTemplateSender];
+        if (in_array(null, $dependencies, true)) {
             throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
         }
         $senderEmail = $this->userConfigManager->get('oro_notification.email_notification_sender_email');
@@ -166,7 +167,12 @@ class UserHandler extends AbstractUserHandler
             From::emailAddress($senderEmail, $senderName),
             $user,
             new EmailTemplateCriteria(self::INVITE_USER_TEMPLATE, User::class),
-            ['entity' => $user, 'user' => $user, 'password' => $plainPassword]
+            [
+                'entity' => $user,
+                'user' => $user,
+                'password' => $plainPassword,
+                Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM => $user->getConfirmationToken() ?: null,
+            ]
         );
     }
 }

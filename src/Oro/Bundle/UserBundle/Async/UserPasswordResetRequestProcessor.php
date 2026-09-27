@@ -48,7 +48,7 @@ class UserPasswordResetRequestProcessor extends AbstractPasswordResetRequestProc
             return self::ACK;
         }
 
-        if (!$this->isPasswordResetAllowed($user) || $this->isPasswordAlreadyRequested($user)) {
+        if (!$this->isPasswordResetAllowed($user)) {
             return self::ACK;
         }
 

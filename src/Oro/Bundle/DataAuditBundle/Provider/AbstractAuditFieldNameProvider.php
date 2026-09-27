@@ -23,6 +23,14 @@ abstract class AbstractAuditFieldNameProvider
     }
 
     /**
+     * @return array{classes: string[], fields: string[]}
+     */
+    public function getMatchingFields(string $term): array
+    {
+        return $this->matchFields($term);
+    }
+
+    /**
      * @return string[] object classes this provider knows the field names of
      */
     abstract protected function getObjectClasses(): array;

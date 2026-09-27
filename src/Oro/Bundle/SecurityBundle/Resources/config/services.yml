@@ -72,6 +72,7 @@ services:
         arguments:
             - '@oro_security.acl.manager'
             - '@translator'
+            - '@event_dispatcher'
 
     oro_security.acl.sid_manager:
         class: Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager

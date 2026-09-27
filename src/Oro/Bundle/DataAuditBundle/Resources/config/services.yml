@@ -17,7 +17,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_dataaudit.provider.config_audit_field_label_provider'
+            - '@oro_dataaudit.provider.audit_type_registry'
             - '@oro_dataaudit.provider.entity_audit_field_search_provider'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: audit-data }
@@ -56,18 +56,124 @@ services:
             - { name: doctrine.event_listener, event: onFlush, priority: -255 }
             - { name: doctrine.event_listener, event: postFlush, priority: -255 }
 
+    oro_dataaudit.audit_entry_recorder:
+        class: 'Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder'
+        arguments:
+            - '@oro_message_queue.message_producer'
+            - '@security.token_storage'
+            - '@oro_dataaudit.provider.audit_message_body_provider'
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_distribution.handler.application_status'
+
+    oro_dataaudit.provider.audit_type_registry:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\AuditTypeRegistry'
+        arguments:
+            - !tagged_iterator { tag: oro_dataaudit.audit_type }
+
+    oro_dataaudit.provider.config_audit_type:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\LevelAuditType'
+        arguments:
+            - '@oro_dataaudit.provider.config_audit_level_provider'
+            - '@oro_dataaudit.provider.config_audit_field_label_provider'
+            - '@translator'
+        tags:
+            - { name: oro_dataaudit.audit_type }
+
+    oro_dataaudit.model.menu_audit_value_normalizer:
+        class: 'Oro\Bundle\DataAuditBundle\Model\MenuAuditValueNormalizer'
+        arguments:
+            - '@oro_entity.entity_name_resolver'
+
+    oro_dataaudit.menu_update.inherited_state:
+        class: 'Oro\Bundle\DataAuditBundle\MenuUpdate\MenuUpdateInheritedStatePropagator'
+        arguments:
+            - '@doctrine'
+            - '@property_accessor'
+            - '@oro_dataaudit.model.menu_audit_value_normalizer'
+        tags:
+            # Runs last, when a menu update carries everything it inherits and nothing a person changed yet.
+            - { name: oro_navigation.menu_update.propagator.to_menu_update, priority: -255 }
+
+    oro_dataaudit.provider.menu_audit_level_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\MenuAuditLevelProvider'
+        arguments:
+            - '@oro_scope.scope_manager'
+            - '@oro_entity.entity_name_resolver'
+            - 'menu_default_visibility'
+            - 'Oro\Bundle\NavigationBundle\'
+            - 'BackOfficeMenu'
+            - 'oro.dataaudit.back_office_menu.type.'
+            - 'Back-Office Menu'
+
+    oro_dataaudit.provider.menu_audit_field_label_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\MenuAuditFieldLabelProvider'
+        arguments:
+            - '@oro_dataaudit.provider.menu_audit_level_provider'
+            - '@oro_entity_config.config_manager'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
+            - '@translator'
+
+    oro_dataaudit.provider.menu_audit_type:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\LevelAuditType'
+        arguments:
+            - '@oro_dataaudit.provider.menu_audit_level_provider'
+            - '@oro_dataaudit.provider.menu_audit_field_label_provider'
+            - '@translator'
+        tags:
+            - { name: oro_dataaudit.audit_type }
+
+    oro_dataaudit.provider.menu_audit_object:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\MenuAuditObjectProvider'
+        arguments:
+            - '@oro_dataaudit.provider.menu_audit_level_provider'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
+        tags:
+            - { name: oro_dataaudit.menu_audit_object }
+
+    oro_dataaudit.provider.chain_menu_audit_object:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\ChainMenuAuditObjectProvider'
+        arguments:
+            - !tagged_iterator { tag: oro_dataaudit.menu_audit_object }
+
+    Oro\Bundle\DataAuditBundle\Provider\MenuAuditObjectProviderInterface:
+        alias: oro_dataaudit.provider.chain_menu_audit_object
+
+    oro_dataaudit.provider.menu_item_name_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\MenuItemNameProvider'
+        arguments:
+            - '@doctrine'
+            - '@oro_navigation.configuration.provider'
+            - '@translator'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
+
+    oro_dataaudit.event_listener.menu_update_change_collector:
+        class: 'Oro\Bundle\DataAuditBundle\EventListener\MenuUpdateChangeCollector'
+        arguments:
+            - '@oro_dataaudit.audit_entry_recorder'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+
+    oro_dataaudit.event_listener.menu_update_audit:
+        class: 'Oro\Bundle\DataAuditBundle\EventListener\MenuUpdateAuditListener'
+        arguments:
+            - '@oro_dataaudit.audit_entry_recorder'
+            - '@oro_dataaudit.event_listener.menu_update_change_collector'
+            - '@oro_dataaudit.provider.menu_audit_level_provider'
+            - '@oro_dataaudit.model.menu_audit_value_normalizer'
+            - '@oro_dataaudit.menu_update.inherited_state'
+            - '@oro_dataaudit.provider.menu_item_name_provider'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.menu_update_change, method: onMenuUpdateChange }
+
     oro_dataaudit.event_listener.config_change_audit:
         class: 'Oro\Bundle\DataAuditBundle\EventListener\ConfigChangeAuditListener'
         arguments:
             - '@doctrine'
-            - '@security.token_storage'
             - '@oro_entity.entity_name_resolver'
-            - '@oro_featuretoggle.checker.feature_checker'
-            - '@oro_message_queue.message_producer'
-            - '@oro_distribution.handler.application_status'
             - '@oro_dataaudit.model.config_audit_value_normalizer'
-            - '@oro_dataaudit.provider.audit_message_body_provider'
             - '@oro_dataaudit.provider.config_audit_level_provider'
+            - '@oro_dataaudit.audit_entry_recorder'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
 
@@ -103,16 +209,24 @@ services:
             - '@oro_entity_config.config_manager'
             - '@translator'
 
-    oro_dataaudit.twig.config_audit:
-        class: 'Oro\Bundle\DataAuditBundle\Twig\ConfigAuditExtension'
+    oro_dataaudit.twig.audit_field_label:
+        class: 'Oro\Bundle\DataAuditBundle\Twig\AuditFieldLabelExtension'
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: container.service_subscriber, id: oro_dataaudit.provider.config_audit_field_label_provider, key: Oro\Bundle\DataAuditBundle\Provider\ConfigAuditFieldLabelProvider }
+            - { name: container.service_subscriber, id: oro_dataaudit.provider.audit_type_registry, key: Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface }
 
-    oro_dataaudit.async.config_change_audit:
-        class: 'Oro\Bundle\DataAuditBundle\Async\ConfigChangeAuditProcessor'
+    oro_dataaudit.twig.menu_audit:
+        class: 'Oro\Bundle\DataAuditBundle\Twig\MenuAuditExtension'
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }
+            - { name: container.service_subscriber, id: oro_dataaudit.provider.chain_menu_audit_object, key: Oro\Bundle\DataAuditBundle\Provider\MenuAuditObjectProviderInterface }
+
+    oro_dataaudit.async.audit_entry:
+        class: 'Oro\Bundle\DataAuditBundle\Async\AuditEntryProcessor'
         arguments:
             - '@doctrine'
             - '@oro_dataaudit.set_new_audit_version'
@@ -126,8 +240,7 @@ services:
             - '@oro_entity.entity_class_name_provider'
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_featuretoggle.checker.feature_checker'
-            - '@translator'
-            - '@oro_dataaudit.provider.config_audit_level_provider'
+            - '@oro_dataaudit.provider.audit_type_registry'
 
     oro_dataaudit.datagrid.author_provider:
         class: 'Oro\Bundle\DataAuditBundle\Datagrid\AuthorProvider'
@@ -192,6 +305,12 @@ services:
         public: true
         arguments:
             - '@oro_entity_config.provider.dataaudit'
+
+    oro_dataaudit.placeholder.menu_filter:
+        class: 'Oro\Bundle\DataAuditBundle\Placeholder\MenuAuditFilter'
+        public: true
+        arguments:
+            - '@oro_dataaudit.provider.chain_menu_audit_object'
 
     oro_dataaudit.audit.manager.api:
         class: 'Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager'

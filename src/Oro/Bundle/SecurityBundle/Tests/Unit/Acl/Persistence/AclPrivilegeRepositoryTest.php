@@ -5,12 +5,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclChangeSet;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
@@ -27,18 +29,20 @@ use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AclPrivilegeRepositoryTest extends TestCase
+final class AclPrivilegeRepositoryTest extends TestCase
 {
     private AclManager&MockObject $manager;
     private TranslatorInterface&MockObject $translator;
     private AclExtensionSelector&MockObject $extensionSelector;
     private AclExtensionInterface&MockObject $extension;
     private AceManipulationHelper&MockObject $aceProvider;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private array $expectationsForSetPermission;
     private array $triggeredExpectationsForSetPermission;
     private AclPrivilegeRepository $repository;
@@ -98,7 +102,9 @@ class AclPrivilegeRepositoryTest extends TestCase
                 return $result;
             });
 
-        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator, $this->eventDispatcher);
     }
 
     public function testGetPermissionNames(): void
@@ -571,7 +577,10 @@ class AclPrivilegeRepositoryTest extends TestCase
         self::assertEquals(new ArrayCollection([$fieldPrivilege1]), $result[0]->getFields());
     }
 
-    private function initSavePrivileges($extensionKey, $rootOid): void
+    /**
+     * @param string[] $changedOidTypes Object identity types the mocked flush reports as actually changed
+     */
+    private function initSavePrivileges($extensionKey, $rootOid, array $changedOidTypes = []): void
     {
         $this->extension->expects(self::any())
             ->method('getExtensionKey')
@@ -589,7 +598,12 @@ class AclPrivilegeRepositoryTest extends TestCase
             ->willReturn($rootOid);
 
         $this->manager->expects(self::once())
-            ->method('flush');
+            ->method('flush')
+            ->willReturnCallback(static function (AclChangeSet $changeSet) use ($extensionKey, $changedOidTypes) {
+                foreach ($changedOidTypes as $oidType) {
+                    $changeSet->addChangedOid(new ObjectIdentity($extensionKey, $oidType));
+                }
+            });
     }
 
     private function validateExpectationsForSetPermission(): void
@@ -763,6 +777,53 @@ class AclPrivilegeRepositoryTest extends TestCase
         );
 
         $sid = $this->createMock(SecurityIdentityInterface::class);
+        $this->initSavePrivileges($extensionKey, $rootOid, ['Acme\Class1']);
+
+        $this->setExpectationsForGetAces([]);
+
+        $this->setExpectationsForSetPermission(
+            $sid,
+            [
+                'test:(root)'      => [],
+                'test:Acme\Class1' => ['VIEW_SYSTEM', 'CREATE_BASIC'],
+            ]
+        );
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::callback(static function (AclPrivilegesSavedEvent $event) {
+                    $ids = $event->getPrivileges()
+                        ->map(static fn (AclPrivilege $privilege) => $privilege->getIdentity()->getId())
+                        ->getValues();
+
+                    return ['test:Acme\Class1'] === $ids;
+                }),
+                AclPrivilegesSavedEvent::NAME
+            );
+
+        $this->repository->savePrivileges($sid, $privileges);
+
+        $this->validateExpectationsForGetAces();
+        $this->validateExpectationsForSetPermission();
+    }
+
+    public function testSavePrivilegesDoesNotDispatchWhenNothingChanged(): void
+    {
+        $extensionKey = 'test';
+        $rootOid = new ObjectIdentity($extensionKey, ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
+
+        $privileges = new ArrayCollection();
+        $privileges[] = self::getPrivilege(
+            'test:Acme\Class1',
+            [
+                'VIEW' => AccessLevel::SYSTEM_LEVEL,
+                'CREATE' => AccessLevel::BASIC_LEVEL,
+                'EDIT' => AccessLevel::NONE_LEVEL,
+            ]
+        );
+
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $this->initSavePrivileges($extensionKey, $rootOid);
 
         $this->setExpectationsForGetAces([]);
@@ -775,10 +836,66 @@ class AclPrivilegeRepositoryTest extends TestCase
             ]
         );
 
-        $this->repository->savePrivileges($sid, $privileges);
+        $this->eventDispatcher->expects(self::never())
+            ->method('dispatch');
 
-        $this->validateExpectationsForGetAces();
-        $this->validateExpectationsForSetPermission();
+        $this->repository->savePrivileges($sid, $privileges);
+    }
+
+    public function testSavePrivilegesDispatchesParentPrivilegeOnFieldOnlyChange(): void
+    {
+        $extensionKey = 'test';
+        $rootOid = new ObjectIdentity($extensionKey, ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
+
+        $fieldPrivilege = new AclPrivilege();
+        $fieldPrivilege->setIdentity(new AclPrivilegeIdentity('test:Acme\Class1::brand'));
+
+        $privilege = self::getPrivilege(
+            'test:Acme\Class1',
+            [
+                'VIEW' => AccessLevel::SYSTEM_LEVEL,
+                'CREATE' => AccessLevel::BASIC_LEVEL,
+                'EDIT' => AccessLevel::NONE_LEVEL,
+            ]
+        );
+        $privilege->setFields(new ArrayCollection([$fieldPrivilege]));
+
+        $privileges = new ArrayCollection([$privilege]);
+
+        $sid = $this->createMock(SecurityIdentityInterface::class);
+        $this->initSavePrivileges($extensionKey, $rootOid, ['Acme\Class1']);
+
+        $this->extension->expects(self::any())
+            ->method('getFieldExtension')
+            ->willReturn($this->extension);
+        $this->manager->expects(self::any())
+            ->method('getFieldAces')
+            ->willReturn([]);
+
+        $this->setExpectationsForGetAces([]);
+
+        $this->setExpectationsForSetPermission(
+            $sid,
+            [
+                'test:(root)'      => [],
+                'test:Acme\Class1' => ['VIEW_SYSTEM', 'CREATE_BASIC'],
+            ]
+        );
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::callback(static function (AclPrivilegesSavedEvent $event) {
+                    $ids = $event->getPrivileges()
+                        ->map(static fn (AclPrivilege $privilege) => $privilege->getIdentity()->getId())
+                        ->getValues();
+
+                    return ['test:Acme\Class1'] === $ids;
+                }),
+                AclPrivilegesSavedEvent::NAME
+            );
+
+        $this->repository->savePrivileges($sid, $privileges);
     }
 
     public function testSavePrivilegesForNewRoleWithRoot(): void

@@ -10,7 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Filter\AuditDataFilter;
-use Oro\Bundle\DataAuditBundle\Provider\ConfigAuditFieldLabelProvider;
+use Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface;
 use Oro\Bundle\DataAuditBundle\Provider\EntityAuditFieldSearchProvider;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -22,17 +22,17 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class AuditDataFilterTest extends TestCase
 {
-    private array $matchingKeys = [];
+    private array $matchingAuditTypeGroups = [];
     private array $matchingEntityFields = ['classes' => [], 'fields' => []];
     private AuditDataFilter $filter;
 
     #[\Override]
     protected function setUp(): void
     {
-        $configFieldLabelProvider = $this->createMock(ConfigAuditFieldLabelProvider::class);
-        $configFieldLabelProvider->expects(self::any())
-            ->method('getMatchingFieldKeys')
-            ->willReturnCallback(fn (): array => $this->matchingKeys);
+        $auditTypes = $this->createMock(AuditTypeInterface::class);
+        $auditTypes->expects(self::any())
+            ->method('getMatchingFieldGroups')
+            ->willReturnCallback(fn (): array => $this->matchingAuditTypeGroups);
 
         $entityFieldSearchProvider = $this->createMock(EntityAuditFieldSearchProvider::class);
         $entityFieldSearchProvider->expects(self::any())
@@ -42,7 +42,7 @@ class AuditDataFilterTest extends TestCase
         $this->filter = new AuditDataFilter(
             $this->createMock(FormFactoryInterface::class),
             new FilterUtility(),
-            $configFieldLabelProvider,
+            $auditTypes,
             $entityFieldSearchProvider
         );
         $this->filter->init('audit-data', [FilterUtility::DATA_NAME_KEY => 'a.id']);
@@ -80,7 +80,6 @@ class AuditDataFilterTest extends TestCase
         self::assertStringContainsString('.field', $where);
         self::assertStringContainsString('.oldText', $where);
         self::assertStringContainsString('.newText', $where);
-        // The term is wrapped once (by StringFilter::parseValue), not double-wrapped.
         self::assertStringContainsString('%promo%', $where);
         self::assertStringNotContainsString('%%promo%%', $where);
     }
@@ -95,11 +94,11 @@ class AuditDataFilterTest extends TestCase
         self::assertStringContainsString('NOT(', $this->whereString($ds));
     }
 
-    public function testMatchesConfigurationKeysResolvedFromTheBreadcrumb(): void
+    public function testMatchesUnscopedFieldsOfAnAuditType(): void
     {
-        // A setting whose displayed breadcrumb contains the term is resolved to its stored key and
-        // matched, even though the stored "field" is the key, not the translated path.
-        $this->matchingKeys = ['oro_product.new_arrivals_max_items'];
+        $this->matchingAuditTypeGroups = [
+            ['classes' => [], 'fields' => ['oro_product.new_arrivals_max_items']],
+        ];
         $ds = $this->createDatasource();
 
         $result = $this->filter->apply($ds, ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'Promotions']);
@@ -108,12 +107,53 @@ class AuditDataFilterTest extends TestCase
         $where = $this->whereString($ds);
         self::assertStringContainsStringIgnoringCase(' IN (', $where);
         self::assertStringContainsString('oro_product.new_arrivals_max_items', $where);
+        self::assertStringNotContainsString('a.objectClass IN', $where);
+    }
+
+    public function testMatchesFieldsOfAnAuditTypeScopedByClass(): void
+    {
+        $this->matchingAuditTypeGroups = [
+            ['classes' => ['Oro\Bundle\CommerceMenuBundle\WebsiteStorefrontMenu'], 'fields' => ['Contact Us']],
+        ];
+        $ds = $this->createDatasource();
+
+        $result = $this->filter->apply($ds, ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'Contact']);
+
+        self::assertTrue($result);
+        $where = $this->whereString($ds);
+        self::assertStringContainsString(
+            'a.objectClass IN (Oro\Bundle\CommerceMenuBundle\WebsiteStorefrontMenu)',
+            $where
+        );
+        self::assertStringContainsString('.field IN (Contact Us)', $where);
+    }
+
+    public function testKeepsAnUnscopedGroupWhenAScopedOneMatchesAsWell(): void
+    {
+        $this->matchingAuditTypeGroups = [
+            ['classes' => [], 'fields' => ['oro_product.new_arrivals_max_items']],
+            ['classes' => ['Oro\Bundle\CommerceMenuBundle\WebsiteStorefrontMenu'], 'fields' => ['Contact Us']],
+        ];
+        $ds = $this->createDatasource();
+
+        $result = $this->filter->apply($ds, ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'Contact']);
+
+        self::assertTrue($result);
+        $where = $this->whereString($ds);
+        self::assertStringContainsString('.field IN (oro_product.new_arrivals_max_items)', $where);
+        self::assertStringContainsString(
+            'a.objectClass IN (Oro\Bundle\CommerceMenuBundle\WebsiteStorefrontMenu)',
+            $where
+        );
+        self::assertStringContainsString('.field IN (Contact Us)', $where);
+        self::assertDoesNotMatchRegularExpression(
+            '/objectClass IN \([^)]*\) AND [^)]*oro_product\.new_arrivals_max_items/',
+            $where
+        );
     }
 
     public function testMatchesEntityFieldsByLabelScopedByClass(): void
     {
-        // "Primary Email" is the label of User::email; the audit stores the field name, so the matching
-        // classes and field names are added as two scoped sets.
         $this->matchingEntityFields = [
             'classes' => ['Oro\Bundle\UserBundle\Entity\User'],
             'fields' => ['email'],

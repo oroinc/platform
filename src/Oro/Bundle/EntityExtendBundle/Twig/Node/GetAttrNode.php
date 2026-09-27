@@ -12,6 +12,7 @@ use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
 use Twig\Node\Expression\GetAttrExpression;
 use Twig\Node\Node;
+use Twig\Sandbox\SecurityError;
 use Twig\Sandbox\SecurityNotAllowedMethodError;
 use Twig\Sandbox\SecurityNotAllowedPropertyError;
 use Twig\Source;
@@ -121,7 +122,7 @@ class GetAttrNode extends GetAttrExpression
             ->raw(', ')->repr($this->getAttribute('ignore_strict_check'))
             ->raw(', ')->repr($env->hasExtension(SandboxExtension::class))
             ->raw(', ')->repr($this->getNode('node')->getTemplateLine())
-            ->raw(')');
+            ->raw(', $context)');
 
         if ($arrayAccessSandbox) {
             $compiler->raw(')');
@@ -141,6 +142,7 @@ class GetAttrNode extends GetAttrExpression
      * @param bool $ignoreStrictCheck Whether to ignore the strict attribute check or not
      * @param bool $sandboxed
      * @param int $lineno The template line where the attribute was called
+     * @param array $context The Twig context the template is being rendered with
      *
      * @return mixed The attribute value, or a Boolean when $isDefinedTest is true, or null when the attribute is not
      *               set and $ignoreStrictCheck is true
@@ -158,7 +160,8 @@ class GetAttrNode extends GetAttrExpression
         $isDefinedTest = false,
         $ignoreStrictCheck = false,
         $sandboxed = false,
-        int $lineno = -1
+        int $lineno = -1,
+        array $context = []
     ) {
         if ($object instanceof ExtendEntityInterface) {
             $basePropertyExists = EntityPropertyInfo::propertyExists($object, $item);
@@ -187,7 +190,7 @@ class GetAttrNode extends GetAttrExpression
             }
         }
 
-        return self::twigGetAttribute(
+        return static::twigGetAttribute(
             $env,
             $source,
             $object,
@@ -197,7 +200,8 @@ class GetAttrNode extends GetAttrExpression
             $isDefinedTest,
             $ignoreStrictCheck,
             $sandboxed,
-            $lineno
+            $lineno,
+            $context
         );
     }
 
@@ -211,7 +215,8 @@ class GetAttrNode extends GetAttrExpression
         $isDefinedTest = false,
         $ignoreStrictCheck = false,
         $sandboxed = false,
-        int $lineno = -1
+        int $lineno = -1,
+        array $context = []
     ) {
         $propertyNotAllowedError = null;
 
@@ -455,12 +460,23 @@ class GetAttrNode extends GetAttrExpression
             $method = $item;
             $call = true;
         } else {
-            if ($isDefinedTest) {
-                return false;
+            if ($propertyNotAllowedError) {
+                return static::onSecurityError(
+                    $propertyNotAllowedError,
+                    $env,
+                    $source,
+                    $object,
+                    $item,
+                    $arguments,
+                    $type,
+                    $isDefinedTest,
+                    $lineno,
+                    $context
+                );
             }
 
-            if ($propertyNotAllowedError) {
-                throw $propertyNotAllowedError;
+            if ($isDefinedTest) {
+                return false;
             }
 
             if ($ignoreStrictCheck || !$env->isStrictVariables()) {
@@ -483,15 +499,18 @@ class GetAttrNode extends GetAttrExpression
             try {
                 $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
             } catch (SecurityNotAllowedMethodError $e) {
-                if ($isDefinedTest) {
-                    return false;
-                }
-
-                if ($propertyNotAllowedError) {
-                    throw $propertyNotAllowedError;
-                }
-
-                throw $e;
+                return static::onSecurityError(
+                    $propertyNotAllowedError ?? $e,
+                    $env,
+                    $source,
+                    $object,
+                    $item,
+                    $arguments,
+                    $type,
+                    $isDefinedTest,
+                    $lineno,
+                    $context
+                );
             }
         }
 
@@ -511,6 +530,50 @@ class GetAttrNode extends GetAttrExpression
         }
 
         return $ret;
+    }
+
+    /**
+     * Decides what an attribute access denied by the Twig sandbox resolves to.
+     *
+     * The default is the behaviour of the Twig core: a denied attribute is an error, except when it is only tested
+     * for existence, which is answered with false. Override this method to resolve a denied attribute to a value of
+     * your own - the returned value becomes the result of the attribute access.
+     *
+     * @param SecurityError $error The sandbox error that denied the access.
+     * @param Environment $env
+     * @param Source $source
+     * @param mixed $object The object the attribute was read from
+     * @param mixed $item The name of the denied property or method
+     * @param array $arguments The arguments the denied method was called with
+     * @param string $type The type of attribute (@see \Twig\Template constants)
+     * @param bool $isDefinedTest Whether this is only a defined check
+     * @param int $lineno The template line where the attribute was called
+     * @param array $context The Twig context the template is being rendered with
+     *
+     * @return mixed The value the denied attribute resolves to, or a Boolean when $isDefinedTest is true
+     *
+     * @throws SecurityError
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected static function onSecurityError(
+        SecurityError $error,
+        Environment $env,
+        Source $source,
+        mixed $object,
+        mixed $item,
+        array $arguments,
+        string $type,
+        bool $isDefinedTest,
+        int $lineno,
+        array $context = []
+    ): mixed {
+        if ($isDefinedTest) {
+            return false;
+        }
+
+        throw $error;
     }
 
     private static function getPropertyChecker(string $class, string $property): \Closure

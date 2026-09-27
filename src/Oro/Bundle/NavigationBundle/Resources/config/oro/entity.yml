@@ -1,4 +1,7 @@
 oro_entity:
+    exclusions:
+        - { entity: Oro\Bundle\NavigationBundle\Entity\MenuUpdate }
+
     entity_aliases:
         Oro\Bundle\NavigationBundle\Entity\Title:
             alias:        pagetitle

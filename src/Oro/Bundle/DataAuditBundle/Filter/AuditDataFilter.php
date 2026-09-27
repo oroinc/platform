@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Filter;
 
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
-use Oro\Bundle\DataAuditBundle\Provider\ConfigAuditFieldLabelProvider;
+use Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface;
 use Oro\Bundle\DataAuditBundle\Provider\EntityAuditFieldSearchProvider;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -20,10 +20,10 @@ use Symfony\Component\Form\FormFactoryInterface;
  * The audit grid's "Data" column is built after the query has run (see Datagrid/Property/data.html.twig),
  * so it cannot be filtered directly; this filter applies a correlated EXISTS subquery over the related
  * AuditField rows instead. It matches
- *  - the changed field key (a configuration key or an entity field name),
+ *  - the changed field key (a configuration key, a menu item, an entity field name),
  *  - the old and the new text value,
- *  - every configuration setting whose displayed breadcrumb contains the term, so any part of
- *    "Commerce › Product › Promotions › Maximum Items" finds the record,
+ *  - every field of an audited domain whose displayed name contains the term, so that any part of
+ *    "Commerce › Product › Promotions › Maximum Items" finds a configuration change,
  *  - and every audited entity field whose displayed label contains the term ("Primary Email" finds the
  *    change of User::email).
  *
@@ -35,7 +35,7 @@ class AuditDataFilter extends StringFilter
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $filterUtility,
-        private readonly ConfigAuditFieldLabelProvider $configFieldLabelProvider,
+        private readonly AuditTypeInterface $auditTypes,
         private readonly EntityAuditFieldSearchProvider $entityFieldSearchProvider
     ) {
         parent::__construct($factory, $filterUtility);
@@ -75,28 +75,32 @@ class AuditDataFilter extends StringFilter
             ['field', 'oldText', 'newText']
         );
 
-        // StringFilter::parseValue() wrapped the term in "%...%"; the names are matched against the raw
-        // term. Configuration keys are globally unique, so they need no object class scoping.
+        // StringFilter::parseValue() wrapped the term in "%...%"; the names are matched against the raw term.
         $rawTerm = trim((string)$data['value'], '%');
-        $configKeys = $this->configFieldLabelProvider->getMatchingFieldKeys($rawTerm);
-        if ($configKeys) {
-            $conditions[] = sprintf(
+        $matchingFields = [
+            ...$this->auditTypes->getMatchingFieldGroups($rawTerm),
+            $this->entityFieldSearchProvider->getMatchingFields($rawTerm),
+        ];
+        foreach ($matchingFields as $matching) {
+            if (!$matching['fields']) {
+                continue;
+            }
+
+            $condition = sprintf(
                 '%s.field IN (%s)',
                 $fieldAlias,
-                $this->addParameter($ds, 'audit_config_keys', $configKeys)
+                $this->addParameter($ds, 'audit_fields', $matching['fields'])
             );
-        }
+            if ($matching['classes']) {
+                $condition = sprintf(
+                    '(%s.objectClass IN (%s) AND %s)',
+                    $rootAlias,
+                    $this->addParameter($ds, 'audit_classes', $matching['classes']),
+                    $condition
+                );
+            }
 
-        // Entity field names are not unique across entities, so they are scoped by the matching classes.
-        $entityFields = $this->entityFieldSearchProvider->getMatchingFields($rawTerm);
-        if ($entityFields['fields']) {
-            $conditions[] = sprintf(
-                '(%s.objectClass IN (%s) AND %s.field IN (%s))',
-                $rootAlias,
-                $this->addParameter($ds, 'audit_classes', $entityFields['classes']),
-                $fieldAlias,
-                $this->addParameter($ds, 'audit_fields', $entityFields['fields'])
-            );
+            $conditions[] = $condition;
         }
 
         $expr = $ds->expr()->exists(sprintf(
