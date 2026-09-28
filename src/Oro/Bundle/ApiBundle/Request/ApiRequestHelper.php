@@ -38,6 +38,7 @@ class ApiRequestHelper
         foreach ($this->apiPatterns as $apiPattern) {
             if (preg_match($apiPattern, $pathinfo) === 1) {
                 $result = true;
+                break;
             }
         }
         $this->cache[$pathinfo] = $result;
