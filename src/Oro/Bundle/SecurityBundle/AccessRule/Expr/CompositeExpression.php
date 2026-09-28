@@ -11,18 +11,37 @@ class CompositeExpression implements ExpressionInterface
 {
     const TYPE_AND = 'AND';
     const TYPE_OR = 'OR';
+    const TYPE_NOT = 'NOT';
 
-    /** @var string */
-    private $type;
-
-    /** @var ExpressionInterface[]  */
-    private $expressions = [];
+    private string $type;
+    /** @var ExpressionInterface[] */
+    private array $expressions = [];
 
     public function __construct(string $type, array $expressions)
     {
-        $this->type = $type;
+        if (self::TYPE_AND !== $type && self::TYPE_OR !== $type && self::TYPE_NOT !== $type) {
+            throw new \RuntimeException(\sprintf(
+                'The expression type must be %s, %s or %s.',
+                self::TYPE_AND,
+                self::TYPE_OR,
+                self::TYPE_NOT
+            ));
+        }
+        if (\count($expressions) === 0) {
+            throw new \RuntimeException('At least one child expression must exist.');
+        }
+        if (self::TYPE_NOT === $type && \count($expressions) !== 1) {
+            throw new \RuntimeException('NOT expression must have exactly one child expression.');
+        }
 
+        $this->type = $type;
         foreach ($expressions as $expr) {
+            if (!$expr instanceof ExpressionInterface) {
+                throw new \RuntimeException(\sprintf(
+                    'A child expression must be an instance of %s.',
+                    ExpressionInterface::class
+                ));
+            }
             $this->expressions[] = $expr;
         }
     }
@@ -38,7 +57,7 @@ class CompositeExpression implements ExpressionInterface
     }
 
     /**
-     * Returns the composite type (AND or OR).
+     * Returns the composite type (AND, OR or NOT).
      */
     public function getType(): string
     {
