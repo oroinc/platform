@@ -32,7 +32,7 @@ Feature: Email template unavailable field rendering
     And I login as "charlie" user
     When I go to System/ User Management/ Users
     And click view "victor@example.com" in grid
-    And I click "More actions"
+    And I click "More actions" if present
     And I click "Send email"
     And I fill "Email Form" with:
       | To             | Charlie Sheen           |
