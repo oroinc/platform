@@ -139,8 +139,6 @@ class GuzzleRestClient implements RestClientInterface
         array $headers = [],
         array $options = []
     ) {
-        // Add the base url to resource, if the resource is relative
-        $url = $this->buildUrl($url, $params);
         // Add default options to the options provided
         $options = array_merge($this->defaultOptions, $options);
 
@@ -151,6 +149,10 @@ class GuzzleRestClient implements RestClientInterface
         }
 
         try {
+            // Built inside the try block: the base url comes from the integration settings, so it can
+            // be malformed, and such a failure must be reported as a REST exception.
+            $url = $this->buildUrl($url, $params);
+
             $this->lastGuzzleRequest = $request = new Request(
                 $method,
                 $url,
