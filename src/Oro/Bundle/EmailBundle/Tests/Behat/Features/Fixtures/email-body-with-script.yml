@@ -1,0 +1,49 @@
+Oro\Bundle\EmailBundle\Entity\EmailBody:
+  emailBody:
+    # The angle brackets are escaped because a bare <...> is Nelmio Alice value-resolver syntax.
+    # Keep the escaping. Without it no live script element is stored and the scenario passes
+    # even when the fix is absent.
+    bodyContent: '\<div id="marker"\>not executed\</div\>\<script\>document.getElementById("marker").textContent = "script executed";\</script\>'
+    bodyIsText: false
+    textBody: 'not executed'
+    persistent: true
+
+Oro\Bundle\EmailBundle\Entity\Email:
+  email:
+    subject: 'Email body with script'
+    emailBody: '@emailBody'
+    sentAt: '<dateTimeBetween("-1 day", "now")>'
+    fromName: 'John Doe'
+    fromEmailAddress: '@adminEmailAddress'
+    internalDate: '<dateTimeBetween("-1 day", "now")>'
+    messageId: 'fsdfasdf'
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser ]))>'
+    head: true
+
+Oro\Bundle\EmailBundle\Entity\EmailUser:
+  adminEmailUser:
+    email: '@email'
+    receivedAt: '@email->sentAt'
+    seen: true
+    owner: '@admin'
+    organization: '@organization'
+    origin: '@adminEmailOrigin'
+    folders: ['@adminEmailFolder']
+
+Oro\Bundle\EmailBundle\Entity\EmailFolder:
+  adminEmailFolder:
+    name: 'sent'
+    fullName: 'sent'
+    type: 'sent'
+    origin: '@adminEmailOrigin'
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser ]))>'
+
+Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin:
+  adminEmailOrigin:
+    active: true
+    name: 'internalemailorigin'
+    internalName: 'BAP_User_1'
+    mailboxName: 'Local'
+    emailUsers: '<(new \Doctrine\Common\Collections\ArrayCollection([ @adminEmailUser ]))>'
+    owner: '@admin'
+    organization: '@organization'

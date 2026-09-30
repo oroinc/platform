@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\ConnectException;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
@@ -678,5 +679,33 @@ class EmailContext extends OroFeatureContext
         }
 
         return $value;
+    }
+
+    /**
+     * Opens the email body route as a top-level document, the way a link inside a message can.
+     *
+     * Example: When I open the body of the "Email body with script" email as a page
+     *
+     * @When /^(?:|I )open the body of the "(?P<subject>[^"]+)" email as a page$/
+     */
+    public function iOpenTheBodyOfTheEmailAsAPage(string $subject): void
+    {
+        $emailBody = $this->getEmailBySubject($subject)->getEmailBody();
+        self::assertNotNull($emailBody, sprintf('Email with the subject "%s" has no body', $subject));
+
+        $this->visitPath(
+            $this->getAppContainer()->get('router')->generate('oro_email_body', ['id' => $emailBody->getId()])
+        );
+    }
+
+    private function getEmailBySubject(string $subject): Email
+    {
+        $email = $this->getAppContainer()
+            ->get('doctrine')
+            ->getRepository(Email::class)
+            ->findOneBy(['subject' => $subject]);
+        self::assertNotNull($email, sprintf('Email with the subject "%s" is not found', $subject));
+
+        return $email;
     }
 }
