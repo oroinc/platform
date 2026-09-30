@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -72,6 +73,54 @@ class EmailControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
         self::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
+    }
+
+    public function testBodyResponseIsSandboxed()
+    {
+        $url = $this->getUrl('oro_email_body', ['id' => $this->getReference('emailBody_1')->getId()]);
+        $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
+        $result = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($result, 200);
+        $this->assertResponseHeader($result, 'Content-Security-Policy', 'sandbox');
+        $this->assertResponseContentTypeEquals($result, 'text/html; charset=UTF-8');
+    }
+
+    public function testBodyReturnsStoredHtmlContentAsIs()
+    {
+        $content = '<p>Email body</p><script>window.emailBodyScriptExecuted = true;</script>';
+
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(EmailBody::class);
+        /** @var EmailBody $emailBody */
+        $emailBody = $em->find(EmailBody::class, $this->getReference('emailBody_1')->getId());
+        $emailBody->setBodyContent($content);
+        $emailBody->setBodyIsText(false);
+        $em->flush();
+
+        $url = $this->getUrl('oro_email_body', ['id' => $emailBody->getId()]);
+        $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
+        $result = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($result, 200);
+        self::assertEquals($content, $result->getContent());
+    }
+
+    public function testContentSecurityPolicyIsNotSetOnEmailView()
+    {
+        $url = $this->getUrl('oro_email_view', ['id' => $this->getReference('email_1')->getId()]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertResponseHeaderNotExists($result, 'Content-Security-Policy');
+    }
+
+    public function testContentSecurityPolicyIsNotSetOnBodyAttachments()
+    {
+        $url = $this->getUrl('oro_email_body_attachments', [
+            'id' => $this->getReference('emailBody_1')->getId(),
+        ]);
+        $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
+        $result = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($result, 200);
+        $this->assertResponseHeaderNotExists($result, 'Content-Security-Policy');
     }
 
     public function testActivity()
