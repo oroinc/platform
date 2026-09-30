@@ -226,6 +226,7 @@ class ScriptHandler
         $dispatcher = $event->getComposer()->getEventDispatcher();
         $packages = self::getInstalledPackages($event->getComposer());
 
+        $hasOroScripts = false;
         foreach ($packages as $package) {
             $oroScripts = $package->getExtra()[$oroEvent] ?? [];
             if (empty($oroScripts)) {
@@ -233,7 +234,12 @@ class ScriptHandler
             }
 
             self::collectOroScripts($rootPackage, $package, $oroScripts, $oroEvent);
+            $hasOroScripts = true;
+        }
 
+        // Dispatch one time, after the loop collects the scripts of all packages.
+        // A dispatch in the loop runs the scripts of the earlier packages again.
+        if ($hasOroScripts) {
             $dispatcher->dispatchScript($oroEvent, $event->isDevMode(), $event->getArguments(), $event->getFlags());
         }
     }

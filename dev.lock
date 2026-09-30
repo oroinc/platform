@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ef44c9291f01a263fcf0dc08539a6d11",
+    "content-hash": "b160f9530888ae2fbf52023dff904ccb",
     "packages": [
         {
             "name": "ass/xmlsecurity",
@@ -16202,6 +16202,171 @@
                 }
             ],
             "time": "2026-08-11T06:25:15+00:00"
+        },
+        {
+            "name": "playwright-php/playwright",
+            "version": "v1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/playwright-php/playwright.git",
+                "reference": "8492788afdb920dcb04ec89bddeb3c4e93d3b5e2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/playwright-php/playwright/zipball/8492788afdb920dcb04ec89bddeb3c4e93d3b5e2",
+                "reference": "8492788afdb920dcb04ec89bddeb3c4e93d3b5e2",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2",
+                "psr/clock": "^1.0",
+                "psr/log": "^2.0 || ^3.0",
+                "symfony/console": "^6.4 || ^7.3 || ^8.0",
+                "symfony/process": "^6.4 || ^7.3 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.40",
+                "monolog/monolog": "^3.9",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^11.5",
+                "symfony/var-dumper": "^6.4 || ^7.3 || ^8.0"
+            },
+            "bin": [
+                "bin/playwright-install"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Testing/functions.php"
+                ],
+                "psr-4": {
+                    "Playwright\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Simon André",
+                    "email": "smn.andre@gmail.com",
+                    "homepage": "https://github.com/smnandre"
+                },
+                {
+                    "name": "Playwright PHP Contributors",
+                    "homepage": "https://github.com/playwright-php"
+                }
+            ],
+            "description": "Modern PHP library for Playwright automation: browsing, scraping, screenshots, testing, and more.",
+            "keywords": [
+                "automation",
+                "browser",
+                "chromium",
+                "firefox",
+                "headless",
+                "php",
+                "playwright",
+                "scraping",
+                "screenshots",
+                "test",
+                "testing",
+                "web",
+                "webkit"
+            ],
+            "support": {
+                "issues": "https://github.com/playwright-php/playwright/issues",
+                "source": "https://github.com/playwright-php/playwright/tree/v1.5.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/smnandre",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-20T12:54:18+00:00"
+        },
+        {
+            "name": "playwright-php/playwright-mink",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/playwright-php/playwright-mink.git",
+                "reference": "53540460c1df277e410eb0d310c6e57f3444849d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/playwright-php/playwright-mink/zipball/53540460c1df277e410eb0d310c6e57f3444849d",
+                "reference": "53540460c1df277e410eb0d310c6e57f3444849d",
+                "shasum": ""
+            },
+            "require": {
+                "behat/mink": "^1.10",
+                "php": "^8.2",
+                "playwright-php/playwright": "^1.0"
+            },
+            "require-dev": {
+                "mink/driver-testsuite": "dev-master",
+                "phpunit/phpunit": "^8.5.22 || ^9.5.11"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/playwright-php/playwright",
+                    "name": "playwright-php/playwright"
+                },
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Playwright\\Mink\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Simon André",
+                    "email": "smn.andre@gmail.com",
+                    "homepage": "https://github.com/smnandre"
+                },
+                {
+                    "name": "Playwright PHP Contributors",
+                    "homepage": "https://github.com/playwright-php"
+                }
+            ],
+            "description": "Mink driver powered by Playwright PHP (Chromium/Firefox/WebKit).",
+            "homepage": "https://playwright-php.dev/mink",
+            "keywords": [
+                "Behat",
+                "Mink",
+                "behat-driver",
+                "browser",
+                "mink-driver",
+                "mink-extension",
+                "playwright",
+                "playwright-php"
+            ],
+            "support": {
+                "issues": "https://github.com/playwright-php/playwright-mink/issues",
+                "source": "https://github.com/playwright-php/playwright-mink/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/smnandre",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-11-08T13:43:49+00:00"
         },
         {
             "name": "react/child-process",

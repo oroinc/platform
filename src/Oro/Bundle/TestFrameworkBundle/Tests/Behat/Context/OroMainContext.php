@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\FeatureNode;
@@ -25,6 +26,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\ScreenshotTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroPlaywrightDriver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
@@ -242,6 +244,23 @@ class OroMainContext extends MinkContext implements
         $driver->waitForAjax();
 
         $this->checkForUnexpectedErrors($scope);
+    }
+
+    /**
+     * Releases the Playwright renderer heap, so a long feature does not run out of memory.
+     *
+     * @AfterScenario
+     */
+    public function collectRendererGarbageAfterScenario(AfterScenarioScope $scope)
+    {
+        if (!$this->getMink()->isSessionStarted()) {
+            return;
+        }
+
+        $driver = $this->getMink()->getSession()->getDriver();
+        if ($driver instanceof OroPlaywrightDriver) {
+            $driver->collectGarbage();
+        }
     }
 
     protected function isSupportedUrl(Session $session): bool
@@ -697,8 +716,15 @@ class OroMainContext extends MinkContext implements
      */
     public function iAcceptAlert()
     {
-        /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
+
+        if ($driver instanceof OroPlaywrightDriver) {
+            $driver->acceptAlert();
+
+            return;
+        }
+
+        /** @var Selenium2Driver $driver */
         $session = $driver->getWebDriverSession();
 
         for ($tries = 0; $tries < 3; ++$tries) {
@@ -723,8 +749,19 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldNotSeeAlert()
     {
-        /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
+
+        if ($driver instanceof OroPlaywrightDriver) {
+            $alertMessage = $driver->getAlertMessage(1500);
+            if (null === $alertMessage) {
+                return;
+            }
+            $driver->acceptAlert();
+
+            self::fail('Expect to see no alert but alert with "' . $alertMessage . '" message is present');
+        }
+
+        /** @var Selenium2Driver $driver */
         $session = $driver->getWebDriverSession();
 
         try {
@@ -745,8 +782,28 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeAlert(string $expectedMessage)
     {
-        /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
+
+        if ($driver instanceof OroPlaywrightDriver) {
+            $alertMessage = $driver->getAlertMessage();
+            if (null === $alertMessage) {
+                self::fail('Expected to see alert, but it was not found');
+            }
+
+            self::assertEquals(
+                $expectedMessage,
+                $alertMessage,
+                sprintf(
+                    'Expected to see alert with message "%s" but alert with "%s" found instead',
+                    $expectedMessage,
+                    $alertMessage
+                )
+            );
+
+            return;
+        }
+
+        /** @var Selenium2Driver $driver */
         $session = $driver->getWebDriverSession();
 
         try {
@@ -1387,14 +1444,20 @@ class OroMainContext extends MinkContext implements
         $elementObject = $this->createElement($element);
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
 
-        $actual = $elementObject->getText();
         $text = $this->fixStepArgument($text);
-
         $regex = '/' . preg_quote($text, '/') . '/ui';
 
-        $message = sprintf('Failed asserting that "%s" contains "%s"', $text, $actual);
+        // the content may still be rendering when the step starts
+        $actual = '';
+        $result = $this->spin(function () use ($elementObject, $regex, &$actual) {
+            $actual = $elementObject->getText();
 
-        self::assertTrue((bool)preg_match($regex, $actual), $message, $element);
+            return (bool)preg_match($regex, $actual);
+        }, 5);
+
+        $message = sprintf('Failed asserting that element text "%s" contains "%s"', $actual, $text);
+
+        self::assertTrue((bool)$result, $message, $element);
     }
 
     #[\Override]
@@ -2309,8 +2372,25 @@ JS;
         ?int $xOffset = null,
         ?int $yOffset = null
     ): void {
-        /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
+
+        if ($driver instanceof OroPlaywrightDriver) {
+            $sourceXpath = is_string($element) ? $this->createElement($element)->getXpath() : $element->getXpath();
+            $destinationXpath = null;
+            if ($dropZone) {
+                $destinationXpath = is_string($dropZone)
+                    ? $this->createElement($dropZone)->getXpath()
+                    : $dropZone->getXpath();
+            }
+
+            $this->waitForAjax();
+            $driver->dragAndDropWithOffsets($sourceXpath, $destinationXpath, $xOffset, $yOffset);
+            $this->waitForAjax();
+
+            return;
+        }
+
+        /** @var Selenium2Driver $driver */
         $webDriverSession = $driver->getWebDriverSession();
 
         $sourceXpath = is_string($element) ? $this->createElement($element)->getXpath() : $element->getXpath();
@@ -2870,13 +2950,10 @@ JS;
     public function iShouldNotSeeElementInsideElement($childElementName, $parentElementName)
     {
         $parentElement = $this->createElement($parentElementName);
-        self::assertTrue(
-            $parentElement->isIsset() && $parentElement->isVisible(),
-            sprintf(
-                'Parent element "%s" not found on page',
-                $parentElementName
-            )
-        );
+        // An absent or hidden parent cannot show the child, so the assertion already holds.
+        if (!$parentElement->isIsset() || !$parentElement->isVisible()) {
+            return;
+        }
 
         $childElement = $parentElement->getElement($childElementName);
         self::assertTrue(

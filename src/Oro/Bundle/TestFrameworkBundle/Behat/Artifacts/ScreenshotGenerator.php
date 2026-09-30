@@ -9,6 +9,9 @@ use Behat\Mink\Mink;
  */
 class ScreenshotGenerator
 {
+    /** @var string[] */
+    private array $lastUrls = [];
+
     /**
      * @param Mink $mink
      * @param ArtifactsHandlerInterface[] $artifactsHandlers
@@ -34,6 +37,24 @@ class ScreenshotGenerator
             $urls[] = $artifactsHandler->save($screenshot);
         }
 
+        $this->lastUrls = $urls;
+
         return $urls;
+    }
+
+    /**
+     * URLs from the last take() call, so several failure listeners can share one screenshot.
+     * FailureReportSubscriber calls reset() when a scenario starts.
+     *
+     * @return string[]
+     */
+    public function getLastUrls(): array
+    {
+        return $this->lastUrls;
+    }
+
+    public function reset(): void
+    {
+        $this->lastUrls = [];
     }
 }

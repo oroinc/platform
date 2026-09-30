@@ -281,6 +281,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $this->waitForAjax();
         $grid = $this->getGrid($gridName);
+        $this->waitForFirstRowToRender($grid);
         $hiddenRowsCount = 0;
 
         foreach ($table as $index => $row) {
@@ -329,6 +330,25 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         return (string) $value;
+    }
+
+    /**
+     * After waitForAjax() the grid view can still render. A row that is not rendered yet reads as invisible,
+     * and iShouldSeeFollowingGrid() skips it as hidden. The wait must not fail on timeout: a grid whose first
+     * row is really hidden, such as a group row, costs the timeout one time and then continues as before.
+     * The type is Table, the common parent of the back-office Grid and the storefront FrontendTableGrid.
+     */
+    private function waitForFirstRowToRender(Table $grid): void
+    {
+        try {
+            $this->spin(static function () use ($grid) {
+                $rows = $grid->getRows();
+
+                return $rows && reset($rows)->isVisible() ? true : null;
+            }, 3);
+        } catch (\Throwable) {
+            // leave the assertion to report what it finds
+        }
     }
 
     /**
@@ -2553,10 +2573,14 @@ TEXT;
         $refreshButton = $grid->getElement($grid->getMappedChildElementName('GridToolbarActionReset'));
 
         if ($refreshButton && $refreshButton->isIsset()) {
-            return $refreshButton->click();
+            $refreshButton->click();
+            $this->waitForAjax();
+
+            return;
         }
 
-        $this->spin(function () use ($grid) {
+        $clicked = false;
+        $this->spin(function () use ($grid, &$clicked) {
             try {
                 $refreshButton = $this->getPage()->find(
                     'css',
@@ -2568,6 +2592,7 @@ TEXT;
 
                 if ($refreshButton && $refreshButton->isVisible()) {
                     $refreshButton->click();
+                    $clicked = true;
                 }
 
                 return true;
@@ -2577,6 +2602,10 @@ TEXT;
 
             return true;
         });
+
+        if ($clicked) {
+            $this->waitForAjax();
+        }
     }
 
     /**
@@ -2991,14 +3020,18 @@ TEXT;
     {
         $filters = $this->elementFactory->createElement($gridName . 'Filters');
         if (!$filters->isVisible()) {
-            $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
-            if ($gridToolbarActions->isVisible() && $openFilters) {
-                $gridToolbarActions->getActionByTitle('Filter Toggle')->click();
+            if ($this->elementFactory->hasElement($gridName . 'ToolbarActions')) {
+                $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
+                if ($gridToolbarActions->isVisible() && $openFilters) {
+                    $gridToolbarActions->getActionByTitle('Filter Toggle')->click();
+                }
             }
 
-            $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-            if ($filterState->isValid() && $filterState->isVisible() && $openFilters) {
-                $filterState->click();
+            if ($this->elementFactory->hasElement($gridName . 'FiltersState')) {
+                $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
+                if ($filterState->isValid() && $filterState->isVisible() && $openFilters) {
+                    $filterState->click();
+                }
             }
         }
 

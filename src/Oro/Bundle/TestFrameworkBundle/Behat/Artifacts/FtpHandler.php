@@ -12,7 +12,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  * to a specified directory on the remote server. It supports environment variable substitution in
  * configuration values and provides proper error handling for FTP operations.
  */
-class FtpHandler implements ArtifactsHandlerInterface
+class FtpHandler implements ArtifactsFileHandlerInterface
 {
     /**
      * @var Resource|false
@@ -59,22 +59,36 @@ class FtpHandler implements ArtifactsHandlerInterface
     #[\Override]
     public function save($data)
     {
-        $fileName = TokenGenerator::generateToken('image') . '.png';
+        return $this->saveFile($data, TokenGenerator::generateToken('image') . '.png');
+    }
+
+    #[\Override]
+    public function saveFile(string $content, string $fileName): string
+    {
+        $fileName = basename($fileName);
         $localFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName;
-        file_put_contents($localFile, $data);
+        file_put_contents($localFile, $content);
 
         if (!$ftpConnection = $this->getFtpConnection()) {
             return "There is issue with ftp connection";
         }
 
         if (!ftp_put($ftpConnection, $fileName, $localFile, FTP_BINARY)) {
-            return "There was a problem while uploading screenshot to ftp server\n";
+            return "There was a problem while uploading artifact to ftp server\n";
         }
 
         ftp_chmod($ftpConnection, 0644, $fileName);
         ftp_close($ftpConnection);
 
         return rtrim($this->screenshotRemoteBaseUrl, '/') . '/' . trim($fileName, '/');
+    }
+
+    #[\Override]
+    public function getBaseUrl(): ?string
+    {
+        return '' !== $this->screenshotRemoteBaseUrl
+            ? rtrim($this->screenshotRemoteBaseUrl, '/') . '/'
+            : null;
     }
 
     #[\Override]

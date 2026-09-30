@@ -155,7 +155,9 @@
         "symfony/var-exporter": "~7.4.0",
         "symfony/web-profiler-bundle": "~7.4.0",
         "friendsofphp/php-cs-fixer": "~3.92.3",
-        "oro/twig-inspector": "1.1.*"
+        "oro/twig-inspector": "1.1.*",
+        "playwright-php/playwright": "^1.4",
+        "playwright-php/playwright-mink": "^1.0"
     },
     "provide": {
         "psr/http-factory-implementation": "^1.0"
@@ -173,6 +175,11 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "scripts": {
+        "playwright-bootstrap": [
+            "Oro\\Bundle\\TestFrameworkBundle\\Composer\\PlaywrightBootstrapHandler::bootstrap"
+        ]
+    },
     "extra": {
         "npm": {
             "colors": "1.4.0",
@@ -220,7 +227,13 @@
         },
         "branch-alias": {
             "dev-master": "7.1-dev"
-        }
+        },
+        "oro-post-install-cmd": [
+            "@playwright-bootstrap"
+        ],
+        "oro-post-update-cmd": [
+            "@playwright-bootstrap"
+        ]
     },
     "autoload": {
         "psr-4": {

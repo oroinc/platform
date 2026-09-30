@@ -221,3 +221,39 @@ chromedriver:
                                         - "--guest"
                                     mobileEmulation:
                                         deviceName: "iPhone 12 Pro"
+
+playwright:
+    <<: *default
+    extensions:
+        Behat\MinkExtension:
+            browser_name: chrome
+            sessions:
+                second_session:
+                    oroSelenium2: false
+                    oroPlaywright: &oro_playwright_desktop
+                        browser_type: chromium
+                        headless: false
+                first_session:
+                    oroSelenium2: false
+                    oroPlaywright: *oro_playwright_desktop
+                system_session:
+                    oroSelenium2: false
+                    oroPlaywright: *oro_playwright_desktop
+                375_session:
+                    oroSelenium2: false
+                    oroPlaywright:
+                        browser_type: chromium
+                        headless: false
+                        viewport: { width: 375, height: 640 }
+                640_session:
+                    oroSelenium2: false
+                    oroPlaywright:
+                        browser_type: chromium
+                        headless: false
+                        viewport: { width: 640, height: 1100 }
+                mobile_session:
+                    oroSelenium2: false
+                    oroPlaywright:
+                        browser_type: chromium
+                        headless: false
+                        viewport: { width: 375, height: 640 }
