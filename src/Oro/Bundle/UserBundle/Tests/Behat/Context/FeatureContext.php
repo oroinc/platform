@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
@@ -24,12 +25,58 @@ class FeatureContext extends OroFeatureContext implements
     private $oroMainContext;
 
     /**
+     * Set only in the suites that register EmailContext. Many suites share this context.
+     */
+    private ?EmailContext $emailContext = null;
+
+    /**
      * @BeforeScenario
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
         $environment = $scope->getEnvironment();
         $this->oroMainContext = $environment->getContext(OroMainContext::class);
+        if ($environment->hasContextClass(EmailContext::class)) {
+            $this->emailContext = $environment->getContext(EmailContext::class);
+        }
+    }
+
+    /**
+     * Waits for the token of the reset password link. UserPasswordResetRequestProcessor calls updateUser() only
+     * after UserManager::sendResetPasswordEmail(), and the Email entity write in between can take more than
+     * a second. Thus the mailbox can show the link before the database holds the token, and a step that opens
+     * the link at once gets the 404 page.
+     *
+     * Example: And I wait for the reset password link to become valid
+     *
+     * @Given /^(?:|I )wait for the reset password link to become valid$/
+     */
+    public function waitForResetPasswordLinkToBecomeValid(): void
+    {
+        self::assertNotNull(
+            $this->emailContext,
+            sprintf('This step requires %s to be registered in the suite', EmailContext::class)
+        );
+
+        $url = $this->emailContext->getLinkUrlFromEmail('RESET PASSWORD');
+        self::assertNotNull($url, '"RESET PASSWORD" link not found in the email');
+
+        self::assertSame(
+            1,
+            preg_match('#/reset/(?P<token>\w+)#', $url, $matches),
+            sprintf('No reset password token in the link from the email: %s', $url)
+        );
+
+        $userManager = $this->getAppContainer()->get('oro_user.manager');
+        $stored = $this->spin(
+            fn () => null !== $userManager->findUserByConfirmationToken($matches['token']),
+            30
+        );
+
+        self::assertTrue(
+            (bool)$stored,
+            sprintf('Reset password token "%s" has not been stored within 30 seconds', $matches['token'])
+        );
     }
 
     /**

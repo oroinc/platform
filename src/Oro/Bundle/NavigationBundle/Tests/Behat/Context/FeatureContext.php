@@ -11,6 +11,7 @@ use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
@@ -299,7 +300,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
             $this->chooseQuickMenuTab($tab);
         }
 
-        self::assertTrue($content->isVisible());
+        self::assertTrue($this->isQuickMenuTabRendered($content));
 
         /** @var NodeElement $item */
         foreach ($content->findAll('css', 'ul li a') as $key => $item) {
@@ -341,7 +342,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
             $this->chooseQuickMenuTab($tab);
         }
 
-        self::assertTrue($content->isVisible());
+        self::assertTrue($this->isQuickMenuTabRendered($content));
 
         /** @var NodeElement $item */
         foreach ($content->findAll('css', 'ul li a') as $key => $item) {
@@ -352,7 +353,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
             }
         }
 
-        if ($content->isVisible()) {
+        if ($this->isQuickMenuTabRendered($content)) {
             // close history dropdown after check
             $this->clickBarsIcon();
         }
@@ -376,8 +377,26 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
             $this->chooseQuickMenuTab($tab);
         }
 
-        self::assertTrue($content->isVisible());
+        self::assertTrue($this->isQuickMenuTabRendered($content));
         self::assertCount(0, $content->findAll('css', 'ul li a'));
+    }
+
+    /**
+     * Tells whether a quick menu tab is rendered. The container does not have to occupy space.
+     *
+     * An empty tab renders no rows, so its container has a zero height, and its message is outside the flow.
+     * Playwright reports such a container as not visible. WebDriver called a zero-size element visible while
+     * a child still had a size. Thus an empty tab is found through its message. A tab that never opened still fails.
+     */
+    private function isQuickMenuTabRendered(Element $content): bool
+    {
+        if ($content->isVisible()) {
+            return true;
+        }
+
+        $noData = $content->find('css', '.no-data');
+
+        return null !== $noData && $noData->isVisible();
     }
 
     /**
@@ -453,7 +472,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     public function thereAreNoPagesInFavorites()
     {
         $content = $this->createElement('Favorites Content');
-        self::assertTrue($content->isVisible());
+        self::assertTrue($this->isQuickMenuTabRendered($content));
 
         self::assertCount(0, $content->findAll('css', 'ul li'));
     }

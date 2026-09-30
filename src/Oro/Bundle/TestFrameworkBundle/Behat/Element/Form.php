@@ -67,18 +67,19 @@ class Form extends Element
             }, 15);
 
             if (!$filled) {
+                $printableValue = is_array($value) ? implode(', ', $value) : (string)$value;
                 if ($lastException !== null) {
                     $message = sprintf(
                         'Could not fill field "%s" with value "%s": %s',
                         $label,
-                        $value,
+                        $printableValue,
                         $lastException->getMessage()
                     );
                     throw new \RuntimeException($message, 0, $lastException);
                 }
 
                 throw new \RuntimeException(
-                    sprintf('Could not fill field "%s" with value "%s"', $label, $value)
+                    sprintf('Could not fill field "%s" with value "%s"', $label, $printableValue)
                 );
             }
         }

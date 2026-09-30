@@ -33,6 +33,35 @@ services:
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
+    oro_test.listener.playwright_trace_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\PlaywrightTraceSubscriber'
+        arguments:
+            - '@mink'
+            - '%kernel.log_dir%/playwright-traces'
+            - '@oro_test.artifacts.trace_file_registry'
+            - [] # artifacts handlers, injected by OroTestFrameworkExtension::processArtifactHandlers()
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
+    oro_test.artifacts.trace_file_registry:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\TraceFileRegistry'
+
+    oro_test.artifacts.failure_report_renderer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\FailureReportRenderer'
+
+    oro_test.artifacts.failure_report_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\FailureReportSubscriber'
+        arguments:
+            - '@mink'
+            - '@oro_test.artifacts.screenshot_generator'
+            - '@oro_test.artifacts.trace_file_registry'
+            - '@oro_test.artifacts.failure_report_renderer'
+            - '%kernel.log_dir%/playwright-traces'
+            - '%kernel.log_dir%'
+            - [] # artifacts handlers, injected by OroTestFrameworkExtension::processArtifactHandlers()
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
     oro_test.listener.job_status_subcriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\JobStatusSubscriber
         arguments:

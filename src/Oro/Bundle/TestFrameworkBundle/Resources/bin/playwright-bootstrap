@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Installs the Node bridge and the Chromium browser of the Playwright driver for the Behat tests.
+# PlaywrightBootstrapHandler runs it after composer install or update when ORO_BEHAT_PLAYWRIGHT is true.
+# A developer can also run it by hand. The script is idempotent.
+# It does not use the vendor bin/playwright-install, which does not use the npm options of the application.
+# It exits with code 0 when playwright-php/playwright is not installed, so builds without this package still work.
+#
+# Usage: playwright-bootstrap [<application root>]
+# The application root defaults to the current directory, where composer runs its scripts.
+set -euo pipefail
+
+APP_DIR="$(CDPATH='' cd -- "${1:-$PWD}" && pwd)"
+PW_BIN_DIR="$APP_DIR/vendor/playwright-php/playwright/bin"
+SERVER="$PW_BIN_DIR/playwright-server.js"
+PLAYWRIGHT_CLI="$PW_BIN_DIR/node_modules/.bin/playwright"
+
+log() { echo "playwright-bootstrap: $*"; }
+fail() { echo "playwright-bootstrap: ERROR: $*" >&2; exit 1; }
+
+if [ ! -f "$SERVER" ]; then
+    log "playwright-php/playwright is not installed. The script has nothing to do."
+    exit 0
+fi
+
+# tracingGroup is one of the bridge handlers that the driver needs and that playwright-php/playwright has since v1.4.0.
+# Fail early, because an older bridge gives errors at test time that are hard to understand.
+if ! grep -q 'tracingGroup:' "$SERVER"; then
+    fail "vendor/playwright-php/playwright is older than v1.4.0. The bridge does not have the handlers that the driver needs. Run composer update playwright-php/playwright."
+fi
+
+command -v node >/dev/null 2>&1 || fail "The script cannot find node in PATH. The Playwright driver needs node."
+command -v npm >/dev/null 2>&1 || fail "The script cannot find npm in PATH. The script needs npm to install the Playwright Node bridge."
+
+# The bridge has its own package.json, so npm does not read the application .npmrc.
+# A copy of that file applies the application registry. The copy can contain a token.
+# rm before cp prevents a write through a symbolic link at the destination.
+# The trap removes the copy on exit, also after an error or a stop signal.
+# --ignore-scripts keeps the install scripts of the dependencies from running while the copy is in the directory.
+NPMRC_COPY="$PW_BIN_DIR/.npmrc"
+rm -f "$NPMRC_COPY"
+trap 'rm -f "$NPMRC_COPY"' EXIT
+if [ -x "$PLAYWRIGHT_CLI" ]; then
+    log "The Node bridge dependencies are already installed."
+else
+    if [ -f "$APP_DIR/.npmrc" ]; then
+        cp "$APP_DIR/.npmrc" "$NPMRC_COPY"
+    fi
+    log "The script installs the Node bridge dependencies."
+    (cd "$PW_BIN_DIR" && npm install --omit=dev --no-audit --no-fund --ignore-scripts)
+fi
+
+# Composer and Behat can run as different users on CI, so the browser goes into the project, not $HOME.
+# PLAYWRIGHT_BROWSERS_PATH replaces the default var/ms-playwright. OroPlaywrightDriver uses the same path.
+export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-$APP_DIR/var/ms-playwright}"
+log "The script installs the Chromium browser in $PLAYWRIGHT_BROWSERS_PATH."
+if ! (cd "$PW_BIN_DIR" && "$PLAYWRIGHT_CLI" install chromium); then
+    log "The Chromium installation failed. A minimal container can lack the system libraries of the browser."
+    log "Read the output above. Install the packages that it lists, or run this command with root access:"
+    log "$PLAYWRIGHT_CLI install-deps chromium"
+    fail "The script could not install the Chromium browser."
+fi
+
+log "The bootstrap is complete."

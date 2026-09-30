@@ -90,11 +90,14 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
             });
             EOF;
         try {
-            $this->mink
+            $webDriverSession = $this->mink
                 ->getSession()
                 ->getDriver()
-                ->getWebDriverSession()
-                ->execute(['script' => $script, 'args' => []]);
+                ->getWebDriverSession();
+            if (null === $webDriverSession) {
+                return;
+            }
+            $webDriverSession->execute(['script' => $script, 'args' => []]);
         } catch (\Throwable $e) {
             // The cursor marker only decorates failure screenshots. Whenever the browser refuses to run
             // the script - an open JS alert blocks it, the session is gone - the step itself must still run,
