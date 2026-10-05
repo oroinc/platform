@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleArgumentsInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
@@ -16,7 +17,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Synchronizes emails via IMAP.
  */
-class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionInterface
+class EmailSyncCommand extends Command implements
+    CronCommandScheduleDefinitionInterface,
+    CronCommandScheduleArgumentsInterface
 {
     /** The maximum number of email origins which can be synchronized */
     public const MAX_TASKS = -1;
@@ -29,6 +32,12 @@ class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionI
 
     /** The maximum execution time (in minutes) */
     public const MAX_EXEC_TIME_IN_MIN = 15;
+
+    /**
+     * The extra time (in seconds), on top of MAX_EXEC_TIME_IN_MIN, given to the OS subprocess running
+     * this command before it is killed - so the command's own cooperative deadline check can fire first.
+     */
+    public const PROCESS_TIMEOUT_MARGIN_IN_SEC = 300;
 
     /** The maximum number of jobs running in the same time */
     public const MAX_JOBS_COUNT = 3;
@@ -50,6 +59,14 @@ class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionI
     public function getDefaultDefinition(): string
     {
         return '*/1 * * * *';
+    }
+
+    #[\Override]
+    public function getDefaultArguments(): array
+    {
+        return [
+            sprintf('--process-timeout=%d', self::MAX_EXEC_TIME_IN_MIN * 60 + self::PROCESS_TIMEOUT_MARGIN_IN_SEC),
+        ];
     }
 
     /**

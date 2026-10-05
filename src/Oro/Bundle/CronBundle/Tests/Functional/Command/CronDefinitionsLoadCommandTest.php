@@ -37,9 +37,17 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
             . ' Skipping, the command does not implement CronCommandScheduleDefinitionInterface.',
             $result
         );
+        self::assertStringContainsString(
+            'Processing command "oro:cron:test:with_arguments": setting up schedule.',
+            $result
+        );
 
         $schedules = $scheduleRepository->findAll();
         self::assertGreaterThan(0, count($schedules));
+
+        $scheduleWithArguments = $scheduleRepository->findOneBy(['command' => 'oro:cron:test:with_arguments']);
+        self::assertInstanceOf(Schedule::class, $scheduleWithArguments);
+        self::assertEquals(['--process-timeout=1200'], $scheduleWithArguments->getArguments());
 
         /** @var Schedule $expected */
         foreach ($nonCronSchedules as $expected) {

@@ -79,6 +79,27 @@ class CronCommandTest extends WebTestCase
         self::assertIsArray($message['message']);
         self::assertArrayHasKey('command', $message['message']);
         self::assertArrayHasKey('arguments', $message['message']);
+
+        $messageWithArguments = $this->findMessageByCommand($messages, 'oro:cron:test:with_arguments');
+        self::assertSame(
+            ['--process-timeout' => '1200'],
+            $messageWithArguments['message']['arguments']
+        );
+    }
+
+    private function findMessageByCommand(array $messages, string $commandName): array
+    {
+        foreach ($messages as $message) {
+            if (($message['message']['command'] ?? null) === $commandName) {
+                return $message;
+            }
+        }
+
+        self::fail(sprintf(
+            'No "%s" message was sent for command "%s".',
+            RunCommandTopic::getName(),
+            $commandName
+        ));
     }
 
     public function testShouldNotSendMessagesIfNotCommandDue(): void
