@@ -114,32 +114,24 @@ class Select2Entity extends Element implements ClearableInterface
                 $result->click();
                 $this->getDriver()->waitForAjax();
 
-                return true;
-            } catch (StaleElementReference $e) {
-                $freshResults = array_filter(
-                    $this->getPage()->findAll('css', '.select2-results li'),
-                    fn (NodeElement $el) => $el->isVisible()
-                );
+                if ($this->isOpen()) {
+                    // Select2 ignores a click on a result that a user cannot select yet, and gives no message.
+                    // For example, an option of a dependent field is still disabled while the page settles.
+                    // Thus build the dropdown again and take a fresh result.
+                    $this->close();
+                    $this->open();
+                    $result = $this->findFreshResult($expectedText) ?? $result;
 
-                if (!$freshResults) {
                     return false;
                 }
 
-                if ($expectedText !== '') {
-                    foreach ($freshResults as $fresh) {
-                        try {
-                            if (trim($fresh->getText()) === $expectedText) {
-                                $result = $fresh;
-
-                                return false;
-                            }
-                        } catch (\Exception $e) {
-                            // element already stale again, keep looking
-                        }
-                    }
+                return true;
+            } catch (StaleElementReference $e) {
+                $fresh = $this->findFreshResult($expectedText);
+                if (null === $fresh) {
+                    return false;
                 }
-
-                $result = array_values($freshResults)[0];
+                $result = $fresh;
 
                 return false;
             }
@@ -149,6 +141,35 @@ class Select2Entity extends Element implements ClearableInterface
             'Could not click Select2 result "%s" after retries',
             $expectedText ?: '(unknown)'
         ));
+    }
+
+    /**
+     * Finds a currently visible dropdown result, preferring an exact text match.
+     */
+    private function findFreshResult(string $expectedText): ?NodeElement
+    {
+        $freshResults = array_values(array_filter(
+            $this->getPage()->findAll('css', '.select2-results li'),
+            fn (NodeElement $el) => $el->isVisible()
+        ));
+
+        if (!$freshResults) {
+            return null;
+        }
+
+        if ($expectedText !== '') {
+            foreach ($freshResults as $fresh) {
+                try {
+                    if (trim($fresh->getText()) === $expectedText) {
+                        return $fresh;
+                    }
+                } catch (\Exception $e) {
+                    // the element is stale again, so continue the search
+                }
+            }
+        }
+
+        return $freshResults[0];
     }
 
     /**

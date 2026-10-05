@@ -10,7 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SelectorManipulator;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
-use WebDriver\Exception\NoSuchElement;
 use WebDriver\Key;
 
 class FilterContext extends OroFeatureContext implements OroPageObjectAware
@@ -112,9 +111,16 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
                 $button->click();
             }
         }
-        $this->getPage()
-             ->find('xpath', "(//span[contains(., '{$condition}')] | //li/a[contains(., '{$condition}')])[last()]")
-             ->click();
+        $option = $this->spin(function (FilterContext $context) use ($condition) {
+            $option = $context->getPage()
+                ->find('xpath', "(//span[contains(., '{$condition}')] | //li/a[contains(., '{$condition}')])[last()]");
+
+            return $option && $option->isVisible() ? $option : null;
+        }, 5);
+
+        self::assertNotNull($option, sprintf('Filter condition "%s" did not appear in the dropdown.', $condition));
+
+        $option->click();
     }
 
     /**
@@ -126,26 +132,40 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
         $value = VariableStorage::normalizeValue($value);
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
-        try {
-            $inputXpath = "//span[contains(@class, 'active-filter')]"
-                . "//a[contains(@class, 'dropdown-toggle') and contains(., '{$condition}')]"
-                . "/following-sibling::input[contains(@name, 'value')]";
 
-            $driver->typeIntoInput($inputXpath, $value);
-        } catch (NoSuchElement $e) {
-            $inputXpath = "//span[contains(@class, 'active-filter')]"
-                . "//a[contains(@class, 'dropdown-toggle') and contains(., '{$condition}')]"
-                . "/../following-sibling::div[contains(@class, 'select2-container')]"
-                . "//input[contains(@class, 'select2-input')]";
+        $condTail = "//a[contains(@class, 'dropdown-toggle') and contains(., '{$condition}')]";
+        $plainXpath = "//span[contains(@class, 'active-filter')]" . $condTail
+            . "/following-sibling::input[contains(@name, 'value')]";
+        $select2Xpath = "//span[contains(@class, 'active-filter')]" . $condTail
+            . "/../following-sibling::div[contains(@class, 'select2-container')]"
+            . "//input[contains(@class, 'select2-input')]";
 
-            $select2Element = $this->getPage()->find('xpath', $inputXpath);
-
-            /** @var Select2Entities $select2Entities */
-            $select2Entities = $this->elementFactory->wrapElement('Select2Entities', $select2Element);
-            if ($select2Element->isVisible()) {
-                $select2Entities->setValue($value);
+        // The condition choice renders the card again: a plain input for a scalar field, a select2 for a multienum.
+        // A read right after the click finds the card in the middle of the render, so wait for the widget.
+        $field = $this->spin(function (FilterContext $context) use ($plainXpath, $select2Xpath) {
+            foreach (['plain' => $plainXpath, 'select2' => $select2Xpath] as $kind => $xpath) {
+                $element = $context->getPage()->find('xpath', $xpath);
+                if ($element && $element->isVisible()) {
+                    return [$kind, $element];
+                }
             }
+
+            return null;
+        }, 5);
+
+        self::assertNotNull($field, sprintf('No value input rendered for filter condition "%s".', $condition));
+
+        [$kind, $element] = $field;
+
+        if ('plain' === $kind) {
+            $driver->typeIntoInput($element->getXpath(), $value);
+
+            return;
         }
+
+        /** @var Select2Entities $select2Entities */
+        $select2Entities = $this->elementFactory->wrapElement('Select2Entities', $element);
+        $select2Entities->setValue($value);
     }
 
     /**

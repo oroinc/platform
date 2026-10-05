@@ -763,7 +763,11 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         if ($element instanceof Select2Entity) {
             $options = $element->getAllSuggestedValues($this->getSession(), $value);
             foreach ($optionLabels as $optionLabel) {
-                static::assertContains($optionLabel, $options);
+                static::assertContains(
+                    $optionLabel,
+                    $options,
+                    sprintf('Actual options: %s', json_encode($options))
+                );
             }
         } elseif ($element instanceof Select2Entities) {
             $element->focus();
@@ -781,12 +785,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             /** @var NodeElement[] $options */
             $options = $element->findAll('css', 'option');
             $optionsValue = [];
-            /** @var Element $element */
-            foreach ($options as $element) {
-                $optionsValue[] = $element->getText();
+            /** @var Element $option */
+            foreach ($options as $option) {
+                $optionsValue[] = $option->getText();
             }
             foreach ($optionLabels as $optionLabel) {
-                static::assertContains($optionLabel, $optionsValue);
+                static::assertContains(
+                    $optionLabel,
+                    $optionsValue,
+                    sprintf('Actual options: %s', json_encode($optionsValue))
+                );
             }
         } else {
             $this->assertSelectContainsOptions($field, $optionLabels);
@@ -867,6 +875,17 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         string $formName = 'OroForm'
     ): void {
         $fieldElement = $this->getFieldInForm($fieldName, $formName);
+        if ($fieldElement instanceof Select) {
+            // Only the select2 dropdown renders the element that this step looks for, for example a ghost option.
+            $focusser = $fieldElement->find(
+                'xpath',
+                'preceding-sibling::div[contains(@class, "select2-container")][1]'
+                . '//input[contains(@class, "select2-focusser")]'
+            );
+            if (null !== $focusser) {
+                $fieldElement = $this->elementFactory->wrapElement('Select2Entity', $focusser);
+            }
+        }
         if ($fieldElement instanceof Select2Entity) {
             $needleElement = null;
             $suggestions = $fieldElement->getSuggestions();
@@ -1036,7 +1055,11 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $selectOptionsText = $this->getSelectOptionsText($selectField);
 
         foreach ($optionLabels as $optionLabel) {
-            static::assertContains($optionLabel, $selectOptionsText);
+            static::assertContains(
+                $optionLabel,
+                $selectOptionsText,
+                sprintf('Actual options: %s', json_encode($selectOptionsText))
+            );
         }
     }
 

@@ -83,18 +83,41 @@ class MainMenu extends Element
     public function selectSideSubmenu(string $item): NodeElement
     {
         $link = $this->findVisibleLink($item);
-        if (!$link->find('xpath', './span')->hasClass('title-level-1')) {
-            throw new \LogicException(sprintf('Cannot find submenu "%s" in the side menu', $item));
+
+        if (!$this->isTopLevelSideMenuItem($link)) {
+            // findLink() returns the first match in the DOM. It can be a link in the side menu overlay that
+            // a previous navigation left open, not the top-level item. Thus close the overlay and look again.
+            if ($this->isSideMenuOverlayOpen()) {
+                $this->elementFactory->createElement('SideMenuOverlayCloseButton')->click();
+                $link = $this->findVisibleLink($item);
+            }
+
+            if (!$this->isTopLevelSideMenuItem($link)) {
+                throw new \LogicException(sprintf('Cannot find submenu "%s" in the side menu', $item));
+            }
         }
 
-        $menuOverlay = $this->elementFactory->createElement('SideMenuOverlay');
-
         // Do not click already opened menu
-        if (!$menuOverlay->hasClass('open') || !$link->getParent()->hasClass('active')) {
+        if (!$this->isSideMenuOverlayOpen() || !$link->getParent()->hasClass('active')) {
             $link->click();
         }
 
         return $link;
+    }
+
+    /**
+     * The sidebar JS component creates the overlay markup. Thus the overlay does not exist on a page that is not
+     * fully initialized or that never opened the menu. That state means "not open".
+     */
+    private function isSideMenuOverlayOpen(): bool
+    {
+        try {
+            $menuOverlay = $this->elementFactory->createElement('SideMenuOverlay');
+
+            return $menuOverlay->isIsset() && $menuOverlay->hasClass('open');
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     public function walkAllMenuItems(): \Generator
@@ -196,6 +219,25 @@ class MainMenu extends Element
         }
 
         return (int)$matches[1];
+    }
+
+    /**
+     * The side menu renders again while the overlay opens or closes, so the title span can go away between
+     * the lookup and the class check. Thus an error causes a retry and does not fail the step.
+     */
+    private function isTopLevelSideMenuItem(NodeElement $link): bool
+    {
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            try {
+                $title = $link->find('xpath', './span');
+
+                return null !== $title && $title->hasClass('title-level-1');
+            } catch (\Throwable) {
+                usleep(100000);
+            }
+        }
+
+        return false;
     }
 
     private function findVisibleLink(string $title): NodeElement

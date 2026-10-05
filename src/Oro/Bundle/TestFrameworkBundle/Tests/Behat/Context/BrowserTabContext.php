@@ -14,6 +14,26 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
     /** @var BrowserTabManager */
     private $browserTabManager;
 
+    /** @var array<string, string[]> Session name => window names */
+    private array $tabsAtScenarioStart = [];
+
+    /**
+     * Remembers the open tabs, so a tab of an earlier scenario does not count as a new tab.
+     *
+     * @BeforeScenario
+     */
+    public function rememberOpenTabs(): void
+    {
+        $this->tabsAtScenarioStart = [];
+
+        $mink = $this->getMink();
+        if (!$mink->isSessionStarted()) {
+            return;
+        }
+
+        $this->tabsAtScenarioStart[$mink->getDefaultSessionName()] = $mink->getSession()->getWindowNames();
+    }
+
     #[\Override]
     public function setBrowserTabManager(BrowserTabManager $browserTabManager)
     {
@@ -28,8 +48,19 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
     private function getCurrentAndLastTabNames()
     {
         $currentTab = $this->getSession()->getWindowName();
-        $windowNames = $this->getSession()->getWindowNames();
-        $lastTab = end($windowNames);
+        $lastTab = $currentTab;
+        // A new tab registers in the driver after a delay. Wait for a tab that this scenario opened, because a tab
+        // of an earlier scenario is not new. Without a list of earlier tabs, any tab except the current one counts.
+        $knownTabs = $this->tabsAtScenarioStart[$this->getMink()->getDefaultSessionName()] ?? [];
+        $knownTabs[] = $currentTab;
+        $this->spin(function () use (&$lastTab, $knownTabs) {
+            $windowNames = $this->getSession()->getWindowNames();
+            $openedHere = array_values(array_diff($windowNames, $knownTabs));
+            $lastTab = $openedHere ? end($openedHere) : end($windowNames);
+
+            return (bool)$openedHere;
+        }, 15);
+
         return [$currentTab, $lastTab];
     }
 

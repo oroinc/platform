@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroPlaywrightDriver;
 
 /**
  * Probably it should be defined as a service - just for behat.
@@ -41,7 +42,10 @@ class FileDownloader
      */
     private function getCookieJar(Session $session, string $url)
     {
-        $cookies = $session->getDriver()->getWebDriverSession()->getAllCookies();
+        $driver = $session->getDriver();
+        $cookies = $driver instanceof OroPlaywrightDriver
+            ? $driver->getAllCookies()
+            : $driver->getWebDriverSession()->getAllCookies();
         $cookieJar = new CookieJar(true, $cookies);
         foreach ($cookies as $cookieData) {
             $data = [];

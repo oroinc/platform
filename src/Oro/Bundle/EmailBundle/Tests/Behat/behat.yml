@@ -169,6 +169,9 @@ oro_behat_extension:
     Email To Field:
       selector: 'input[aria-describedby^="oro_email_email_to"]'
 
+    Email To Suggestions:
+      selector: '#select2-drop .select2-results li'
+
     Email Templates Grid:
       selector: '[id^="grid-email-templates"]'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid

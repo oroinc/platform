@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\AST;
+use Oro\Bundle\EntitySerializedFieldsBundle\ORM\Query\AST\Functions\JsonExtract;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr;
 use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
@@ -106,6 +107,15 @@ class AstVisitor extends Visitor
 
         if ($expr->getType() === Expr\CompositeExpression::TYPE_AND) {
             return new AST\ConditionalTerm($factors);
+        }
+
+        if ($expr->getType() === Expr\CompositeExpression::TYPE_NOT) {
+            $invertedFactors = [];
+            foreach ($factors as $factor) {
+                $invertedFactors[] = new AST\ConditionalFactor($factor, true);
+            }
+
+            return new AST\ConditionalTerm($invertedFactors);
         }
 
         $terms = [];
@@ -209,21 +219,22 @@ class AstVisitor extends Visitor
 
         $metadata = $this->getMetadata($alias);
         if ($metadata->isSingleValuedAssociation($field)) {
-            $type = AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
-        } elseif ($metadata->isCollectionValuedAssociation($field)) {
-            $type = AST\PathExpression::TYPE_COLLECTION_VALUED_ASSOCIATION;
-        } else {
-            $type = AST\PathExpression::TYPE_STATE_FIELD;
+            return $this->getPathExpression($alias, $field, AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION);
+        }
+        if ($metadata->isCollectionValuedAssociation($field)) {
+            return $this->getPathExpression($alias, $field, AST\PathExpression::TYPE_COLLECTION_VALUED_ASSOCIATION);
+        }
+        if ($metadata->hasField($field)) {
+            return $this->getPathExpression($alias, $field, AST\PathExpression::TYPE_STATE_FIELD);
         }
 
-        $expression = new AST\PathExpression(
-            AST\PathExpression::TYPE_STATE_FIELD | AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
-            $alias,
-            $field
+        // serialized field
+        // to get a value of a serialized field the following expression is used:
+        // JSON_EXTRACT({alias}.serialized_data, '{field}')
+        return JsonExtract::create(
+            $this->getPathExpression($alias, 'serialized_data', AST\PathExpression::TYPE_STATE_FIELD),
+            $this->getValueLiteral($field)
         );
-        $expression->type = $type;
-
-        return $expression;
     }
 
     #[\Override]
@@ -392,6 +403,18 @@ class AstVisitor extends Visitor
             // Here used Numeric type to avoid the parameter escaping with quotes
             new Ast\Literal(Ast\Literal::NUMERIC, sprintf("'%s'::jsonb", json_encode($value, JSON_THROW_ON_ERROR)))
         );
+    }
+
+    private function getPathExpression(string $alias, string $field, int $type): AST\PathExpression
+    {
+        $expression = new AST\PathExpression(
+            AST\PathExpression::TYPE_STATE_FIELD | AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+            $alias,
+            $field
+        );
+        $expression->type = $type;
+
+        return $expression;
     }
 
     private function getValueLiteral(mixed $value): AST\Literal

@@ -9,39 +9,39 @@ Feature: Back-office menu changes are recorded in Data Audit
   Scenario: Changing a menu item is recorded as a change of that item
     Given I go to System/ Menus
     And I click view "application_menu" in grid
-    When I click on "Products" in tree "Sidebar Menu Tree"
+    When I click on "Dashboards" in tree "Sidebar Menu Tree"
     And I fill "Menu Form" with:
-      | Title | Audited products |
+      | Title | Audited dashboards |
     And I save form
     Then I should see "Menu item saved successfully" flash message
     When I go to System/ Data Audit
-    And I filter "Data" as contains "Audited products"
+    And I filter "Data" as contains "Audited dashboards"
     Then I should see following grid containing rows:
-      | Entity type              | Entity name                         | Action |
-      | Back-Office Menu: Global | application_menu / Audited products | Update |
+      | Entity type              | Entity name                           | Action |
+      | Back-Office Menu: Global | application_menu / Audited dashboards | Update |
     And I should see "Title" in grid
 
   Scenario: Hiding a menu item is recorded as a change of that item
     Given I go to System/ Menus
     And I click view "application_menu" in grid
-    When I click on "Audited products" in tree "Sidebar Menu Tree"
+    When I click on "Audited dashboards" in tree "Sidebar Menu Tree"
     And I click "Hide"
     Then I should see "Menu item is hidden now" flash message
     When I go to System/ Data Audit
-    And I filter "Entity name" as contains "Audited products"
+    And I filter "Entity name" as contains "Audited dashboards"
     Then I should see following grid containing rows:
-      | Entity type              | Entity name                         | Action |
-      | Back-Office Menu: Global | application_menu / Audited products | Update |
+      | Entity type              | Entity name                           | Action |
+      | Back-Office Menu: Global | application_menu / Audited dashboards | Update |
     And I should see "Active" in grid
 
   Scenario: The change history of a menu item is shown on the page of that item
     Given I go to System/ Menus
     And I click view "application_menu" in grid
-    When I click on "Audited products" in tree "Sidebar Menu Tree"
+    When I click on "Audited dashboards" in tree "Sidebar Menu Tree"
     And I click "Change History"
     Then I should see following "Audit History Grid" grid containing rows:
-      | Old Values      | New Values              |
-      | Title: Products | Title: Audited products |
+      | Old Values        | New Values                |
+      | Title: Dashboards | Title: Audited dashboards |
     And I close ui dialog
 
   Scenario: Deleting a menu item records where the items nested into it went
@@ -68,14 +68,13 @@ Feature: Back-office menu changes are recorded in Data Audit
     And I filter "Entity name" as contains "Audited "
     Then I should see following grid containing rows:
       | Entity type              | Entity name                       | Action |
-      | Back-Office Menu: Global | application_menu / Audited parent  | Remove |
-      | Back-Office Menu: Global | application_menu / Audited child   | Update |
+      | Back-Office Menu: Global | application_menu / Audited parent | Remove |
+      | Back-Office Menu: Global | application_menu / Audited child  | Update |
     And I should see "Parent" in grid
 
   Scenario: Data Audit is filtered by the back-office menu levels
-    Given I go to System/ Data Audit
     When I check "Back-Office Menu: Global" in "Entity Type" filter
     Then I should see "Back-Office Menu: Global" in grid
-    And I should see "Audited products" in grid
+    And I should see "Audited dashboards" in grid
     When I check "Back-Office Menu: User" in "Entity Type" filter
-    Then I should see "Audited products" in grid
+    Then I should see "Audited dashboards" in grid

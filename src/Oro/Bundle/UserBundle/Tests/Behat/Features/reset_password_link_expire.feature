@@ -15,6 +15,7 @@ Feature: Reset password link expire
     And I fill form with:
       | Username or Email | admin |
     When I click "Request"
+    And I wait for the reset password link to become valid
     And I follow "RESET PASSWORD" link from the email
     Then I should not see "Not Found"
     And I should be on User Password Reset page
@@ -32,6 +33,7 @@ Feature: Reset password link expire
     And I fill form with:
       | Username or Email | admin |
     When I click "Request"
+    And I wait for the reset password link to become valid
     And I follow "RESET PASSWORD" link from the email
     Then I should not see "Not Found"
     And I should be on User Password Reset page
@@ -54,6 +56,7 @@ Feature: Reset password link expire
     And I fill form with:
       | Username or Email | admin |
     When I click "Request"
+    And I wait for the reset password link to become valid
     And I follow "RESET PASSWORD" link from the email
     Then I should not see "Not Found"
     And I should be on User Password Reset page
@@ -76,6 +79,7 @@ Feature: Reset password link expire
     And I fill form with:
       | Username or Email | charlie |
     When I click "Request"
+    And I wait for the reset password link to become valid
     And I follow "RESET PASSWORD" link from the email
     Then I should not see "Not Found"
     And I should be on User Password Reset page

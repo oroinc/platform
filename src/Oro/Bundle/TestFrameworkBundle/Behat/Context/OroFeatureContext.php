@@ -6,6 +6,7 @@ use Behat\Mink\Session;
 use Behat\MinkExtension\Context\RawMinkContext;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroPlaywrightDriver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -83,7 +84,10 @@ class OroFeatureContext extends RawMinkContext implements AppKernelAwareInterfac
      */
     protected function getCookieJar(Session $session)
     {
-        $sessionCookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $driver = $session->getDriver();
+        $sessionCookies = $driver instanceof OroPlaywrightDriver
+            ? $driver->getAllCookies()
+            : $driver->getWebDriverSession()->getCookie();
         $cookies = [];
         foreach ($sessionCookies as $sessionCookie) {
             $cookie = [];

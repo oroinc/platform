@@ -73,7 +73,35 @@ class SidebarConfigMenu extends Element
             '//div[@class="content-with-sidebar--header"]/div/div/ul/li[1]/a[@class="action dropdown-item"]'
         );
         self::assertNotNull($expandAllLink, 'Expand All link not found');
+
+        $this->waitForTreeToSettle();
+
         $expandAllLink->click();
+    }
+
+    /**
+     * The sidebar search filters the tree on a debounce, and its redraw collapses the expanded nodes. Thus wait
+     * before the Expand All click until two samples 300 ms apart are equal. A slower redraw can still get through.
+     */
+    private function waitForTreeToSettle(): void
+    {
+        $previous = null;
+
+        $this->spin(function () use (&$previous) {
+            $current = $this->getDriver()->evaluateScript(
+                'return document.querySelectorAll("li.jstree-node").length'
+                . ' + ":" + document.querySelectorAll("li.jstree-open").length'
+                . ' + ":" + document.querySelectorAll("li.jstree-closed").length'
+            );
+
+            if (null !== $previous && $current === $previous) {
+                return true;
+            }
+
+            $previous = $current;
+
+            return false;
+        }, 5, 300000);
     }
 
     public function collapseAll()

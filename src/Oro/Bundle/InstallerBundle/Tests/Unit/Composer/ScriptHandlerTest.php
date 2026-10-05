@@ -7,7 +7,11 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 use Composer\Composer;
 use Composer\Config;
 use Composer\Config\ConfigSourceInterface;
+use Composer\EventDispatcher\EventDispatcher;
 use Composer\IO\IOInterface;
+use Composer\Package\CompletePackage;
+use Composer\Package\PackageInterface;
+use Composer\Package\RootPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Repository\RepositoryManager;
@@ -23,6 +27,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * - updateAssets (dev.json)
  * - isDevManifest detection (env / configSource)
  * - error propagation for each pnpm branch
+ * - executePost*PackageScripts (collection of the oro scripts of the installed packages)
  *
  * The cwd placeholder convention used by dataProviders:
  *   'MONOREPO_ROOT' → $this->monorepoRoot (parent of parent of project cwd)
@@ -582,9 +587,109 @@ class ScriptHandlerTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider packageScriptsEventDataProvider
+     */
+    public function testExecutePackageScriptsRunsCollectedScriptsOnce(string $method, string $oroEvent): void
+    {
+        $rootPackage = new RootPackage('oro/app', '1.0.0.0', '1.0.0');
+        $rootPackage->setScripts(['post-install-cmd' => ['@execute-post-install-package-scripts']]);
+
+        $first = new CompletePackage('oro/first', '1.0.0.0', '1.0.0');
+        $first->setExtra([$oroEvent => ['@first-script']]);
+        $first->setScripts(['first-script' => ['First\\Handler::run']]);
+
+        $second = new CompletePackage('oro/second', '1.0.0.0', '1.0.0');
+        $second->setExtra([$oroEvent => ['console second:command']]);
+
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $dispatcher->expects(self::once())
+            ->method('dispatchScript')
+            ->with($oroEvent, false, [], [])
+            ->willReturnCallback(static function () use ($rootPackage, $oroEvent): int {
+                self::assertEquals(
+                    [
+                        'post-install-cmd' => ['@execute-post-install-package-scripts'],
+                        'first-script' => ['First\\Handler::run'],
+                        $oroEvent => ['@first-script', 'console second:command'],
+                    ],
+                    $rootPackage->getScripts()
+                );
+
+                return 0;
+            });
+
+        $event = $this->makePackageScriptsEvent(
+            $rootPackage,
+            [$first, new CompletePackage('oro/no-scripts', '1.0.0.0', '1.0.0'), $second],
+            $dispatcher
+        );
+        ScriptHandler::{$method}($event);
+    }
+
+    /**
+     * @dataProvider packageScriptsEventDataProvider
+     */
+    public function testExecutePackageScriptsDoesNothingWithoutPackageScripts(string $method): void
+    {
+        $rootPackage = new RootPackage('oro/app', '1.0.0.0', '1.0.0');
+
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $dispatcher->expects(self::never())
+            ->method('dispatchScript');
+
+        $event = $this->makePackageScriptsEvent(
+            $rootPackage,
+            [new CompletePackage('oro/no-scripts', '1.0.0.0', '1.0.0')],
+            $dispatcher
+        );
+        ScriptHandler::{$method}($event);
+
+        self::assertEquals([], $rootPackage->getScripts());
+    }
+
+    public function packageScriptsEventDataProvider(): array
+    {
+        return [
+            'post install' => [
+                'method' => 'executePostInstallPackageScripts',
+                'oroEvent' => 'oro-post-install-cmd',
+            ],
+            'post update' => [
+                'method' => 'executePostUpdatePackageScripts',
+                'oroEvent' => 'oro-post-update-cmd',
+            ],
+        ];
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Helpers
     // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @param PackageInterface[] $packages
+     */
+    private function makePackageScriptsEvent(
+        RootPackage $rootPackage,
+        array $packages,
+        EventDispatcher $dispatcher
+    ): Event {
+        $repo = $this->createMock(InstalledRepositoryInterface::class);
+        $repo->method('getCanonicalPackages')->willReturn($packages);
+
+        $rm = $this->createMock(RepositoryManager::class);
+        $rm->method('getLocalRepository')->willReturn($repo);
+
+        $composer = $this->createMock(Composer::class);
+        $composer->method('getPackage')->willReturn($rootPackage);
+        $composer->method('getRepositoryManager')->willReturn($rm);
+        $composer->method('getEventDispatcher')->willReturn($dispatcher);
+
+        $event = $this->createMock(Event::class);
+        $event->method('getComposer')->willReturn($composer);
+
+        return $event;
+    }
 
     private function makeEvent(string $configSource = '/abs/composer.json', int|string $processTimeout = 300): Event
     {

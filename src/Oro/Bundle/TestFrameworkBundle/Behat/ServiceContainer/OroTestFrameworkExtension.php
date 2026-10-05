@@ -17,6 +17,8 @@ use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
 use Nelmio\Alice\Bridge\Symfony\DependencyInjection\NelmioAliceExtension;
 use Nelmio\Alice\Bridge\Symfony\NelmioAliceBundle;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroPlaywrightDriver;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroPlaywrightFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Healer\Handler\RuntimeCallHealerHandler;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
@@ -28,6 +30,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\MinkSessionManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SymfonyBundleSuite;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\NullCumulativeFileLoader;
+use Playwright\Mink\Driver\PlaywrightDriver;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
@@ -48,6 +51,7 @@ use Symfony\Component\Yaml\Yaml;
  * Basic behat extension that contains logic which prepare environment while testing, load configuration, etc.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OroTestFrameworkExtension implements TestworkExtension
 {
@@ -87,6 +91,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         /** @var MinkExtension $minkExtension */
         $minkExtension = $extensionManager->getExtension('mink');
         $minkExtension->registerDriverFactory(new OroSelenium2Factory());
+        $minkExtension->registerDriverFactory(new OroPlaywrightFactory());
     }
 
     #[\Override]
@@ -112,6 +117,14 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->arrayPrototype()
                         ->scalarPrototype()->end()
                     ->end()
+                ->end()
+                ->booleanNode('playwright_driver')
+                    ->info(
+                        'Replace the driver of every Mink session with the Playwright driver at the container level,'
+                        . ' regardless of the session driver configuration. The ORO_BEHAT_PLAYWRIGHT environment'
+                        . ' variable replaces this value for one run: 1 turns the driver on, 0 turns it off.'
+                    )
+                    ->defaultFalse()
                 ->end()
             ->end();
     }
@@ -142,6 +155,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts'] ?? []);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers'] ?? []);
         $container->setParameter('oro_test.feature_topics', $config['feature_topics'] ?? []);
+        $container->setParameter('oro_test.playwright_driver', $config['playwright_driver'] ?? false);
 
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->removeDefinition('fob_symfony.kernel_orchestrator');
@@ -167,8 +181,105 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processContextInitializers($container);
         $this->processHealerInitializers($container);
         $this->replaceMinkSessionManager($container);
+        $this->processPlaywrightDriverSwap($container);
 
         $container->get(SymfonyExtension::KERNEL_ID)->shutdown();
+    }
+
+    /**
+     * Replaces the Mink session drivers with OroPlaywrightDriver when "playwright_driver" is on.
+     * A session that already uses OroPlaywrightDriver, as in the headed "playwright" profile, keeps its configuration.
+     *
+     * The swap occurs at the container level, because the CI behat.yml sets oroSelenium2 on every session.
+     * ORO_BEHAT_PLAYWRIGHT replaces the option value: 1 turns the swap on, 0 turns it off. Set it for composer install
+     * too, so that PlaywrightBootstrapHandler installs the browser.
+     */
+    private function processPlaywrightDriverSwap(ContainerBuilder $container): void
+    {
+        $enabled = (bool)$container->getParameter('oro_test.playwright_driver');
+        $override = getenv('ORO_BEHAT_PLAYWRIGHT');
+        if (false !== $override && '' !== $override) {
+            $enabled = filter_var($override, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if (!$enabled) {
+            return;
+        }
+
+        // Fail here, because otherwise the missing class stops the first scenario inside Mink.
+        if (!class_exists(PlaywrightDriver::class)) {
+            throw new \RuntimeException(sprintf(
+                'ORO_BEHAT_PLAYWRIGHT or the playwright_driver option of OroTestFrameworkExtension'
+                . ' turns on the Playwright driver, but the %s class does not exist. Add'
+                . ' playwright-php/playwright and playwright-php/playwright-mink to require-dev of the'
+                . ' application and install them.',
+                PlaywrightDriver::class
+            ));
+        }
+
+        foreach ($container->getDefinition('mink')->getMethodCalls() as $call) {
+            if ('registerSession' !== $call[0]) {
+                continue;
+            }
+
+            /** @var Definition $sessionDefinition */
+            [$sessionName, $sessionDefinition] = $call[1];
+            $driverDefinition = $sessionDefinition->getArgument(0);
+            if (
+                !$driverDefinition instanceof Definition
+                || is_a((string)$driverDefinition->getClass(), OroPlaywrightDriver::class, true)
+            ) {
+                continue;
+            }
+
+            $sessionDefinition->replaceArgument(0, $this->buildPlaywrightDriverDefinition($sessionName));
+        }
+    }
+
+    private function buildPlaywrightDriverDefinition(string $sessionName): Definition
+    {
+        // The same viewports as in the "playwright" Behat profile.
+        $viewports = [
+            '375_session' => ['width' => 375, 'height' => 640],
+            '640_session' => ['width' => 640, 'height' => 1100],
+            'mobile_session' => ['width' => 375, 'height' => 640],
+        ];
+
+        // The options match the "iPhone 12 Pro" emulation of the Selenium mobile_session. The back-office detects
+        // the mobile UI, for example the mobile menu toggler, by the user agent, so the viewport alone is not enough.
+        $contextOptions = [];
+        if ('mobile_session' === $sessionName) {
+            $contextOptions = [
+                'userAgent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X)'
+                    . ' AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1',
+                'deviceScaleFactor' => 3,
+                'isMobile' => true,
+                'hasTouch' => true,
+            ];
+        }
+
+        $definition = new Definition(OroPlaywrightDriver::class, [
+            'chromium',
+            // Headless by default. ORO_PLAYWRIGHT_HEADED=1 shows the browser window.
+            !getenv('ORO_PLAYWRIGHT_HEADED'),
+            [
+                'args' => [
+                    // A CI container mounts a small /dev/shm, and the renderer uses it for shared buffers.
+                    '--disable-dev-shm-usage',
+                    // Exposes window.gc(), so a long feature can release the renderer heap.
+                    '--js-flags=--expose-gc',
+                ],
+            ],
+            $viewports[$sessionName] ?? ['width' => 1920, 'height' => 1080],
+            $contextOptions,
+        ]);
+        $definition->addMethodCall(
+            'setScreenshotGenerator',
+            [new Reference('oro_test.artifacts.screenshot_generator')]
+        );
+        $definition->addMethodCall('setBrowsersPath', ['%kernel.project_dir%/var/ms-playwright']);
+
+        return $definition;
     }
 
     private function replaceMinkSessionManager(ContainerBuilder $container): void
@@ -349,6 +460,10 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
 
         $screenshotGenerator->setArgument(1, $artifactHandlers);
+        $container->getDefinition('oro_test.artifacts.failure_report_subscriber')
+            ->setArgument(6, $artifactHandlers);
+        $container->getDefinition('oro_test.listener.playwright_trace_subscriber')
+            ->setArgument(3, $artifactHandlers);
     }
 
     private function processHealthCheckers(ContainerBuilder $container): void
