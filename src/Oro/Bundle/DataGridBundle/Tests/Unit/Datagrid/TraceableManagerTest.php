@@ -35,12 +35,8 @@ class TraceableManagerTest extends TestCase
         $gridName = 'test_grid';
         $parameters = ['key' => 'val'];
         $this->requestStack->push(new Request($parameters));
-        $extension = $this->createMock(ExtensionVisitorInterface::class);
-        $extension->expects(self::once())
-            ->method('getPriority')
-            ->willReturn(0);
 
-        $datagrid = $this->getDatagridMock($gridName, $parameters, [$extension]);
+        $datagrid = $this->getDatagridMock($gridName);
         $this->innerManager
             ->expects(self::once())
             ->method('getDatagrid')
@@ -50,39 +46,34 @@ class TraceableManagerTest extends TestCase
         self::assertSame($datagrid, $this->traceableManager->getDatagrid($gridName, $parameters, []));
     }
 
-    public function testGetDatagridCalledTwiseWillNotSaveGridTwice(): void
+    public function testGetDatagridCalledTwiceKeepsOneDatagridPerParameters(): void
     {
         $gridName = 'test_grid';
         $parameters = ['key' => 'val'];
-        $this->requestStack->push(new Request($parameters));
+        $request = new Request($parameters);
+        $this->requestStack->push($request);
 
-        $extension = $this->createMock(ExtensionVisitorInterface::class);
-        $extension->expects(self::once())
-            ->method('getPriority')
-            ->willReturn(0);
-
-        $datagrid = $this->getDatagridMock($gridName, $parameters, [$extension]);
+        $firstDatagrid = $this->getDatagridMock($gridName);
+        $lastDatagrid = $this->getDatagridMock($gridName, $parameters, [], true);
 
         $this->innerManager
             ->expects(self::exactly(2))
             ->method('getDatagrid')
             ->with($gridName, $parameters, [])
-            ->willReturn($datagrid);
+            ->willReturnOnConsecutiveCalls($firstDatagrid, $lastDatagrid);
 
-        self::assertSame($datagrid, $this->traceableManager->getDatagrid($gridName, $parameters, []));
-        self::assertSame($datagrid, $this->traceableManager->getDatagrid($gridName, $parameters, []));
+        self::assertSame($firstDatagrid, $this->traceableManager->getDatagrid($gridName, $parameters, []));
+        self::assertSame($lastDatagrid, $this->traceableManager->getDatagrid($gridName, $parameters, []));
+
+        $datagrids = $this->traceableManager->getDatagrids($request);
+        self::assertCount(1, $datagrids[$gridName]);
     }
 
     public function testGetDatagridByRequestParam(): void
     {
         $gridName = 'test_grid';
-        $parameters = [];
-        $extension = $this->createMock(ExtensionVisitorInterface::class);
-        $extension->expects(self::once())
-            ->method('getPriority')
-            ->willReturn(0);
 
-        $datagrid = $this->getDatagridMock($gridName, $parameters, [$extension]);
+        $datagrid = $this->getDatagridMock($gridName);
         $this->innerManager
             ->expects(self::once())
             ->method('getDatagridByRequestParams')
@@ -105,7 +96,7 @@ class TraceableManagerTest extends TestCase
             ->method('getPriority')
             ->willReturn(0);
 
-        $datagrid = $this->getDatagridMock($gridName, $parameters, [$extension]);
+        $datagrid = $this->getDatagridMock($gridName, $parameters, [$extension], true);
 
         $this->innerManager
             ->expects(self::once())
@@ -146,27 +137,37 @@ class TraceableManagerTest extends TestCase
         self::assertSame($config, $this->traceableManager->getConfigurationForGrid($gridName));
     }
 
-    private function getDatagridMock($name, $parameters = [], array $extensions = []): DatagridInterface|MockObject
-    {
+    /**
+     * The datagrid is described only when the traced datagrids are read; tracing itself never touches
+     * its metadata, so the application is the first to visit it.
+     */
+    private function getDatagridMock(
+        string $name,
+        array $parameters = [],
+        array $extensions = [],
+        bool $described = false
+    ): DatagridInterface|MockObject {
+        $describedTimes = $described ? self::once() : self::never();
+
         $config = $this->createMock(DatagridConfiguration::class);
-        $config->expects(self::once())
+        $config->expects(clone $describedTimes)
             ->method('getName')
             ->willReturn($name);
-        $config->expects(self::once())
+        $config->expects(clone $describedTimes)
             ->method('offsetGetOr')
             ->with(SystemAwareResolver::KEY_EXTENDED_FROM, [])
             ->willReturn([]);
-        $config->expects(self::once())
+        $config->expects(clone $describedTimes)
             ->method('toArray')
             ->willReturn([]);
 
         $metadata = $this->createMock(MetadataObject::class);
-        $metadata->expects(self::once())
+        $metadata->expects(clone $describedTimes)
             ->method('toArray')
             ->willReturn([]);
 
         $acceptor = $this->createMock(Acceptor::class);
-        $acceptor->expects(self::once())
+        $acceptor->expects(clone $describedTimes)
             ->method('getExtensions')
             ->willReturn($extensions);
 
@@ -174,16 +175,18 @@ class TraceableManagerTest extends TestCase
         $datagrid->expects(self::any())
             ->method('getName')
             ->willReturn($name);
-        $datagrid->expects(self::once())
+        $datagrid->expects(clone $describedTimes)
             ->method('getConfig')
             ->willReturn($config);
-        $datagrid->expects(self::once())
-            ->method('getResolvedMetadata')
+        $datagrid->expects(clone $describedTimes)
+            ->method('getMetadata')
             ->willReturn($metadata);
-        $datagrid->expects(self::once())
+        $datagrid->expects(self::never())
+            ->method('getResolvedMetadata');
+        $datagrid->expects(clone $describedTimes)
             ->method('getParameters')
             ->willReturn(new ParameterBag($parameters));
-        $datagrid->expects(self::once())
+        $datagrid->expects(clone $describedTimes)
             ->method('getAcceptor')
             ->willReturn($acceptor);
 

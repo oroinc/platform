@@ -29,7 +29,12 @@ class GridDataCollector extends DataCollector implements LateDataCollectorInterf
     public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         $this->currentRequest = $request ?: null;
-        $this->data = [];
+        $this->data = ['datagrids' => [], 'listeners' => []];
+
+        // The datagrids are described while the request is still current, so their metadata can be resolved.
+        if ($this->manager instanceof TraceableManager) {
+            $this->data['datagrids'] = $this->cloneVar($this->manager->getDatagrids($request));
+        }
     }
 
     #[\Override]
@@ -76,10 +81,6 @@ class GridDataCollector extends DataCollector implements LateDataCollectorInterf
     #[\Override]
     public function lateCollect()
     {
-        if ($this->manager instanceof TraceableManager) {
-            $this->data['datagrids'] = $this->cloneVar($this->manager->getDatagrids($this->currentRequest));
-        }
-
         if (!$this->eventDispatcher instanceof TraceableEventDispatcher) {
             return;
         }
