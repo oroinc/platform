@@ -65,7 +65,7 @@ class GuzzleRestClient implements RestClientInterface
      */
     public function get($resource, array $params = [], array $headers = [], array $options = [])
     {
-        return $this->performRequest('get', $resource, $params, null, $headers, $options);
+        return $this->performRequest('GET', $resource, $params, null, $headers, $options);
     }
 
     /**
@@ -88,7 +88,7 @@ class GuzzleRestClient implements RestClientInterface
      */
     public function post($resource, $data, array $headers = [], array $options = [])
     {
-        return $this->performRequest('post', $resource, [], $data, $headers, $options);
+        return $this->performRequest('POST', $resource, [], $data, $headers, $options);
     }
 
     /**
@@ -96,7 +96,7 @@ class GuzzleRestClient implements RestClientInterface
      */
     public function put($resource, $data, array $headers = [], array $options = [])
     {
-        return $this->performRequest('put', $resource, [], $data, $headers, $options);
+        return $this->performRequest('PUT', $resource, [], $data, $headers, $options);
     }
 
     /**
@@ -104,7 +104,7 @@ class GuzzleRestClient implements RestClientInterface
      */
     public function delete($resource, array $headers = [], array $options = [])
     {
-        return $this->performRequest('delete', $resource, [], null, $headers, $options);
+        return $this->performRequest('DELETE', $resource, [], null, $headers, $options);
     }
 
     /**
@@ -149,8 +149,6 @@ class GuzzleRestClient implements RestClientInterface
         array $headers = [],
         array $options = []
     ) {
-        // Add the base url to resource, if the resource is relative
-        $url = $this->buildUrl($url, $params);
         // Add default options to the options provided
         $options = array_merge($this->defaultOptions, $options);
 
@@ -161,8 +159,12 @@ class GuzzleRestClient implements RestClientInterface
         }
 
         try {
+            // Built inside the try block: the base url comes from the integration settings, so it can
+            // be malformed, and such a failure must be reported as a REST exception.
+            $url = $this->buildUrl($url, $params);
+
             $this->lastGuzzleRequest = $request = new Request(
-                $method,
+                strtoupper($method),
                 $url,
                 $headers,
                 $data

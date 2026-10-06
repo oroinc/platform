@@ -13,6 +13,7 @@ use Twig\Extension\ExtensionInterface;
 use Twig\Extension\SandboxExtension;
 use Twig\Sandbox\SecurityPolicy;
 use Twig\Source;
+use Twig\TemplateWrapper;
 
 /**
  * The base class to render TWIG templates in a sandboxed environment.
@@ -71,6 +72,21 @@ abstract class TemplateRenderer implements LoggerAwareInterface
     public function addExtension(ExtensionInterface $extension): void
     {
         $this->environment->addExtension($extension);
+    }
+
+    /**
+     * Compiles the given TWIG template source without rendering it.
+     *
+     * Ensures the sandbox is configured first, so the environment's extension set is never locked
+     * (via {@see TwigEnvironment::createTemplate()}) before this renderer's own extensions are registered.
+     *
+     * @throws \Twig\Error\SyntaxError if the given template has errors
+     */
+    public function createTemplate(string $template): TemplateWrapper
+    {
+        $this->ensureSandboxConfigured();
+
+        return $this->environment->createTemplate($template);
     }
 
     /**

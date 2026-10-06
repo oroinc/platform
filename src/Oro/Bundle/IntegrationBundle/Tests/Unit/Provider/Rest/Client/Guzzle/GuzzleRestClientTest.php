@@ -287,4 +287,80 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
 
         $this->client->getJSON($url, $params, $headers, $options);
     }
+
+    /**
+     * @dataProvider httpMethodDataProvider
+     */
+    public function testRequestIsSentWithUppercaseMethod(string $clientMethod, array $args, string $expectedMethod)
+    {
+        $sentRequest = null;
+        $this->sourceClient->expects(self::once())
+            ->method('send')
+            ->willReturnCallback(function (Request $request) use (&$sentRequest) {
+                $sentRequest = $request;
+
+                return $this->createMock(Response::class);
+            });
+
+        $deprecations = $this->collectDeprecations(
+            fn () => call_user_func_array([$this->client, $clientMethod], $args)
+        );
+
+        self::assertSame($expectedMethod, $sentRequest->getMethod());
+        self::assertSame([], $deprecations);
+    }
+
+    public function httpMethodDataProvider(): array
+    {
+        return [
+            'get' => ['clientMethod' => 'get', 'args' => ['users'], 'expectedMethod' => 'GET'],
+            'post' => ['clientMethod' => 'post', 'args' => ['users', 'data'], 'expectedMethod' => 'POST'],
+            'put' => ['clientMethod' => 'put', 'args' => ['users', 'data'], 'expectedMethod' => 'PUT'],
+            'delete' => ['clientMethod' => 'delete', 'args' => ['users'], 'expectedMethod' => 'DELETE'],
+            'lowercase method' => [
+                'clientMethod' => 'performRequest',
+                'args' => ['get', 'users'],
+                'expectedMethod' => 'GET',
+            ],
+        ];
+    }
+
+    private function collectDeprecations(callable $callback): array
+    {
+        $deprecations = [];
+        set_error_handler(
+            static function (int $errno, string $errstr) use (&$deprecations): bool {
+                $deprecations[] = $errstr;
+
+                return true;
+            },
+            E_USER_DEPRECATED
+        );
+
+        try {
+            $callback();
+        } finally {
+            restore_error_handler();
+        }
+
+        return $deprecations;
+    }
+
+    /**
+     * The base url comes from the integration settings, so it is not always a usable URL. Such a value
+     * must be reported as a REST exception like any other failure of this client.
+     */
+    public function testPerformRequestThrowsRestExceptionWhenUrlIsMalformed()
+    {
+        $client = new GuzzleRestClient('https://example com/api/', self::DEFAULT_OPTIONS);
+        $client->setGuzzleClient($this->sourceClient);
+
+        $this->sourceClient->expects(self::never())
+            ->method('send');
+
+        $this->expectException(GuzzleRestException::class);
+        $this->expectExceptionMessage('Invalid host');
+
+        $client->get('users');
+    }
 }

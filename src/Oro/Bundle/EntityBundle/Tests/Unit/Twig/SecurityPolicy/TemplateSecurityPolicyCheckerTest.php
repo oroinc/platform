@@ -6,6 +6,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\SecurityPolicy;
 
 use Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessAnalyzer;
 use Oro\Bundle\EntityBundle\Twig\Analyzer\TemplateAccessEntry;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\SecurityPolicy\TemplateSecurityPolicyChecker;
 use Oro\Bundle\EntityBundle\Twig\SecurityPolicy\Violation\SecurityPolicyFilterViolation;
 use Oro\Bundle\EntityBundle\Twig\SecurityPolicy\Violation\SecurityPolicyFunctionViolation;
@@ -219,6 +220,138 @@ final class TemplateSecurityPolicyCheckerTest extends TestCase
             ->willReturn(true);
 
         $this->twigEnvironment
+            ->expects(self::once())
+            ->method('createTemplate')
+            ->willThrowException($syntaxError);
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessageMatches('/Unexpected token/');
+
+        $this->checker->checkSecurityPolicy('{% invalid syntax %}');
+    }
+
+    public function testCheckSecurityPolicyReturnsPropertyViolationWhenTemplateRendererIsSet(): void
+    {
+        $templateRenderer = $this->createMock(TemplateRenderer::class);
+        $this->checker->setTemplateRenderer($templateRenderer);
+
+        $securityPolicy = $this->createMock(SecurityPolicyInterface::class);
+        $sandboxExtension = new SandboxExtension($securityPolicy, true);
+        $templateWrapper = new TemplateWrapper(
+            $this->twigEnvironment,
+            $this->getMockBuilder(Template::class)
+                ->addMethods(['checkSecurity'])
+                ->disableOriginalConstructor()
+                ->getMockForAbstractClass(),
+        );
+        $accessEntry = new TemplateAccessEntry(
+            \stdClass::class,
+            'entity',
+            'secret',
+            TemplateAccessEntry::ACCESS_TYPE_PROPERTY,
+            5,
+        );
+        $propertyError = new SecurityNotAllowedPropertyError(
+            sprintf('Property "%s::secret" is not allowed.', \stdClass::class),
+            \stdClass::class,
+            'secret',
+        );
+
+        $this->twigEnvironment
+            ->expects(self::once())
+            ->method('hasExtension')
+            ->with(SandboxExtension::class)
+            ->willReturn(true);
+
+        $this->twigEnvironment
+            ->expects(self::never())
+            ->method('createTemplate');
+
+        $templateRenderer
+            ->expects(self::once())
+            ->method('createTemplate')
+            ->with('{{ entity.secret }}')
+            ->willReturn($templateWrapper);
+
+        $this->twigEnvironment
+            ->expects(self::once())
+            ->method('getExtension')
+            ->with(SandboxExtension::class)
+            ->willReturn($sandboxExtension);
+
+        $this->templateAccessAnalyzer
+            ->expects(self::once())
+            ->method('analyzeTemplate')
+            ->with('{{ entity.secret }}', ['entity' => \stdClass::class])
+            ->willReturn([$accessEntry]);
+
+        $securityPolicy
+            ->expects(self::once())
+            ->method('checkPropertyAllowed')
+            ->willThrowException($propertyError);
+
+        $result = $this->checker->checkSecurityPolicy('{{ entity.secret }}', ['entity' => \stdClass::class]);
+
+        self::assertCount(1, $result);
+        self::assertInstanceOf(SecurityPolicyPropertyViolation::class, $result[0]);
+        self::assertSame('secret', $result[0]->getName());
+    }
+
+    /**
+     * @dataProvider sandboxViolationDataProvider
+     */
+    public function testCheckSecurityPolicyReturnsSandboxViolationWhenTemplateRendererIsSetAndDisallowedElementUsed(
+        \Throwable $exceptionToThrow,
+        string $expectedViolationClass,
+        string $expectedName,
+        int $expectedTemplateLine,
+    ): void {
+        $templateRenderer = $this->createMock(TemplateRenderer::class);
+        $this->checker->setTemplateRenderer($templateRenderer);
+
+        $this->twigEnvironment
+            ->expects(self::once())
+            ->method('hasExtension')
+            ->with(SandboxExtension::class)
+            ->willReturn(true);
+
+        $this->twigEnvironment
+            ->expects(self::never())
+            ->method('createTemplate');
+
+        $templateRenderer
+            ->expects(self::once())
+            ->method('createTemplate')
+            ->with('{{ foo }}')
+            ->willThrowException($exceptionToThrow);
+
+        $result = $this->checker->checkSecurityPolicy('{{ foo }}');
+
+        self::assertCount(1, $result);
+        self::assertInstanceOf($expectedViolationClass, $result[0]);
+        self::assertSame($expectedName, $result[0]->getName());
+        self::assertSame($expectedTemplateLine, $result[0]->getTemplateLine());
+        self::assertSame($exceptionToThrow, $result[0]->getCause());
+    }
+
+    public function testCheckSecurityPolicyPropagatesSyntaxErrorWhenTemplateRendererIsSet(): void
+    {
+        $templateRenderer = $this->createMock(TemplateRenderer::class);
+        $this->checker->setTemplateRenderer($templateRenderer);
+
+        $syntaxError = new SyntaxError('Unexpected token.', 3);
+
+        $this->twigEnvironment
+            ->expects(self::once())
+            ->method('hasExtension')
+            ->with(SandboxExtension::class)
+            ->willReturn(true);
+
+        $this->twigEnvironment
+            ->expects(self::never())
+            ->method('createTemplate');
+
+        $templateRenderer
             ->expects(self::once())
             ->method('createTemplate')
             ->willThrowException($syntaxError);

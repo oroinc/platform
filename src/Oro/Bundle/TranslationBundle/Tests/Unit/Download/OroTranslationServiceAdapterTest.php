@@ -8,7 +8,6 @@ use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Utils;
 use Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter;
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
 use Oro\Bundle\TranslationBundle\Test\TranslationArchiveGenerator;
@@ -83,7 +82,7 @@ class OroTranslationServiceAdapterTest extends TestCase
      */
     public function testFetchTranslationMetrics(): void
     {
-        $response = new Response(200, [], Utils::jsonEncode(array_values(self::METRICS)));
+        $response = new Response(200, [], json_encode(array_values(self::METRICS), JSON_THROW_ON_ERROR));
         $this->client->expects(self::any())
             ->method('send')
             ->willReturn($response);
@@ -136,7 +135,7 @@ class OroTranslationServiceAdapterTest extends TestCase
                     self::callback(fn (array $val) => $val['response_body_contents'] === 'not JSON'),
                     self::arrayHasKey('called_in'),
                     self::arrayHasKey('exception'),
-                    self::callback(fn (array $val) => $val['exception'] instanceof InvalidArgumentException),
+                    self::callback(fn (array $val) => $val['exception'] instanceof \JsonException),
                 )
             );
 
@@ -176,7 +175,7 @@ class OroTranslationServiceAdapterTest extends TestCase
             ['code' => 'xyz', 'lastBuildDate' => '2020-12-31T20:08:24+0300'],            // no translationStatus
             ['translationStatus' => 100, 'lastBuildDate' => '2020-12-31T20:08:24+0300'], // no code
         ];
-        $response = new Response(200, [], Utils::jsonEncode($incompleteMetrics));
+        $response = new Response(200, [], json_encode($incompleteMetrics, JSON_THROW_ON_ERROR));
         $this->client->expects(self::any())
             ->method('send')
             ->willReturn($response);
@@ -212,7 +211,7 @@ class OroTranslationServiceAdapterTest extends TestCase
         $originalMetrics['fr_CA']['RealCode'] = 'xyz'; // should be ignored because altCode is already present
         $expectedMetrics['fr_CA']['altCode'] = 'abc';
 
-        $response = new Response(200, [], Utils::jsonEncode(array_values($originalMetrics)));
+        $response = new Response(200, [], json_encode(array_values($originalMetrics), JSON_THROW_ON_ERROR));
         $this->client->expects(self::any())
             ->method('send')
             ->willReturn($response);
@@ -446,7 +445,7 @@ class OroTranslationServiceAdapterTest extends TestCase
         $expectedUriString = 'https://translations.oroinc.com/api/stats'
             . '?packages=PackageA,PackageB'
             . '&version=' . OroTranslationServiceAdapter::TRANSLATIONS_VERSION;
-        $response = new Response(200, [], Utils::jsonEncode(array_values(self::METRICS)));
+        $response = new Response(200, [], json_encode(array_values(self::METRICS), JSON_THROW_ON_ERROR));
         $this->client->expects(self::once())
             ->method('send')
             ->with(
@@ -460,7 +459,7 @@ class OroTranslationServiceAdapterTest extends TestCase
     /** @covers ::request */
     public function testRequestApiKeyObfuscatedForLogging(): void
     {
-        $response = new Response(200, [], Utils::jsonEncode(array_values(self::METRICS)));
+        $response = new Response(200, [], json_encode(array_values(self::METRICS), JSON_THROW_ON_ERROR));
         $this->client->expects(self::any())
             ->method('send')
             ->willReturn($response);

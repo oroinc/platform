@@ -278,4 +278,51 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals($this->sourceResponse, $this->response->getSourceResponse());
     }
+
+    public function testJsonDoesNotTriggerDeprecation()
+    {
+        $this->sourceResponse->expects(self::once())
+            ->method('getBody')
+            ->willReturn($this->createStream('{"key": "val"}'));
+
+        $deprecations = [];
+        set_error_handler(
+            static function (int $errno, string $errstr) use (&$deprecations): bool {
+                $deprecations[] = $errstr;
+
+                return true;
+            },
+            E_USER_DEPRECATED
+        );
+
+        try {
+            $data = $this->response->json();
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(['key' => 'val'], $data);
+        self::assertSame([], $deprecations);
+    }
+
+    public function testJsonThrowsExceptionWhenBodyIsNotValidJson()
+    {
+        $this->sourceResponse->expects(self::once())
+            ->method('getBody')
+            ->willReturn($this->createStream('not a json'));
+
+        $this->expectException(GuzzleRestException::class);
+        $this->expectExceptionMessage('Unable to parse response body into JSON: Syntax error');
+
+        $this->response->json();
+    }
+
+    private function createStream(string $content): Stream
+    {
+        $stream = fopen('php://memory', 'rb+');
+        fwrite($stream, $content);
+        rewind($stream);
+
+        return new Stream($stream);
+    }
 }

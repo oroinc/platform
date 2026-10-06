@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * The controller to check OAuth connection for IMAP/SMTP.
@@ -27,6 +28,8 @@ class CheckConnectionController extends AbstractController
                     ['form' => $form->createView()]
                 )
             ];
+        } catch (AccessDeniedException $e) {
+            throw $e;
         } catch (\Exception $e) {
             $response = ['error' => $e->getMessage()];
         }
