@@ -1,5 +1,4 @@
 The upgrade instructions are available at [Oro documentation website](https://doc.oroinc.com/master/backend/setup/upgrade-to-new-version/).
-
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
 ## Changes in the Platform package versions
@@ -28,6 +27,14 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ActionBundle
+* Added the `propertyBagObject` duplicator matcher keyword served by `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher`; it matches an entry of a property bag that holds an object.
+
+#### Duplicator Component
+* Added `Oro\Component\Duplicator\PropertyBag` and `Oro\Component\Duplicator\PropertyBagInterface`, the carrier that hands detached values of an entity, such as its extended entity storage, to DeepCopy together with the owning entity class.
+* Added `Oro\Component\Duplicator\Matcher\PropertyMatcher` and `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher` duplicator matchers.
+* Added `Oro\Component\Duplicator\Filter\SourceBagRetentionTrait` for filters that copy a property bag.
+
 #### DataAuditBundle
 * Added `Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder` and `Oro\Bundle\DataAuditBundle\Model\AuditEntry`: the way for a bundle to record an audit entry for a change the audit cannot discover on its own, i.e. a change that is not a change of an auditable entity (a system configuration setting, a storefront menu). The recorder resolves the author, checks whether anything is audited at all and stores the entry asynchronously, so a producer only describes what changed.
 * Added `Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface` and the `oro_dataaudit.audit_type` tag: describes an audit type whose object class is not an entity of the application and provides everything the audit grid shows for it (the Entity Type column and filter, the name of a changed field, and what the `audit-data` filter matches). `Oro\Bundle\DataAuditBundle\Provider\LevelAuditType` implements it for any domain that is recorded per level — the configuration levels, the menu levels — so such a domain is added by registering services only, and `Oro\Bundle\DataAuditBundle\Provider\AuditTypeRegistry` combines all of them. A bundle can now add an audited domain without changing the Data Audit bundle.
@@ -42,7 +49,6 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager::deleteMenuUpdate()` and `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository::findChildren()`: deleting a menu item now moves the items nested into it to the top level of the menu, instead of leaving them with a parent key that no longer exists. The menu showed such an item at the top level anyway, and the move is recorded in the Data Audit now.
 * Added `Oro\Bundle\NavigationBundle\Datagrid\ExcludedEntitiesConfigGridListener` that hides the given entities from a config grid, so a bundle can keep its system entity out of the entity management grid.
 * Added `Oro\Bundle\NavigationBundle\EventListener\ExcludedEntitiesConfigRequestListener` that makes the entity config pages of the given entities respond with 404, so a system entity kept out of the entity management cannot be opened by a direct URL.
-
 
 #### SecurityBundle
 * Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with an unconfigured organization field that make AclHelper compile invalid SQL.
@@ -96,6 +102,9 @@ The current file describes significant changes in the code that may affect the u
 * Changed the sanitize rules of the `oro_user` table: `confirmation_token` is replaced with an `md5` value now, so a database dump produced by `php bin/console oro:sanitize:dump-sql` carries no usable password reset token. A dump produced by any other means is unaffected.
 * Changed the shipped `user_reset_password`, `force_reset_password` and `invite_user` email templates so they read the `confirmationToken` email template parameter instead of `entity.confirmationToken`. `\Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateEmailTemplates` and `\Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateInviteUserEmailTemplates` apply the new content to an installation that has not customised them.
 
+### Changed
+
+
 ## 6.1.10
 
 ### Added
@@ -139,6 +148,13 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue. The message producer and the user logging info provider are injected into it with the `setMessageProducer()` and `setUserLoggingInfoProvider()` methods.
 
 ### Changed
+
+#### ActionBundle
+* Changed the `property` duplicator matcher keyword to be served by `Oro\Component\Duplicator\Matcher\PropertyMatcher` instead of `DeepCopy\Matcher\PropertyMatcher`, so that a class-based rule also matches the extended fields of that class. The class and property name arguments must be strings, and the property name is compared strictly.
+
+#### EntityExtendBundle
+* Changed `Oro\Bundle\EntityExtendBundle\Duplicator\Filter\StorageFilter` to hand the extended entity storage to DeepCopy as `Oro\Component\Duplicator\PropertyBag`, so that the `property`, `propertyName` and `propertyType` duplicator rules apply to extended fields.
+* Changed `Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtendDuplicatorPass` to register a default `keep` rule for object values of the extended entity storage: an extended relation or collection without a matching rule is shared by reference with the original entity instead of being deep-copied. Add an explicit rule (`collection`, `emptyCollection`, `setNull`, `shallowCopy`) to a duplicate configuration that needs another behaviour.
 
 #### DataGridBundle
 * Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Only the explicitly declared entity is taken into account, the root entity of the datasource query is not. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.
