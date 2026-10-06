@@ -1,5 +1,4 @@
 The upgrade instructions are available at [Oro documentation website](https://doc.oroinc.com/master/backend/setup/upgrade-to-new-version/).
-
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
 ## Changes in the Platform package versions
@@ -28,6 +27,14 @@ The current file describes significant changes in the code that may affect the u
 ## 7.0.5
 
 ### Added
+
+#### ActionBundle
+* Added the `propertyBagObject` duplicator matcher keyword served by `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher`; it matches an entry of a property bag that holds an object.
+
+#### Duplicator Component
+* Added `Oro\Component\Duplicator\PropertyBag` and `Oro\Component\Duplicator\PropertyBagInterface`, the carrier that hands detached values of an entity, such as its extended entity storage, to DeepCopy together with the owning entity class.
+* Added `Oro\Component\Duplicator\Matcher\PropertyMatcher` and `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher` duplicator matchers.
+* Added `Oro\Component\Duplicator\Filter\SourceBagRetentionTrait` for filters that copy a property bag.
 
 #### DataAuditBundle
 * Added `Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder` and `Oro\Bundle\DataAuditBundle\Model\AuditEntry`: the way for a bundle to record an audit entry for a change the audit cannot discover on its own, i.e. a change that is not a change of an auditable entity (a system configuration setting, a storefront menu). The recorder resolves the author, checks whether anything is audited at all and stores the entry asynchronously, so a producer only describes what changed.
@@ -134,6 +141,13 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\UserBundle\Form\Handler\AbstractPasswordResetRequestHandler` that schedules the processing of a value submitted in a forgot password form to the message queue. The message producer and the user logging info provider are injected into it with the `setMessageProducer()` and `setUserLoggingInfoProvider()` methods.
 
 ### Changed
+
+#### ActionBundle
+* Changed the `property` duplicator matcher keyword to be served by `Oro\Component\Duplicator\Matcher\PropertyMatcher` instead of `DeepCopy\Matcher\PropertyMatcher`, so that a class-based rule also matches the extended fields of that class. The class and property name arguments must be strings, and the property name is compared strictly.
+
+#### EntityExtendBundle
+* Changed `Oro\Bundle\EntityExtendBundle\Duplicator\Filter\StorageFilter` to hand the extended entity storage to DeepCopy as `Oro\Component\Duplicator\PropertyBag`, so that the `property`, `propertyName` and `propertyType` duplicator rules apply to extended fields.
+* Changed `Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtendDuplicatorPass` to register a default `keep` rule for object values of the extended entity storage: an extended relation or collection without a matching rule is shared by reference with the original entity instead of being deep-copied. Add an explicit rule (`collection`, `emptyCollection`, `setNull`, `shallowCopy`) to a duplicate configuration that needs another behaviour.
 
 #### DataGridBundle
 * Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Only the explicitly declared entity is taken into account, the root entity of the datasource query is not. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.

@@ -6,7 +6,6 @@ use DeepCopy\Filter\Doctrine\DoctrineCollectionFilter;
 use DeepCopy\Filter\Doctrine\DoctrineEmptyCollectionFilter;
 use DeepCopy\Filter\KeepFilter;
 use DeepCopy\Filter\SetNullFilter;
-use DeepCopy\Matcher\PropertyMatcher;
 use DeepCopy\Matcher\PropertyNameMatcher;
 use DeepCopy\Matcher\PropertyTypeMatcher;
 use Oro\Component\Duplicator\DuplicatorFactory;
@@ -14,6 +13,8 @@ use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Filter\ReplaceValueFilter;
 use Oro\Component\Duplicator\Filter\ShallowCopyFilter;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
+use Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher;
+use Oro\Component\Duplicator\Matcher\PropertyMatcher;
 use Oro\Component\Duplicator\ObjectType;
 use PHPUnit\Framework\TestCase;
 
@@ -25,6 +26,7 @@ abstract class DuplicatorTestCase extends TestCase
         $factory->addObjectType(new ObjectType('property', PropertyMatcher::class));
         $factory->addObjectType(new ObjectType('propertyName', PropertyNameMatcher::class));
         $factory->addObjectType(new ObjectType('propertyType', PropertyTypeMatcher::class));
+        $factory->addObjectType(new ObjectType('propertyBagObject', PropertyBagObjectMatcher::class));
 
         return $factory;
     }
