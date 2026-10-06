@@ -63,7 +63,7 @@ services:
         class: 'Oro\Component\Duplicator\ObjectType'
         arguments:
             - property
-            - DeepCopy\Matcher\PropertyMatcher
+            - Oro\Component\Duplicator\Matcher\PropertyMatcher
         tags:
             - { name: oro_action.duplicate.matcher_type }
 
@@ -80,5 +80,13 @@ services:
         arguments:
             - propertyType
             - DeepCopy\Matcher\PropertyTypeMatcher
+        tags:
+            - { name: oro_action.duplicate.matcher_type }
+
+    oro_action.duplicator_matcher_type.property_bag_object:
+        class: 'Oro\Component\Duplicator\ObjectType'
+        arguments:
+            - propertyBagObject
+            - Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher
         tags:
             - { name: oro_action.duplicate.matcher_type }

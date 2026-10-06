@@ -6,6 +6,27 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ActionBundle
+* Added the `propertyBagObject` duplicator matcher keyword served by `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher`; it matches an entry of a property bag that holds an object.
+
+#### Duplicator Component
+* Added `Oro\Component\Duplicator\PropertyBag` and `Oro\Component\Duplicator\PropertyBagInterface`, the carrier that hands detached values of an entity, such as its extended entity storage, to DeepCopy together with the owning entity class.
+* Added `Oro\Component\Duplicator\Matcher\PropertyMatcher` and `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher` duplicator matchers.
+* Added `Oro\Component\Duplicator\Filter\SourceBagRetentionTrait` for filters that copy a property bag.
+
+### Changed
+
+#### ActionBundle
+* Changed the `property` duplicator matcher keyword to be served by `Oro\Component\Duplicator\Matcher\PropertyMatcher` instead of `DeepCopy\Matcher\PropertyMatcher`, so that a class-based rule also matches the extended fields of that class. The class and property name arguments must be strings, and the property name is compared strictly.
+
+#### EntityExtendBundle
+* Changed `Oro\Bundle\EntityExtendBundle\Duplicator\Filter\StorageFilter` to hand the extended entity storage to DeepCopy as `Oro\Component\Duplicator\PropertyBag`, so that the `property`, `propertyName` and `propertyType` duplicator rules apply to extended fields.
+* Changed `Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtendDuplicatorPass` to register a default `keep` rule for object values of the extended entity storage: an extended relation or collection without a matching rule is shared by reference with the original entity instead of being deep-copied. Add an explicit rule (`collection`, `emptyCollection`, `setNull`, `shallowCopy`) to a duplicate configuration that needs another behaviour.
+
+## UNRELEASED
+
+### Added
+
 #### DataAuditBundle
 * Added `Oro\Bundle\DataAuditBundle\Service\AuditEntryRecorder` and `Oro\Bundle\DataAuditBundle\Model\AuditEntry`: the way for a bundle to record an audit entry for a change the audit cannot discover on its own, i.e. a change that is not a change of an auditable entity (a system configuration setting, a storefront menu). The recorder resolves the author, checks whether anything is audited at all and stores the entry asynchronously, so a producer only describes what changed.
 * Added `Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface` and the `oro_dataaudit.audit_type` tag: describes an audit type whose object class is not an entity of the application and provides everything the audit grid shows for it (the Entity Type column and filter, the name of a changed field, and what the `audit-data` filter matches). `Oro\Bundle\DataAuditBundle\Provider\LevelAuditType` implements it for any domain that is recorded per level — the configuration levels, the menu levels — so such a domain is added by registering services only, and `Oro\Bundle\DataAuditBundle\Provider\AuditTypeRegistry` combines all of them. A bundle can now add an audited domain without changing the Data Audit bundle.
