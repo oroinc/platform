@@ -143,6 +143,7 @@ services:
             - '@translator'
             - '@router'
             - '@oro_distribution.handler.application_status'
+            - '@translation.locale_switcher'
         tags:
             - { name: kernel.event_subscriber }
 

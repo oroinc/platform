@@ -1,0 +1,5 @@
+oro_data_audit:
+    # The audit shows the name of what was configured, so it needs to know which entity the id of a
+    # configuration scope refers to. The global scope has none.
+    configuration_level_entities:
+        user: Oro\Bundle\UserBundle\Entity\User

@@ -69,6 +69,20 @@ class DefaultUserSystemConfigListenerTest extends TestCase
         self::assertEquals([self::SETTINGS_KEY => ['value' => $user]], $event->getSettings());
     }
 
+    public function testOnFormPreSetDataWhenSettingIsNotOnTheForm(): void
+    {
+        $this->doctrine->expects(self::never())
+            ->method('getManagerForClass');
+        $this->defaultUserProvider->expects(self::never())
+            ->method('getDefaultUser');
+
+        $settings = ['another___key' => ['value' => 'some value']];
+        $event = new ConfigSettingsUpdateEvent($this->createMock(ConfigManager::class), $settings);
+        $this->listener->onFormPreSetData($event);
+
+        self::assertEquals($settings, $event->getSettings());
+    }
+
     public function testOnFormPreSetDataWhenNoUserIdInConfigAndDefaultUserFound(): void
     {
         $user = $this->getUser(1);

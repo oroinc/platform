@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Oro\Bundle\DataAuditBundle\DependencyInjection\CompilerPass\ConfigurationLevelPass;
 use Oro\Bundle\DataAuditBundle\DependencyInjection\CompilerPass\EntityAuditStrategyPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -15,6 +16,7 @@ class OroDataAuditBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new EntityAuditStrategyPass());
+        $container->addCompilerPass(new ConfigurationLevelPass());
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(

@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Twig;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Exception\DatagridDisabledException;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -61,8 +62,12 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function getGrid($name, array $params = [])
     {
-        if ($this->isAclGrantedForGridName($name)) {
-            return $this->getManager()->getDatagridByRequestParams($name, $params);
+        try {
+            if ($this->isAclGrantedForGridName($name)) {
+                return $this->getManager()->getDatagridByRequestParams($name, $params);
+            }
+        } catch (DatagridDisabledException $e) {
+            // the datagrid is disabled by a feature, so it should not be rendered
         }
 
         return null;
@@ -206,8 +211,15 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         $queryString = $request->getQueryString();
         parse_str($queryString, $queryStringComponents);
 
+        if (!isset($queryStringComponents['grid']) || !\is_array($queryStringComponents['grid'])) {
+            $queryStringComponents['grid'] = [];
+        }
+
         $gridParams = [];
-        if (isset($queryStringComponents['grid'][$grid->getName()])) {
+        if (
+            isset($queryStringComponents['grid'][$grid->getName()])
+            && \is_string($queryStringComponents['grid'][$grid->getName()])
+        ) {
             parse_str($queryStringComponents['grid'][$grid->getName()], $gridParams);
         }
 

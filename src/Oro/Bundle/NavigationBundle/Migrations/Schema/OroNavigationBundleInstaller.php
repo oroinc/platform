@@ -11,7 +11,7 @@ class OroNavigationBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_12';
+        return 'v1_13';
     }
 
     #[\Override]

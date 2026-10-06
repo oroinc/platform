@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Controller;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\Security;
+use Oro\Bundle\FormBundle\Exception\NotFoundSearchHandlerException;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,6 +31,12 @@ class AutocompleteController extends AbstractController
     #[Route(path: '/search', name: 'oro_form_autocomplete_search')]
     public function searchAction(Request $request)
     {
+        // Unlock the session to not block concurrent requests
+        $session = $request->getSession();
+        if ($session->isStarted()) {
+            $session->save();
+        }
+
         $autocompleteRequest = new AutocompleteRequest($request);
         $validator           = $this->container->get(ValidatorInterface::class);
         $isXmlHttpRequest    = $request->isXmlHttpRequest();
@@ -60,9 +67,13 @@ class AutocompleteController extends AbstractController
         }
 
         /** @var SearchHandlerInterface $searchHandler */
-        $searchHandler = $this->container
-            ->get(SearchRegistry::class)
-            ->getSearchHandler($autocompleteRequest->getName());
+        try {
+            $searchHandler = $this->container
+                ->get(SearchRegistry::class)
+                ->getSearchHandler($autocompleteRequest->getName());
+        } catch (NotFoundSearchHandlerException $e) {
+            throw $this->createNotFoundException($e->getMessage());
+        }
 
         return new JsonResponse(
             $searchHandler->search(

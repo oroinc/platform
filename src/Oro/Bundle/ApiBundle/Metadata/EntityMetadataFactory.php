@@ -138,6 +138,34 @@ class EntityMetadataFactory
         return $associationMetadata;
     }
 
+    /**
+     * Checks whether at least one association in the given path is nullable,
+     * it means that a value of a property that is accessed via this path can be NULL.
+     *
+     * @param string   $entityClass
+     * @param string[] $associationPath
+     */
+    public function isNullableAssociationPath(string $entityClass, array $associationPath): bool
+    {
+        $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
+        while ($associationPath) {
+            $associationName = array_shift($associationPath);
+            if (null === $classMetadata || !isset($classMetadata->associationMappings[$associationName])) {
+                return false;
+            }
+            $mapping = $classMetadata->associationMappings[$associationName];
+            if ($this->isNullableAssociation($mapping)) {
+                return true;
+            }
+            if (!$associationPath) {
+                break;
+            }
+            $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping[self::TARGET_ENTITY], false);
+        }
+
+        return false;
+    }
+
     private function getFieldType(array $fieldMapping): string
     {
         return (string)$fieldMapping[self::TYPE];

@@ -15,15 +15,22 @@ class UpdateEmailTemplates extends AbstractHashEmailMigration implements Version
     {
         return [
             'user_change_password' => ['55cf4f5b78600eabeb3d14ea0d4aa5ae'],
-            'force_reset_password' => ['94bf65b402a50c53b3bef0f88c2cf121'],
-            'user_reset_password'  => ['1e707aadaa5524244233001c2850c6f8']
+            'force_reset_password' => [
+                '94bf65b402a50c53b3bef0f88c2cf121', // 1.0
+                '48308cf739b6771294e3098e261c6aa7', // 1.1
+                '9c8ec7e9d5ee2bd090db23b3d3511536', // 7.0.5.0
+            ],
+            'user_reset_password' => [
+                '1e707aadaa5524244233001c2850c6f8', // 1.0
+                '1128cb4636b0582e72c20bc7862e0ea5', // 7.0.5.0
+            ],
         ];
     }
 
     #[\Override]
     public function getVersion(): string
     {
-        return '1.0';
+        return '7.0.5.0';
     }
 
     #[\Override]

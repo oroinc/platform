@@ -26,23 +26,27 @@ class LoadAjaxEmailControllerData extends AbstractFixture implements DependentFi
     public function load(ObjectManager $manager): void
     {
         $owner = $this->getReference('simple_user');
+        assert($owner instanceof User);
 
         $validTemplate = new EmailTemplate('valid_template', 'Valid template content {{ entity.email }}');
         $validTemplate->setSubject('Valid Subject {{ entity.username }}');
         $validTemplate->setEntityName(User::class);
         $validTemplate->setOrganization($owner->getOrganization());
+        $validTemplate->setOwner($owner);
         $validTemplate->setType('html');
 
         $invalidTemplate = new EmailTemplate('invalid_template', 'Invalid template {{ unclosed.tag');
         $invalidTemplate->setSubject('Invalid Subject {{ invalid.syntax');
         $invalidTemplate->setEntityName(User::class);
         $invalidTemplate->setOrganization($owner->getOrganization());
+        $invalidTemplate->setOwner($owner);
         $invalidTemplate->setType('html');
 
         $templateWithAttachments = new EmailTemplate('template_with_attachments', 'Template with attachments');
         $templateWithAttachments->setSubject('Subject with attachments');
         $templateWithAttachments->setEntityName(User::class);
         $templateWithAttachments->setOrganization($owner->getOrganization());
+        $templateWithAttachments->setOwner($owner);
         $templateWithAttachments->setType('html');
 
         /** @var FileManager $fileManager */

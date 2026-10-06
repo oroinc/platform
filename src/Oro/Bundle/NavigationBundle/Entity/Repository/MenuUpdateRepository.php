@@ -184,4 +184,22 @@ class MenuUpdateRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return array<int,MenuUpdateInterface>
+     */
+    public function findChildren(string $menuName, Scope $scope, string $parentKey): array
+    {
+        $queryBuilder = $this->createQueryBuilder('mu');
+
+        return $queryBuilder
+            ->where($queryBuilder->expr()->eq('mu.menu', ':menu'))
+            ->andWhere($queryBuilder->expr()->eq('mu.scope', ':scope'))
+            ->andWhere($queryBuilder->expr()->eq('mu.parentKey', ':parentKey'))
+            ->setParameter('menu', $menuName, Types::STRING)
+            ->setParameter('scope', $scope)
+            ->setParameter('parentKey', $parentKey, Types::STRING)
+            ->getQuery()
+            ->getResult();
+    }
 }

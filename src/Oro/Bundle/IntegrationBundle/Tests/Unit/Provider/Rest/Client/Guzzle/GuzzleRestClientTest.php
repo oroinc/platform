@@ -285,4 +285,22 @@ class GuzzleRestClientTest extends TestCase
 
         $this->client->getJSON($url, $params, $headers, $options);
     }
+
+    /**
+     * The base url comes from the integration settings, so it is not always a usable URL. Such a value
+     * must be reported as a REST exception like any other failure of this client.
+     */
+    public function testPerformRequestThrowsRestExceptionWhenUrlIsMalformed()
+    {
+        $client = new GuzzleRestClient('https://example com/api/', self::DEFAULT_OPTIONS);
+        $client->setGuzzleClient($this->sourceClient);
+
+        $this->sourceClient->expects(self::never())
+            ->method('send');
+
+        $this->expectException(GuzzleRestException::class);
+        $this->expectExceptionMessage('Invalid host');
+
+        $client->get('users');
+    }
 }

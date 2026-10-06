@@ -49,6 +49,9 @@ class AclManager extends AbstractAclManager
     /** @var BatchItem[] [oid => batch item, ...] all requested ACLs and flags indicate which changes are queued */
     protected $items = [];
 
+    /** Filled only for the duration of a flushAndCollectChanges() call. */
+    private ?AclChangeSet $changeSet = null;
+
     /**
      * Constructor
      */
@@ -165,9 +168,20 @@ class AclManager extends AbstractAclManager
         return $this->aceProvider;
     }
 
+    public function flushAndCollectChanges(AclChangeSet $changeSet)
+    {
+        $this->changeSet = $changeSet;
+        try {
+            $this->flush();
+        } finally {
+            $this->changeSet = null;
+        }
+    }
+
     /**
      * Flushes all changes to ACLs that have been queued up to now to the database.
      * This synchronizes the in-memory state of managed ACLs with the database.
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function flush()
@@ -203,13 +217,16 @@ class AclManager extends AbstractAclManager
                         }
                         if ($hasChanges) {
                             $this->aclProvider->updateAcl($acl);
+                            $this->changeSet?->addChangedOid($item->getOid());
                         }
                         break;
                     case BatchItem::STATE_UPDATE:
                         $this->aclProvider->updateAcl($item->getAcl());
+                        $this->changeSet?->addChangedOid($item->getOid());
                         break;
                     case BatchItem::STATE_DELETE:
                         $this->aclProvider->deleteAcl($item->getOid());
+                        $this->changeSet?->addChangedOid($item->getOid());
                         break;
                 }
             }

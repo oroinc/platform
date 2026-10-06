@@ -114,7 +114,7 @@ class EmailTemplateController extends RestController
      *
      * @return Response
      */
-    #[AclAncestor('oro_email_emailtemplate_view')]
+    #[Acl(id: 'oro_email_emailtemplate_view', type: 'entity', class: EmailTemplate::class, permission: 'VIEW')]
     public function getVariablesAction()
     {
         /** @var VariablesProvider $provider */
@@ -154,6 +154,10 @@ class EmailTemplateController extends RestController
                 ->getRepository($emailTemplate->getEntityName())
                 ->find($entityId);
             if ($entity) {
+                if (!$this->isGranted('VIEW', $entity)) {
+                    throw $this->createAccessDeniedException();
+                }
+
                 $templateParams['entity'] = $entity;
             }
         }

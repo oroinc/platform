@@ -92,25 +92,72 @@ class GridRow extends TableRow
     /**
      * Start inline editing on the cell without changing the value and without saving
      *
+     * Double click is used instead of the edit icon: the icon is appended to a cell lazily, on
+     * `mouseenter` only (see inline-editing-plugin.js), so a pointer that already rests on the cell
+     * renders no icon at all, and re-hovering a cell that sits behind a horizontal grid scroll is
+     * unreliable. Double click is bound to the same `isEditable` gate and lets the plugin scroll the
+     * cell into view on its own, which makes this step independent of the pointer position.
+     *
      * @param string $header Column header name
      * @return NodeElement
      */
     public function startInlineEditing($header)
     {
         $cell = $this->getCellByHeader($header);
-        $cell->mouseOver();
 
-        /** @var NodeElement $pencilIcon */
-        $pencilIcon = $cell->find('css', '[data-role="edit"]');
-        self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
-        self::assertTrue(
-            $pencilIcon->isValid() && $pencilIcon->isVisible(),
-            "Cell with '$header' is not inline editable"
-        );
+        $isEditingStarted = $this->spin(function () use ($cell) {
+            if ($cell->hasClass('edit-mode')) {
+                return true;
+            }
 
-        $pencilIcon->click();
+            if (!$cell->hasClass('editable')) {
+                // Double click on a non-editable cell is handled as a row click and opens the record,
+                // so leave such a cell alone and let the assertion below report it.
+                return null;
+            }
+
+            $cell->doubleClick();
+
+            return $cell->hasClass('edit-mode') ? true : null;
+        }, 5);
+
+        if (null === $isEditingStarted) {
+            // Fallback for editors that do not switch the cell into the `edit-mode` state.
+            $isEditingStarted = $this->startInlineEditingByIcon($cell);
+        }
+
+        self::assertNotNull($isEditingStarted, "Cell with '$header' is not inline editable");
 
         return $cell;
+    }
+
+    /**
+     * @param NodeElement $cell
+     * @return bool|null
+     */
+    private function startInlineEditingByIcon(NodeElement $cell)
+    {
+        return $this->spin(function () use ($cell) {
+            foreach ($this->findAll('xpath', 'child::td|child::th') as $awayCell) {
+                if ($awayCell->getXpath() !== $cell->getXpath()) {
+                    $awayCell->mouseOver();
+                    break;
+                }
+            }
+
+            $cell->focus();
+            $cell->mouseOver();
+
+            /** @var NodeElement $pencilIcon */
+            $pencilIcon = $cell->find('css', '[data-role="edit"]');
+            if (null === $pencilIcon || !$pencilIcon->isValid() || !$pencilIcon->isVisible()) {
+                return null;
+            }
+
+            $pencilIcon->click();
+
+            return true;
+        }, 5);
     }
 
     /**

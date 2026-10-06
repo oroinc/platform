@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -28,6 +31,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Route(path: '/openapi-specification')]
 class OpenApiSpecificationController
 {
+    private AuthorizationCheckerInterface $authorizationChecker;
+
     public function __construct(
         private FormFactoryInterface $formFactoty,
         private UpdateHandlerFacade $updateHandlerFacade,
@@ -38,7 +43,12 @@ class OpenApiSpecificationController
     ) {
     }
 
-    #[Route(path: '/', name: 'oro_openapi_specification_index')]
+    public function setAuthorizationChecker(AuthorizationCheckerInterface $authorizationChecker): void
+    {
+        $this->authorizationChecker = $authorizationChecker;
+    }
+
+    #[Route(path: '/', name: 'oro_openapi_specification_index', methods: ['GET'])]
     #[AclAncestor('oro_openapi_specification_view')]
     #[Template('@OroApi/OpenApiSpecification/index.html.twig')]
     public function indexAction(): array
@@ -46,7 +56,12 @@ class OpenApiSpecificationController
         return ['entity_class' => OpenApiSpecification::class];
     }
 
-    #[Route(path: '/view/{id}', name: 'oro_openapi_specification_view', requirements: ['id' => '\d+'])]
+    #[Route(
+        path: '/view/{id}',
+        name: 'oro_openapi_specification_view',
+        requirements: ['id' => '\d+'],
+        methods: ['GET']
+    )]
     #[Acl(
         id: 'oro_openapi_specification_view',
         type: 'entity',
@@ -59,7 +74,7 @@ class OpenApiSpecificationController
         return ['entity' => $entity];
     }
 
-    #[Route(path: '/create', name: 'oro_openapi_specification_create')]
+    #[Route(path: '/create', name: 'oro_openapi_specification_create', methods: ['GET', 'POST'])]
     #[Acl(
         id: 'oro_openapi_specification_create',
         type: 'entity',
@@ -79,7 +94,12 @@ class OpenApiSpecificationController
         );
     }
 
-    #[Route(path: '/update/{id}', name: 'oro_openapi_specification_update', requirements: ['id' => '\d+'])]
+    #[Route(
+        path: '/update/{id}',
+        name: 'oro_openapi_specification_update',
+        requirements: ['id' => '\d+'],
+        methods: ['GET', 'POST']
+    )]
     #[Acl(
         id: 'oro_openapi_specification_update',
         type: 'entity',
@@ -101,7 +121,13 @@ class OpenApiSpecificationController
         );
     }
 
-    #[Route(path: '/delete/{id}', name: 'oro_openapi_specification_delete', requirements: ['id' => '\d+'])]
+    #[Route(
+        path: '/delete/{id}',
+        name: 'oro_openapi_specification_delete',
+        requirements: ['id' => '\d+'],
+        methods: ['DELETE']
+    )]
+    #[CsrfProtection]
     #[Acl(
         id: 'oro_openapi_specification_delete',
         type: 'entity',
@@ -115,11 +141,18 @@ class OpenApiSpecificationController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[Route(path: '/clone/{id}', name: 'oro_openapi_specification_clone', requirements: ['id' => '\d+'])]
+    #[Route(
+        path: '/clone/{id}',
+        name: 'oro_openapi_specification_clone',
+        requirements: ['id' => '\d+'],
+        methods: ['GET', 'POST']
+    )]
     #[AclAncestor('oro_openapi_specification_create')]
     #[Template('@OroApi/OpenApiSpecification/create.html.twig')]
     public function cloneAction(OpenApiSpecification $entity, Request $request): array|Response
     {
+        $this->assertGranted('VIEW', $entity);
+
         $newEntity = new OpenApiSpecification();
         $newEntity->setOrganization($entity->getOrganization());
         $newEntity->setOwner($entity->getOwner());
@@ -144,9 +177,12 @@ class OpenApiSpecificationController
         requirements: ['id' => '\d+'],
         methods: ['POST']
     )]
-    #[AclAncestor('oro_openapi_specification_create')]
+    #[CsrfProtection]
+    #[AclAncestor('oro_openapi_specification_update')]
     public function renewAction(OpenApiSpecification $entity): Response
     {
+        $this->assertGranted('EDIT', $entity);
+
         if ($entity->getStatus() === OpenApiSpecification::STATUS_CREATING) {
             return new JsonResponse(['successful' => false]);
         }
@@ -172,9 +208,12 @@ class OpenApiSpecificationController
         requirements: ['id' => '\d+'],
         methods: ['POST']
     )]
-    #[AclAncestor('oro_openapi_specification_create')]
+    #[CsrfProtection]
+    #[AclAncestor('oro_openapi_specification_update')]
     public function publishAction(OpenApiSpecification $entity): Response
     {
+        $this->assertGranted('EDIT', $entity);
+
         if ($entity->isPublished() || null === $entity->getSpecificationCreatedAt()) {
             return new JsonResponse(['successful' => false]);
         }
@@ -194,5 +233,12 @@ class OpenApiSpecificationController
     private function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass(OpenApiSpecification::class);
+    }
+
+    private function assertGranted(string $permission, OpenApiSpecification $entity): void
+    {
+        if (!$this->authorizationChecker->isGranted($permission, $entity)) {
+            throw new AccessDeniedException();
+        }
     }
 }

@@ -67,6 +67,12 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
         $request = $this->requestStack->getCurrentRequest();
         $view->vars['is_partial'] = $request->isXmlHttpRequest()
             && (bool)$request->get('formParentName', false);
+
+        $origin = $form->getData();
+        if ($origin instanceof UserEmailOrigin && null !== $origin->getId()) {
+            $view->children['accessToken']->vars['value'] = '';
+            $view->children['refreshToken']->vars['value'] = '';
+        }
     }
 
     #[\Override]
@@ -202,6 +208,11 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
                     }
                 );
                 if (count($filtered) > 0) {
+                    $accessToken = $event->getForm()->get('accessToken')->getData();
+                    if (empty($data['accessToken']) && $accessToken) {
+                        // populate accessToken
+                        $data['accessToken'] = $accessToken;
+                    }
                     $refreshToken = $event->getForm()->get('refreshToken')->getData();
                     if (empty($data['refreshToken']) && $refreshToken) {
                         // populate refreshToken

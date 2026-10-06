@@ -49,6 +49,11 @@ final class EnableAvailableInTemplatesForFieldsInTemplatesTask implements PostUp
             }
 
             $entityFieldConfig = $configProvider->getConfig($entityField['entity'], $entityField['field']);
+            if ($entityFieldConfig->is('immutable')) {
+                // Skip because the field is deliberately not allowed in email templates, e.g. it is sensitive.
+                continue;
+            }
+
             if ($entityFieldConfig->get('available_in_template') !== true) {
                 $entityFieldConfig->set('available_in_template', true);
 

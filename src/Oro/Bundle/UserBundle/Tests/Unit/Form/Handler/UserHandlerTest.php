@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
 use Oro\Bundle\UserBundle\Entity\User as RealUserEntity;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -133,11 +134,97 @@ class UserHandlerTest extends TestCase
                 From::emailAddress('admin@example.com', 'John Doe'),
                 $user,
                 new EmailTemplateCriteria(UserHandler::INVITE_USER_TEMPLATE, RealUserEntity::class),
-                ['entity' => $user, 'user' => $user, 'password' => $plainPassword]
+                [
+                    'entity' => $user,
+                    'user' => $user,
+                    'password' => $plainPassword,
+                    Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM => null,
+                ]
             )
             ->willReturn($this->createMock(EmailUser::class));
 
         self::assertTrue($this->handler->process($user));
+
+        self::assertNull($user->getConfirmationToken());
+        self::assertNull($user->getPasswordRequestedAt());
+    }
+
+    public function testProcessSendsInvitationWithConfirmationTokenWhenPasswordIsNotSentInEmail(): void
+    {
+        $user = new User();
+        $user->setEmail('test@example.com');
+
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod(Request::METHOD_POST);
+
+        $this->form->expects(self::once())
+            ->method('submit')
+            ->with(self::FORM_DATA);
+        $this->form->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->manager->expects(self::once())
+            ->method('setAuthStatus')
+            ->with($user, UserManager::STATUS_ACTIVE);
+
+        $this->userConfigManager->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnMap([
+                ['oro_user.send_password_in_invitation_email', false, false, null, false],
+                ['oro_notification.email_notification_sender_email', false, false, null, 'admin@example.com'],
+                ['oro_notification.email_notification_sender_name', false, false, null, 'John Doe'],
+            ]);
+
+        $this->form->expects(self::exactly(2))
+            ->method('has')
+            ->willReturnMap([
+                ['passwordGenerate', true],
+                ['inviteUser', true],
+            ]);
+
+        $childForm = $this->createMock(FormInterface::class);
+        $childForm->expects(self::once())
+            ->method('getData')
+            ->willReturn(false);
+        $childForm->expects(self::once())
+            ->method('getViewData')
+            ->willReturn(true);
+
+        $this->form->expects(self::exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['passwordGenerate', $childForm],
+                ['inviteUser', $childForm],
+            ]);
+
+        $this->manager->expects(self::never())
+            ->method('generatePassword');
+        $this->manager->expects(self::once())
+            ->method('updateUser')
+            ->with($user);
+
+        $sentTemplateParams = [];
+        $this->emailTemplateSender->expects(self::once())
+            ->method('sendEmailTemplate')
+            ->willReturnCallback(function (
+                From $from,
+                $recipients,
+                $templateName,
+                array $templateParams
+            ) use (&$sentTemplateParams): EmailUser {
+                $sentTemplateParams = $templateParams;
+
+                return $this->createMock(EmailUser::class);
+            });
+
+        self::assertTrue($this->handler->process($user));
+
+        self::assertNotEmpty($user->getConfirmationToken());
+        self::assertSame(
+            $user->getConfirmationToken(),
+            $sentTemplateParams[Processor::CONFIRMATION_TOKEN_TEMPLATE_PARAM]
+        );
     }
 
     public function testProcessWithoutEmailAndWithPassword(): void
@@ -190,5 +277,8 @@ class UserHandlerTest extends TestCase
             ->method('sendEmailTemplate');
 
         self::assertTrue($this->handler->process($user));
+
+        self::assertNotEmpty($user->getConfirmationToken());
+        self::assertNotNull($user->getPasswordRequestedAt());
     }
 }

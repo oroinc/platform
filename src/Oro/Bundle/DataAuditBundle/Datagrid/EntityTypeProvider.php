@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Datagrid;
 
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
+use Oro\Bundle\DataAuditBundle\Provider\AuditTypeInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -12,26 +13,21 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
  */
 class EntityTypeProvider
 {
-    private EntityClassNameProviderInterface $entityClassNameProvider;
-    private AuditConfigProvider $configProvider;
-    private FeatureChecker $featureChecker;
-
     public function __construct(
-        EntityClassNameProviderInterface $entityClassNameProvider,
-        AuditConfigProvider $configProvider,
-        FeatureChecker $featureChecker
+        private readonly EntityClassNameProviderInterface $entityClassNameProvider,
+        private readonly AuditConfigProvider $configProvider,
+        private readonly FeatureChecker $featureChecker,
+        private readonly AuditTypeInterface $auditTypes
     ) {
-        $this->entityClassNameProvider = $entityClassNameProvider;
-        $this->configProvider = $configProvider;
-        $this->featureChecker = $featureChecker;
     }
 
     public function getEntityType(): callable|\Closure
     {
         return function (ResultRecord $record) {
-            return $this->entityClassNameProvider->getEntityClassName(
-                $record->getValue('objectClass')
-            );
+            $objectClass = (string)$record->getValue('objectClass');
+
+            return $this->auditTypes->getTypeLabel($objectClass)
+                ?? $this->entityClassNameProvider->getEntityClassName($objectClass);
         };
     }
 
@@ -52,7 +48,13 @@ class EntityTypeProvider
                 $result[$label] = $className;
             }
         }
-        asort($result, SORT_STRING | SORT_FLAG_CASE);
+
+        foreach ($this->auditTypes->getTypes() as $objectClass => $label) {
+            $result[$label] = $objectClass;
+        }
+
+        // Order by the visible label (the array key), not by the entity class.
+        ksort($result, SORT_STRING | SORT_FLAG_CASE);
 
         return $result;
     }

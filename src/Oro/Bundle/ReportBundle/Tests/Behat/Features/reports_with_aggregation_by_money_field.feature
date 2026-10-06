@@ -1,5 +1,4 @@
 @ticket-BB-20775
-@regression
 
 Feature: Reports with aggregation by money field
   Aggregating money fields must be rendered with correct formatting for money values (maximum precision is equal 4)

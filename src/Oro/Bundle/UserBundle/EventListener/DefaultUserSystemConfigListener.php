@@ -37,6 +37,10 @@ class DefaultUserSystemConfigListener
             $this->configKey
         );
         $settings = $event->getSettings();
+        if (!\array_key_exists($settingsKey, $settings)) {
+            return;
+        }
+
         $user = null;
         if (isset($settings[$settingsKey]['value'])) {
             $user = $this->findUser($settings[$settingsKey]['value']);

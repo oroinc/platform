@@ -12,6 +12,7 @@ use Twig\Sandbox\SecurityPolicyInterface;
  * Works as a decorator for Twig security policy:
  *   - Adds the allowed methods and properties for entity classes from the template renderer config provider.
  *   - Adds getters for tags, functions, filters, methods and properties.
+ *   - Authorizes every object a render walks to against the VIEW permission of the current user.
  */
 class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
 {
@@ -42,10 +43,24 @@ class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
 
     private bool $initialized = false;
 
+    private ?EmailTemplateEntityAccessChecker $entityAccessChecker = null;
+
     public function __construct(
         private SecurityPolicyInterface $securityPolicy,
         private TemplateRendererConfigProviderInterface $templateRendererConfigProvider,
     ) {
+    }
+
+    /**
+     * Supplies the checker that authorizes every record a render walks to against the VIEW permission of the
+     * current user.
+     *
+     * @bc-layer The checker is supplied with a setter instead of a constructor argument, because adding a
+     *           constructor argument would break the classes that already extend or instantiate this one.
+     */
+    public function setEntityAccessChecker(EmailTemplateEntityAccessChecker $entityAccessChecker): void
+    {
+        $this->entityAccessChecker = $entityAccessChecker;
     }
 
     public function __call($name, $arguments)
@@ -167,11 +182,17 @@ class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
     {
         // __toString is a PHP string-coercion magic method, not an entity field accessor.
         if (strtolower($method) === '__tostring') {
+            // @bc-layer No checker means the policy was built by code that predates setEntityAccessChecker(),
+            // so the render keeps the previous behaviour and is not bound by the per-record VIEW permission.
+            $this->entityAccessChecker?->assertMethodAccessGranted($obj, $method);
+
             return;
         }
         $this->ensureInitialized();
 
         $this->securityPolicy->checkMethodAllowed($obj, $method);
+        // @bc-layer See the note above: without a checker the per-record authorization is skipped.
+        $this->entityAccessChecker?->assertMethodAccessGranted($obj, $method);
     }
 
     #[\Override]
@@ -180,6 +201,9 @@ class EmailTemplateSecurityPolicy implements SecurityPolicyInterface
         $this->ensureInitialized();
 
         $this->securityPolicy->checkPropertyAllowed($obj, $property);
+        // @bc-layer Without a checker supplied through setEntityAccessChecker() the per-record authorization is
+        // skipped, which is how this class behaved before the checker existed.
+        $this->entityAccessChecker?->assertPropertyAccessGranted($obj, $property);
     }
 
     private function ensureInitialized(): void

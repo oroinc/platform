@@ -501,7 +501,10 @@ class EmailController extends AbstractController
     #[AclAncestor('oro_email_email_body_view')]
     public function bodyAction(EmailBody $entity)
     {
-        return new Response($entity->getBodyContent());
+        // The stored email body is not sanitized, so the response is sandboxed and its script cannot run.
+        return new Response($entity->getBodyContent(), Response::HTTP_OK, [
+            'Content-Security-Policy' => 'sandbox',
+        ]);
     }
 
     /**

@@ -4,9 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\AttachmentBundle\Controller\FileController;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistryInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadFileData;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadImageData;
+use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 
@@ -326,5 +328,104 @@ class FileControllerTest extends WebTestCase
         self::assertNotEquals(0, $result->headers->getCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, $file->getMimeType());
         self::assertResponseStatusCodeEquals($result, 200);
+    }
+
+    public function testGetResizedAttachmentImageStoresImageUnderDecodedPath(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_JPG_NON_ASCII_NAME);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getResizedImageUrl($file, 42, 142, '');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseContentTypeEquals($result, $file->getMimeType());
+        self::assertResponseStatusCodeEquals($result, 200);
+        $this->assertImageStoredUnderDecodedPath($file, $url);
+    }
+
+    public function testGetFilteredImageStoresImageUnderDecodedPath(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_JPG_NON_ASCII_NAME);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getFilteredImageUrl($file, 'avatar_med', '');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseContentTypeEquals($result, $file->getMimeType());
+        self::assertResponseStatusCodeEquals($result, 200);
+        $this->assertImageStoredUnderDecodedPath($file, $url);
+    }
+
+    public function testGetResizedAttachmentImageMovesImageStoredUnderLegacyPath(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_JPG_NON_ASCII_NAME);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getResizedImageUrl($file, 43, 143, '');
+        $legacyImageContent = $this->storeLegacyImage($file, $url);
+
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseStatusCodeEquals($result, 200);
+        self::assertSame($legacyImageContent, $result->getContent());
+        $this->assertImageStoredUnderDecodedPath($file, $url);
+    }
+
+    public function testGetFilteredImageMovesImageStoredUnderLegacyPath(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_JPG_NON_ASCII_NAME);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getFilteredImageUrl($file, 'avatar_xsmall', '');
+        $legacyImageContent = $this->storeLegacyImage($file, $url);
+
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseStatusCodeEquals($result, 200);
+        self::assertSame($legacyImageContent, $result->getContent());
+        $this->assertImageStoredUnderDecodedPath($file, $url);
+    }
+
+    /**
+     * Stores an image under the legacy (percent-encoded) media cache path and returns its content.
+     */
+    private function storeLegacyImage(File $file, string $url): string
+    {
+        $encodedPath = preg_replace('~^.*?/media/cache/~', '', $url);
+        $legacyImageContent = file_get_contents(__DIR__ . '/../DataFixtures/files/image.jpg');
+        $this->getMediaCacheManager($file)->writeToStorage($legacyImageContent, $encodedPath);
+
+        return $legacyImageContent;
+    }
+
+    private function getMediaCacheManager(File $file): GaufretteFileManager
+    {
+        /** @var MediaCacheManagerRegistryInterface $registry */
+        $registry = self::getContainer()->get('oro_attachment.tests.media_cache_manager_registry');
+
+        return $registry->getManagerForFile($file);
+    }
+
+    private function assertImageStoredUnderDecodedPath(File $file, string $url): void
+    {
+        $encodedPath = preg_replace('~^.*?/media/cache/~', '', $url);
+        $decodedPath = rawurldecode($encodedPath);
+        self::assertNotEquals($encodedPath, $decodedPath, 'The URL is expected to contain encoded characters.');
+        self::assertStringContainsString('фото-кафе.jpg', $decodedPath);
+
+        $mediaCacheManager = $this->getMediaCacheManager($file);
+
+        self::assertTrue(
+            $mediaCacheManager->hasFile($decodedPath),
+            sprintf('The image is expected to be stored under the decoded path "%s".', $decodedPath)
+        );
+        self::assertFalse(
+            $mediaCacheManager->hasFile($encodedPath),
+            sprintf('The image is not expected to be stored under the encoded path "%s".', $encodedPath)
+        );
     }
 }

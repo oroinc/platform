@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Exception\DatagridDisabledException;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
@@ -97,6 +98,22 @@ class DataGridExtensionTest extends TestCase
             ->willReturn(null);
 
         $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_datagrid_build', [$gridName])
+        );
+    }
+
+    public function testGetGridReturnsNullWhenDatagridIsDisabledByFeature(): void
+    {
+        $gridName = 'test-grid';
+
+        $this->manager->expects(self::once())
+            ->method('getConfigurationForGrid')
+            ->with($gridName)
+            ->willThrowException(new DatagridDisabledException('The datagrid is disabled.'));
+        $this->manager->expects(self::never())
+            ->method('getDatagridByRequestParams');
+
+        self::assertNull(
             self::callTwigFunction($this->extension, 'oro_datagrid_build', [$gridName])
         );
     }
@@ -422,6 +439,31 @@ class DataGridExtensionTest extends TestCase
                 'queryString' => 'grid%5Btest%5D=i%3D4',
                 'page' => 5,
                 'expectedParameters' => 'grid%5Btest%5D=i%3D5'
+            ],
+            'with scalar grid param' => [
+                'queryString' => 'grid=1',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D5'
+            ],
+            'with empty scalar grid param' => [
+                'queryString' => 'grid=',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D5'
+            ],
+            'with scalar grid param and other params' => [
+                'queryString' => 'grid=1&other=2',
+                'page' => 3,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D3&other=2'
+            ],
+            'with array value under grid name' => [
+                'queryString' => 'grid%5Btest%5D%5Bi%5D=4',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Btest%5D=i%3D5'
+            ],
+            'with grid params of another grid' => [
+                'queryString' => 'grid%5Bother%5D=i%3D2',
+                'page' => 5,
+                'expectedParameters' => 'grid%5Bother%5D=i%3D2&grid%5Btest%5D=i%3D5'
             ],
         ];
     }

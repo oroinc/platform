@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 use Oro\Bundle\SecurityBundle\Model\Role;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
@@ -109,7 +110,7 @@ abstract class AbstractUser implements
     #[ORM\Column(name: 'confirmation_token', type: Types::STRING, nullable: true)]
     #[ConfigField(defaultValues: [
         'importexport' => ['excluded' => true],
-        'email' => ['available_in_template' => true],
+        'email' => ['available_in_template' => false, 'immutable' => true],
     ])]
     protected ?string $confirmationToken = null;
 
@@ -134,7 +135,7 @@ abstract class AbstractUser implements
 
     public function __construct()
     {
-        $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
+        $this->salt = RandomTokenGenerator::generate(128);
         $this->userRoles = new ArrayCollection();
     }
 
@@ -478,7 +479,7 @@ abstract class AbstractUser implements
     #[\Override]
     public function generateToken()
     {
-        return base_convert(bin2hex(hash('sha256', uniqid(mt_rand(), true), true)), 16, 36);
+        return RandomTokenGenerator::generate();
     }
 
     #[\Override]
@@ -486,8 +487,8 @@ abstract class AbstractUser implements
     {
         $passwordRequestAt = $this->getPasswordRequestedAt();
 
-        return $passwordRequestAt === null || ($passwordRequestAt instanceof \DateTime
-        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time());
+        return $passwordRequestAt instanceof \DateTime
+            && $passwordRequestAt->getTimestamp() + $ttl > time();
     }
 
     /**
@@ -509,6 +510,12 @@ abstract class AbstractUser implements
         $this->passwordRequestedAt = $time;
 
         return $this;
+    }
+
+    public function renewConfirmationToken(): void
+    {
+        $this->setConfirmationToken($this->generateToken());
+        $this->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
     }
 
     #[\Override]
