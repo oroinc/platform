@@ -73,7 +73,13 @@ class ChangeSubresourceContext extends ChangeRelationshipContext
             if ($documentationAction) {
                 $descriptionsConfigExtraKey = $this->findDescriptionsConfigExtraKey($configExtras);
                 if (null !== $descriptionsConfigExtraKey) {
-                    $configExtras[$descriptionsConfigExtraKey] = new DescriptionsConfigExtra($documentationAction);
+                    /** @var DescriptionsConfigExtra $descriptionsConfigExtra */
+                    $descriptionsConfigExtra = $configExtras[$descriptionsConfigExtraKey];
+
+                    $configExtras[$descriptionsConfigExtraKey] = new DescriptionsConfigExtra(
+                        documentationAction: $documentationAction,
+                        useFallbackDescriptions: $descriptionsConfigExtra->useFallbackDescriptions()
+                    );
                     $isLoadEntityConfigRequired = true;
                 }
             }

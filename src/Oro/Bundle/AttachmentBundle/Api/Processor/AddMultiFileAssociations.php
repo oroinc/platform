@@ -87,7 +87,9 @@ class AddMultiFileAssociations implements ProcessorInterface
             ) {
                 /** @see BuildMultiFileSubresourceQuery */
                 $sortOrderMetaProperty = $this->addSortOrderMetaProperty($definition, 'r.' . self::SORT_ORDER);
-                if ($context->hasExtra(DescriptionsConfigExtra::NAME)) {
+                /** @var DescriptionsConfigExtra|null $descriptionsConfigExtra */
+                $descriptionsConfigExtra = $context->getExtra(DescriptionsConfigExtra::NAME);
+                if ($descriptionsConfigExtra?->useFallbackDescriptions()) {
                     $sortOrderMetaProperty->setDescription(
                         'This meta option denotes which order a file is to appear when displayed.'
                     );

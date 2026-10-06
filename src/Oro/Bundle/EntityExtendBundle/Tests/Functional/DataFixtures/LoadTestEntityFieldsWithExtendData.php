@@ -17,9 +17,12 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntity;
  */
 class LoadTestEntityFieldsWithExtendData extends AbstractFixture
 {
-    public const ENTITY = 'test_entity_fields_with_extend_data';
-    public const RELATED_ENTITY = 'test_entity_fields_m2o_target';
-    public const M2M_ENTITY = 'test_entity_fields_m2m_item';
+    public const string ENTITY = 'test_entity_fields_with_extend_data';
+    public const string RELATED_ENTITY = 'test_entity_fields_m2o_target';
+    public const string M2M_ENTITY = 'test_entity_fields_m2m_item';
+    public const string ENUM_OPTION = 'test_entity_fields_enum_option';
+    public const string RELATED_BAG_TARGET = 'test_entity_fields_related_bag_m2o_target';
+    public const string RELATED_ENUM_OPTION = 'test_entity_fields_related_enum_option';
 
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -45,6 +48,7 @@ class LoadTestEntityFieldsWithExtendData extends AbstractFixture
         );
         $enumOption->setLocale('en');
         $manager->persist($enumOption);
+        $this->setReference(self::ENUM_OPTION, $enumOption);
 
         $multiEnumOpt = $enumRepo->createEnumOption(
             'test_entity_fields_multienum_field',
@@ -55,8 +59,29 @@ class LoadTestEntityFieldsWithExtendData extends AbstractFixture
         $multiEnumOpt->setLocale('en');
         $manager->persist($multiEnumOpt);
 
+        $relatedEnumOption = $enumRepo->createEnumOption(
+            'test_extended_entity_enum_attribute',
+            'dup_nested_opt1',
+            'Dup Nested Option 1',
+            1
+        );
+        $relatedEnumOption->setLocale('en');
+        $manager->persist($relatedEnumOption);
+        $this->setReference(self::RELATED_ENUM_OPTION, $relatedEnumOption);
+
+        $bagTarget = new TestEntityFields();
+        $bagTarget->setStringField('bag-target');
+        $manager->persist($bagTarget);
+        $this->setReference(self::RELATED_BAG_TARGET, $bagTarget);
+
         // Must be flushed before being referenced as a relation
         $manager->flush();
+
+        // Extended storage of the related entity: an object, a collection and serialized values
+        $relatedEntity->set('oro_test_framework_test_entity_fields', $bagTarget);
+        $relatedEntity->set('biM2MOwners', new ArrayCollection());
+        $relatedEntity->set('serialized_attribute', 'nested-serialized');
+        $relatedEntity->set('testExtendedEntityEnumAttribute', $relatedEnumOption);
 
         $entity = new TestEntityFields();
         $entity->setStringField('original');

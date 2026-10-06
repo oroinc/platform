@@ -32,12 +32,16 @@ class FiltersDescriptionHelper
         $this->descriptionProcessor = $descriptionProcessor;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function setDescriptionsForFilters(
         FiltersConfig $filters,
         EntityDefinitionConfig $definition,
         RequestType $requestType,
         string $entityClass,
-        bool $isInherit
+        bool $isInherit,
+        bool $useFallbackDescriptions = true
     ): void {
         $resourceDocParser = $this->resourceDocParserProvider->getResourceDocParser($requestType);
         $fields = $filters->getFields();
@@ -52,7 +56,7 @@ class FiltersDescriptionHelper
                         );
                     }
                     $field->setDescription($description);
-                } elseif (!$field->getDescription()) {
+                } elseif ($useFallbackDescriptions && !$field->getDescription()) {
                     $field->setDescription(
                         $this->getFilterDefaultDescription($fieldName, $definition->getField($fieldName))
                     );

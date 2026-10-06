@@ -29,6 +29,14 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ActionBundle
+* Added the `propertyBagObject` duplicator matcher keyword served by `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher`; it matches an entry of a property bag that holds an object.
+
+#### Duplicator Component
+* Added `Oro\Component\Duplicator\PropertyBag` and `Oro\Component\Duplicator\PropertyBagInterface`, the carrier that hands detached values of an entity, such as its extended entity storage, to DeepCopy together with the owning entity class.
+* Added `Oro\Component\Duplicator\Matcher\PropertyMatcher` and `Oro\Component\Duplicator\Matcher\PropertyBagObjectMatcher` duplicator matchers.
+* Added `Oro\Component\Duplicator\Filter\SourceBagRetentionTrait` for filters that copy a property bag.
+
 #### ApiBundle
 
 * Added `CorsSettings::addAllowedOrigins(array $origins): void` method to append extra allowed origins to the existing list at runtime (deduplicated).
@@ -136,6 +144,13 @@ The current file describes significant changes in the code that may affect the u
 * Added `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclChangeSet` that collects object identities whose ACLs have been actually changed by `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager::flush()`; pass an instance as the new optional `$changeSet` argument of `flush()` to receive them.
 
 ### Changed
+
+#### ActionBundle
+* Changed the `property` duplicator matcher keyword to be served by `Oro\Component\Duplicator\Matcher\PropertyMatcher` instead of `DeepCopy\Matcher\PropertyMatcher`, so that a class-based rule also matches the extended fields of that class. The class and property name arguments must be strings, and the property name is compared strictly.
+
+#### EntityExtendBundle
+* Changed `Oro\Bundle\EntityExtendBundle\Duplicator\Filter\StorageFilter` to hand the extended entity storage to DeepCopy as `Oro\Component\Duplicator\PropertyBag`, so that the `property`, `propertyName` and `propertyType` duplicator rules apply to extended fields.
+* Changed `Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtendDuplicatorPass` to register a default `keep` rule for object values of the extended entity storage: an extended relation or collection without a matching rule is shared by reference with the original entity instead of being deep-copied. Add an explicit rule (`collection`, `emptyCollection`, `setNull`, `shallowCopy`) to a duplicate configuration that needs another behaviour.
 
 #### SecurityBundle
 * Added the `\Symfony\Contracts\EventDispatcher\EventDispatcherInterface` argument to the `\Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository` constructor to dispatch `\Oro\Bundle\SecurityBundle\Acl\Event\AclPrivilegesSavedEvent`.
