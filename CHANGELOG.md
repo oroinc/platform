@@ -103,6 +103,7 @@ The current file describes significant changes in the code that may affect the u
 * Added `open` CSS class support for active menu dropdown state in the side menu alongside the existing `active` class.
 * Added `tree-boundary` and `last-item-in-group` CSS classes for menu items in the overlay menu to support visual grouping of navigation levels.
 * Added the `system-configuration-content-header__switchers` container element in the System Configuration page layout (`ConfigBundle/Resources/views/macros.html.twig`).
+* Added `\Oro\Bundle\UIBundle\Tools\UrlHelperInterface` with the `getAbsoluteUrl()`, `getRelativePath()`, `getAbsolutePath()` and `isLocalUrl()` methods. `\Oro\Bundle\UIBundle\Tools\UrlHelper` now implements it. Type-hint `UrlHelperInterface` instead of `UrlHelper` wherever the `oro_ui.tools.url_helper` service is injected, so that decorators of this service do not have to extend `UrlHelper`.
 
 #### ConfigBundle
 * Added a dedicated wrapper element with the `system-configuration-content-header__switchers` class for highlight switcher controls in `Resources/views/macros.html.twig`.
