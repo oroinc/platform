@@ -91,16 +91,19 @@ class EntityDescriptionHelper implements ResetInterface
         string $targetAction,
         bool $isCollection,
         ?string $associationName,
-        ?string $parentEntityClass
+        ?string $parentEntityClass,
+        bool $useFallbackDescriptions = true
     ): void {
-        $this->identifierDescriptionHelper->setDescriptionForEntityIdentifier($definition);
+        if ($useFallbackDescriptions) {
+            $this->identifierDescriptionHelper->setDescriptionForEntityIdentifier($definition);
+        }
 
         if ($definition->hasDescription()) {
             $description = $definition->getDescription();
             if ($description instanceof Label) {
                 $definition->setDescription($this->trans($description));
             }
-        } else {
+        } elseif ($useFallbackDescriptions) {
             if ($associationName) {
                 $description = $this->resourceDocProvider->getSubresourceDescription(
                     $targetAction,
@@ -126,10 +129,14 @@ class EntityDescriptionHelper implements ResetInterface
             $targetAction,
             $isCollection,
             $associationName,
-            $parentEntityClass
+            $parentEntityClass,
+            $useFallbackDescriptions
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function setDocumentationForEntity(
         EntityDefinitionConfig $definition,
         RequestType $requestType,
@@ -138,7 +145,8 @@ class EntityDescriptionHelper implements ResetInterface
         string $targetAction,
         bool $isCollection,
         ?string $associationName,
-        ?string $parentEntityClass
+        ?string $parentEntityClass,
+        bool $useFallbackDescriptions
     ): void {
         $this->registerDocumentationResources($definition, $requestType);
         $this->loadDocumentationForEntity(
@@ -151,7 +159,7 @@ class EntityDescriptionHelper implements ResetInterface
             $parentEntityClass
         );
         $processInheritDoc = !$associationName;
-        if (!$definition->hasDocumentation()) {
+        if ($useFallbackDescriptions && !$definition->hasDocumentation()) {
             if ($associationName) {
                 $this->setDocumentationForSubresource(
                     $definition,
@@ -169,7 +177,7 @@ class EntityDescriptionHelper implements ResetInterface
                 );
             }
         }
-        if ($processInheritDoc) {
+        if ($processInheritDoc && $definition->hasDocumentation()) {
             $this->processInheritDocForEntity($definition, $entityClass);
         }
 
@@ -183,14 +191,16 @@ class EntityDescriptionHelper implements ResetInterface
             }
             $documentation = $this->descriptionProcessor->process($documentation, $requestType);
 
-            $maxResultNote = $this->getMaxResultNoteForEntityDocumentation($definition, $targetAction);
-            if ($maxResultNote) {
-                $documentation .= $maxResultNote;
-            }
+            if ($useFallbackDescriptions) {
+                $maxResultNote = $this->getMaxResultNoteForEntityDocumentation($definition, $targetAction);
+                if ($maxResultNote) {
+                    $documentation .= $maxResultNote;
+                }
 
-            $additionalNote = $this->getUpsertAndValidateNoteForEntityDocumentation($definition, $targetAction);
-            if ($additionalNote) {
-                $documentation .= $additionalNote;
+                $additionalNote = $this->getUpsertAndValidateNoteForEntityDocumentation($definition, $targetAction);
+                if ($additionalNote) {
+                    $documentation .= $additionalNote;
+                }
             }
 
             $definition->setDocumentation($documentation);

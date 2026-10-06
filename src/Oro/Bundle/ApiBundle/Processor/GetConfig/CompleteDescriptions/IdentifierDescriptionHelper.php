@@ -33,7 +33,8 @@ class IdentifierDescriptionHelper
     public function setDescriptionForIdentifierField(
         EntityDefinitionConfig $definition,
         string $entityClass,
-        string $targetAction
+        string $targetAction,
+        bool $useFallbackDescriptions = true
     ): void {
         $identifierFieldNames = $definition->getIdentifierFieldNames();
         if (\count($identifierFieldNames) !== 1) {
@@ -43,22 +44,27 @@ class IdentifierDescriptionHelper
 
         $identifierFieldName = reset($identifierFieldNames);
         $identifierField = $definition->getField($identifierFieldName);
-        if (null !== $identifierField) {
-            if (!$identifierField->getDescription()) {
-                $identifierField->setDescription(
-                    $this->getDescriptionForIdentifierField(
-                        $definition,
-                        $entityClass,
-                        $identifierFieldName,
-                        $targetAction
-                    )
-                );
-            } elseif (
-                ApiAction::UPDATE === $targetAction
-                && self::ID_DESCRIPTION === $identifierField->getDescription()
-            ) {
-                $identifierField->setDescription(self::REQUIRED_ID_DESCRIPTION);
+        if (null === $identifierField) {
+            return;
+        }
+
+        if (!$identifierField->getDescription()) {
+            $description = $this->getDescriptionForIdentifierField(
+                $definition,
+                $entityClass,
+                $identifierFieldName,
+                $targetAction,
+                $useFallbackDescriptions
+            );
+            if ($description) {
+                $identifierField->setDescription($description);
             }
+        } elseif (
+            $useFallbackDescriptions
+            && ApiAction::UPDATE === $targetAction
+            && self::ID_DESCRIPTION === $identifierField->getDescription()
+        ) {
+            $identifierField->setDescription(self::REQUIRED_ID_DESCRIPTION);
         }
     }
 
@@ -66,8 +72,9 @@ class IdentifierDescriptionHelper
         EntityDefinitionConfig $definition,
         string $entityClass,
         string $identifierFieldName,
-        string $targetAction
-    ): string {
+        string $targetAction,
+        bool $useFallbackDescriptions
+    ): ?string {
         $required = false;
         if (ApiAction::UPDATE === $targetAction) {
             $required = true;
@@ -79,9 +86,19 @@ class IdentifierDescriptionHelper
         }
 
         if ($definition->hasIdentifierDescription()) {
+            $description = $definition->getIdentifierDescription();
+
+            if (!$useFallbackDescriptions) {
+                return $description;
+            }
+
             return $required
-                ? sprintf(self::REQUIRED_ID_DESCRIPTION_TEMPLATE, $definition->getIdentifierDescription())
-                : $definition->getIdentifierDescription();
+                ? sprintf(self::REQUIRED_ID_DESCRIPTION_TEMPLATE, $description)
+                : $description;
+        }
+
+        if (!$useFallbackDescriptions) {
+            return null;
         }
 
         return $required
