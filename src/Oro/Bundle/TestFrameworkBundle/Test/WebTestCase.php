@@ -148,7 +148,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @after
      * @internal
      */
-    protected function afterTest()
+    protected function afterTest(bool $clearConfigCache = true): void
     {
         $this->client = null;
 
@@ -163,7 +163,9 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$referenceRepository = null;
 
             self::rollbackTransaction();
-            self::clearConfigCache();
+            if ($clearConfigCache) {
+                self::clearConfigCache();
+            }
             self::resetClient();
         }
     }
