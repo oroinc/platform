@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
@@ -28,7 +29,10 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 /**
  * Authenticator guard for impersonated authentication.
  */
-class ImpersonationAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
+class ImpersonationAuthenticator implements
+    AuthenticatorInterface,
+    AuthenticationEntryPointInterface,
+    InteractiveAuthenticatorInterface
 {
     public const TOKEN_PARAMETER = '_impersonation_token';
 
@@ -109,6 +113,12 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
         }
 
         return new RedirectResponse($this->router->generate('oro_user_security_login'));
+    }
+
+    #[\Override]
+    public function isInteractive(): bool
+    {
+        return true;
     }
 
     protected function getImpersonation(string $impersonationToken): ?Impersonation

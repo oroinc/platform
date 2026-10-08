@@ -24,7 +24,7 @@
  *                 altFormat: 'yy-mm-dd'
  *                 changeMonth: true
  *                 changeYear: true
- *                 yearRange: '-80:+1'
+ *                 yearRange: 'c-80:c+20'
  *                 showButtonPanel: true
  *               timePickerOptions:
  *                 # See https://github.com/jonthornton/jquery-timepicker#options

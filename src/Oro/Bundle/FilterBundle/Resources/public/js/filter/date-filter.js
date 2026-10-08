@@ -99,7 +99,7 @@ const DateFilter = ChoiceFilter.extend({
     dateWidgetOptions: {
         changeMonth: true,
         changeYear: true,
-        yearRange: '-80:+1',
+        yearRange: 'c-80:c+20',
         dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'),
         altFormat: 'yy-mm-dd',
         className: 'date-filter-widget',
