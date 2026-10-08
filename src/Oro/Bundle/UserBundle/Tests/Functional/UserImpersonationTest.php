@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\UserLoginAttempt;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Component\Testing\Command\CommandOutputNormalizer;
@@ -61,6 +62,47 @@ class UserImpersonationTest extends WebTestCase
         $this->assertSelectorTextSame(
             '.page-title__entity-title',
             LoadUserData::SIMPLE_USER_FIRST_NAME . ' ' . LoadUserData::SIMPLE_USER_LAST_NAME
+        );
+    }
+
+    public function testImpersonationLoginAttemptIsTracked(): void
+    {
+        $commandTester = $this->doExecuteCommand('oro:user:impersonate', [
+            'username' => LoadUserData::SIMPLE_USER,
+            '--no-notification' => true
+        ]);
+
+        $output = $commandTester->getDisplay();
+
+        self::assertSame(
+            1,
+            preg_match(
+                '/https?:\/\/[^\s]+_impersonation_token=[a-z0-9]+/',
+                $output,
+                $matches
+            )
+        );
+
+        $this->client->request('GET', $matches[0]);
+
+        $this->assertHtmlResponseStatusCodeEquals(
+            $this->client->getResponse(),
+            200
+        );
+
+        $loginAttempt = $this->getContainer()
+            ->get('doctrine')
+            ->getRepository(UserLoginAttempt::class)
+            ->findOneBy(
+                ['username' => LoadUserData::SIMPLE_USER],
+                ['attemptAt' => 'DESC']
+            );
+
+        self::assertNotNull($loginAttempt);
+        self::assertTrue($loginAttempt->isSuccess());
+        self::assertSame(
+            $this->getContainer()->getParameter('oro_user.login_sources')['impersonation']['code'],
+            $loginAttempt->getSource()
         );
     }
 }
