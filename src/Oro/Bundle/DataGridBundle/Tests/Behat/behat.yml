@@ -166,6 +166,9 @@ oro_behat_extension:
         locator: '//select[contains(@class,"ui-datepicker-month")]'
         type: xpath
 
+    DateTimePickerNextMonth:
+      selector: '.ui-datepicker-next'
+
     TimePicker:
       selector: 'input.timepicker-input'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TimePicker

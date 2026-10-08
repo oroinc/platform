@@ -31,7 +31,7 @@ import DatepickerView from 'oroui/js/app/views/datepicker/datepicker-view';
  *                 altFormat: 'yy-mm-dd'
  *                 changeMonth: true
  *                 changeYear: true
- *                 yearRange: '-80:+1'
+ *                 yearRange: 'c-80:c+20'
  *                 showButtonPanel: true
  *           validation_rules:
  *             NotBlank: true
@@ -83,7 +83,7 @@ const DateEditorView = TextEditorView.extend(/** @exports DateEditorView.prototy
             altFormat: 'yy-mm-dd',
             changeMonth: true,
             changeYear: true,
-            yearRange: '-80:+1',
+            yearRange: 'c-80:c+20',
             showButtonPanel: true,
             blurInputOnTodaySelection: false
         }
