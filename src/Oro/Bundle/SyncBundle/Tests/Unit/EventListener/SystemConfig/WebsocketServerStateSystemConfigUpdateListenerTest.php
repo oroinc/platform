@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener\SystemConfig;
 
+use Doctrine\DBAL\Driver\Exception as DriverException;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\SyncBundle\EventListener\SystemConfig\WebsocketServerStateSystemConfigUpdateListener;
@@ -16,83 +18,245 @@ final class WebsocketServerStateSystemConfigUpdateListenerTest extends TestCase
 {
     private ApplicationState&MockObject $applicationState;
     private WebsocketServerStateManagerInterface&MockObject $stateManager;
-    private WebsocketServerStateSystemConfigUpdateListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->applicationState = $this->createMock(ApplicationState::class);
         $this->stateManager = $this->createMock(WebsocketServerStateManagerInterface::class);
-        $this->listener = new WebsocketServerStateSystemConfigUpdateListener(
-            $this->applicationState,
-            $this->stateManager
-        );
     }
 
-    public function testOnConfigUpdateCallsUpdateStateWithSystemConfigStateWhenApplicationIsInstalled(): void
+    public function testOnConfigUpdateUpdatesStateWhenWatchedOptionChanged(): void
     {
-        $changeSet = [
-            'oro_test.some_setting' => [
-                'old' => 'old_value',
-                'new' => 'new_value',
-            ],
-        ];
-        $scope = 'global';
-        $scopeId = 0;
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_ui.application_url']
+        );
+        $event = new ConfigUpdateEvent(
+            ['oro_ui.application_url' => ['old' => 'http://old.example.com', 'new' => 'http://new.example.com']],
+            'global',
+            0
+        );
 
-        $event = new ConfigUpdateEvent($changeSet, $scope, $scopeId);
-
-        $this->applicationState->expects(self::once())
-            ->method('isInstalled')
+        $this->applicationState->method('isInstalled')
             ->willReturn(true);
-
         $this->stateManager->expects(self::once())
             ->method('updateState')
             ->with(WebsocketServerStates::SYSTEM_CONFIG)
-            ->willReturn(new \DateTime('2024-01-15 10:00:00', new \DateTimeZone('UTC')));
+            ->willReturn(new \DateTime());
 
-        $this->listener->onConfigUpdate($event);
+        $listener->onConfigUpdate($event);
     }
 
-    public function testOnConfigUpdateDoesNotCallUpdateStateWhenApplicationIsNotInstalled(): void
+    public function testOnConfigUpdateUpdatesStateWhenOneOfSeveralWatchedOptionsChanged(): void
     {
-        $changeSet = [
-            'oro_test.some_setting' => [
-                'old' => 'old_value',
-                'new' => 'new_value',
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_test.first_option', 'oro_test.second_option']
+        );
+        $event = new ConfigUpdateEvent(
+            ['oro_test.second_option' => ['old' => 'a', 'new' => 'b']],
+            'global',
+            0
+        );
+
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
+        $this->stateManager->expects(self::once())
+            ->method('updateState')
+            ->with(WebsocketServerStates::SYSTEM_CONFIG)
+            ->willReturn(new \DateTime());
+
+        $listener->onConfigUpdate($event);
+    }
+
+    public function testOnConfigUpdateUpdatesStateOnceWhenSeveralWatchedOptionsChanged(): void
+    {
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_test.first_option', 'oro_test.second_option']
+        );
+        $event = new ConfigUpdateEvent(
+            [
+                'oro_test.first_option' => ['old' => 'a', 'new' => 'b'],
+                'oro_test.second_option' => ['old' => 'c', 'new' => 'd'],
             ],
+            'global',
+            0
+        );
+
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
+        $this->stateManager->expects(self::once())
+            ->method('updateState')
+            ->with(WebsocketServerStates::SYSTEM_CONFIG)
+            ->willReturn(new \DateTime());
+
+        $listener->onConfigUpdate($event);
+    }
+
+    /**
+     * @dataProvider scopeDataProvider
+     */
+    public function testOnConfigUpdateUpdatesStateForWatchedOptionInAnyScope(
+        string $scope,
+        int $scopeId
+    ): void {
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_test.watched_option']
+        );
+        $event = new ConfigUpdateEvent(
+            ['oro_test.watched_option' => ['old' => 'a', 'new' => 'b']],
+            $scope,
+            $scopeId
+        );
+
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
+        $this->stateManager->expects(self::once())
+            ->method('updateState')
+            ->with(WebsocketServerStates::SYSTEM_CONFIG)
+            ->willReturn(new \DateTime());
+
+        $listener->onConfigUpdate($event);
+    }
+
+    public static function scopeDataProvider(): array
+    {
+        return [
+            'global scope' => ['global', 0],
+            'organization scope' => ['organization', 1],
+            'website scope' => ['website', 5],
         ];
-        $scope = 'global';
-        $scopeId = 0;
+    }
 
-        $event = new ConfigUpdateEvent($changeSet, $scope, $scopeId);
+    public function testOnConfigUpdateDoesNotUpdateStateWhenOnlyOtherOptionChanged(): void
+    {
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_ui.application_url']
+        );
+        $event = new ConfigUpdateEvent(
+            ['oro_email.attachment_preview_limit' => ['old' => 8, 'new' => 9]],
+            'global',
+            0
+        );
 
-        $this->applicationState->expects(self::once())
-            ->method('isInstalled')
-            ->willReturn(false);
-
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
         $this->stateManager->expects(self::never())
             ->method('updateState');
 
-        $this->listener->onConfigUpdate($event);
+        $listener->onConfigUpdate($event);
     }
 
-    public function testOnConfigUpdateWorksWithEmptyChangeSet(): void
+    public function testOnConfigUpdateDoesNotUpdateStateWhenChangeSetIsEmpty(): void
     {
-        $changeSet = [];
-        $scope = 'organization';
-        $scopeId = 1;
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_ui.application_url']
+        );
+        $event = new ConfigUpdateEvent([], 'global', 0);
 
-        $event = new ConfigUpdateEvent($changeSet, $scope, $scopeId);
-
-        $this->applicationState->expects(self::once())
-            ->method('isInstalled')
+        $this->applicationState->method('isInstalled')
             ->willReturn(true);
+        $this->stateManager->expects(self::never())
+            ->method('updateState');
 
+        $listener->onConfigUpdate($event);
+    }
+
+    public function testOnConfigUpdateDoesNotUpdateStateWhenNoOptionsAreWatched(): void
+    {
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            []
+        );
+        $event = new ConfigUpdateEvent(
+            ['oro_ui.application_url' => ['old' => 'http://old.example.com', 'new' => 'http://new.example.com']],
+            'global',
+            0
+        );
+
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
+        $this->stateManager->expects(self::never())
+            ->method('updateState');
+
+        $listener->onConfigUpdate($event);
+    }
+
+    public function testOnConfigUpdateDoesNotUpdateStateWhenWatchedOptionOnlyFallsBackToParentScope(): void
+    {
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_test.watched_option']
+        );
+        $event = new ConfigUpdateEvent(
+            [],
+            'website',
+            5,
+            ['oro_test.watched_option' => ['old' => 'a', 'new' => 'a', 'action' => 'add']]
+        );
+
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
+        $this->stateManager->expects(self::never())
+            ->method('updateState');
+
+        $listener->onConfigUpdate($event);
+    }
+
+    public function testOnConfigUpdateDoesNotUpdateStateWhenApplicationIsNotInstalled(): void
+    {
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_ui.application_url']
+        );
+        $event = new ConfigUpdateEvent(
+            ['oro_ui.application_url' => ['old' => 'http://old.example.com', 'new' => 'http://new.example.com']],
+            'global',
+            0
+        );
+
+        $this->applicationState->method('isInstalled')
+            ->willReturn(false);
+        $this->stateManager->expects(self::never())
+            ->method('updateState');
+
+        $listener->onConfigUpdate($event);
+    }
+
+    public function testOnConfigUpdateIgnoresMissingStateTable(): void
+    {
+        $listener = new WebsocketServerStateSystemConfigUpdateListener(
+            $this->applicationState,
+            $this->stateManager,
+            ['oro_ui.application_url']
+        );
+        $event = new ConfigUpdateEvent(
+            ['oro_ui.application_url' => ['old' => 'http://old.example.com', 'new' => 'http://new.example.com']],
+            'global',
+            0
+        );
+
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
         $this->stateManager->expects(self::once())
             ->method('updateState')
             ->with(WebsocketServerStates::SYSTEM_CONFIG)
-            ->willReturn(new \DateTime('2024-01-15 10:00:00', new \DateTimeZone('UTC')));
+            ->willThrowException(new TableNotFoundException($this->createMock(DriverException::class), null));
 
-        $this->listener->onConfigUpdate($event);
+        $listener->onConfigUpdate($event);
     }
 }

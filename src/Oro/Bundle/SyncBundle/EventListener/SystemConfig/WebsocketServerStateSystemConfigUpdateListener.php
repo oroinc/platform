@@ -15,13 +15,14 @@ class WebsocketServerStateSystemConfigUpdateListener
 {
     public function __construct(
         private readonly ApplicationState $applicationState,
-        private readonly WebsocketServerStateManagerInterface $websocketServerStateManager
+        private readonly WebsocketServerStateManagerInterface $websocketServerStateManager,
+        private readonly array $configOptions,
     ) {
     }
 
     public function onConfigUpdate(ConfigUpdateEvent $event): void
     {
-        if (!$this->applicationState->isInstalled()) {
+        if (!$this->isAnyConfigOptionChanged($event) || !$this->applicationState->isInstalled()) {
             return;
         }
 
@@ -31,5 +32,16 @@ class WebsocketServerStateSystemConfigUpdateListener
             // Listener is triggered during application upgrade - from the point when the related table
             // is not yet created.
         }
+    }
+
+    private function isAnyConfigOptionChanged(ConfigUpdateEvent $event): bool
+    {
+        foreach ($this->configOptions as $configOption) {
+            if ($event->isChanged($configOption)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
