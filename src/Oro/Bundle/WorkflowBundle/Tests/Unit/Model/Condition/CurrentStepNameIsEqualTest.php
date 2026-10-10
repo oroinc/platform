@@ -102,6 +102,25 @@ class CurrentStepNameIsEqualTest extends TestCase
         ];
     }
 
+    public function testEvaluateWithPositionalOptions(): void
+    {
+        $context = $this->createMock(TransitionContext::class);
+        $user = $this->getEntity(User::class);
+        $workflowItem = $this->getEntity(WorkflowItem::class, [
+            'current_step' => $this->getEntity(WorkflowStep::class, [
+                'name' => self::STEP_NAME
+            ])
+        ]);
+
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflowItem')
+            ->with($user, self::WORKFLOW_NAME)
+            ->willReturn($workflowItem);
+
+        $this->condition->initialize([self::STEP_NAME, $user, self::WORKFLOW_NAME]);
+        $this->assertTrue($this->condition->evaluate($context));
+    }
+
     public function testToArray(): void
     {
         $stdClass = new \stdClass();
