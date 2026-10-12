@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Component\PhpUtils\DsnUtil;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 
 /**
@@ -11,6 +12,8 @@ use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 class EngineParameters
 {
     private ?string $engineName;
+
+    private string $scheme;
 
     private ?array $engineNameAliases = [];
 
@@ -24,10 +27,11 @@ class EngineParameters
 
     private array $parameters = [];
 
-    public function __construct(string $dsn)
+    public function __construct(#[\SensitiveParameter] string $dsn)
     {
-        $invalidDsnException =
-            new InvalidArgumentException(sprintf('The "%s" search engine DSN is invalid.', $dsn));
+        $invalidDsnException = new InvalidArgumentException(
+            sprintf('The "%s" search engine DSN is invalid.', DsnUtil::hideSecrets($dsn))
+        );
 
         $parsedDsn = parse_url($dsn);
         if (false === $parsedDsn) {
@@ -40,9 +44,13 @@ class EngineParameters
         }
 
         if (!isset($parsedDsn['scheme'])) {
-            throw new InvalidArgumentException(sprintf('The "%s" search engine DSN must contain a scheme.', $dsn));
+            throw new InvalidArgumentException(sprintf(
+                'The "%s" search engine DSN must contain a scheme.',
+                DsnUtil::hideSecrets($dsn)
+            ));
         }
 
+        $this->scheme = $parsedDsn['scheme'];
         $this->engineName = str_replace('-', '_', $parsedDsn['scheme']);
         $this->host = $parsedDsn['host'] ?? null;
         $this->user = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
@@ -59,6 +67,14 @@ class EngineParameters
     public function getEngineName(): string
     {
         return $this->engineNameAliases[$this->engineName] ?? $this->engineName;
+    }
+
+    /**
+     * The DSN scheme as written, for example "https". Unlike getEngineName(), it is not resolved through the aliases.
+     */
+    public function getScheme(): string
+    {
+        return $this->scheme;
     }
 
     public function getHost(): ?string
