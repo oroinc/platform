@@ -16,6 +16,7 @@ use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass a
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Component\Config\Cache\ChainConfigCacheState;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -56,20 +57,28 @@ class ConfigurationLoader
                 ->addMethodCall('addDependency', [new Reference('oro_entity.entity_configuration.provider')]);
         }
 
+        $configFileRequestTypeExpressions = $this->getConfigFileRequestTypeExpressions($config['config_files']);
+
         $configBagsConfig = [];
         $exclusionProvidersConfig = [];
         $entityAliasResolversConfig = [];
         $entityOverrideProvidersConfig = [];
         $configCacheStatesConfig = [];
         foreach ($config['config_files'] as $configKey => $fileConfig) {
+            $requestTypeExpression = $this->getRequestTypeExpression($fileConfig);
+
             [
                 $configBagServiceId,
                 $entityAliasResolverServiceId,
                 $exclusionProviderServiceId,
                 $entityOverrideProviderServiceId,
                 $configCacheStateServiceId
-            ] = $this->configureApi($configKey, $fileConfig['file_name']);
-            $requestTypeExpression = $this->getRequestTypeExpression($fileConfig);
+            ] = $this->configureApi(
+                $configKey,
+                $fileConfig['file_name'],
+                $configFileRequestTypeExpressions,
+                $requestTypeExpression
+            );
 
             $configBagsConfig[] = [$configBagServiceId, $requestTypeExpression];
             $entityAliasResolversConfig[] = [$entityAliasResolverServiceId, $requestTypeExpression];
@@ -122,11 +131,20 @@ class ConfigurationLoader
      * @return string[] [config bag service id, entity alias resolver service id, exclusion provider service id,
      *                  entity override provider service id, config cache state service id]
      */
-    private function configureApi(string $configKey, array $fileNames): array
-    {
+    private function configureApi(
+        string $configKey,
+        array $fileNames,
+        array $configFileRequestTypeExpressions,
+        string $requestTypeExpression
+    ): array {
         return \count($fileNames) === 1
-            ? $this->configureSingleFileApi($configKey, $fileNames[0])
-            : $this->configureMultiFileApi($configKey, $fileNames);
+            ? $this->configureSingleFileApi($configKey, $fileNames[0], $configFileRequestTypeExpressions)
+            : $this->configureMultiFileApi(
+                $configKey,
+                $fileNames,
+                $configFileRequestTypeExpressions,
+                $requestTypeExpression
+            );
     }
 
     /**
@@ -136,14 +154,18 @@ class ConfigurationLoader
      * @return string[] [config bag service id, entity alias resolver service id, exclusion provider service id,
      *                  entity override provider service id, config cache state service id]
      */
-    private function configureSingleFileApi(string $configKey, string $fileName): array
-    {
+    private function configureSingleFileApi(
+        string $configKey,
+        string $fileName,
+        array $configFileRequestTypeExpressions
+    ): array {
         $configCacheServiceId = $this->configureConfigCache($configKey);
         $configCacheStateServiceId = $this->configureConfigCacheState($configKey, $configCacheServiceId);
         $configBagServiceId = $this->configureConfigBag(
             $configKey,
             $fileName,
-            $configCacheServiceId
+            $configCacheServiceId,
+            $configFileRequestTypeExpressions[$fileName] ?? ''
         );
         $entityOverrideProviderServiceId = $this->configureEntityOverrideProvider(
             $configKey,
@@ -178,8 +200,12 @@ class ConfigurationLoader
      * @return string[] [config bag service id, entity alias resolver service id, exclusion provider service id,
      *                  entity override provider service id, config cache state service id]
      */
-    private function configureMultiFileApi(string $configKey, array $fileNames): array
-    {
+    private function configureMultiFileApi(
+        string $configKey,
+        array $fileNames,
+        array $configFileRequestTypeExpressions,
+        string $requestTypeExpression
+    ): array {
         $configCacheServiceId = $this->configureConfigCache($configKey);
         $configCacheStateServiceId = $this->configureConfigCacheState($configKey, $configCacheServiceId);
 
@@ -188,7 +214,8 @@ class ConfigurationLoader
             $serviceId = $this->configureConfigBag(
                 sprintf('%s_%s_internal', $configKey, $key),
                 $fileName,
-                $configCacheServiceId
+                $configCacheServiceId,
+                $configFileRequestTypeExpressions[$fileName] ?? ''
             );
             $this->container->getDefinition($serviceId)->setPublic(false);
             $allConfigBags[] = new Reference($serviceId);
@@ -196,7 +223,8 @@ class ConfigurationLoader
 
         $configBagServiceId = $this->configureCombinedConfigBag(
             $configKey,
-            $allConfigBags
+            $allConfigBags,
+            $requestTypeExpression
         );
         $entityOverrideProviderServiceId = $this->configureEntityOverrideProvider(
             $configKey,
@@ -274,12 +302,16 @@ class ConfigurationLoader
      *
      * @return string config bag service id
      */
-    private function configureConfigBag(string $configKey, string $fileName, string $configCacheServiceId): string
-    {
+    private function configureConfigBag(
+        string $configKey,
+        string $fileName,
+        string $configCacheServiceId,
+        string $requestTypeExpression
+    ): string {
         $configBagServiceId = 'oro_api.config_bag.' . $configKey;
         $this->container
             ->register($configBagServiceId, ConfigBag::class)
-            ->setArguments([new Reference($configCacheServiceId), $fileName])
+            ->setArguments([new Reference($configCacheServiceId), $fileName, $requestTypeExpression])
             ->setPublic(false);
 
         return $configBagServiceId;
@@ -291,14 +323,19 @@ class ConfigurationLoader
      *
      * @return string combined config bag service id
      */
-    private function configureCombinedConfigBag(string $configKey, array $configBags): string
-    {
+    private function configureCombinedConfigBag(
+        string $configKey,
+        array $configBags,
+        string $requestTypeExpression
+    ): string {
         $configBagServiceId = 'oro_api.config_bag.' . $configKey;
         $this->container
             ->register($configBagServiceId, CombinedConfigBag::class)
             ->setArguments([
                 $configBags,
-                new Reference('oro_api.config_merger.entity')
+                new Reference('oro_api.config_merger.entity'),
+                $requestTypeExpression,
+                new TaggedIteratorArgument('oro.api.config_bag_merge_processor')
             ])
             ->setPublic(false);
 
@@ -468,5 +505,17 @@ class ConfigurationLoader
         }
 
         return ServiceLocatorTagPass::register($this->container, $services);
+    }
+
+    private function getConfigFileRequestTypeExpressions(array $configFiles): array
+    {
+        $result = [];
+
+        foreach ($configFiles as $fileConfig) {
+            $result[$fileConfig['file_name'][0]] =
+                $this->getRequestTypeExpression($fileConfig);
+        }
+
+        return $result;
     }
 }

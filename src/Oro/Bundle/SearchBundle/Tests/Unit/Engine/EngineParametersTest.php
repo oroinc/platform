@@ -126,4 +126,32 @@ class EngineParametersTest extends TestCase
             'Not matched engine' => ['foo://user:password@localhost:9200?prefix=oro', 'foo'],
         ];
     }
+
+    /**
+     * @dataProvider schemeDataProvider
+     */
+    public function testGetSchemeReturnsTheSchemeWithoutAliases(string $dsn, string $expectedScheme): void
+    {
+        $engineParameters = new EngineParameters($dsn);
+        $engineParameters->addEngineNameAlias('elastic_search', 'https');
+
+        self::assertSame($expectedScheme, $engineParameters->getScheme());
+    }
+
+    public function schemeDataProvider(): array
+    {
+        return [
+            'orm' => ['orm:', 'orm'],
+            'https alias' => ['https://user:password@es.example.com:9243?prefix=oro_search', 'https'],
+            'scheme with a hyphen' => ['elastic-search://127.0.0.1:9200', 'elastic-search'],
+        ];
+    }
+
+    public function testInvalidDsnMessageHidesTheCredentialsAndTheOptions(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "https://***@es.example.com:9243/path?***" search engine DSN is invalid.');
+
+        new EngineParameters('https://elastic:s3cr/et@es.example.com:9243/path?prefix=oro&ssl[passphrase]=secret');
+    }
 }

@@ -82,6 +82,8 @@ services:
         arguments:
             - '@oro_distribution.handler.application_status'
             - '@oro_sync.websocket_server_state.shared_manager'
+            -
+                - !php/const Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider::APPLICATION_URL_OPTION
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
 

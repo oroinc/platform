@@ -9,11 +9,14 @@ use Symfony\Contracts\Service\ResetInterface;
  * The API resources configuration bag that collects the configuration
  * from all child configuration bags and returns the merged version of the configuration.
  */
-class CombinedConfigBag implements ConfigBagInterface, ResetInterface
+class CombinedConfigBag implements ConfigBagInterface, RequestTypeAwareConfigBagInterface, ResetInterface
 {
     /** @var ConfigBagInterface[] */
     private array $configBags;
     private EntityConfigMerger $entityConfigMerger;
+    private string $requestTypeExpression;
+    /** @var iterable<ConfigBagMergeProcessorInterface> */
+    private iterable $mergeProcessors;
     /** @var array [class name + version => config, ...] */
     private array $cache = [];
 
@@ -23,10 +26,14 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
      */
     public function __construct(
         array $configBags,
-        EntityConfigMerger $entityConfigMerger
+        EntityConfigMerger $entityConfigMerger,
+        string $requestTypeExpression = '',
+        iterable $mergeProcessors = []
     ) {
         $this->configBags = $configBags;
         $this->entityConfigMerger = $entityConfigMerger;
+        $this->requestTypeExpression = $requestTypeExpression;
+        $this->mergeProcessors = $mergeProcessors;
     }
 
     #[\Override]
@@ -40,6 +47,9 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
         return array_unique(array_merge(...$result));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     #[\Override]
     public function getConfig(string $className, string $version): ?array
     {
@@ -51,6 +61,21 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
         $configs = [];
         foreach ($this->configBags as $configBag) {
             $config = $configBag->getConfig($className, $version);
+            if (!$config) {
+                continue;
+            }
+
+            $sourceRequestTypeExpression = $configBag instanceof RequestTypeAwareConfigBagInterface
+                ? $configBag->getRequestTypeExpression()
+                : '';
+            foreach ($this->mergeProcessors as $mergeProcessor) {
+                $config = $mergeProcessor->process(
+                    $config,
+                    $sourceRequestTypeExpression,
+                    $this->requestTypeExpression
+                );
+            }
+
             if ($config) {
                 $configs[] = $config;
             }
@@ -74,6 +99,12 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
         $this->cache[$cacheKey] = $result;
 
         return $result;
+    }
+
+    #[\Override]
+    public function getRequestTypeExpression(): string
+    {
+        return $this->requestTypeExpression;
     }
 
     #[\Override]

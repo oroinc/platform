@@ -87,7 +87,40 @@ class DsnBasedParametersTest extends TestCase
                 'host' => '127.0.0.1',
                 'port' => '5672',
                 'path' => null
+            ],
+            'amqps with ssl options' => [
+                'dsn' => 'amqps://oro:secret@mq.example.com:5671/%2f?ssl[cafile]=/etc/ssl/ca.pem',
+                'transportName' => 'amqps',
+                'parameters' => ['ssl' => ['cafile' => '/etc/ssl/ca.pem']],
+                'parameter' => ['ssl' => ['cafile' => '/etc/ssl/ca.pem']],
+                'user' => 'oro',
+                'password' => 'secret',
+                'host' => 'mq.example.com',
+                'port' => '5671',
+                'path' => '/'
+            ],
+            'amqps without host' => [
+                'dsn' => 'amqps:///',
+                'transportName' => 'amqps',
+                'parameters' => [],
+                'parameter' => ['ssl' => null],
+                'user' => null,
+                'password' => null,
+                'host' => 'localhost',
+                'port' => null,
+                'path' => null
             ]
         ];
+    }
+
+    public function testInvalidDsnMessageHidesTheCredentialsAndTheOptions(): void
+    {
+        // The password contains "?". Thus the "@" can be in the password or in the query, and all the text is hidden.
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The "amqps://***" message queue transport connection DSN is invalid.'
+        );
+
+        new DsnBasedParameters('amqps://oro:p?ss/w@rd@mq.example.com:5671/%2f?ssl[passphrase]=secret');
     }
 }

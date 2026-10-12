@@ -83,7 +83,10 @@ HELP
             }
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
             if ($this->checkCommand($output, $command)) {
-                $schedule = $this->createSchedule($output, $command, $name);
+                $arguments = $command instanceof CronCommandScheduleArgumentsInterface
+                    ? $command->getDefaultArguments()
+                    : [];
+                $schedule = $this->createSchedule($output, $command, $name, $arguments);
                 $em->persist($schedule);
             }
         }

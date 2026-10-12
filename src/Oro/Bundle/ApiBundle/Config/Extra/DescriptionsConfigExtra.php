@@ -14,11 +14,16 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 
     private ?string $documentationAction;
     private ?string $resourceDocumentationAction;
+    private bool $useFallbackDescriptions;
 
-    public function __construct(?string $documentationAction = null, ?string $resourceDocumentationAction = null)
-    {
+    public function __construct(
+        ?string $documentationAction = null,
+        ?string $resourceDocumentationAction = null,
+        bool $useFallbackDescriptions = true
+    ) {
         $this->documentationAction = $documentationAction;
         $this->resourceDocumentationAction = $resourceDocumentationAction;
+        $this->useFallbackDescriptions = $useFallbackDescriptions;
     }
 
     /**
@@ -35,6 +40,15 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     public function getResourceDocumentationAction(): ?string
     {
         return $this->resourceDocumentationAction;
+    }
+
+    /**
+     * Indicates whether default descriptions should be used
+     * when explicit documentation is not available.
+     */
+    public function useFallbackDescriptions(): bool
+    {
+        return $this->useFallbackDescriptions;
     }
 
     #[\Override]
@@ -61,6 +75,9 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
         $result = self::NAME;
         if ($this->documentationAction) {
             $result .= ':' . $this->documentationAction;
+        }
+        if (!$this->useFallbackDescriptions) {
+            $result .= ':no_fallback_descriptions';
         }
 
         return $result;

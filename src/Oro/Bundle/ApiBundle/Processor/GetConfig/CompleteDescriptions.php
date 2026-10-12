@@ -66,6 +66,7 @@ class CompleteDescriptions implements ProcessorInterface
 
         /** @var DescriptionsConfigExtra|null $descriptionsConfigExtra */
         $descriptionsConfigExtra = $context->getExtra(DescriptionsConfigExtra::NAME);
+        $useFallbackDescriptions = $descriptionsConfigExtra?->useFallbackDescriptions() ?? true;
         $this->entityDescriptionHelper->setDescriptionForEntity(
             $definition,
             $requestType,
@@ -74,7 +75,8 @@ class CompleteDescriptions implements ProcessorInterface
             $descriptionsConfigExtra?->getResourceDocumentationAction() ?? $targetAction,
             $context->isCollection(),
             $context->getAssociationName(),
-            $context->getParentClassName()
+            $context->getParentClassName(),
+            $useFallbackDescriptions
         );
         if (ApiAction::OPTIONS !== $targetAction) {
             $this->fieldsDescriptionHelper->setDescriptionsForFields(
@@ -82,7 +84,9 @@ class CompleteDescriptions implements ProcessorInterface
                 $requestType,
                 $entityClass,
                 $isInherit,
-                $descriptionsConfigExtra?->getDocumentationAction() ?? $targetAction
+                $descriptionsConfigExtra?->getDocumentationAction() ?? $targetAction,
+                null,
+                $useFallbackDescriptions
             );
             $filters = $context->getFilters();
             if (null !== $filters) {
@@ -91,7 +95,8 @@ class CompleteDescriptions implements ProcessorInterface
                     $definition,
                     $requestType,
                     $entityClass,
-                    $isInherit
+                    $isInherit,
+                    $useFallbackDescriptions
                 );
             }
         }

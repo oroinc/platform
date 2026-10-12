@@ -2,6 +2,8 @@
 
 namespace Oro\Component\MessageQueue\Transport;
 
+use Oro\Component\PhpUtils\DsnUtil;
+
 /**
  * DSN string based parameters bag to configure MQ transport.
  */
@@ -21,17 +23,19 @@ class DsnBasedParameters
 
     private array $parameters = [];
 
-    public function __construct(string $dsn)
+    public function __construct(#[\SensitiveParameter] string $dsn)
     {
         $invalidDsnException =
             new \InvalidArgumentException(sprintf(
                 'The "%s" message queue transport connection DSN is invalid.',
-                $dsn
+                DsnUtil::hideSecrets($dsn)
             ));
 
         $dsn = strtr($dsn, [
             'amqp:///' => 'amqp://localhost/',
             'amqp://:' => 'amqp://localhost:',
+            'amqps:///' => 'amqps://localhost/',
+            'amqps://:' => 'amqps://localhost:',
         ]);
 
         $parsedDsn = parse_url($dsn);
@@ -42,7 +46,7 @@ class DsnBasedParameters
         if (!isset($parsedDsn['scheme'])) {
             throw new \InvalidArgumentException(sprintf(
                 'The "%s" message queue transport connection DSN must contain a scheme.',
-                $dsn
+                DsnUtil::hideSecrets($dsn)
             ));
         }
 

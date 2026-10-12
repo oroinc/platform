@@ -54,4 +54,39 @@ class RunCommandTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider createJobNameDataProvider
+     */
+    public function testCreateJobName(array $messageBody, string $expectedJobName): void
+    {
+        self::assertEquals(
+            $expectedJobName,
+            $this->getTopic()->createJobName($messageBody)
+        );
+    }
+
+    public static function createJobNameDataProvider(): array
+    {
+        return [
+            'no arguments' => [
+                'messageBody' => ['command' => 'oro:test', 'arguments' => []],
+                'expectedJobName' => 'oro:cron:run_command:oro:test',
+            ],
+            'email-body-sync with resolved process-timeout argument' => [
+                'messageBody' => [
+                    'command' => 'oro:cron:email-body-sync',
+                    'arguments' => ['--process-timeout' => '1200'],
+                ],
+                'expectedJobName' => 'oro:cron:run_command:oro:cron:email-body-sync---process-timeout=1200',
+            ],
+            'imap-sync with resolved process-timeout argument' => [
+                'messageBody' => [
+                    'command' => 'oro:cron:imap-sync',
+                    'arguments' => ['--process-timeout' => '1200'],
+                ],
+                'expectedJobName' => 'oro:cron:run_command:oro:cron:imap-sync---process-timeout=1200',
+            ],
+        ];
+    }
 }

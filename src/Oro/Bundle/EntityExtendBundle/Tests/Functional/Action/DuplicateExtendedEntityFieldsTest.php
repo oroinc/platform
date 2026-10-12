@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\DataFixtures\LoadTestEntityFieldsWithExtendData;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityFields;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntity;
 
 /**
  * Functional test for the @duplicate action covering all filter types:
@@ -17,13 +18,29 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityFields;
  */
 class DuplicateExtendedEntityFieldsTest extends ActionTestCase
 {
+    private const array ALL_FILTER_TYPES_SETTINGS = [
+        [['setNull'], ['propertyName', ['id']]],
+        [['keep'], ['propertyName', ['stringField']]],
+        [['replaceValue', [999]], ['propertyName', ['integerField']]],
+        [['shallowCopy'], ['propertyName', ['manyToOneRelation']]],
+        [['keep'], ['propertyName', ['enum_field']]],
+        [['emptyCollection'], ['propertyName', ['multienum_field']]],
+        [['collection'], ['propertyType', [Collection::class]]],
+    ];
+
+    /** Rules for the declared fields only; the extended storage gets no rule unless a test adds one. */
+    private const array BASE_SETTINGS = [
+        [['setNull'], ['propertyName', ['id']]],
+        [['collection'], ['propertyName', ['manyToManyRelation']]],
+    ];
+
     #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         $this->initClient();
         $this->loadFixtures([LoadTestEntityFieldsWithExtendData::class]);
-        $this->registerDuplicateActionGroup();
+        $this->registerDuplicateActionGroup('test_entity_fields_duplicate', self::ALL_FILTER_TYPES_SETTINGS);
     }
 
     public function testAllFilterTypesAppliedToRegularAndExtendedFields(): void
@@ -98,10 +115,98 @@ class DuplicateExtendedEntityFieldsTest extends ActionTestCase
         );
     }
 
-    private function registerDuplicateActionGroup(): void
+    public function testPropertyRuleAppliesToExtendedField(): void
+    {
+        $original = $this->getReference(LoadTestEntityFieldsWithExtendData::ENTITY);
+        $originalEnum = $original->get('enum_field');
+
+        $copy = $this->duplicate('property_rule', [
+            ...self::BASE_SETTINGS,
+            [['setNull'], ['property', [TestEntityFields::class, 'enum_field']]],
+        ]);
+
+        self::assertNull($copy->get('enum_field'), 'a property rule must apply to an extended field');
+        self::assertSame($originalEnum, $original->get('enum_field'));
+    }
+
+    public function testPropertyRuleOfAnotherClassDoesNotApplyToExtendedField(): void
+    {
+        $original = $this->getReference(LoadTestEntityFieldsWithExtendData::ENTITY);
+
+        $copy = $this->duplicate('foreign_property_rule', [
+            ...self::BASE_SETTINGS,
+            [['setNull'], ['property', [TestExtendedEntity::class, 'enum_field']]],
+        ]);
+
+        self::assertSame($original->get('enum_field'), $copy->get('enum_field'));
+    }
+
+    public function testSerializedEnumValueOfCopyIsManagedInstance(): void
+    {
+        $original = $this->getReference(LoadTestEntityFieldsWithExtendData::ENTITY);
+        $enumOption = $this->getReference(LoadTestEntityFieldsWithExtendData::ENUM_OPTION);
+
+        $copy = $this->duplicate('no_extend_rules', self::BASE_SETTINGS);
+
+        self::assertSame($enumOption, $copy->get('enum_field'));
+        self::assertSame($original->get('enum_field'), $copy->get('enum_field'));
+        self::assertTrue(self::getContainer()->get('doctrine')->getManager()->contains($copy->get('enum_field')));
+    }
+
+    public function testNestedExtendEntityKeepsStorageObjectsByReference(): void
+    {
+        $original = $this->getReference(LoadTestEntityFieldsWithExtendData::ENTITY);
+        /** @var TestExtendedEntity $originalRelated */
+        $originalRelated = $original->getManyToOneRelation();
+        $bagTarget = $this->getReference(LoadTestEntityFieldsWithExtendData::RELATED_BAG_TARGET);
+        $relatedEnumOption = $this->getReference(LoadTestEntityFieldsWithExtendData::RELATED_ENUM_OPTION);
+        self::assertInstanceOf(Collection::class, $originalRelated->get('biM2MOwners'));
+
+        // no rule for manyToOneRelation: the related extend entity is deep-copied
+        $copy = $this->duplicate('nested_extend_entity', self::BASE_SETTINGS);
+
+        /** @var TestExtendedEntity $copyRelated */
+        $copyRelated = $copy->getManyToOneRelation();
+        self::assertNotSame($originalRelated, $copyRelated);
+        self::assertSame($bagTarget, $copyRelated->get('oro_test_framework_test_entity_fields'));
+        self::assertSame($originalRelated->get('biM2MOwners'), $copyRelated->get('biM2MOwners'));
+        // serialized values of the nested entity are resolved with its own class
+        self::assertSame('nested-serialized', $copyRelated->get('serialized_attribute'));
+        self::assertSame($relatedEnumOption, $copyRelated->get('testExtendedEntityEnumAttribute'));
+    }
+
+    public function testCollectionRuleCopiesExtendStorageCollections(): void
+    {
+        $original = $this->getReference(LoadTestEntityFieldsWithExtendData::ENTITY);
+        $originalCollection = $original->getManyToOneRelation()->get('biM2MOwners');
+
+        $copy = $this->duplicate('collection_by_type', [
+            [['setNull'], ['propertyName', ['id']]],
+            [['collection'], ['propertyType', [Collection::class]]],
+        ]);
+
+        $copyCollection = $copy->getManyToOneRelation()->get('biM2MOwners');
+        self::assertInstanceOf(Collection::class, $copyCollection);
+        self::assertNotSame($originalCollection, $copyCollection);
+        self::assertCount($originalCollection->count(), $copyCollection);
+    }
+
+    private function duplicate(string $name, array $settings): TestEntityFields
+    {
+        $this->registerDuplicateActionGroup($name, $settings);
+        $actionData = $this->executeActionGroup($name, [
+            'entity' => $this->getReference(LoadTestEntityFieldsWithExtendData::ENTITY),
+        ]);
+        $copy = $actionData->offsetGet('entityCopy');
+        self::assertInstanceOf(TestEntityFields::class, $copy);
+
+        return $copy;
+    }
+
+    private function registerDuplicateActionGroup(string $name, array $settings): void
     {
         $config = [
-            'test_entity_fields_duplicate' => [
+            $name => [
                 'parameters' => [
                     'entity' => ['type' => TestEntityFields::class],
                 ],
@@ -110,15 +215,7 @@ class DuplicateExtendedEntityFieldsTest extends ActionTestCase
                         '@duplicate' => [
                             'target'    => '$.entity',
                             'attribute' => '$.entityCopy',
-                            'settings'  => [
-                                [['setNull'], ['propertyName', ['id']]],
-                                [['keep'], ['propertyName', ['stringField']]],
-                                [['replaceValue', [999]], ['propertyName', ['integerField']]],
-                                [['shallowCopy'], ['propertyName', ['manyToOneRelation']]],
-                                [['keep'], ['propertyName', ['enum_field']]],
-                                [['emptyCollection'], ['propertyName', ['multienum_field']]],
-                                [['collection'], ['propertyType', ['Doctrine\Common\Collections\Collection']]],
-                            ],
+                            'settings'  => $settings,
                         ],
                     ],
                 ],

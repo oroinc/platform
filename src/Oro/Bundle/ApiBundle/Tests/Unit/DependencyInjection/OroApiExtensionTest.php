@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -1148,7 +1149,9 @@ class OroApiExtensionTest extends TestCase
                     new Reference('oro_api.config_bag.second_0_internal'),
                     new Reference('oro_api.config_bag.second_1_internal')
                 ],
-                new Reference('oro_api.config_merger.entity')
+                new Reference('oro_api.config_merger.entity'),
+                'second',
+                new TaggedIteratorArgument('oro.api.config_bag_merge_processor')
             ],
             $container->getDefinition('oro_api.config_bag.second')->getArguments()
         );

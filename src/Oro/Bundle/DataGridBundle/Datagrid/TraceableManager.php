@@ -14,6 +14,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableManager implements ManagerInterface, ResetInterface
 {
+    /** @var DatagridInterface[][][] [request hash => [datagrid name => [parameters key => datagrid]]] */
     private array $datagrids = [];
     private array $configurations = [];
 
@@ -54,7 +55,15 @@ class TraceableManager implements ManagerInterface, ResetInterface
     public function getDatagrids(?Request $request = null): array
     {
         $hash = $request ? spl_object_hash($request) : null;
-        return $this->datagrids[$hash] ?? [];
+
+        $result = [];
+        foreach ($this->datagrids[$hash] ?? [] as $name => $datagrids) {
+            foreach ($datagrids as $key => $datagrid) {
+                $result[$name][$key] = $this->describeDatagrid($datagrid);
+            }
+        }
+
+        return $result;
     }
 
     public function getConfigurations(?Request $request = null): array
@@ -77,28 +86,33 @@ class TraceableManager implements ManagerInterface, ResetInterface
     {
         $request = $this->requestStack?->getCurrentRequest();
         $hash = $request ? spl_object_hash($request) : null;
-
-        if (!isset($this->datagrids[$hash][$name][$key])) {
-            $config = $datagrid->getConfig();
-
-            $this->datagrids[$hash][$name][$key] = [
-                'configuration' => $config->toArray(),
-                'resolved_metadata' => $datagrid->getResolvedMetadata()->toArray(),
-                'parameters' => $datagrid->getParameters()->all(),
-                'extensions' => array_map(
-                    fn ($extension) => [
-                        'stub' => new ClassStub($extension::class),
-                        'priority' => $extension->getPriority(),
-                    ],
-                    $datagrid->getAcceptor()->getExtensions()
-                ),
-                'names' => [
-                    ...$config->offsetGetOr(SystemAwareResolver::KEY_EXTENDED_FROM, []),
-                    $config->getName()
-                ]
-            ];
-        }
+        $this->datagrids[$hash][$name][$key] = $datagrid;
 
         return $datagrid;
+    }
+
+    /**
+     * Describes the datagrid on demand, so tracing never visits its metadata before the application does.
+     */
+    private function describeDatagrid(DatagridInterface $datagrid): array
+    {
+        $config = $datagrid->getConfig();
+
+        return [
+            'configuration' => $config->toArray(),
+            'resolved_metadata' => $datagrid->getMetadata()->toArray(),
+            'parameters' => $datagrid->getParameters()->all(),
+            'extensions' => array_map(
+                fn ($extension) => [
+                    'stub' => new ClassStub($extension::class),
+                    'priority' => $extension->getPriority(),
+                ],
+                $datagrid->getAcceptor()->getExtensions()
+            ),
+            'names' => [
+                ...$config->offsetGetOr(SystemAwareResolver::KEY_EXTENDED_FROM, []),
+                $config->getName()
+            ]
+        ];
     }
 }

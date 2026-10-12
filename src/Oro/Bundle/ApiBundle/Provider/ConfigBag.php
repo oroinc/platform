@@ -7,18 +7,20 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * A storage for configuration of all registered API resources.
  */
-class ConfigBag implements ConfigBagInterface, ResetInterface
+class ConfigBag implements ConfigBagInterface, RequestTypeAwareConfigBagInterface, ResetInterface
 {
     private const ENTITIES = 'entities';
 
     private ConfigCache $configCache;
     private string $configFile;
+    private string $requestTypeExpression;
     private ?array $config = null;
 
-    public function __construct(ConfigCache $configCache, string $configFile)
+    public function __construct(ConfigCache $configCache, string $configFile, string $requestTypeExpression = '')
     {
         $this->configCache = $configCache;
         $this->configFile = $configFile;
+        $this->requestTypeExpression = $requestTypeExpression;
     }
 
     #[\Override]
@@ -39,6 +41,11 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
         $this->ensureInitialized();
 
         return $this->config[self::ENTITIES][$className] ?? null;
+    }
+
+    public function getRequestTypeExpression(): string
+    {
+        return $this->requestTypeExpression;
     }
 
     #[\Override]

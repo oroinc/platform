@@ -6,14 +6,19 @@ namespace Oro\Bundle\EntityExtendBundle\Duplicator\Filter;
 
 use DeepCopy\Filter\Filter;
 use DeepCopy\Reflection\ReflectionHelper;
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Model\ExtendEntityStorage;
+use Oro\Component\Duplicator\Filter\SourceBagRetentionTrait;
+use Oro\Component\Duplicator\PropertyBag;
 
 /**
  * DeepCopy Extended Entity Storage Filter
  */
 class StorageFilter implements Filter
 {
+    use SourceBagRetentionTrait;
+
     #[\Override]
     public function apply($object, $property, $objectCopier): void
     {
@@ -27,11 +32,12 @@ class StorageFilter implements Filter
         if ($oldStorage instanceof \ArrayObject) {
             $this->unsetSerializedNormalizedData($oldStorage);
 
-            $data = $oldStorage->getArrayCopy();
-            $copiedBag = $objectCopier((object)$data);
+            $bag = new PropertyBag(ClassUtils::getClass($object), $oldStorage->getArrayCopy());
+            $this->retainSourceBag($bag);
+            $copiedBag = $objectCopier($bag);
 
             $newStorage = new ExtendEntityStorage(
-                (array)$copiedBag,
+                $copiedBag->toArray(),
                 \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS
             );
 

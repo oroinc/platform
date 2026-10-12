@@ -58,7 +58,8 @@ class FieldsDescriptionHelper
         string $entityClass,
         bool $isInherit,
         string $targetAction,
-        ?string $fieldPrefix = null
+        ?string $fieldPrefix = null,
+        bool $useFallbackDescriptions = true
     ): void {
         $entityConfig = $this->getEntityConfig($entityClass);
         $identifierFieldName = $this->getIdentifierFieldName($definition);
@@ -73,7 +74,8 @@ class FieldsDescriptionHelper
                     $targetAction,
                     $fieldName,
                     $fieldPrefix,
-                    $fieldName === $identifierFieldName ? IdentifierDescriptionHelper::ID_DESCRIPTION : null
+                    $fieldName === $identifierFieldName ? IdentifierDescriptionHelper::ID_DESCRIPTION : null,
+                    $useFallbackDescriptions
                 );
                 if ($description) {
                     $field->setDescription($description);
@@ -116,7 +118,8 @@ class FieldsDescriptionHelper
                     $entityClass,
                     $isInherit,
                     $targetAction,
-                    $targetFieldPrefix
+                    $targetFieldPrefix,
+                    $useFallbackDescriptions
                 );
             }
         }
@@ -124,10 +127,14 @@ class FieldsDescriptionHelper
         $this->identifierDescriptionHelper->setDescriptionForIdentifierField(
             $definition,
             $entityClass,
-            $targetAction
+            $targetAction,
+            $useFallbackDescriptions
         );
-        $this->setDescriptionForCreatedAtField($definition, $targetAction);
-        $this->setDescriptionForUpdatedAtField($definition, $targetAction);
+
+        if ($useFallbackDescriptions) {
+            $this->setDescriptionForCreatedAtField($definition, $targetAction);
+            $this->setDescriptionForUpdatedAtField($definition, $targetAction);
+        }
     }
 
     private function getIdentifierFieldName(EntityDefinitionConfig $definition): ?string
@@ -181,7 +188,8 @@ class FieldsDescriptionHelper
         string $targetAction,
         string $fieldName,
         ?string $fieldPrefix,
-        ?string $fieldDescriptionReplacement
+        ?string $fieldDescriptionReplacement,
+        bool $useFallbackDescriptions
     ): ?string {
         $resourceDocParser = $this->resourceDocParserProvider->getResourceDocParser($requestType);
         $description = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
@@ -224,7 +232,7 @@ class FieldsDescriptionHelper
                     }
                     $description = InheritDocUtil::replaceInheritDoc($description, $fieldDescription);
                 }
-            } else {
+            } elseif ($useFallbackDescriptions) {
                 $description = $this->getFieldDescription(
                     $entityClass,
                     $entityConfig,

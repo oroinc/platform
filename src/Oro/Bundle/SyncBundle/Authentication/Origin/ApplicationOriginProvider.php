@@ -9,6 +9,8 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
  */
 class ApplicationOriginProvider implements OriginProviderInterface
 {
+    public const string APPLICATION_URL_OPTION = 'oro_ui.application_url';
+
     /** @var ConfigManager */
     private $configManager;
 
@@ -26,7 +28,7 @@ class ApplicationOriginProvider implements OriginProviderInterface
     #[\Override]
     public function getOrigins(): array
     {
-        $origin = $this->originExtractor->fromUrl($this->configManager->get('oro_ui.application_url'));
+        $origin = $this->originExtractor->fromUrl($this->configManager->get(self::APPLICATION_URL_OPTION));
 
         return $origin === null ? [] : [$origin];
     }

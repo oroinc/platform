@@ -6,6 +6,7 @@ use Predis\Configuration\Options as BaseOptions;
 
 /**
  * Adds the preferSlave option that allows to configure a preferable slave server for an application.
+ * Creates the connections over TLS with {@see ConnectionFactoryOption}.
  */
 class Options extends BaseOptions
 {
@@ -42,6 +43,7 @@ class Options extends BaseOptions
     {
         $handlers = parent::getHandlers();
         $handlers['replication'] = ReplicationOption::class;
+        $handlers['connections'] = ConnectionFactoryOption::class;
 
         return $handlers;
     }

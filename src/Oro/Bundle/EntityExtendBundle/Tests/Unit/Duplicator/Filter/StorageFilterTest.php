@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Duplicator\Filter;
 use Oro\Bundle\EntityExtendBundle\Duplicator\Filter\StorageFilter;
 use Oro\Bundle\EntityExtendBundle\Model\ExtendEntityStorage;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Duplicator\Filter\Stub\ExtendEntityStub;
+use Oro\Component\Duplicator\PropertyBag;
 use PHPUnit\Framework\TestCase;
 
 class StorageFilterTest extends TestCase
@@ -87,5 +88,73 @@ class StorageFilterTest extends TestCase
         $this->filter->apply($object, 'extendEntityStorage', fn ($v) => clone $v);
 
         self::assertNotSame($originalStorage, $object->extendEntityStorage);
+    }
+
+    public function testCopierReceivesPropertyBagWithOwnerClass(): void
+    {
+        $originalStorage = new ExtendEntityStorage(
+            ['some_field' => 'value', 'serialized_normalized' => ['foo' => 1]],
+            \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS
+        );
+        $object = new ExtendEntityStub($originalStorage);
+
+        $received = null;
+        $this->filter->apply($object, 'extendEntityStorage', function ($bag) use (&$received) {
+            $received = $bag;
+
+            return clone $bag;
+        });
+
+        self::assertInstanceOf(PropertyBag::class, $received);
+        self::assertSame(ExtendEntityStub::class, $received->getOwnerClass());
+        self::assertSame(['some_field' => 'value'], $received->toArray());
+    }
+
+    public function testNewStorageBuiltFromCopiedBag(): void
+    {
+        $relation = new \stdClass();
+        $object = new ExtendEntityStub(new ExtendEntityStorage(
+            ['some_field' => 'value', 'relation' => $relation],
+            \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS
+        ));
+
+        $this->filter->apply($object, 'extendEntityStorage', function (PropertyBag $bag) {
+            $copy = clone $bag;
+            $copy->some_field = null;
+            $copy->added = 'new';
+
+            return $copy;
+        });
+
+        $newStorage = $object->extendEntityStorage;
+        self::assertSame(
+            ['some_field' => null, 'relation' => $relation, 'added' => 'new'],
+            $newStorage->getArrayCopy()
+        );
+        self::assertFalse($newStorage->offsetExists('ownerClass'));
+        self::assertSame(\ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS, $newStorage->getFlags());
+        self::assertSame($relation, $newStorage->relation);
+    }
+
+    public function testSourceBagRetainedWhileFilterLives(): void
+    {
+        $object = new ExtendEntityStub(new ExtendEntityStorage(
+            ['some_field' => 'value'],
+            \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS
+        ));
+
+        $weakRef = null;
+        $this->filter->apply($object, 'extendEntityStorage', function ($bag) use (&$weakRef) {
+            $weakRef = \WeakReference::create($bag);
+
+            return clone $bag;
+        });
+
+        gc_collect_cycles();
+        self::assertNotNull($weakRef->get(), 'the source bag must live as long as the filter');
+
+        $this->filter = new StorageFilter();
+        gc_collect_cycles();
+        self::assertNull($weakRef->get(), 'the source bag must be released with the filter');
     }
 }
