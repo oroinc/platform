@@ -207,7 +207,8 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $response = $client->request('GET', $url, [
             'allow_redirects' => true,
             'cookies' => $cookieJar,
-            'sink' => $this->template
+            'sink' => $this->template,
+            'verify' => false
         ]);
 
         self::assertEquals(200, $response->getStatusCode());

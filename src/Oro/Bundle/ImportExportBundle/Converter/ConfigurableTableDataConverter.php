@@ -478,11 +478,11 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             if (str_contains($frontendHeader, $this->collectionDelimiter)) {
                 $rules[$frontendHeader] = [
                     self::FRONTEND_TO_BACKEND => [
-                        $frontendHeader,
+                        $this->quoteCollectionDelimiterParts($frontendHeader),
                         $this->getReplaceCallback($backendHeader, -1),
                     ],
                     self::BACKEND_TO_FRONTEND => [
-                        $backendHeader,
+                        $this->quoteCollectionDelimiterParts($backendHeader),
                         $this->getReplaceCallback($frontendHeader, +1),
                     ],
                 ];
@@ -490,6 +490,19 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         }
 
         return $rules;
+    }
+
+    /**
+     * Builds a regexp pattern out of a header string that carries the {@see collectionDelimiter}
+     * placeholder: the placeholder is kept as a live capturing group, every other (label-derived)
+     * part is escaped so it is matched literally, regardless of regexp metacharacters it may contain.
+     */
+    private function quoteCollectionDelimiterParts(string $string): string
+    {
+        $parts = explode($this->collectionDelimiter, $string);
+        $parts = array_map(fn (string $part): string => preg_quote($part, '~'), $parts);
+
+        return implode($this->collectionDelimiter, $parts);
     }
 
     /**
