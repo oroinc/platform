@@ -124,6 +124,53 @@ class ConfigurableTableDataConverterTest extends TestCase
                 'related_entity_name' => 'DictionaryEntity',
             ]
         ],
+        'MultiEnumEntity' => [
+            [
+                'name' => 'id',
+                'label' => 'ID',
+            ],
+            [
+                'name' => 'attr',
+                'label' => 'Horsepower (HP) [max]',
+                'type' => 'multiEnum',
+            ],
+        ],
+        'SpecialCharacterEntity' => [
+            [
+                'name' => 'id',
+                'label' => 'ID',
+            ],
+            [
+                'name' => 'bracket',
+                'label' => 'Horsepower (HP) [Max]',
+                'relation_type' => 'ref-many',
+                'related_entity_name' => 'ScalarEntity',
+            ],
+            [
+                'name' => 'sizeDotA',
+                'label' => 'Size.A',
+                'relation_type' => 'ref-many',
+                'related_entity_name' => 'ScalarEntity',
+            ],
+            [
+                'name' => 'sizeXA',
+                'label' => 'SizeXA',
+                'relation_type' => 'ref-many',
+                'related_entity_name' => 'ScalarEntity',
+            ],
+            [
+                'name' => 'weight',
+                'label' => 'Weight ~Approx~',
+                'relation_type' => 'ref-many',
+                'related_entity_name' => 'ScalarEntity',
+            ],
+            [
+                'name' => 'price',
+                'label' => 'Price $1 [\1]',
+                'relation_type' => 'ref-many',
+                'related_entity_name' => 'ScalarEntity',
+            ],
+        ],
     ];
 
     private array $config = [
@@ -200,6 +247,34 @@ class ConfigurableTableDataConverterTest extends TestCase
                 'full' => true,
             ],
         ],
+        'MultiEnumEntity' => [
+            'id' => [
+                'order' => 10
+            ],
+            'attr' => [
+                'order' => 20,
+            ],
+        ],
+        'SpecialCharacterEntity' => [
+            'id' => [
+                'order' => 10
+            ],
+            'bracket' => [
+                'order' => 20,
+            ],
+            'sizeDotA' => [
+                'order' => 30,
+            ],
+            'sizeXA' => [
+                'order' => 40,
+            ],
+            'weight' => [
+                'order' => 50,
+            ],
+            'price' => [
+                'order' => 60,
+            ],
+        ],
     ];
 
     private array $relations = [
@@ -210,7 +285,14 @@ class ConfigurableTableDataConverterTest extends TestCase
             'scalarEntities' => 3,
             'singleRelationEntities' => 1,
             'dictionaryEntities' => 2,
-        ]
+        ],
+        'SpecialCharacterEntity' => [
+            'bracket' => 1,
+            'sizeDotA' => 1,
+            'sizeXA' => 1,
+            'weight' => 1,
+            'price' => 1,
+        ],
     ];
 
     private FieldHelper&MockObject $fieldHelper;
@@ -241,7 +323,14 @@ class ConfigurableTableDataConverterTest extends TestCase
                     $this->createMock(EnumOptionsProvider::class)
                 ]
             )
-            ->onlyMethods(['getConfigValue', 'getEntityFields', 'processRelationAsScalar', 'setLocale'])
+            ->onlyMethods([
+                'getConfigValue',
+                'getEntityFields',
+                'processRelationAsScalar',
+                'setLocale',
+                'getEnumOptionKeys',
+                'getExtendConfigOwner',
+            ])
             ->getMock();
 
         $this->relationCalculator = $this->createMock(RelationCalculator::class);
@@ -574,6 +663,93 @@ class ConfigurableTableDataConverterTest extends TestCase
         $this->prepareRelationCalculator();
         $this->converter->setEntityName($entityName);
         self::assertSame($expected, $this->converter->convertToImportFormat($input));
+    }
+
+    public function testExportImportMultiEnumWithRegexMetacharactersInLabel(): void
+    {
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
+        $this->fieldHelper->expects(self::any())
+            ->method('getExtendConfigOwner')
+            ->willReturn(null);
+        $this->fieldHelper->expects(self::any())
+            ->method('getEnumOptionKeys')
+            ->willReturn(['option_1', 'option_2']);
+
+        $this->converter->setEntityName('MultiEnumEntity');
+
+        $input = [
+            'id' => 1,
+            'attr' => [
+                ['name' => 'Small'],
+                ['name' => 'Large'],
+            ],
+        ];
+
+        $exported = $this->converter->convertToExportFormat($input);
+        self::assertSame(
+            [
+                'ID' => '1',
+                'Horsepower (HP) [max] 1 Name' => 'Small',
+                'Horsepower (HP) [max] 2 Name' => 'Large',
+            ],
+            $exported
+        );
+
+        $imported = $this->converter->convertToImportFormat($exported);
+        self::assertSame(
+            [
+                'id' => '1',
+                'attr' => [
+                    ['name' => 'Small'],
+                    ['name' => 'Large'],
+                ],
+            ],
+            $imported
+        );
+    }
+
+    public function testExportImportRelationsWithRegexMetacharactersInLabel(): void
+    {
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
+        $this->converter->setEntityName('SpecialCharacterEntity');
+
+        $input = [
+            'id' => 1,
+            'bracket' => [['name' => 'bracketValue']],
+            // "Size.A" and "SizeXA" differ only by a regexp metacharacter: unescaped, the "." in
+            // "Size.A" would match the "X" in "SizeXA" and hijack its column.
+            'sizeDotA' => [['name' => 'literalDot']],
+            'sizeXA' => [['name' => 'noDot']],
+            'weight' => [['name' => 'approxValue']],
+            'price' => [['name' => 'priceValue']],
+        ];
+
+        $expected = [
+            'ID' => '1',
+            'Horsepower (HP) [Max] 1 Entity Name' => 'bracketValue',
+            'Size.A 1 Entity Name' => 'literalDot',
+            'SizeXA 1 Entity Name' => 'noDot',
+            'Weight ~Approx~ 1 Entity Name' => 'approxValue',
+            'Price $1 [\1] 1 Entity Name' => 'priceValue',
+        ];
+
+        $exported = $this->converter->convertToExportFormat($input);
+        self::assertSame($expected, $exported);
+
+        $imported = $this->converter->convertToImportFormat($exported);
+        self::assertSame(
+            [
+                'id' => '1',
+                'bracket' => [['name' => 'bracketValue']],
+                'sizeDotA' => [['name' => 'literalDot']],
+                'sizeXA' => [['name' => 'noDot']],
+                'weight' => [['name' => 'approxValue']],
+                'price' => [['name' => 'priceValue']],
+            ],
+            $imported
+        );
     }
 
     public function testGetFieldHeaderWithRelation(): void
