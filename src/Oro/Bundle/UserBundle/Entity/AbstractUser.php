@@ -164,7 +164,7 @@ abstract class AbstractUser implements
     #[\Override]
     public function getUserIdentifier(): string
     {
-        return $this->username;
+        return $this->username ?? '';
     }
 
     public function setUserIdentifier($username): self
