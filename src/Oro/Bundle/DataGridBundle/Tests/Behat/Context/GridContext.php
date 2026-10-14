@@ -28,6 +28,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\DomCrawler\Crawler;
 use WebDriver\Exception\NoSuchElement;
 
@@ -270,6 +271,35 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * The grid can get its rows after it is shown, for example data audit records that the message queue writes.
+     * The step refreshes the grid until it has the expected rows, for up to 30 seconds.
+     *
+     * Example: Then should see following "Audit History Grid" grid after the grid refresh:
+     *   | Old Values | New Values |
+     *
+     * @Then /^(?:|I )should see following "(?P<gridName>[^"]+)" grid after the grid refresh:$/
+     */
+    public function iShouldSeeFollowingGridAfterGridRefresh(TableNode $table, string $gridName): void
+    {
+        $this->spin(function () use ($table, $gridName) {
+            try {
+                $this->iShouldSeeFollowingGrid($table, $gridName);
+
+                return true;
+            } catch (AssertionFailedError) {
+                // Only missing or unexpected rows trigger the refresh. Other errors go to spin(), which retries
+                // until the timeout, and the final check below reports them.
+                $this->iRefreshGrid($gridName);
+                $this->waitForAjax();
+
+                return false;
+            }
+        }, 30);
+
+        $this->iShouldSeeFollowingGrid($table, $gridName);
+    }
+
+    /**
      * Example: And I should see following grid:
      *   | First name | Last name | Primary Email     | Enabled | Status {{ "type": "array", "separator": ";" }} |
      *   | John       | Doe       | admin@example.com | Enabled | Active; Reviewed                               |
@@ -471,6 +501,36 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
         self::assertEquals($this->getCount($number), $this->getGridPaginator($grid)->getTotalRecordsCount());
+    }
+
+    //phpcs:disable
+    /**
+     * The grid can show the expected order later, for example after an asynchronous storefront reindex.
+     * The step reloads the page until the record is at the expected position.
+     *
+     * Example: Then PSKU1 must be first record in "Product Frontend Grid" and continue checking the condition is met for maximum 30 seconds
+     *
+     * @Then /^(?P<content>[\w\d\s\-\.,%]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[^"]+)" and continue checking the condition is met for maximum (?P<seconds>\d+) seconds$/
+     */
+    //phpcs:enable
+    public function assertRowContentWithWait(string $content, string $rowNumber, string $gridName, int $seconds): void
+    {
+        $this->spin(function () use ($content, $rowNumber, $gridName) {
+            try {
+                $this->assertRowContent($content, $rowNumber, $gridName);
+
+                return true;
+            } catch (AssertionFailedError) {
+                // Only an unexpected row triggers the reload. Other errors go to spin(), which retries
+                // until the timeout, and the final check below reports them.
+                $this->getSession()->reload();
+                $this->waitForAjax();
+
+                return false;
+            }
+        }, $seconds);
+
+        $this->assertRowContent($content, $rowNumber, $gridName);
     }
 
     /**

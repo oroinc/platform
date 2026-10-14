@@ -1838,21 +1838,22 @@ JS;
      */
     public function clickOnEmptySpace()
     {
-        $overlay = $this->getPage()->find('css', '#oro-dropdown-mask');
-        if ($overlay?->isVisible()) {
-            $overlay->click();
-        } else {
-            try {
-                $container = $this->getPage()->find('css', '#container');
-                if ($container?->isVisible()) {
-                    $container->click();
-                }
-            } catch (\Exception $e) {
-                $dropMask = $this->getPage()->find('css', '#select2-drop-mask');
-                if ($dropMask?->isVisible()) {
-                    $dropMask->click();
-                }
+        // An open select2 covers the page with its mask, and only a click on the mask closes it
+        foreach (['#oro-dropdown-mask', '#select2-drop-mask'] as $mask) {
+            $overlay = $this->getPage()->find('css', $mask);
+            if ($overlay?->isVisible()) {
+                $overlay->click();
+
+                return;
             }
+        }
+
+        try {
+            $container = $this->getPage()->find('css', '#container');
+            if ($container?->isVisible()) {
+                $container->click();
+            }
+        } catch (\Exception $e) {
         }
     }
 
@@ -2444,6 +2445,8 @@ return jQuery(
     document.evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
 ).outerWidth();
 JS;
+        // The sidebar width changes with a CSS transition, so wait until the transition ends
+        $this->spin(fn () => $width == $driver->evaluateScript($javascipt), 5);
         self::assertEquals($width, $driver->evaluateScript($javascipt));
     }
 
