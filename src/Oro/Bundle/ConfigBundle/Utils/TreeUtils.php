@@ -73,4 +73,12 @@ class TreeUtils
     ): string {
         return $rootNodeName . $separator . $configKey;
     }
+
+    /**
+     * Gets the form field name of a config key, e.g. "oro_user___some_setting" for "oro_user.some_setting".
+     */
+    public static function getFieldName(string $configKey): string
+    {
+        return str_replace(ConfigManager::SECTION_MODEL_SEPARATOR, ConfigManager::SECTION_VIEW_SEPARATOR, $configKey);
+    }
 }

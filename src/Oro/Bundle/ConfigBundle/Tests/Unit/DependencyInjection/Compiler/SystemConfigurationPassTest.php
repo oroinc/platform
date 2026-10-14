@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class SystemConfigurationPassTest extends TestCase
 {
@@ -69,18 +70,34 @@ class SystemConfigurationPassTest extends TestCase
                 ],
             ]);
         $apiManagerServiceDef = $this->createMock(Definition::class);
+        $managerRegistryServiceDef = $this->createMock(Definition::class);
+        $scopeNameProviderServiceDef = $this->createMock(Definition::class);
         $configManagerServiceDef = $this->createMock(Definition::class);
-        $this->container->expects($this->exactly(4))
+        $this->container->expects($this->exactly(6))
             ->method('getDefinition')
             ->willReturnMap([
                 ['oro_config.config_definition_bag', $bagServiceDef],
                 ['oro_config.config_bag', $configBagServiceDef],
                 ['oro_config.manager.api', $apiManagerServiceDef],
+                ['oro_config.manager_registry', $managerRegistryServiceDef],
+                ['oro_config.provider.system_config_scope_name', $scopeNameProviderServiceDef],
                 ['oro_config.manager', $configManagerServiceDef],
                 ['oro_config.default_provider', $defaultProviderMock],
             ]);
         $apiManagerServiceDef->expects($this->exactly(2))
             ->method('addMethodCall');
+        $managerRegistryServiceDef->expects(self::exactly(2))
+            ->method('addMethodCall')
+            ->withConsecutive(
+                ['addConfigManager', ['app', new Reference('oro_config.app')]],
+                ['addConfigManager', ['user', new Reference('oro_config.user')]]
+            );
+        $scopeNameProviderServiceDef->expects(self::exactly(2))
+            ->method('addMethodCall')
+            ->withConsecutive(
+                ['addScopeManager', ['app', new Reference('first_scope_service')]],
+                ['addScopeManager', ['user', new Reference('second_scope_service')]]
+            );
 
         $bagServiceDef->expects($this->once())
             ->method('replaceArgument')
@@ -171,13 +188,17 @@ class SystemConfigurationPassTest extends TestCase
             ]);
 
         $apiManagerServiceDef = $this->createMock(Definition::class);
+        $managerRegistryServiceDef = $this->createMock(Definition::class);
+        $scopeNameProviderServiceDef = $this->createMock(Definition::class);
         $configManagerServiceDef = $this->createMock(Definition::class);
-        $this->container->expects(self::exactly(5))
+        $this->container->expects(self::exactly(7))
             ->method('getDefinition')
             ->willReturnMap([
                 ['oro_config.config_definition_bag', $bagServiceDef],
                 ['oro_config.config_bag', $configBagServiceDef],
                 ['oro_config.manager.api', $apiManagerServiceDef],
+                ['oro_config.manager_registry', $managerRegistryServiceDef],
+                ['oro_config.provider.system_config_scope_name', $scopeNameProviderServiceDef],
                 ['oro_config.manager', $configManagerServiceDef],
                 ['oro_config.default_provider', $defaultProviderMock],
             ]);
