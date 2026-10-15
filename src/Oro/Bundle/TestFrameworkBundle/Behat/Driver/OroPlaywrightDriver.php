@@ -18,6 +18,7 @@ use Playwright\Input\Mouse;
 use Playwright\Locator\LocatorInterface;
 use Playwright\Mink\Driver\PlaywrightDriver;
 use Playwright\Page\PageInterface;
+use Playwright\Transport\JsonRpc\ProcessLauncherInterface;
 use WebDriver\Exception\NoSuchElement;
 
 /**
@@ -114,6 +115,8 @@ class OroPlaywrightDriver extends CoreDriver
         array $viewport = ['width' => 1920, 'height' => 1080],
         array $contextOptions = []
     ) {
+        // Every page of the context gets the viewport, also a new tab. Selenium tabs shared the size of the window.
+        $contextOptions += ['viewport' => $viewport];
         $this->driver = new PlaywrightDriver($browserType, $headless, $launchOptions, $contextOptions);
         $this->dialogListenerPages = new \WeakMap();
         $this->viewport = $viewport;
@@ -259,9 +262,11 @@ class OroPlaywrightDriver extends CoreDriver
 
     /**
      * Starts a Playwright trace recording. ORO_PLAYWRIGHT_TRACE=0 turns it off.
-     * The DOM snapshots and the screenshots are off by default, because their buffers stay in the renderer memory for
-     * the whole feature. ORO_PLAYWRIGHT_TRACE_SNAPSHOTS=1 and ORO_PLAYWRIGHT_TRACE_SCREENSHOTS=1 turn them on.
-     * The trace records the action log, the network and the console errors. A tracing error never stops the run.
+     * The trace records the action log, the network and the console errors.
+     * The screenshots are off by default, because with them the renderer crashed on the CI runs.
+     * ORO_PLAYWRIGHT_TRACE_SCREENSHOTS=1 turns them on.
+     * The DOM snapshots are off by default, because their buffers stay in the renderer memory for the whole feature.
+     * ORO_PLAYWRIGHT_TRACE_SNAPSHOTS=1 turns them on. A tracing error never stops the run.
      * The network log includes cookies and form posts, and CI publishes the trace zips as artifacts.
      */
     public function startTracing(): void
@@ -1128,6 +1133,11 @@ JS;
                 return;
             }
 
+            // An attachment response starts a download and keeps the current page, as WebDriver get() did
+            if (str_contains($e->getMessage(), 'Download is starting')) {
+                return;
+            }
+
             throw new DriverException(sprintf('The navigation request failed: %s', $e->getMessage()), 0, $e);
         }
 
@@ -1192,6 +1202,31 @@ JS;
         );
     }
 
+    /**
+     * Prints the end of the stderr of the Node bridge. With DEBUG=pw:browser it holds the browser log,
+     * for example the failed Chromium CHECK that crashed the renderer. The CI log shows nothing else about it.
+     */
+    private function printBridgeStderr(): void
+    {
+        try {
+            $object = $this->driver;
+            foreach (['client', 'transport', 'decorated', 'processLauncher'] as $name) {
+                $reflection = new \ReflectionObject($object);
+                if ($reflection->hasProperty($name)) {
+                    $object = $reflection->getProperty($name)->getValue($object);
+                }
+            }
+            if (!$object instanceof ProcessLauncherInterface) {
+                return;
+            }
+
+            $lines = array_slice(explode("\n", trim($object->getStderrOutput())), -80);
+            echo "Playwright: the end of the bridge stderr before the browser restart:\n"
+                . implode("\n", $lines) . "\n";
+        } catch (\Throwable) {
+        }
+    }
+
     private function setVendorProperty(string $name, mixed $value): void
     {
         $driverReflection = new \ReflectionObject($this->driver);
@@ -1221,10 +1256,26 @@ JS;
         }
     }
 
+    /**
+     * A failed navigation, for example to a host that does not resolve, shows the Chromium error page.
+     * Playwright then gives "chrome-error://chromewebdata/", and WebDriver gave the URL that failed.
+     * The navigation entry of the error page keeps that URL.
+     */
     #[\Override]
     public function getCurrentUrl()
     {
-        return $this->driver->getCurrentUrl();
+        $url = $this->driver->getCurrentUrl();
+        if (!str_starts_with($url, 'chrome-error://')) {
+            return $url;
+        }
+
+        try {
+            return $this->getPage()->evaluate(
+                '() => performance.getEntriesByType("navigation")[0]?.name'
+            ) ?: $url;
+        } catch (\Throwable) {
+            return $url;
+        }
     }
 
     #[\Override]
@@ -1466,6 +1517,9 @@ JS;
         // The whitespace before a newline stays, because the audit grids test for the double space that it gives.
         // "Prices: \nProduct Price" thus becomes "Prices:  Product Price".
         $text = preg_replace("/\n[ \t]+/", "\n", (string)$text);
+
+        // A last table cell with a block element gives a tab before the line break. WebDriver gave one space.
+        $text = preg_replace("/\t+\n/", "\n", (string)$text);
 
         // innerText separates table cells with a tab, but WebDriver used a space
         return trim(str_replace(["\r\n", "\r", "\n", "\t", "\u{00A0}"], ' ', (string)$text));
@@ -1996,6 +2050,7 @@ JS;
 
         $recovering = true;
         try {
+            $this->printBridgeStderr();
             $this->saveCrashTrace();
             try {
                 $this->stop();
@@ -2496,11 +2551,15 @@ JS;
     /**
      * A DOM click changes the state and sends the change event, also on a hidden input.
      * A direct write of the property is the last option, for an input whose click handlers stop the change.
+     * A disabled input keeps its state, as with WebDriver.
      */
     private function setCheckedByJs(string $xpath, bool $value): void
     {
         $script = sprintf(
-            'if (({{ELEMENT}}).checked !== %1$s) {
+            'if (({{ELEMENT}}).disabled) {
+                return;
+            }
+            if (({{ELEMENT}}).checked !== %1$s) {
                 ({{ELEMENT}}).click();
             }
             if (({{ELEMENT}}).checked !== %1$s) {
@@ -2538,13 +2597,20 @@ JS;
     }
 
     /**
+     * Scrolls the element into view only when it is outside of the viewport, as the moveto command of WebDriver did.
+     * A scroll in the middle of a drag leaves jQuery UI sortable with the old item positions,
+     * and the drop does nothing.
+     *
      * @return array{x: float, y: float, width: float, height: float}
      */
     private function getElementRect(string $xpath): array
     {
         $rect = $this->executeJsOnXpath(
             $xpath,
-            '({{ELEMENT}}).scrollIntoView({block: "center", behavior: "instant"});
+            'const v = ({{ELEMENT}}).getBoundingClientRect();
+            if (v.top < 0 || v.left < 0 || v.bottom > window.innerHeight || v.right > window.innerWidth) {
+                ({{ELEMENT}}).scrollIntoView({block: "center", behavior: "instant"});
+            }
             const r = ({{ELEMENT}}).getBoundingClientRect();
             return { x: r.x, y: r.y, width: r.width, height: r.height };'
         );
