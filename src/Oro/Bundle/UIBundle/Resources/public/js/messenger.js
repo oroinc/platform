@@ -188,7 +188,9 @@ const messenger = {
 
     setup: function(options) {
         _.extend(config, options);
-        $(document).on('remove', config.temporaryContainer, this.removeTemporaryContainer);
+        $(document)
+            .off('remove', config.temporaryContainer, this.removeTemporaryContainer)
+            .on('remove', config.temporaryContainer, this.removeTemporaryContainer);
     },
 
     flushStoredMessages: function() {

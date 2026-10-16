@@ -78,6 +78,10 @@ const CellLinksPlugin = BasePlugin.extend({
             },
 
             createCellLinkView(event) {
+                if (this.disposed) {
+                    return;
+                }
+
                 if (this.inEditMode() ||
                     (event.type === 'touchstart' && event.target.tagName === 'A') ||
                     this.isSelectedText() ||
@@ -88,6 +92,10 @@ const CellLinksPlugin = BasePlugin.extend({
 
                 if (isTouchDevice()) {
                     this.timeoutId = setTimeout(() => {
+                        if (this.disposed) {
+                            return;
+                        }
+
                         this.subview('cell-link', new CellLinkView({
                             container: this.$el,
                             url: this.rowUrl
@@ -102,6 +110,10 @@ const CellLinksPlugin = BasePlugin.extend({
             },
 
             destroyCellLinkView() {
+                if (this.disposed) {
+                    return;
+                }
+
                 if (this.timeoutId) {
                     clearTimeout(this.timeoutId);
                 }

@@ -410,5 +410,9 @@ services:
         class: Oro\Bundle\FormBundle\Form\Handler\FormWithAjaxReloadHandler
         arguments:
             - '@doctrine'
+            - '@oro_form.event.event_dispatcher'
         tags:
             - { name: oro_form.form.handler, alias: ajax_reload_form_handler }
+
+    Oro\Bundle\FormBundle\Form\Handler\FormWithAjaxReloadHandler:
+        alias: oro_form.ajax_reload_handler

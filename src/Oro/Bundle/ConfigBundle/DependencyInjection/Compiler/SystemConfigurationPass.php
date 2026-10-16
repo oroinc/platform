@@ -27,6 +27,8 @@ class SystemConfigurationPass implements CompilerPassInterface
     private const CONFIG_DEFINITION_BAG_SERVICE = 'oro_config.config_definition_bag';
     private const MAIN_MANAGER_SERVICE = 'oro_config.manager';
     private const API_MANAGER_SERVICE = 'oro_config.manager.api';
+    private const MANAGER_REGISTRY_SERVICE = 'oro_config.manager_registry';
+    private const SCOPE_NAME_PROVIDER_SERVICE = 'oro_config.provider.system_config_scope_name';
     private const SCOPE_MANAGER_TAG_NAME = 'oro_config.scope';
 
     private const SETTINGS_KEY = 'settings';
@@ -66,6 +68,8 @@ class SystemConfigurationPass implements CompilerPassInterface
 
         $mainManagerDef = $container->getDefinition(self::MAIN_MANAGER_SERVICE);
         $apiManagerDef = $container->getDefinition(self::API_MANAGER_SERVICE);
+        $managerRegistryDef = $container->getDefinition(self::MANAGER_REGISTRY_SERVICE);
+        $scopeNameProviderDef = $container->getDefinition(self::SCOPE_NAME_PROVIDER_SERVICE);
 
         // register scoped config managers
         /** @var Definition[] $managerDefs */
@@ -84,6 +88,8 @@ class SystemConfigurationPass implements CompilerPassInterface
             $managerId = 'oro_config.' . $scope;
             $container->setDefinition($managerId, $managerDef);
             $apiManagerDef->addMethodCall('addConfigManager', [$scope, new Reference($managerId)]);
+            $managerRegistryDef->addMethodCall('addConfigManager', [$scope, new Reference($managerId)]);
+            $scopeNameProviderDef->addMethodCall('addScopeManager', [$scope, $managers[$scope]]);
         }
 
         // a main config manager should be an alias to the most priority scoped config manager

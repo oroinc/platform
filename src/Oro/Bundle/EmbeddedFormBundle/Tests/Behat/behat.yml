@@ -11,3 +11,14 @@ oro_behat_extension:
                 - Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext
             paths:
                 - '@OroEmbeddedFormBundle/Tests/Behat/Features'
+
+    elements:
+        Embedded Form CSS:
+            selector:
+                locator: '//div[contains(@class, "control-group")][label[contains(@class, "control-label")][normalize-space(text())="CSS"]]//bdo'
+                type: xpath
+
+        Embedded Form Success Message:
+            selector:
+                locator: '//div[contains(@class, "attribute-item")][label[contains(@class, "attribute-item__term")][normalize-space(text())="Success message"]]//div[contains(@class, "control-label")]'
+                type: xpath

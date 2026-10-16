@@ -93,6 +93,16 @@ services:
         parent: oro_config.provider.abstract_provider
         lazy: true
 
+    oro_config.provider.system_config_setting_definition:
+        class: Oro\Bundle\ConfigBundle\Provider\SystemConfigSettingDefinitionProvider
+        arguments:
+            - '@oro_config.config_bag'
+            - '@security.authorization_checker'
+            - '@oro_featuretoggle.checker.feature_checker'
+
+    oro_config.provider.system_config_scope_name:
+        class: Oro\Bundle\ConfigBundle\Provider\SystemConfigScopeNameProvider
+
     oro_config.form.config_subscriber:
         class: Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
         arguments:
@@ -156,6 +166,11 @@ services:
         arguments:
             - '@oro_config.provider.system_configuration.form_provider'
 
+    oro_config.manager_registry:
+        class: Oro\Bundle\ConfigBundle\Config\ConfigManagerRegistry
+        arguments:
+            - '@oro_config.provider.system_config_scope_name'
+
     oro_config.form.config_file_data_transformer:
         class: Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer
         arguments:
@@ -200,6 +215,12 @@ services:
             - '@oro_config.manager'
         tags:
             - { name: oro_config.configuration_search_provider, priority: -10 }
+
+    oro_config.formatter.system_config_value:
+        class: Oro\Bundle\ConfigBundle\Formatter\SystemConfigValueFormatter
+        arguments:
+            - '@oro_config.config_bag'
+            - '@translator'
 
     oro_config.placeholder.filter:
         class: Oro\Bundle\ConfigBundle\Placeholder\PlaceholderFilter
