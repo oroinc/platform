@@ -75,6 +75,12 @@ abstract class AbstractOAuthManager implements OAuthManagerInterface
         );
 
         $origin->setAccessToken($response->getAccessToken());
+
+        $newRefreshToken = $response->getRefreshToken();
+        if (!empty($newRefreshToken)) {
+            $origin->setRefreshToken($newRefreshToken);
+        }
+
         $origin->setAccessTokenExpiresAt(new \DateTime(
             '+' . ((int)$response->getExpiresIn() - 5) . ' seconds',
             new \DateTimeZone('UTC')
