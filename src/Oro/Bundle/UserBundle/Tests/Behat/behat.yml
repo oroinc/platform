@@ -188,5 +188,7 @@ oro_behat_extension:
         - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
         - Oro\Bundle\ApiBundle\Tests\Behat\Context\ApiContext
         - Oro\Bundle\NavigationBundle\Tests\Behat\Context\ScrollspyContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\PinbarContext
+        - Oro\Bundle\UIBundle\Tests\Behat\Context\BreadcrumbContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

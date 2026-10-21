@@ -18,7 +18,7 @@ navigation:
                 route:    'oro_user_index'
                 position: 10
                 extras:
-                    routes: ['/^oro_user_(?!role\w+|group\w+|security\w+|reset\w+)\w+$/']
+                    routes: ['/^oro_user_(?!role\w+|group\w+|security\w+|reset\w+|login_attempts$)\w+$/']
                     description: 'oro.user.menu.user_list.description'
             user_create:
                 label: 'oro.user.menu.user_create.label'

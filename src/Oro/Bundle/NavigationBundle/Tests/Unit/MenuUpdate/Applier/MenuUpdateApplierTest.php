@@ -3,12 +3,15 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\MenuUpdate\Applier;
 
 use Knp\Menu\ItemInterface;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplier;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplierInterface;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContext;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\MenuUpdateToMenuItemPropagatorInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -140,6 +143,9 @@ class MenuUpdateApplierTest extends TestCase
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('item-2');
         $menuUpdate->setCustom(true);
+        $scope = new Scope();
+        ReflectionUtil::setId($scope, 7);
+        $menuUpdate->setScope($scope);
 
         $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
@@ -156,6 +162,7 @@ class MenuUpdateApplierTest extends TestCase
         );
 
         $expectedItem = $this->createItem('item-1-1-1-1');
+        $expectedItem->setExtra(MenuUpdateInterface::ORIGIN_SCOPE_ID, 7);
         $expectedItem->setParent($menu->getChild('item-2'));
 
         self::assertEquals($expectedItem, $menu->getChild('item-2')->getChild('item-1-1-1-1'));
@@ -174,6 +181,9 @@ class MenuUpdateApplierTest extends TestCase
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('non-existing');
         $menuUpdate->setCustom(true);
+        $scope = new Scope();
+        ReflectionUtil::setId($scope, 7);
+        $menuUpdate->setScope($scope);
 
         $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
@@ -190,6 +200,7 @@ class MenuUpdateApplierTest extends TestCase
         );
 
         $expectedItem = $this->createItem('item-1-1-1-1');
+        $expectedItem->setExtra(MenuUpdateInterface::ORIGIN_SCOPE_ID, 7);
         $expectedItem->setParent($menu);
 
         self::assertEquals($expectedItem, $menu->getChild('item-1-1-1-1'));

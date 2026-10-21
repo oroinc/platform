@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Utils;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 /**
@@ -68,6 +69,23 @@ class MenuUpdateUtils
         }
 
         return $menuItemsByName;
+    }
+
+    /**
+     * Returns true if a custom menu item was created in a scope other than the specified one.
+     *
+     * When the menu item comes from the menu built for the scope's context, the other scope is always
+     * a less specific one, e.g. the organization scope for a website scope.
+     */
+    public static function isCreatedInOtherScope(?ItemInterface $menuItem, Scope $scope): bool
+    {
+        if (null === $menuItem || !$menuItem->getExtra(MenuUpdateInterface::IS_CUSTOM)) {
+            return false;
+        }
+
+        $originScopeId = $menuItem->getExtra(MenuUpdateInterface::ORIGIN_SCOPE_ID);
+
+        return null !== $originScopeId && $scope->getId() !== $originScopeId;
     }
 
     /**

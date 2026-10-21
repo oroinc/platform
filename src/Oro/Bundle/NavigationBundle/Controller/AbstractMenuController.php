@@ -253,6 +253,10 @@ abstract class AbstractMenuController extends AbstractController
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
             $response['menuItem'] = $menuItem;
+            $response['isCreatedInOtherScope'] = MenuUpdateUtils::isCreatedInOtherScope(
+                $menuItem,
+                $menuUpdate->getScope()
+            );
             $response['menu'] = $menu;
             $response = array_merge($response, $context);
         } else {
