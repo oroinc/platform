@@ -64,4 +64,10 @@ class TreeUtilsTest extends TestCase
         $this->assertEquals('root.name', TreeUtils::getConfigKey('root', 'name'));
         $this->assertEquals('root__name', TreeUtils::getConfigKey('root', 'name', '__'));
     }
+
+    public function testGetFieldName(): void
+    {
+        self::assertSame('oro_user___some_setting', TreeUtils::getFieldName('oro_user.some_setting'));
+        self::assertSame('some_setting', TreeUtils::getFieldName('some_setting'));
+    }
 }

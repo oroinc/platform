@@ -303,7 +303,13 @@ class SearchTest extends RestJsonApiTestCase
         $userId = $this->getEntityId(User::class);
         $response = $this->cget(
             ['entity' => 'search'],
-            ['filter' => ['searchText' => 'Doe', 'aggregations' => 'lastName count']]
+            [
+                'filter' => [
+                    'searchText' => 'Doe',
+                    'aggregations' => 'lastName count',
+                    'entities' => 'users,businessunits'
+                ]
+            ]
         );
         $filteredResponseContent = self::filterResponseContent($response);
         $expectedContent = [

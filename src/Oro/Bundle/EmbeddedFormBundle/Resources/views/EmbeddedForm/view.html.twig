@@ -5,7 +5,7 @@
 {% block navButtons %}
     {% import '@OroUI/macros.html.twig' as UI %}
 
-    {% if is_granted('oro_embedded_form_delete') %}
+    {% if is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
             'dataRedirect': path('oro_embedded_form_list'),
@@ -16,7 +16,7 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
 
-    {% if is_granted('oro_embedded_form_delete') %}
+    {% if is_granted('EDIT', entity) %}
         {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Edit'|trans, 'label' : 'Edit'|trans}) }}
     {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}

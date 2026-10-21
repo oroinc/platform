@@ -10,7 +10,7 @@ use Symfony\Component\Routing\RequestContext;
 /**
  * Decorates {@see SymfonyUrlHelper} to add getAbsolutePath() method.
  */
-class UrlHelper
+class UrlHelper implements UrlHelperInterface
 {
     private SymfonyUrlHelper $symfonyUrlHelper;
 
@@ -28,19 +28,19 @@ class UrlHelper
         $this->requestContext = $requestContext;
     }
 
+    #[\Override]
     public function getAbsoluteUrl(string $path): string
     {
         return $this->symfonyUrlHelper->getAbsoluteUrl($path);
     }
 
+    #[\Override]
     public function getRelativePath(string $path): string
     {
         return $this->symfonyUrlHelper->getRelativePath($path);
     }
 
-    /**
-     * Adds base url to the given path if the path is not an absolute URL or does not starts with base url.
-     */
+    #[\Override]
     public function getAbsolutePath(string $path): string
     {
         if (str_contains($path, '://') || '//' === substr($path, 0, 2)) {
@@ -61,16 +61,7 @@ class UrlHelper
         return $this->requestContext?->getBaseUrl() ?: $this->requestStack->getMainRequest()?->getBaseUrl() ?: '';
     }
 
-    /**
-     * Checks if the given URL is a local URL.
-     *
-     * A URL is considered local if its host matches one of the predefined local hostnames
-     * such as 'localhost', '127.0.0.1', or other common local addresses.
-     *
-     * @param string|null $url The URL to check. If null, the current request's URL is used.
-     *
-     * @return bool True if the URL is local, false otherwise.
-     */
+    #[\Override]
     public function isLocalUrl(?string $url = null): bool
     {
         $url ??= (string) $this->requestStack->getMainRequest()?->getUri();

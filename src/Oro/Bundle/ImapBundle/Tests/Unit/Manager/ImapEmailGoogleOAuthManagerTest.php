@@ -150,6 +150,50 @@ class ImapEmailGoogleOAuthManagerTest extends TestCase
         }
     }
 
+    public function testRefreshAccessTokenStoresRotatedRefreshToken(): void
+    {
+        $origin = new TestUserEmailOrigin();
+        $origin->setRefreshToken('oldRefreshToken');
+
+        $this->oauthProvider->expects($this->once())
+            ->method('getAccessTokenByRefreshToken')
+            ->with('oldRefreshToken', null)
+            ->willReturn(new OAuthAccessTokenData('newAccessToken', 'newRefreshToken', 3600));
+
+        $this->manager->refreshAccessToken($origin);
+
+        self::assertEquals('newAccessToken', $origin->getAccessToken());
+        self::assertEquals('newRefreshToken', $origin->getRefreshToken());
+        self::assertGreaterThan(new \DateTime('now', new \DateTimeZone('UTC')), $origin->getAccessTokenExpiresAt());
+    }
+
+    /**
+     * @dataProvider emptyRefreshTokenDataProvider
+     */
+    public function testRefreshAccessTokenKeepsExistingRefreshTokenWhenResponseHasNoRefreshToken(
+        ?string $responseRefreshToken
+    ): void {
+        $origin = new TestUserEmailOrigin();
+        $origin->setRefreshToken('oldRefreshToken');
+
+        $this->oauthProvider->expects($this->once())
+            ->method('getAccessTokenByRefreshToken')
+            ->willReturn(new OAuthAccessTokenData('newAccessToken', $responseRefreshToken, 3600));
+
+        $this->manager->refreshAccessToken($origin);
+
+        self::assertEquals('newAccessToken', $origin->getAccessToken());
+        self::assertEquals('oldRefreshToken', $origin->getRefreshToken());
+    }
+
+    public function emptyRefreshTokenDataProvider(): array
+    {
+        return [
+            'null'         => [null],
+            'empty string' => ['']
+        ];
+    }
+
     public function getExpirationCheckData(): array
     {
         $expiredOriginNoToken1 = new TestUserEmailOrigin();

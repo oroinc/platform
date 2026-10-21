@@ -7,6 +7,7 @@
     line-height: 1;
     font-size: 12px;
     clear: both;
+    overflow-wrap: break-word;
 
     /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
      * `id` is used to cover only auto-generated jQuery.validate labels and leave posibility to show a few messages
