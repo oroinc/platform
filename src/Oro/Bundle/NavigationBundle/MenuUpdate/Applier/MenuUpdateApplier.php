@@ -79,6 +79,10 @@ class MenuUpdateApplier implements MenuUpdateApplierInterface
         $context->addCreatedItem($menuItem, $menuUpdate);
         $resultCode |= self::RESULT_ITEM_CREATED;
 
+        if ($menuUpdate->isCustom()) {
+            $menuItem->setExtra(MenuUpdateInterface::ORIGIN_SCOPE_ID, $menuUpdate->getScope()?->getId());
+        }
+
         if (!$menuUpdate->isCustom() && !$menuUpdate->isSynthetic()) {
             $context->addLostItem($menuItem, $menuUpdate);
             $resultCode |= self::RESULT_ITEM_LOST;

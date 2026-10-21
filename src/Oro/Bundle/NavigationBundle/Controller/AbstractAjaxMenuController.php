@@ -11,6 +11,7 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateMoveManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper;
 use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
@@ -128,6 +129,14 @@ abstract class AbstractAjaxMenuController extends AbstractController
         $menuUpdate = $manager->findMenuUpdate($menuName, $key, $scope);
         if ($menuUpdate === null || $menuUpdate->getId() === null) {
             throw $this->createNotFoundException();
+        }
+
+        $menuItem = MenuUpdateUtils::findMenuItem($this->getMenu($menuName, $context), $key);
+        if (MenuUpdateUtils::isCreatedInOtherScope($menuItem, $scope)) {
+            return new JsonResponse([
+                'message' => $this->container->get(TranslatorInterface::class)
+                    ->trans('oro.navigation.menuupdate.delete_from_parent_scope_error')
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         /** @var EntityManagerInterface $entityManager */

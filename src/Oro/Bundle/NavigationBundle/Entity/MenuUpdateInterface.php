@@ -16,6 +16,7 @@ interface MenuUpdateInterface
     public const IS_DIVIDER = 'divider';
     public const IS_TRANSLATE_DISABLED = 'translate_disabled';
     public const IS_CUSTOM = 'custom';
+    public const ORIGIN_SCOPE_ID = 'origin_scope_id';
     public const IS_SYNTHETIC = 'synthetic';
     public const POSITION = 'position';
     public const ICON = 'icon';

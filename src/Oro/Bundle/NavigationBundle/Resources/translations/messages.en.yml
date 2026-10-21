@@ -62,6 +62,7 @@ oro:
             hide: Hide
             show: Show
             delete: Delete
+            delete_from_parent_scope_error: "This menu item was created at a higher level and cannot be deleted here."
             hide_success_message: "Menu item is hidden now. Please %reload_link% the page to see the changes applied."
             show_success_message: "Menu item is visible now. Please %reload_link% the page to see the changes applied."
             validation_error_message: Validation error. Please contact system administrator.

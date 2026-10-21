@@ -38,9 +38,10 @@
         {{ UI.dropdownSaveButton({'html': html}) }}
     {% endif %}
 
-    {% if not entity.isCustom or entity.id is not null %}
+    {% set isCreatedInOtherScope = isCreatedInOtherScope|default(false) %}
+    {% if not entity.isCustom or entity.id is not null or isCreatedInOtherScope %}
         {% if entity.key %}
-            {% if entity.isCustom and entity.id is not null %}
+            {% if entity.isCustom and entity.id is not null and not isCreatedInOtherScope %}
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
                     'successMessage': deletedMessage|default('oro.navigation.menuupdate.deleted_message')|trans({'%reload_link%': reloadLink}),
@@ -50,38 +51,38 @@
                     'id': 'btn-remove-attribute',
                     'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
                 }) }}
+            {% endif %}
+
+            {% if entity.active %}
+                {# Hide button #}
+                <div class="pull-right btn-group icons-holder">
+                    {{ UI.ajaxButton({
+                        'aCss':  'no-hash',
+                        'iCss':  'fa-eye-slash',
+                        'label': 'oro.navigation.menuupdate.hide'|trans,
+                        'title': 'oro.navigation.menuupdate.hide'|trans,
+                        'dataId': entity.id,
+                        'dataMethod': 'PUT',
+                        'dataUrl': path(routePrefix ~ 'ajax_hide', {context: context, menuName: menuName, key: entity.key}),
+                        'dataRedirect': app.request.uri,
+                        'successMessage': hiddenMessage|default('oro.navigation.menuupdate.hide_success_message')|trans({'%reload_link%': reloadLink})
+                    }) }}
+                </div>
             {% else %}
-                {% if entity.active %}
-                    {# Hide button #}
-                    <div class="pull-right btn-group icons-holder">
-                        {{ UI.ajaxButton({
-                            'aCss':  'no-hash',
-                            'iCss':  'fa-eye-slash',
-                            'label': 'oro.navigation.menuupdate.hide'|trans,
-                            'title': 'oro.navigation.menuupdate.hide'|trans,
-                            'dataId': entity.id,
-                            'dataMethod': 'PUT',
-                            'dataUrl': path(routePrefix ~ 'ajax_hide', {context: context, menuName: menuName, key: entity.key}),
-                            'dataRedirect': app.request.uri,
-                            'successMessage': hiddenMessage|default('oro.navigation.menuupdate.hide_success_message')|trans({'%reload_link%': reloadLink})
-                        }) }}
-                    </div>
-                {% else %}
-                    {# Show button #}
-                    <div class="pull-right btn-group icons-holder">
-                        {{ UI.ajaxButton({
-                            'aCss':  'no-hash',
-                            'iCss':  'fa-eye',
-                            'label': 'oro.navigation.menuupdate.show'|trans,
-                            'title': 'oro.navigation.menuupdate.show'|trans,
-                            'dataId': entity.id,
-                            'dataMethod': 'PUT',
-                            'dataUrl': path(routePrefix ~ 'ajax_show', {context: context, menuName: menuName, key: entity.key}),
-                            'dataRedirect': app.request.uri,
-                            'successMessage': showedMessage|default('oro.navigation.menuupdate.show_success_message')|trans({'%reload_link%': reloadLink})
-                        }) }}
-                    </div>
-                {% endif %}
+                {# Show button #}
+                <div class="pull-right btn-group icons-holder">
+                    {{ UI.ajaxButton({
+                        'aCss':  'no-hash',
+                        'iCss':  'fa-eye',
+                        'label': 'oro.navigation.menuupdate.show'|trans,
+                        'title': 'oro.navigation.menuupdate.show'|trans,
+                        'dataId': entity.id,
+                        'dataMethod': 'PUT',
+                        'dataUrl': path(routePrefix ~ 'ajax_show', {context: context, menuName: menuName, key: entity.key}),
+                        'dataRedirect': app.request.uri,
+                        'successMessage': showedMessage|default('oro.navigation.menuupdate.show_success_message')|trans({'%reload_link%': reloadLink})
+                    }) }}
+                </div>
             {% endif %}
         {% endif %}
         {% if entity.isDivider == false %}
@@ -114,8 +115,6 @@
             } %}
 
             {{ UI.pinnedDropdownButton(parameters) }}
-
-            {{ UI.buttonSeparator() }}
         {% endif %}
     {% endif %}
 {% endblock navButtons %}
