@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\EventListener;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Listener to fill impersonation column for audit grids using a separate single query
@@ -47,6 +48,38 @@ class AuditGridImpersonationListener
             $impersonationId = $record->getValue('impersonation');
             $impersonation = $impersonationsByIds[$impersonationId] ?? null;
             $record->setValue('impersonation', $impersonation);
+        }
+    }
+
+    public function addImpersonatorUserSupport(OrmResultAfter $event): void
+    {
+        $ids = [];
+        foreach ($event->getRecords() as $record) {
+            $id = $record->getValue('impersonatorUser');
+            $ids[$id] = $id;
+        }
+
+        $ids = array_filter($ids);
+        sort($ids);
+
+        /** @var User[] $users */
+        $users = [];
+        if ($ids) {
+            $users = $this->doctrineHelper
+                ->getEntityRepository(User::class)
+                ->findBy(['id' => $ids]);
+        }
+
+        $usersByIds = [];
+        foreach ($users as $user) {
+            $usersByIds[$user->getId()] = $user;
+        }
+
+        foreach ($event->getRecords() as $record) {
+            $userId = $record->getValue('impersonatorUser');
+            $user = $usersByIds[$userId] ?? null;
+
+            $record->setValue('impersonatorUser', $user);
         }
     }
 }

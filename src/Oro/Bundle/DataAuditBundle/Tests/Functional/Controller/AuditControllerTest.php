@@ -3,7 +3,9 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\DataAuditBundle\Tests\Functional\DataFixtures\LoadAuditData;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 
 /**
  * @dbIsolationPerTest
@@ -39,6 +41,33 @@ class AuditControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         self::assertStringContainsString($entityId, $crawler->html());
+    }
+
+    public function testAuthorTemplateRendersLegacyImpersonationWithoutAuthor(): void
+    {
+        $impersonation = new Impersonation();
+        $impersonation->setIpAddress('127.0.0.1');
+
+        $html = self::getContainer()->get('twig')->render(
+            '@OroDataAudit/Datagrid/Property/author.html.twig',
+            [
+                'value' => null,
+                'record' => new ResultRecord([
+                    'impersonation' => $impersonation,
+                    'impersonatorUser' => null,
+                ]),
+            ]
+        );
+
+        $expected = self::getContainer()->get('translator')->trans(
+            'oro.dataaudit.datagrid.author_impersonation',
+            [
+                '%ipAddress%' => $impersonation->getIpAddress(),
+                '%token%' => $impersonation->getToken(),
+            ]
+        );
+
+        self::assertStringContainsString(trim($expected), trim($html));
     }
 
     public function idsDataProvider(): array

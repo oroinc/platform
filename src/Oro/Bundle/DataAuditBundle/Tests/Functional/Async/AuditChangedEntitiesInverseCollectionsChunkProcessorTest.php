@@ -6,12 +6,14 @@ use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsChunk
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsChunkTopic;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
+use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\DataFixtures\LoadTestAuditDataWithOneToManyData;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -119,6 +121,7 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessorTest extends WebTestCa
         $message = $this->createMessage([
             'timestamp' => time(),
             'transaction_id' => 'aTransactionId',
+            'impersonator_user_id' => 42,
             'entityData' => [$this->getEntityData($owner, $child)]
         ]);
         $entityChanges = $this->getEntityChanges($owner, $child);
@@ -129,7 +132,17 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessorTest extends WebTestCa
 
         $converter->expects(self::once())
             ->method('convert')
-            ->with($entityChanges);
+            ->willReturnCallback(
+                static function (...$arguments) use ($entityChanges): void {
+                    self::assertSame($entityChanges, $arguments[0]);
+
+                    $impersonatorUser = $arguments[array_key_last($arguments)];
+
+                    self::assertInstanceOf(EntityReference::class, $impersonatorUser);
+                    self::assertSame(User::class, $impersonatorUser->getClassName());
+                    self::assertSame(42, $impersonatorUser->getId());
+                }
+            );
         $logger->expects(self::never())
             ->method(self::anything());
 

@@ -1,0 +1,6 @@
+ROLE_MANAGER:
+    permissions:
+        entity|Oro\Bundle\ImportExportBundle\Entity\ImportExportResult: [VIEW_BASIC]
+ROLE_USER:
+    permissions:
+        entity|Oro\Bundle\ImportExportBundle\Entity\ImportExportResult: [VIEW_BASIC]

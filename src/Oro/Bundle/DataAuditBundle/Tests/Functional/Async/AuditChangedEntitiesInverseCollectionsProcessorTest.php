@@ -104,6 +104,8 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
     public function testProcess(): void
     {
         $batchSize = 3;
+        $impersonator = $this->findAdmin();
+        $impersonatorId = $impersonator->getId();
         $owner = $this->getTestAuditDataOwner('test_audit_owner_1');
         $child1 = $this->getTestAuditDataChild($owner, 0);
         $child2 = $this->getTestAuditDataChild($owner, 1);
@@ -113,6 +115,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         $message = $this->createMessage([
             'timestamp' => $timestamp,
             'transaction_id' => 'aTransactionId',
+            'impersonator_user_id' => $impersonatorId,
             'entities_inserted' => [],
             'entities_updated' => [
                 '000000001f4c2232000000006d016312' => [
@@ -134,6 +137,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
                 [
                     'timestamp' => $timestamp,
                     'transaction_id' => 'aTransactionId',
+                    'impersonator_user_id' => $impersonatorId,
                     'entityData' => [
                         $this->getEntityData($owner, [$child1->getId(), $child2->getId(), $child3->getId()])
                     ]
@@ -141,6 +145,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
                 [
                     'timestamp' => $timestamp,
                     'transaction_id' => 'aTransactionId',
+                    'impersonator_user_id' => $impersonatorId,
                     'entityData' => [
                         $this->getEntityData($owner, [$child4->getId()])
                     ]
@@ -151,5 +156,16 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         self::consume();
         $this->assertStoredAuditCount(4);
         $this->assertStoredAuditHasOwnerChanged();
+
+        self::getContainer()
+            ->get('doctrine.orm.entity_manager')
+            ->clear();
+
+        foreach ($this->findStoredAudits() as $audit) {
+            self::assertSame(
+                $impersonatorId,
+                $audit->getImpersonatorUser()?->getId()
+            );
+        }
     }
 }

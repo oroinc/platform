@@ -65,6 +65,7 @@ oro:
             author_impersonation: " (impersonated from %ipAddress% using %token%)"
             author_impersonation_filter: "Impersonated from %ipAddress% using %token%"
             impersonation: Impersonation
+            impersonated_by: "Impersonated by"
 
         back_office_menu:
             type:
@@ -111,6 +112,7 @@ oro:
             version.label: Audit version
             fields.label: Audit fields
             impersonation.label: Audit impersonation
+            impersonator_user.label: Impersonator User
             organization.label: Audit organization
             user.label: Audit user
             additional_fields.label: Additional fields
@@ -131,6 +133,7 @@ oro:
             version.label: Audit version
             fields.label: Audit fields
             impersonation.label: Audit impersonation
+            impersonator_user.label: Impersonator User
             organization.label: Audit organization
             user.label: Audit user
             additional_fields.label: Additional fields

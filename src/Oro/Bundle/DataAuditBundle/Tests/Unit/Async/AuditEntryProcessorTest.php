@@ -85,6 +85,7 @@ class AuditEntryProcessorTest extends TestCase
         self::assertSame(Audit::ACTION_UPDATE, $persisted->getAction());
         self::assertSame('tx-1', $persisted->getTransactionId());
         self::assertCount(2, $persisted->getFields());
+        self::assertNull($persisted->getImpersonatorUser());
 
         $fieldsByName = [];
         foreach ($persisted->getFields() as $field) {
@@ -99,28 +100,44 @@ class AuditEntryProcessorTest extends TestCase
     public function testProcessResolvesAuthorFromTheMessage(): void
     {
         $user = new User();
+        $impersonatorUser = new User();
         $organization = new Organization();
         $impersonation = new Impersonation();
+
         $this->em->expects(self::any())
             ->method('find')
-            ->willReturnCallback(static fn (string $class): ?object => match ($class) {
-                User::class => $user,
-                Organization::class => $organization,
-                Impersonation::class => $impersonation,
-                default => null,
-            });
+            ->willReturnCallback(
+                static function (
+                    string $class,
+                    mixed $id
+                ) use (
+                    $user,
+                    $impersonatorUser,
+                    $organization,
+                    $impersonation
+                ): ?object {
+                    return match ($class) {
+                        User::class => 4 === (int)$id ? $impersonatorUser : $user,
+                        Organization::class => $organization,
+                        Impersonation::class => $impersonation,
+                        default => null,
+                    };
+                }
+            );
 
         $persisted = $this->process([
             'user_id' => 1,
             'user_class' => User::class,
             'organization_id' => 2,
             'impersonation_id' => 3,
+            'impersonator_user_id' => 4,
             'owner_description' => 'John Doe - admin@example.com',
         ]);
 
         self::assertSame($user, $persisted->getUser());
         self::assertSame($organization, $persisted->getOrganization());
         self::assertSame($impersonation, $persisted->getImpersonation());
+        self::assertSame($impersonatorUser, $persisted->getImpersonatorUser());
         self::assertSame('John Doe - admin@example.com', $persisted->getOwnerDescription());
     }
 

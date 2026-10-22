@@ -49,7 +49,8 @@ class EntityChangesToAuditEntryConverter
         EntityReference $organization,
         EntityReference $impersonation,
         ?string $ownerDescription = null,
-        ?string $auditDefaultAction = null
+        ?string $auditDefaultAction = null,
+        ?EntityReference $impersonatorUser = null
     ): void {
         $needFlush = false;
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
@@ -88,7 +89,8 @@ class EntityChangesToAuditEntryConverter
                 $loggedAt,
                 $user,
                 $organization,
-                $impersonation
+                $impersonation,
+                $impersonatorUser
             );
 
             foreach ($fields as $field) {
@@ -147,6 +149,9 @@ class EntityChangesToAuditEntryConverter
         return $reference->getEntity();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     private function findOrCreateAuditEntry(
         EntityManagerInterface $auditEntityManager,
         string $auditEntryClass,
@@ -156,7 +161,8 @@ class EntityChangesToAuditEntryConverter
         \DateTime $loggedAt,
         EntityReference $user,
         EntityReference $organization,
-        EntityReference $impersonation
+        EntityReference $impersonation,
+        ?EntityReference $impersonatorUser = null
     ): AbstractAudit {
         $auditEntry = $this->getAuditRepository($auditEntryClass)
             ->createQueryBuilder('a')
@@ -184,6 +190,11 @@ class EntityChangesToAuditEntryConverter
                 $auditEntry->setObjectName(
                     $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
                 );
+                if (null !== $impersonatorUser) {
+                    $auditEntry->setImpersonatorUser(
+                        $this->getEntityByReference($impersonatorUser)
+                    );
+                }
 
                 $auditEntityManager->persist($auditEntry);
                 $auditEntityManager->flush($auditEntry);

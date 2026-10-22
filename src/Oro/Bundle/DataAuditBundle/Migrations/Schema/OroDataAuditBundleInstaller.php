@@ -14,7 +14,7 @@ class OroDataAuditBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v7_1_0_0';
+        return 'v7_1_0_1';
     }
 
     #[\Override]
@@ -49,6 +49,7 @@ class OroDataAuditBundleInstaller implements Installation
         $table->addColumn('owner_description', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('additional_fields', 'array', ['notnull' => false]);
         $table->addColumn('impersonation_id', 'integer', ['notnull' => false]);
+        $table->addColumn('impersonator_user_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_5FBA427CA76ED395');
         $table->addIndex(['type'], 'idx_oro_audit_type');
@@ -57,6 +58,7 @@ class OroDataAuditBundleInstaller implements Installation
         $table->addIndex(['object_id', 'object_class', 'type'], 'idx_oro_audit_obj_by_type');
         $table->addIndex(['owner_description'], 'idx_oro_audit_owner_descr');
         $table->addIndex(['organization_id'], 'idx_oro_audit_organization_id');
+        $table->addIndex(['impersonator_user_id'], 'idx_oro_audit_impersonator_user_id');
         $table->addUniqueIndex(['object_id', 'object_class', 'version', 'type'], 'idx_oro_audit_version');
         $table->addUniqueIndex(['object_id', 'object_class', 'transaction_id', 'type'], 'idx_oro_audit_transaction');
     }
@@ -134,6 +136,12 @@ class OroDataAuditBundleInstaller implements Installation
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user_impersonation'),
             ['impersonation_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['impersonator_user_id'],
             ['id'],
             ['onDelete' => 'SET NULL']
         );

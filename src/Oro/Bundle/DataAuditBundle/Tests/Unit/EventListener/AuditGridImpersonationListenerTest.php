@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use Oro\Bundle\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -138,5 +139,80 @@ class AuditGridImpersonationListenerTest extends TestCase
 
         $this->assertInstanceOf(Impersonation::class, $record2->getValue('impersonation'));
         $this->assertSame($impersonation2->getId(), $record2->getValue('impersonation')->getId());
+    }
+
+    public function testAddImpersonatorUserSupportNoIds(): void
+    {
+        $this->repository->expects(self::never())
+            ->method('findBy');
+
+        $record = new ResultRecord([]);
+        $event = new OrmResultAfter($this->datagrid, [$record]);
+
+        $this->listener->addImpersonatorUserSupport($event);
+
+        self::assertNull($record->getValue('impersonatorUser'));
+    }
+
+    public function testAddImpersonatorUserSupportNoUsers(): void
+    {
+        $this->repository->expects(self::once())
+            ->method('findBy')
+            ->with(['id' => [24]])
+            ->willReturn([]);
+
+        $record = new ResultRecord(['impersonatorUser' => 24]);
+        $event = new OrmResultAfter($this->datagrid, [$record]);
+
+        $this->listener->addImpersonatorUserSupport($event);
+
+        self::assertNull($record->getValue('impersonatorUser'));
+    }
+
+    public function testAddImpersonatorUserSupportSetUser(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->expects(self::any())
+            ->method('getId')
+            ->willReturn(24);
+
+        $this->repository->expects(self::once())
+            ->method('findBy')
+            ->with(['id' => [24]])
+            ->willReturn([$user]);
+
+        $record = new ResultRecord(['impersonatorUser' => 24]);
+        $event = new OrmResultAfter($this->datagrid, [$record]);
+
+        $this->listener->addImpersonatorUserSupport($event);
+
+        self::assertSame($user, $record->getValue('impersonatorUser'));
+    }
+
+    public function testAddImpersonatorUserSupportMultipleUsers(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->expects(self::any())
+            ->method('getId')
+            ->willReturn(25);
+
+        $user2 = $this->createMock(User::class);
+        $user2->expects(self::any())
+            ->method('getId')
+            ->willReturn(24);
+
+        $this->repository->expects(self::once())
+            ->method('findBy')
+            ->with(['id' => [24, 25]])
+            ->willReturn([$user2, $user]);
+
+        $record = new ResultRecord(['impersonatorUser' => 25]);
+        $record2 = new ResultRecord(['impersonatorUser' => 24]);
+        $event = new OrmResultAfter($this->datagrid, [$record, $record2]);
+
+        $this->listener->addImpersonatorUserSupport($event);
+
+        self::assertSame($user, $record->getValue('impersonatorUser'));
+        self::assertSame($user2, $record2->getValue('impersonatorUser'));
     }
 }

@@ -13,6 +13,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Abstract class for audit entities
@@ -97,6 +98,11 @@ abstract class AbstractAudit
     #[ORM\JoinColumn(name: 'impersonation_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
     protected ?Impersonation $impersonation = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'impersonator_user_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
+    protected ?User $impersonatorUser = null;
 
     #[ORM\Column(name: 'transaction_id', type: Types::STRING, length: 36)]
     #[ConfigField(defaultValues: ['email' => ['available_in_template' => false, 'immutable' => true]])]
@@ -227,6 +233,18 @@ abstract class AbstractAudit
     public function getImpersonation()
     {
         return $this->impersonation;
+    }
+
+    public function setImpersonatorUser(?User $impersonatorUser = null): self
+    {
+        $this->impersonatorUser = $impersonatorUser;
+
+        return $this;
+    }
+
+    public function getImpersonatorUser(): ?User
+    {
+        return $this->impersonatorUser;
     }
 
     /**

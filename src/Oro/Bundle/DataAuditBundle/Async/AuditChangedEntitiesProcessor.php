@@ -47,6 +47,7 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
         $user = $this->getUserReference($body);
         $organization = $this->getOrganizationReference($body);
         $impersonation = $this->getImpersonationReference($body);
+        $impersonatorUser = $this->getImpersonatorUserReference($body);
         $ownerDescription = $this->getOwnerDescription($body);
 
         try {
@@ -60,7 +61,8 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
                     $organization,
                     $impersonation,
                     $ownerDescription,
-                    AbstractAudit::ACTION_CREATE
+                    AbstractAudit::ACTION_CREATE,
+                    $impersonatorUser
                 );
             }
 
@@ -74,7 +76,8 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
                     $organization,
                     $impersonation,
                     $ownerDescription,
-                    AbstractAudit::ACTION_UPDATE
+                    AbstractAudit::ACTION_UPDATE,
+                    $impersonatorUser
                 );
             }
 
@@ -88,7 +91,8 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
                     $organization,
                     $impersonation,
                     $ownerDescription,
-                    AbstractAudit::ACTION_REMOVE
+                    AbstractAudit::ACTION_REMOVE,
+                    $impersonatorUser
                 );
             }
         } catch (WrongDataAuditEntryStateException $e) {

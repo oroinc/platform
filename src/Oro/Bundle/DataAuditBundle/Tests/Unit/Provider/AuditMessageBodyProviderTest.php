@@ -55,10 +55,10 @@ class AuditMessageBodyProviderTest extends TestCase
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
-        $securityToken->expects(self::exactly(2))
+        $securityToken->expects(self::exactly(3))
             ->method('hasAttribute')
-            ->withConsecutive(['IMPERSONATION'], ['owner_description'])
-            ->willReturnOnConsecutiveCalls(false, false);
+            ->withConsecutive(['IMPERSONATION'], ['IMPERSONATOR_USER_ID'], ['owner_description'])
+            ->willReturnOnConsecutiveCalls(false, false, false);
 
         $this->entityNameResolver->expects(self::never())
             ->method('getName');
@@ -84,6 +84,7 @@ class AuditMessageBodyProviderTest extends TestCase
 
         self::assertArrayNotHasKey('organization_id', $body);
         self::assertArrayNotHasKey('impersonation_id', $body);
+        self::assertArrayNotHasKey('impersonator_user_id', $body);
         self::assertArrayNotHasKey('owner_description', $body);
     }
 
@@ -97,10 +98,10 @@ class AuditMessageBodyProviderTest extends TestCase
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
-        $securityToken->expects(self::exactly(2))
+        $securityToken->expects(self::exactly(3))
             ->method('hasAttribute')
-            ->withConsecutive(['IMPERSONATION'], ['owner_description'])
-            ->willReturnOnConsecutiveCalls(false, false);
+            ->withConsecutive(['IMPERSONATION'], ['IMPERSONATOR_USER_ID'], ['owner_description'])
+            ->willReturnOnConsecutiveCalls(false, false, false);
 
         $body = $provider->prepareMessageBody(
             [],
@@ -123,6 +124,7 @@ class AuditMessageBodyProviderTest extends TestCase
 
         self::assertArrayNotHasKey('organization_id', $body);
         self::assertArrayNotHasKey('impersonation_id', $body);
+        self::assertArrayNotHasKey('impersonator_user_id', $body);
         self::assertArrayNotHasKey('owner_description', $body);
     }
 
@@ -168,6 +170,7 @@ class AuditMessageBodyProviderTest extends TestCase
 
         self::assertArrayNotHasKey('organization_id', $body);
         self::assertArrayNotHasKey('impersonation_id', $body);
+        self::assertArrayNotHasKey('impersonator_user_id', $body);
         self::assertArrayHasKey('owner_description', $body);
         self::assertEquals('user@name.com', $body['owner_description']);
 
@@ -204,10 +207,10 @@ class AuditMessageBodyProviderTest extends TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $securityToken->expects(self::exactly(2))
+        $securityToken->expects(self::exactly(3))
             ->method('hasAttribute')
-            ->withConsecutive(['IMPERSONATION'], ['owner_description'])
-            ->willReturnOnConsecutiveCalls(false, false);
+            ->withConsecutive(['IMPERSONATION'], ['IMPERSONATOR_USER_ID'], ['owner_description'])
+            ->willReturnOnConsecutiveCalls(false, false, false);
 
         $body = $provider->prepareMessageBody(
             [],
@@ -232,6 +235,7 @@ class AuditMessageBodyProviderTest extends TestCase
         self::assertEquals(75, $body['organization_id']);
 
         self::assertArrayNotHasKey('impersonation_id', $body);
+        self::assertArrayNotHasKey('impersonator_user_id', $body);
         self::assertArrayNotHasKey('owner_description', $body);
     }
 
@@ -243,10 +247,10 @@ class AuditMessageBodyProviderTest extends TestCase
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
-        $securityToken->expects(self::exactly(2))
+        $securityToken->expects(self::exactly(3))
             ->method('hasAttribute')
-            ->withConsecutive(['IMPERSONATION'], ['owner_description'])
-            ->willReturnOnConsecutiveCalls(true, false);
+            ->withConsecutive(['IMPERSONATION'], ['IMPERSONATOR_USER_ID'], ['owner_description'])
+            ->willReturnOnConsecutiveCalls(true, false, false);
         $securityToken->expects(self::once())
             ->method('getAttribute')
             ->with('IMPERSONATION')
@@ -290,10 +294,10 @@ class AuditMessageBodyProviderTest extends TestCase
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
-        $securityToken->expects(self::exactly(2))
+        $securityToken->expects(self::exactly(3))
             ->method('hasAttribute')
-            ->withConsecutive(['IMPERSONATION'], ['owner_description'])
-            ->willReturnOnConsecutiveCalls(false, true);
+            ->withConsecutive(['IMPERSONATION'], ['IMPERSONATOR_USER_ID'], ['owner_description'])
+            ->willReturnOnConsecutiveCalls(false, false, true);
         $securityToken->expects(self::once())
             ->method('getAttribute')
             ->with('owner_description')
@@ -323,9 +327,47 @@ class AuditMessageBodyProviderTest extends TestCase
 
         self::assertArrayNotHasKey('organization_id', $body);
         self::assertArrayNotHasKey('impersonation_id', $body);
+        self::assertArrayNotHasKey('impersonator_user_id', $body);
 
         self::assertArrayHasKey('owner_description', $body);
         self::assertEquals('owner_description_attribute', $body['owner_description']);
+    }
+
+    public function testPrepareMessageBodyEmptyUserHasImpersonatorUserAttribute(): void
+    {
+        $provider = new AuditMessageBodyProvider($this->entityNameResolver);
+
+        $securityToken = $this->createMock(TokenInterface::class);
+        $securityToken->expects(self::once())
+            ->method('getUser')
+            ->willReturn(null);
+
+        $securityToken->expects(self::exactly(3))
+            ->method('hasAttribute')
+            ->withConsecutive(
+                ['IMPERSONATION'],
+                ['IMPERSONATOR_USER_ID'],
+                ['owner_description']
+            )
+            ->willReturnOnConsecutiveCalls(false, true, false);
+
+        $securityToken->expects(self::once())
+            ->method('getAttribute')
+            ->with('IMPERSONATOR_USER_ID')
+            ->willReturn(42);
+
+        $this->entityNameResolver->expects(self::never())
+            ->method('getName');
+
+        $body = $provider->prepareMessageBody(
+            ['insertions'],
+            ['updates'],
+            ['deletions'],
+            ['collectionUpdates'],
+            $securityToken
+        );
+
+        self::assertSame(42, $body['impersonator_user_id']);
     }
 
     public function testPrepareMessageBodyEmptyToken(): void
@@ -355,6 +397,7 @@ class AuditMessageBodyProviderTest extends TestCase
         self::assertArrayNotHasKey('user_class', $body);
         self::assertArrayNotHasKey('organization_id', $body);
         self::assertArrayNotHasKey('impersonation_id', $body);
+        self::assertArrayNotHasKey('impersonator_user_id', $body);
         self::assertArrayNotHasKey('owner_description', $body);
     }
 }
