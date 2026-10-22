@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -33,7 +34,8 @@ class UserLoginAttemptLogger
         'context'    => 'json',
         'ip'         => 'text',
         'user_agent' => 'text',
-        'user_id'    => 'integer'
+        'user_id'    => 'integer',
+        'impersonator_id' => 'integer'
     ];
 
     public function __construct(
@@ -55,9 +57,27 @@ class UserLoginAttemptLogger
     /**
      * Logs success user login attempt.
      */
-    public function logSuccessLoginAttempt(mixed $user, string $source, array $additionalContext = []): void
-    {
+    public function logSuccessLoginAttempt(
+        mixed $user,
+        string $source,
+        array $additionalContext = []
+    ): void {
         $this->doLogAttempt(true, $user, $source, $additionalContext);
+    }
+
+    public function logSuccessLoginAttemptWithImpersonator(
+        mixed $user,
+        string $source,
+        ?User $impersonator,
+        array $additionalContext = []
+    ): void {
+        $this->doLogAttempt(
+            true,
+            $user,
+            $source,
+            $additionalContext,
+            $impersonator
+        );
     }
 
     /**
@@ -85,7 +105,8 @@ class UserLoginAttemptLogger
         bool $success,
         mixed $user,
         string $source,
-        array $additionalContext = []
+        array $additionalContext = [],
+        ?User $impersonator = null
     ): void {
         $sourceCode = isset($this->loginSources[$source])
             ? $this->loginSources[$source]['code']
@@ -104,6 +125,9 @@ class UserLoginAttemptLogger
 
         if (\is_object($user)) {
             $data['user_id'] = $user->getId();
+        }
+        if (null !== $impersonator) {
+            $data['impersonator_id'] = $impersonator->getId();
         }
         if (isset($data['context']['ipaddress'])) {
             $data['ip'] = $data['context']['ipaddress'];

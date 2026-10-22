@@ -101,11 +101,15 @@ class AuditUpdatedRelationsTest extends WebTestCase
 
     public function testShouldCreateAuditForInsertedEntityToManyToManyCollection()
     {
+        $impersonator = $this->findAdmin();
+        $impersonatorId = $impersonator->getId();
+
         $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
 
         $message = $this->createDummyMessage([
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'theTransactionId',
+            'impersonator_user_id' => $impersonatorId,
             'collections_updated' => [
                 '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
@@ -133,7 +137,14 @@ class AuditUpdatedRelationsTest extends WebTestCase
         $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(1);
+        $this->getEntityManager()->clear();
+
         $audit = $this->findLastStoredAudit();
+
+        self::assertSame(
+            $impersonatorId,
+            $audit->getImpersonatorUser()?->getId()
+        );
 
         $this->assertNotNull($audit->getId());
         $this->assertEquals(123, $audit->getObjectId());

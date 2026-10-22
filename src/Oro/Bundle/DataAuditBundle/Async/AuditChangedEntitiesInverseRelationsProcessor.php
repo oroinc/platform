@@ -50,6 +50,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $user = $this->getUserReference($body);
         $organization = $this->getOrganizationReference($body);
         $impersonation = $this->getImpersonationReference($body);
+        $impersonatorUser = $this->getImpersonatorUserReference($body);
         $ownerDescription = $this->getOwnerDescription($body);
 
         $map = [];
@@ -71,7 +72,8 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
                 $user,
                 $organization,
                 $impersonation,
-                $ownerDescription
+                $ownerDescription,
+                impersonatorUser: $impersonatorUser
             );
         } catch (WrongDataAuditEntryStateException $e) {
             return self::REQUEUE;

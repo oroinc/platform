@@ -278,6 +278,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.audit-grid, method: addImpersonationSupport }
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.audit-history-grid, method: addImpersonationSupport }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.audit-grid, method: addImpersonatorUserSupport }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.audit-history-grid, method: addImpersonatorUserSupport }
 
     oro_dataaudit.event_listener.segment_widget_options_listener:
         class: 'Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener'

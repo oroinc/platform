@@ -113,7 +113,8 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
             $this->getUserReference($body),
             $this->getOrganizationReference($body),
             $this->getImpersonationReference($body),
-            $this->getOwnerDescription($body)
+            $this->getOwnerDescription($body),
+            impersonatorUser: $this->getImpersonatorUserReference($body)
         );
     }
 

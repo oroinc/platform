@@ -17,6 +17,7 @@ datagrids:
                     author:  a.ownerDescription as author
                     organization: IDENTITY(a.organization) as organization
                     impersonation: IDENTITY(a.impersonation) as impersonation
+                    impersonatorUser: IDENTITY(a.impersonatorUser) as impersonatorUser
                 from:
                     - { table: Oro\Bundle\DataAuditBundle\Entity\AbstractAudit, alias: a }
             hints:
@@ -45,8 +46,9 @@ datagrids:
                 frontend_type: html
             author:
                 label: oro.dataaudit.datagrid.author
-                type: callback
-                callable: "@oro_dataaudit.datagrid.author_provider->getAuthor"
+                type: twig
+                template: '@OroDataAudit/Datagrid/Property/author.html.twig'
+                frontend_type: html
             organization:
                 label: oro.dataaudit.datagrid.organization
             loggedAt:
@@ -111,6 +113,13 @@ datagrids:
                     className: 'Oro\Bundle\UserBundle\Entity\Impersonation'
                     autocomplete_alias: impersonations
                     renderedPropertyName: ipAddressToken
+                impersonatorUser:
+                    label: oro.dataaudit.datagrid.impersonated_by
+                    type: choice-tree
+                    data_name: a.impersonatorUser
+                    autocomplete_alias: users
+                    renderedPropertyName: fullName
+                    className: 'Oro\Bundle\UserBundle\Entity\User'
                 loggedAt:
                     type: datetime
                     data_name: a.loggedAt
@@ -129,6 +138,7 @@ datagrids:
                     author: a.ownerDescription as author
                     objectClass: a.objectClass
                     loggedAt: a.loggedAt
+                    impersonatorUser: IDENTITY(a.impersonatorUser) as impersonatorUser
                 from:
                     - { table: Oro\Bundle\DataAuditBundle\Entity\AbstractAudit, alias: a }
                 where:
@@ -140,6 +150,9 @@ datagrids:
             id: {renderable: false, manageable: false}
             author:
                 label: oro.dataaudit.datagrid.author
+                type: twig
+                template: '@OroDataAudit/Datagrid/Property/author.html.twig'
+                frontend_type: html
             loggedAt:
                 label: oro.dataaudit.datagrid.logged_at
                 type: field

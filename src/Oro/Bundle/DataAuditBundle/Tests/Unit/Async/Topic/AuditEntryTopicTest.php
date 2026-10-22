@@ -43,6 +43,7 @@ class AuditEntryTopicTest extends AbstractTopicTestCase
                     'user_class' => null,
                     'organization_id' => null,
                     'impersonation_id' => null,
+                    'impersonator_user_id' => null,
                     'owner_description' => null,
                 ],
             ],

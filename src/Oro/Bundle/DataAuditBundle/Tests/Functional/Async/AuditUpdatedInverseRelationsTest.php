@@ -31,7 +31,11 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
     public function testShouldCreateAuditsForInsertedUpdatedAndDeletedEntities()
     {
+        $impersonator = $this->findAdmin();
+        $impersonatorId = $impersonator->getId();
+
         $message = $this->createDummyMessage([
+            'impersonator_user_id' => $impersonatorId,
             'entities_inserted' => [
                 '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
@@ -82,6 +86,17 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(6);
+
+        $this->getEntityManager()->clear();
+
+        $audits = $this->findStoredAudits();
+        self::assertCount(6, $audits);
+        foreach ($audits as $audit) {
+            self::assertSame(
+                $impersonatorId,
+                $audit->getImpersonatorUser()?->getId()
+            );
+        }
     }
 
     public function testShouldCreateAuditForAddedInverseSideEntityOnOneToOneRelation()

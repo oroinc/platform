@@ -1,0 +1,28 @@
+{%- import '@OroUI/macros.html.twig' as UI -%}
+
+{%- set impersonation = record.getValue('impersonation') -%}
+
+{%- if value -%}
+    {{- value -}}
+{%- endif -%}
+
+{%- if impersonation -%}
+    {{- value ? ' ' : '' -}}
+    {{- 'oro.dataaudit.datagrid.author_impersonation'|trans({
+        '%ipAddress%': impersonation.ipAddress,
+        '%token%': impersonation.token
+    })|trim -}}
+{%- endif -%}
+
+{%- set impersonatorUser = record.getValue('impersonatorUser') -%}
+{%- if impersonatorUser -%}
+    <div class="text-muted">
+        {{ 'oro.dataaudit.datagrid.impersonated_by'|trans }}
+        {{ UI.entityViewLink(
+            impersonatorUser,
+            attribute(impersonatorUser, 'fullName'),
+            'oro_user_view',
+            'VIEW'
+        ) }}
+    </div>
+{%- endif -%}

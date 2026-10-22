@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 
 /**
@@ -64,6 +65,11 @@ abstract class AbstractAuditProcessor implements MessageProcessorInterface
     protected function getImpersonationReference(array $message)
     {
         return $this->getEntityReference($message, 'impersonation_id', Impersonation::class);
+    }
+
+    protected function getImpersonatorUserReference(array $message)
+    {
+        return $this->getEntityReference($message, 'impersonator_user_id', User::class);
     }
 
     /**

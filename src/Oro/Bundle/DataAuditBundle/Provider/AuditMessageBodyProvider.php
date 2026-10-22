@@ -90,6 +90,10 @@ class AuditMessageBodyProvider
             $data['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
         }
 
+        if ($securityToken->hasAttribute('IMPERSONATOR_USER_ID')) {
+            $data['impersonator_user_id'] = $securityToken->getAttribute('IMPERSONATOR_USER_ID');
+        }
+
         if ($securityToken->hasAttribute('owner_description')) {
             $data['owner_description'] = $securityToken->getAttribute('owner_description');
         }

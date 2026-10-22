@@ -21,6 +21,7 @@ abstract class AbstractAuditTopic extends AbstractTopic
                 'user_class',
                 'organization_id',
                 'impersonation_id',
+                'impersonator_user_id',
                 'owner_description',
             ])
             ->setRequired([
@@ -32,6 +33,7 @@ abstract class AbstractAuditTopic extends AbstractTopic
                 'user_class' => null,
                 'organization_id' => null,
                 'impersonation_id' => null,
+                'impersonator_user_id' => null,
                 'owner_description' => null,
             ])
             ->addAllowedTypes('timestamp', 'int')
@@ -40,6 +42,7 @@ abstract class AbstractAuditTopic extends AbstractTopic
             ->addAllowedTypes('user_class', ['string', 'null'])
             ->addAllowedTypes('organization_id', ['string', 'int', 'null'])
             ->addAllowedTypes('impersonation_id', ['string', 'int', 'null'])
+            ->addAllowedTypes('impersonator_user_id', ['string', 'int', 'null'])
             ->addAllowedTypes('owner_description', ['string', 'null']);
     }
 }

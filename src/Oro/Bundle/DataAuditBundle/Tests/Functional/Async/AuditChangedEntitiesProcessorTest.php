@@ -11,6 +11,7 @@ use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditData
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
@@ -280,9 +281,17 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
     public function testShouldProcessAllChangedEntities()
     {
+        $impersonator = $this->getEntityManager()
+            ->getRepository(User::class)
+            ->findOneBy(['email' => self::AUTH_USER]);
+
+        self::assertNotNull($impersonator);
+        $impersonatorId = $impersonator->getId();
+
         $message = $this->createMessage([
             'timestamp' => time(),
             'transaction_id' => 'aTransactionId',
+            'impersonator_user_id' => $impersonatorId,
             'entities_inserted' => [
                 '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
@@ -316,6 +325,18 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(3);
+
+        $this->getEntityManager()->clear();
+
+        $audits = $this->getEntityManager()
+            ->getRepository(Audit::class)
+            ->findAll();
+        foreach ($audits as $audit) {
+            self::assertSame(
+                $impersonatorId,
+                $audit->getImpersonatorUser()?->getId()
+            );
+        }
     }
 
     public function testShouldIncrementVersionWhenEntityChangedAgain()

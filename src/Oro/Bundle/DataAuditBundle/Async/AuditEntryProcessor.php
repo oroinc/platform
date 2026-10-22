@@ -48,6 +48,7 @@ class AuditEntryProcessor extends AbstractAuditProcessor implements TopicSubscri
         $audit->setUser($this->getEntity($this->getUserReference($body), User::class));
         $audit->setOrganization($this->getEntity($this->getOrganizationReference($body), Organization::class));
         $audit->setImpersonation($this->getEntity($this->getImpersonationReference($body), Impersonation::class));
+        $audit->setImpersonatorUser($this->getEntity($this->getImpersonatorUserReference($body), User::class));
 
         foreach ($body['changes'] as $change) {
             $audit->addField(new AuditField(
