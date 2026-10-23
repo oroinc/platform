@@ -19,11 +19,20 @@ class UnauthorizedApiRequestListener implements ServiceSubscriberInterface
 
     private ContainerInterface $container;
     private ApiRequestHelper $apiRequestHelper;
+    private array $copiedHeaders = [];
 
     public function __construct(ContainerInterface $container, ApiRequestHelper $apiRequestHelper)
     {
         $this->container = $container;
         $this->apiRequestHelper = $apiRequestHelper;
+    }
+
+    /**
+     * @param string[] $copiedHeaders
+     */
+    public function setCopiedHeaders(array $copiedHeaders): void
+    {
+        $this->copiedHeaders = $copiedHeaders;
     }
 
     #[\Override]
@@ -48,10 +57,21 @@ class UnauthorizedApiRequestListener implements ServiceSubscriberInterface
 
         /** @var RequestActionHandler $actionHandler */
         $actionHandler = $this->container->get(RequestActionHandler::class);
-        $event->setResponse($actionHandler->handleUnhandledError(
+        $apiResponse = $actionHandler->handleUnhandledError(
             $request,
             $this->createUnauthorizedHttpException($response)
-        ));
+        );
+        $this->copyHeaders($response, $apiResponse);
+        $event->setResponse($apiResponse);
+    }
+
+    private function copyHeaders(Response $source, Response $target): void
+    {
+        foreach ($this->copiedHeaders as $name) {
+            if ($source->headers->has($name) && !$target->headers->has($name)) {
+                $target->headers->set($name, $source->headers->all($name));
+            }
+        }
     }
 
     private function createUnauthorizedHttpException(Response $response): HttpException

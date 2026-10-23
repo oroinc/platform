@@ -35,6 +35,9 @@ class UnauthorizedApiRequestListenerTest extends TestCase
             $container,
             $this->apiRequestHelper
         );
+        $this->listener->setCopiedHeaders(
+            ['Content-Security-Policy', 'Strict-Transport-Security', 'X-Frame-Options']
+        );
     }
 
     private function getEvent(Request $request, Response $response): ResponseEvent
@@ -205,5 +208,39 @@ class UnauthorizedApiRequestListenerTest extends TestCase
         $event = $this->getEvent($request, $response);
         $this->listener->onKernelResponse($event);
         self::assertSame($newResponse, $event->getResponse());
+    }
+
+    public function testForUnauthorizedApiRequestCopiesSecurityHeadersOfOriginalResponse(): void
+    {
+        $request = Request::create('http://test.com/api/products/1');
+        $response = new Response('', Response::HTTP_UNAUTHORIZED);
+        $response->headers->set('X-Frame-Options', 'DENY');
+        $response->headers->set('Strict-Transport-Security', 'max-age=31536000');
+        $response->headers->set('Content-Security-Policy', "default-src 'self'");
+        $response->headers->set('Expires', '0');
+        $response->headers->set('X-Test', 'test');
+
+        $newResponse = new Response('', Response::HTTP_UNAUTHORIZED);
+        $newResponse->headers->set('Content-Security-Policy', "default-src 'none'");
+        $cacheControl = $newResponse->headers->get('Cache-Control');
+
+        $this->apiRequestHelper->expects(self::once())
+            ->method('isApiRequest')
+            ->with('/api/products/1')
+            ->willReturn(true);
+        $this->handler->expects(self::once())
+            ->method('handleUnhandledError')
+            ->willReturn($newResponse);
+
+        $event = $this->getEvent($request, $response);
+        $this->listener->onKernelResponse($event);
+        self::assertSame($newResponse, $event->getResponse());
+        self::assertSame('DENY', $newResponse->headers->get('X-Frame-Options'));
+        self::assertSame('max-age=31536000', $newResponse->headers->get('Strict-Transport-Security'));
+        self::assertArrayHasKey('X-Frame-Options', $newResponse->headers->allPreserveCase());
+        self::assertSame("default-src 'none'", $newResponse->headers->get('Content-Security-Policy'));
+        self::assertFalse($newResponse->headers->has('X-Test'));
+        self::assertFalse($newResponse->headers->has('Expires'));
+        self::assertSame($cacheControl, $newResponse->headers->get('Cache-Control'));
     }
 }

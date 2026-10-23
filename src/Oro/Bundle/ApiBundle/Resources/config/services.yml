@@ -33,6 +33,18 @@ parameters:
     # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
     oro_api.ext_id_entities: ~
 
+    # The headers of the original response that are copied to the response built for an unauthorized API request.
+    oro_api.unauthorized_api_request.copied_headers:
+        - 'Content-Security-Policy'
+        - 'Content-Security-Policy-Report-Only'
+        - 'Permissions-Policy'
+        - 'Referrer-Policy'
+        - 'Strict-Transport-Security'
+        - 'X-Content-Security-Policy'
+        - 'X-Content-Type-Options'
+        - 'X-Frame-Options'
+        - 'X-XSS-Protection'
+
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -780,6 +792,8 @@ services:
         arguments:
             - '@Psr\Container\ContainerInterface'
             - '@oro_api.request_helper'
+        calls:
+            - [setCopiedHeaders, ['%oro_api.unauthorized_api_request.copied_headers%']]
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -100 }
             - { name: container.service_subscriber, id: oro_api.rest.request_action_handler, key: Oro\Bundle\ApiBundle\Request\Rest\RequestActionHandler }

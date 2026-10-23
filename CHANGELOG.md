@@ -38,6 +38,8 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Component\Duplicator\Filter\SourceBagRetentionTrait` for filters that copy a property bag.
 
 #### ApiBundle
+* Added the `oro_api.unauthorized_api_request.copied_headers` parameter that lists the headers of the original response that `\Oro\Bundle\ApiBundle\EventListener\UnauthorizedApiRequestListener` copies to the response built for an unauthorized API request.
+* Added `\Oro\Bundle\ApiBundle\EventListener\UnauthorizedApiRequestListener::setCopiedHeaders()`.
 
 * Added `CorsSettings::addAllowedOrigins(array $origins): void` method to append extra allowed origins to the existing list at runtime (deduplicated).
 * Added `CorsSettings::enableCredentials(): void` method to enable credential support in CORS responses at runtime.
@@ -137,6 +139,8 @@ The current file describes significant changes in the code that may affect the u
 
 #### SecurityBundle
 * Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with unconfigured organization fields causing invalid ACL SQL.
+* Added `\Oro\Bundle\SecurityBundle\EventListener\RedirectSecurityHeadersListenerDecorator` that decorates `nelmio_security.clickjacking_listener`, `nelmio_security.content_type_listener` and `nelmio_security.xss_protection_listener`.
+* Added `\Oro\Bundle\SecurityBundle\EventListener\RedirectContentSecurityPolicyListener` that calls `nelmio_security.csp_listener` for redirect responses.
 
 #### UserBundle
 * Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.

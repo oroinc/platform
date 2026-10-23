@@ -787,6 +787,31 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
+    oro_security.event_listener.redirect_security_headers.clickjacking:
+        class: Oro\Bundle\SecurityBundle\EventListener\RedirectSecurityHeadersListenerDecorator
+        decorates: nelmio_security.clickjacking_listener
+        arguments:
+            - '@.inner'
+
+    oro_security.event_listener.redirect_security_headers.content_type:
+        class: Oro\Bundle\SecurityBundle\EventListener\RedirectSecurityHeadersListenerDecorator
+        decorates: nelmio_security.content_type_listener
+        arguments:
+            - '@.inner'
+
+    oro_security.event_listener.redirect_security_headers.xss_protection:
+        class: Oro\Bundle\SecurityBundle\EventListener\RedirectSecurityHeadersListenerDecorator
+        decorates: nelmio_security.xss_protection_listener
+        arguments:
+            - '@.inner'
+
+    oro_security.event_listener.redirect_security_headers.csp:
+        class: Oro\Bundle\SecurityBundle\EventListener\RedirectContentSecurityPolicyListener
+        arguments:
+            - '@?nelmio_security.csp_listener'
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
     oro_security.access_rule_executor:
         class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor
         public: false
