@@ -209,7 +209,7 @@ oro:
             attribute:
                 webhook_accessible:
                     label: Webhook accessible
-                    tooltip: Select whether this entity should be accessible via webhook.
+                    tooltip: Enable this option to make this entity’s event topics available when configuring webhook endpoints.
                 webhook_relations_includes:
                     label: Webhook relations includes
                     tooltip: >
