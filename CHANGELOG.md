@@ -38,6 +38,8 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Component\Duplicator\Filter\SourceBagRetentionTrait` for filters that copy a property bag.
 
 #### ApiBundle
+* Added the `oro_api.unauthorized_api_request.copied_headers` parameter that lists the headers of the original response that `\Oro\Bundle\ApiBundle\EventListener\UnauthorizedApiRequestListener` copies to the response built for an unauthorized API request.
+* Added `\Oro\Bundle\ApiBundle\EventListener\UnauthorizedApiRequestListener::setCopiedHeaders()`.
 
 * Added `CorsSettings::addAllowedOrigins(array $origins): void` method to append extra allowed origins to the existing list at runtime (deduplicated).
 * Added `CorsSettings::enableCredentials(): void` method to enable credential support in CORS responses at runtime.
@@ -137,6 +139,8 @@ The current file describes significant changes in the code that may affect the u
 
 #### SecurityBundle
 * Added `\Oro\Bundle\SecurityBundle\ORM\DetectEntitiesWithoutOrganizationField` to report owned entities with unconfigured organization fields causing invalid ACL SQL.
+* Added `\Oro\Bundle\SecurityBundle\EventListener\RedirectSecurityHeadersListenerDecorator` that decorates `nelmio_security.clickjacking_listener`, `nelmio_security.content_type_listener` and `nelmio_security.xss_protection_listener`.
+* Added `\Oro\Bundle\SecurityBundle\EventListener\RedirectContentSecurityPolicyListener` that calls `nelmio_security.csp_listener` for redirect responses.
 
 #### UserBundle
 * Added `Oro\Bundle\UserBundle\Async\Topic\AbstractPasswordResetRequestTopic` that declares the message body of the forgot password requests, and `Oro\Bundle\UserBundle\Async\Topic\UserPasswordResetRequestTopic` (`oro.user.password_reset_request`) that processes the forgot password requests submitted in the back-office.
@@ -169,6 +173,10 @@ The current file describes significant changes in the code that may affect the u
 * Changed `Oro\Bundle\DataGridBundle\Twig\DataGridExtension::getGrid()` (the `oro_datagrid_build` TWIG function): it treats a datagrid disabled by a feature as unavailable instead of failing, so such a datagrid is not rendered.
 * Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.
 * Changed `Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`: it builds the datagrid before sending the export message, so an export of an unknown or disabled datagrid responds with 404 instead of enqueueing a message that cannot be processed.
+* Changed the `oro_datagrid_export_action` route (`Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`): it now requires a valid `X-CSRF-Header` and responds with 403 otherwise. Custom code that calls the route directly, for example in tests, must send the header; the export button in the back-office is not affected.
+
+#### SegmentBundle
+* Changed the `oro_segment_refresh` route (`Oro\Bundle\SegmentBundle\Controller\SegmentController::refreshAction()`): it now requires a valid `X-CSRF-Header` and responds with 403 otherwise. Custom code that calls the route directly must send the header.
 
 #### NavigationBundle
 * Changed the `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity configuration: a menu item is a system record managed on the page of its menu, so the entity is hidden from the entity management grid, its entity config pages respond with 404, excluded from the lists of entities (`oro_entity: exclusions`) and its entity audit is turned off and locked (`dataaudit: {auditable: false, immutable: true}`) — the changes of a menu item are recorded by the menu audit, so the entity audit of the same rows would only duplicate them.

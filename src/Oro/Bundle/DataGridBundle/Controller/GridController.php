@@ -122,6 +122,7 @@ class GridController extends AbstractController
      */
     #[Route(path: '/{gridName}/export/', name: 'oro_datagrid_export_action', requirements: ['gridName' => '[\w\:-]+'])]
     #[AclAncestor('oro_datagrid_gridview_export')]
+    #[CsrfProtection]
     public function exportAction(Request $request, $gridName)
     {
         // ensures that the datagrid exists and is not disabled by a feature, otherwise the response is 404

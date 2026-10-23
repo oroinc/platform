@@ -32,13 +32,25 @@ class SchemaTest extends WebTestCase
     }
 
     /**
+     * Gets the entity managers of the application database.
+     * The entity managers of the read-only connections are skipped, because their schema is not managed by the
+     * application, e.g. it mirrors the database of an external service.
+     *
      * @return EntityManagerInterface[]
      */
     private function getEntityManagers(): array
     {
+        $readOnlyConnections = [];
+        foreach (self::getContainer()->getParameter('oro_installer.database.readonly') as $connectionName) {
+            $readOnlyConnections[] = $this->getDoctrine()->getConnection($connectionName);
+        }
+
         $entityManagers = [];
         foreach ($this->getDoctrine()->getManagers() as $manager) {
-            if ($manager instanceof EntityManagerInterface) {
+            if (
+                $manager instanceof EntityManagerInterface
+                && !in_array($manager->getConnection(), $readOnlyConnections, true)
+            ) {
                 $entityManagers[] = $manager;
             }
         }

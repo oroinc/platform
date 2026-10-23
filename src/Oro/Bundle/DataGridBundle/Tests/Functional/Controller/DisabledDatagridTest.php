@@ -58,7 +58,7 @@ class DisabledDatagridTest extends WebTestCase
 
     public function testTryToExportDisabledDatagrid(): void
     {
-        $this->client->request(
+        $this->ajaxRequest(
             'GET',
             $this->getUrl('oro_datagrid_export_action', ['gridName' => self::GRID_NAME, 'format' => 'csv'])
         );

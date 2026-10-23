@@ -12,7 +12,12 @@
        class="action-permissions__dropdown-toggle"
        data-emulate-btn-press=""
        data-toggle="dropdown"
-       aria-expanded="false"><span data-toggle="tooltip"><%- access_level_label %></span></a>
+       aria-expanded="false"
+    ><span data-toggle="tooltip"><%- access_level_label %></span><%
+        if (isAccessLevelChanged) {
+            %><span class="sr-only"><%- _.__('oro.role.access_level_changed') %></span><%
+        }
+    %></a>
     <div class="dropdown-menu dropdown-menu__permissions-item" aria-labelledby="<%- togglerId %>">
         <div data-role="dropdown-menu-content"></div>
     </div>

@@ -19,7 +19,7 @@ class GridControllerTest extends WebTestCase
 
     public function testShouldSendExportMessage(): void
     {
-        $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
+        $this->ajaxRequest('GET', $this->getUrl('oro_datagrid_export_action', [
             'gridName' => 'audit-grid',
             'format' => 'csv',
             'audit-grid' => [
@@ -58,6 +58,19 @@ class GridControllerTest extends WebTestCase
                 FormatterProvider::FORMAT_TYPE => 'excel'
             ],
         ]);
+    }
+
+    public function testShouldNotSendExportMessageWithoutCsrfToken(): void
+    {
+        self::clearMessageCollector();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_datagrid_export_action', ['gridName' => 'audit-grid', 'format' => 'csv'])
+        );
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 403);
+        self::assertMessagesEmpty(DatagridPreExportTopic::getName());
     }
 
     public function testMassActionActionWithToken(): void

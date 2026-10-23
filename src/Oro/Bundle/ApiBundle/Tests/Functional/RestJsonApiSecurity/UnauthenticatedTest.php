@@ -130,4 +130,19 @@ class UnauthenticatedTest extends RestJsonApiTestCase
 
         self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, DELETE');
     }
+
+    public function testUnauthorizedResponseHasSecurityHeaders(): void
+    {
+        $response = $this->get(
+            ['entity' => 'testapientity1', 'id' => '1'],
+            [],
+            [],
+            false
+        );
+
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_UNAUTHORIZED);
+        self::assertResponseHeader($response, 'X-Content-Type-Options', 'nosniff');
+        self::assertTrue($response->headers->has('X-Frame-Options'));
+        self::assertTrue($response->headers->has('X-XSS-Protection'));
+    }
 }
