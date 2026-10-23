@@ -8,6 +8,7 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
+use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler;
@@ -137,6 +138,7 @@ class SegmentController extends AbstractController
      */
     #[Route(path: '/refresh/{id}', name: 'oro_segment_refresh', requirements: ['id' => '\d+'])]
     #[AclAncestor('oro_segment_update')]
+    #[CsrfProtection]
     public function refreshAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);

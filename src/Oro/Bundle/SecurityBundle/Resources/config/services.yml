@@ -771,6 +771,9 @@ services:
         arguments:
             - '@oro_security.csrf_token_manager'
 
+    Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager:
+        alias: oro_security.csrf_request_manager
+
     oro_security.event_listener.csrf_protection_request_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener
         arguments:

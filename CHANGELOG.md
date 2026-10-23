@@ -173,6 +173,10 @@ The current file describes significant changes in the code that may affect the u
 * Changed `Oro\Bundle\DataGridBundle\Twig\DataGridExtension::getGrid()` (the `oro_datagrid_build` TWIG function): it treats a datagrid disabled by a feature as unavailable instead of failing, so such a datagrid is not rendered.
 * Changed the meaning of the `entities` section of `Resources/config/oro/features.yml` configuration file: a datagrid that declares one of the listed entities in the `extended_entity_name` option of its configuration is not available when the feature is disabled. Use the `features.ignore_entity_state` datagrid option to keep such a datagrid available.
 * Changed `Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`: it builds the datagrid before sending the export message, so an export of an unknown or disabled datagrid responds with 404 instead of enqueueing a message that cannot be processed.
+* Changed the `oro_datagrid_export_action` route (`Oro\Bundle\DataGridBundle\Controller\GridController::exportAction()`): it now requires a valid `X-CSRF-Header` and responds with 403 otherwise. Custom code that calls the route directly, for example in tests, must send the header; the export button in the back-office is not affected.
+
+#### SegmentBundle
+* Changed the `oro_segment_refresh` route (`Oro\Bundle\SegmentBundle\Controller\SegmentController::refreshAction()`): it now requires a valid `X-CSRF-Header` and responds with 403 otherwise. Custom code that calls the route directly must send the header.
 
 #### NavigationBundle
 * Changed the `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity configuration: a menu item is a system record managed on the page of its menu, so the entity is hidden from the entity management grid, its entity config pages respond with 404, excluded from the lists of entities (`oro_entity: exclusions`) and its entity audit is turned off and locked (`dataaudit: {auditable: false, immutable: true}`) — the changes of a menu item are recorded by the menu audit, so the entity audit of the same rows would only duplicate them.

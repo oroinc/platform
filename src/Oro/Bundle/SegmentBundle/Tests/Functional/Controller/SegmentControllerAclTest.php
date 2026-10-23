@@ -47,6 +47,28 @@ class SegmentControllerAclTest extends WebTestCase
         self::assertResponseStatusCodeEquals($this->client->getResponse(), Response::HTTP_FORBIDDEN);
     }
 
+    public function testRefreshWithoutCsrfToken(): void
+    {
+        $this->client->request(Request::METHOD_GET, $this->getRefreshUrl());
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), Response::HTTP_FORBIDDEN);
+    }
+
+    public function testRefreshWithCsrfToken(): void
+    {
+        $this->ajaxRequest(Request::METHOD_GET, $this->getRefreshUrl());
+
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), Response::HTTP_FOUND);
+    }
+
+    private function getRefreshUrl(): string
+    {
+        /** @var Segment $segment */
+        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+
+        return $this->getUrl('oro_segment_refresh', ['id' => $segment->getId()]);
+    }
+
     private function getCloneUrl(): string
     {
         /** @var Segment $segment */
