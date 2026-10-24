@@ -389,6 +389,7 @@ entity_config:
                 enum_code:
                     options:
                         auditable:          false
+                        indexed:            true
 
                 enum_locale:
                     options:

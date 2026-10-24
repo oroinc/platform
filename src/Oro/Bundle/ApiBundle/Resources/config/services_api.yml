@@ -42,3 +42,78 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\Processor\AsyncOperation\ComputeErrorSource
         tags:
             - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Batch\Model\BatchError }
+
+    oro_api.enum_option.compute_names:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\ComputeEnumOptionNames
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_translation.api.translation_data_loader'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Model\EnumOption }
+
+    oro_api.enum_option.register_translation_normalize_included_data_callback:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\RegisterEnumOptionTranslationNormalizeIncludedDataCallback
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, class: Oro\Bundle\ApiBundle\Model\EnumOption, priority: -43 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, class: Oro\Bundle\ApiBundle\Model\EnumOption, priority: -43 }
+
+    oro_api.enum_option.prepare_included_translations:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\PrepareIncludedEnumOptionTranslations
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, class: Oro\Bundle\ApiBundle\Model\EnumOption, priority: -47 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, class: Oro\Bundle\ApiBundle\Model\EnumOption, priority: -47 }
+
+    oro_api.enum_option.validate_included_translations:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\ValidateIncludedEnumOptionTranslations
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_translation.provider.language'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, class: Oro\Bundle\ApiBundle\Model\EnumOption }
+
+    oro_api.enum_option.create_from_id:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\CreateEnumOptionFromId
+        arguments:
+            - '@oro_api.enum_option.repository'
+        tags:
+            - { name: oro.api.processor, action: create, group: load_data, class: Oro\Bundle\ApiBundle\Model\EnumOption, priority: -22 }
+
+    oro_api.enum_option.restore_included_translation_model:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\RestoreIncludedEnumOptionTranslationModel
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create|update, class: Oro\Bundle\TranslationBundle\Api\Model\TranslationModel, priority: -10 }
+
+    oro_api.enum_option.update_included_translation_model_identifier:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\UpdateIncludedEnumOptionTranslationModelIdentifier
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_flush_data, parentAction: create, class: Oro\Bundle\TranslationBundle\Api\Model\TranslationCreate }
+
+    oro_api.enum_option.repository:
+        class: Oro\Bundle\ApiBundle\Api\Repository\EnumOptionRepository
+        arguments:
+            - '@oro_entity_config.config_manager'
+
+    oro_api.enum_option.validate_modification_access:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\ValidateEnumOptionModificationAccess
+        arguments:
+            - '@oro_api.enum_option.repository'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_validate, class: Oro\Bundle\ApiBundle\Model\EnumOption }
+
+    oro_api.enum_option.synchronize_name_and_defaults:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\SynchronizeEnumOptionNameAndDefaults
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, class: Oro\Bundle\ApiBundle\Model\EnumOption }
+
+    oro_api.enum_option.validate_deletion_access:
+        class: Oro\Bundle\ApiBundle\Processor\EnumOption\ValidateEnumOptionDeletionAccess
+        arguments:
+            - '@oro_api.enum_option.repository'
+        tags:
+            - { name: oro.api.processor, action: delete, group: data_security_check, class: Oro\Bundle\ApiBundle\Model\EnumOption }

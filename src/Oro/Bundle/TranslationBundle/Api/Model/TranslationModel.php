@@ -33,6 +33,11 @@ abstract class TranslationModel
         return $this->id;
     }
 
+    protected function setId(string $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getTranslationKeyId(): int
     {
         return $this->translationKeyId;

@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -84,7 +85,10 @@ class ConstraintTextExtractorTest extends TestCase
             [new NamedValidationConstraint('IO'), 'io constraint'],
             [new NamedValidationConstraint('IOConstraint'), 'io constraint'],
             [new NamedValidationConstraint('PHP'), 'php constraint'],
-            [new NamedValidationConstraint('PHPConstraint'), 'php constraint']
+            [new NamedValidationConstraint('PHPConstraint'), 'php constraint'],
+            [new NamedValidationConstraint(AccessDeniedException::class), 'access denied exception'],
+            [new NamedValidationConstraint('AccessDeniedException'), 'access denied exception'],
+            [new NamedValidationConstraint('access denied exception'), 'access denied exception'],
         ];
     }
 }

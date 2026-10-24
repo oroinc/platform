@@ -60,6 +60,32 @@ class TranslationUpdateTest extends RestJsonApiTestCase
         );
     }
 
+    public function testTryToUpdateTranslationWithTooLongTranslatedValue(): void
+    {
+        $translationId = $this->resolveTranslationId('<@tk-test_trans1-test_domain->id>-<@en_CA->code>');
+        $response = $this->patch(
+            ['entity' => 'translations', 'id' => $translationId],
+            [
+                'data' => [
+                    'type' => 'translations',
+                    'id' => $translationId,
+                    'attributes' => ['translatedValue' => str_repeat('a', 255)]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'length constraint',
+                'detail' => 'This value is too long. It should have 254 characters or less.',
+                'source' => ['pointer' => '/data/attributes/translatedValue']
+            ],
+            $response
+        );
+    }
+
     public function testUpdateNotExistingTranslation(): void
     {
         $translationId = $this->resolveTranslationId('<@tk-test_trans1-test_domain->id>-<@en_US->code>');

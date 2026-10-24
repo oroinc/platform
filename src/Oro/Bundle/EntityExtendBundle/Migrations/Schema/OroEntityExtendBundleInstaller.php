@@ -21,7 +21,7 @@ class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implem
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_14';
+        return 'v1_15';
     }
 
     #[\Override]

@@ -36,7 +36,6 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
     #[\Override]
     public function getConstraintType(Validator\Constraint $constraint): ?string
     {
-        $suffix = 'Constraint';
         if ($constraint instanceof NamedValidationConstraint) {
             $constraintType = $constraint->getConstraintType();
             $delimiter = strrpos($constraintType, '\\');
@@ -46,15 +45,20 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
             $constraintType = preg_replace('/\W+/', ' ', $constraintType);
             if (str_contains($constraintType, ' ')) {
                 $constraintType = str_replace('_', ' ', strtolower($constraintType));
-                $suffix = ' ' . strtolower($suffix);
-                if (!str_ends_with($constraintType, $suffix)) {
-                    $constraintType .= $suffix;
+                if (!str_ends_with($constraintType, ' exception')) {
+                    $suffix = ' constraint';
+                    if (!str_ends_with($constraintType, $suffix)) {
+                        $constraintType .= $suffix;
+                    }
                 }
             } else {
-                $constraintType = ValueNormalizerUtil::humanizeClassName($constraintType, $suffix);
+                $constraintType = ValueNormalizerUtil::humanizeClassName(
+                    $constraintType,
+                    str_ends_with($constraintType, 'Exception') ? null : 'Constraint'
+                );
             }
         } else {
-            $constraintType = ValueNormalizerUtil::humanizeClassName(\get_class($constraint), $suffix);
+            $constraintType = ValueNormalizerUtil::humanizeClassName(\get_class($constraint), 'Constraint');
         }
 
         return $constraintType;

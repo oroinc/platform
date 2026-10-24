@@ -19,7 +19,18 @@ class ComputeTranslationId implements ProcessorInterface
 
         $data = $context->getData();
         $idFieldName = $context->getResultFieldName('id');
-        $data[$idFieldName] = TranslationIdUtil::buildTranslationId($data[$idFieldName], $data['languageCode']);
+
+        $id = $data[$idFieldName];
+        if (\is_string($id) && null !== TranslationIdUtil::extractTranslationKeyId($id)) {
+            return;
+        }
+
+        $languageCode = $data[$context->getResultFieldName('languageCode')];
+        if (\is_string($id) && TranslationIdUtil::extractLanguageCode($id) === $languageCode) {
+            return;
+        }
+
+        $data[$idFieldName] = TranslationIdUtil::buildTranslationId($id, $languageCode);
         $context->setData($data);
     }
 }

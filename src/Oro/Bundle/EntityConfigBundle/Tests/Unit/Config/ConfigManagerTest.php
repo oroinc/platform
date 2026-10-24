@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
@@ -11,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
@@ -98,6 +101,40 @@ class ConfigManagerTest extends TestCase
     public function testGetProvider(): void
     {
         $this->assertSame($this->configProvider, $this->configManager->getProvider('entity'));
+    }
+
+    public function testFindFieldConfigsByIndexedValue(): void
+    {
+        $fieldModel = new FieldConfigModel('field', 'enum');
+        $fieldModel->setEntity(new EntityConfigModel(self::ENTITY_CLASS));
+        $indexedValue = new ConfigModelIndexValue('enum', 'enum_code', 'test_enum');
+        $indexedValue->setField($fieldModel);
+        $entityIndexedValue = new ConfigModelIndexValue('enum', 'enum_code', 'test_enum');
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects(self::once())
+            ->method('findBy')
+            ->with(['scope' => 'enum', 'code' => 'enum_code', 'value' => 'test_enum'])
+            ->willReturn([$indexedValue, $entityIndexedValue]);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
+            ->method('getRepository')
+            ->with(ConfigModelIndexValue::class)
+            ->willReturn($repository);
+        $this->modelManager->expects(self::once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
+
+        $config = new Config(new FieldConfigId('enum', self::ENTITY_CLASS, 'field', 'enum'));
+        $this->configCache->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('enum', self::ENTITY_CLASS, 'field', false)
+            ->willReturn($config);
+
+        self::assertEquals(
+            [$config],
+            $this->configManager->findFieldConfigsByIndexedValue('enum', 'enum_code', 'test_enum')
+        );
     }
 
     public function testGetEntityMetadata(): void

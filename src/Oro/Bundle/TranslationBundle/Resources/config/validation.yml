@@ -1,0 +1,5 @@
+Oro\Bundle\TranslationBundle\Api\Model\TranslationModel:
+    properties:
+        translatedValue:
+            - Length:
+                max: 254
