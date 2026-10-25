@@ -88,14 +88,19 @@ class AsyncOperationTest extends TestCase
         $entity = new AsyncOperation();
         $entity->beforeSave();
 
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
         // now - 5 min 10 sec
         ReflectionUtil::setPropertyValue(
             $entity,
             'createdAt',
-            (new \DateTime('now', new \DateTimeZone('UTC')))->sub(new \DateInterval('PT5M10S'))
+            (clone $now)->sub(new \DateInterval('PT5M10S'))
         );
         $entity->preUpdate();
 
-        self::assertSame(310, $entity->getElapsedTime());
+        // preUpdate() sets updatedAt to the current time, which can be later than $now.
+        self::assertSame(
+            310 + $entity->getUpdatedAt()->getTimestamp() - $now->getTimestamp(),
+            $entity->getElapsedTime()
+        );
     }
 }
