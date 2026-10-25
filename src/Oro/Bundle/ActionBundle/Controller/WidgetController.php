@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Controller;
 
+use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Handler\OperationFormHandler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
@@ -46,7 +47,11 @@ class WidgetController extends AbstractController
     {
         $handler = $this->container->get(OperationFormHandler::class);
 
-        $result = $handler->process($operationName, $request, $request->getSession()->getFlashBag());
+        try {
+            $result = $handler->process($operationName, $request, $request->getSession()->getFlashBag());
+        } catch (OperationNotFoundException $e) {
+            throw $this->createNotFoundException($e->getMessage(), $e);
+        }
 
         return $result instanceof Response ? $result : $this->render($this->getFormTemplate($result), $result);
     }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional;
 
+use Oro\Bundle\ActionBundle\Model\Operation;
+
 /**
  * Intended for use within {@see \Oro\Bundle\TestFrameworkBundle\Test\WebTestCase}.
  * Provides common methods needed for testing operations.
@@ -21,6 +23,16 @@ trait OperationAwareTestTrait
         ];
         $container = self::getContainer();
         $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
+        if (!$operation instanceof Operation) {
+            $configuration = $container->get('oro_action.tests.configuration.provider')->getConfiguration();
+            $operationConfig = $configuration['operations'][$operationName] ?? null;
+            if ($operationConfig) {
+                $operation = $container->get('oro_action.assembler.operation')
+                    ->createOperation($operationName, $operationConfig);
+            }
+        }
+        self::assertInstanceOf(Operation::class, $operation);
+
         $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
 
         $this->ensureSessionIsAvailable();
