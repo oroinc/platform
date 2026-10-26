@@ -72,6 +72,7 @@ The current file describes significant changes in the code that may affect the u
 
 #### FormBundle
 * Added `FormStateTrackerView` (`oroform/js/app/views/form-state-tracker-view`) — a reusable Backbone view for tracking form state changes. Supports group-based registry, `ignoreChangesInGroup`, and integration with `pageStateChecker`.
+* Added the `oroform/js/app/components/dependent-field-component` page component, which replaces `orosale/js/app/components/dependent-field-component`. It takes the same data attributes and also supports chains of dependent fields, where a dependee is itself a dependent field.
 
 #### ConfigBundle
 * Added `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager::hasSettingValue(string $name, object|int|null $scopeIdentifier = null): bool` method that tells whether a setting has its own stored value in the scope, ignoring the changes scheduled with `set()`.
