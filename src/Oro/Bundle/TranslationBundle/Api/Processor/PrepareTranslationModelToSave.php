@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Api\Processor;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\TranslationBundle\Api\Model\TranslationCreate;
 use Oro\Bundle\TranslationBundle\Api\Model\TranslationModel;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -47,7 +48,7 @@ class PrepareTranslationModelToSave implements ProcessorInterface
             if (null === $translationEntity) {
                 $translationEntity = new Translation();
                 $translationEntity->setScope(Translation::SCOPE_UI);
-                $translationEntity->setTranslationKey($this->loadTranslationKeyEntity($model->getTranslationKeyId()));
+                $translationEntity->setTranslationKey($this->getTranslationKeyEntity($model, $context));
                 $translationEntity->setLanguage($this->loadLanguageEntity($model->getLanguageCode()));
             }
             $translationEntity->setValue($translatedValue);
@@ -71,9 +72,18 @@ class PrepareTranslationModelToSave implements ProcessorInterface
             ->getOneOrNullResult();
     }
 
-    private function loadTranslationKeyEntity(?int $translationKeyId): TranslationKey
-    {
-        return $this->getEntityManager()->find(TranslationKey::class, $translationKeyId);
+    private function getTranslationKeyEntity(
+        TranslationModel $model,
+        CustomizeFormDataContext $context
+    ): TranslationKey {
+        if ($model instanceof TranslationCreate && null !== $model->getNewTranslationKey()) {
+            $translationKey = $model->getNewTranslationKey();
+            $context->addAdditionalEntity($translationKey);
+
+            return $translationKey;
+        }
+
+        return $this->getEntityManager()->find(TranslationKey::class, $model->getTranslationKeyId());
     }
 
     private function loadLanguageEntity(string $languageCode): Language

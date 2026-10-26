@@ -37,16 +37,15 @@ class LoadTranslationUpdate implements ProcessorInterface
     {
         /** @var SingleItemContext|FormContext $context */
 
-        if ($context->hasResult()) {
-            // the entity is already loaded
-            return;
+        if (!$context->hasResult()) {
+            $context->setResult(
+                $this->loadTranslationModel($context->getId(), $context->getConfig(), $context->getRequestType())
+            );
         }
-
-        $context->setResult(
-            $this->loadTranslationModel($context->getId(), $context->getConfig(), $context->getRequestType())
-        );
-        // disable entity mapping
-        $context->setEntityMapper(null);
+        if ($context->getResult() instanceof TranslationUpdate) {
+            // disable entity mapping
+            $context->setEntityMapper(null);
+        }
     }
 
     private function loadTranslationModel(

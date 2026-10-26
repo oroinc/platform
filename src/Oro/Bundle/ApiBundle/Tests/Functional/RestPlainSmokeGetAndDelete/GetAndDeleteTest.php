@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestPlainSmokeGetAndDelete;
 
+use Oro\Bundle\ApiBundle\Model\EnumOption as ApiEnumOption;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Functional\CheckSkippedEntityTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption as EntityEnumOption;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -59,9 +61,17 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         );
         if ($response->getStatusCode() !== Response::HTTP_NO_CONTENT) {
             // process delete errors
+            if (ApiEnumOption::class === $entityClass && Response::HTTP_CONFLICT === $response->getStatusCode()) {
+                // An immutable option or an option of a system enum cannot be deleted.
+                return;
+            }
+
             self::assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
         } else {
             // check if entity was really deleted
+            if (ApiEnumOption::class === $entityClass) {
+                $entityClass = EntityEnumOption::class;
+            }
             $em = $this->getEntityManager($entityClass);
             $em->clear();
             self::assertTrue(null === $em->find($entityClass, $id), 'check if entity was deleted');

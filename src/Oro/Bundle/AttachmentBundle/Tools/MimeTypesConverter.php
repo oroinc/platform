@@ -38,4 +38,20 @@ final class MimeTypesConverter
 
         return array_map('trim', explode("\n", str_replace(',', "\n", str_replace("\r", '', $mimeTypes))));
     }
+
+    /**
+     * Reduces a MIME type to its media type: the lower-case "type/subtype" without parameters.
+     */
+    public static function convertToMediaType(string $mimeType): string
+    {
+        return strtolower(trim(explode(';', $mimeType, 2)[0]));
+    }
+
+    /**
+     * Checks whether a value is a media type, the lower-case "type/subtype" without parameters.
+     */
+    public static function isMediaType(string $value): bool
+    {
+        return 1 === preg_match('/^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/D', $value);
+    }
 }

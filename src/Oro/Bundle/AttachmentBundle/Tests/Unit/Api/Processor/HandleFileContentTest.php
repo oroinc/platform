@@ -10,7 +10,6 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class HandleFileContentTest extends CustomizeFormDataProcessorTestCase
 {
@@ -175,11 +174,10 @@ class HandleFileContentTest extends CustomizeFormDataProcessorTestCase
         self::assertSame($file, $handledData['content']);
     }
 
-    public function testProcessWithValidContentAndWithMimeType(): void
+    public function testProcessIgnoresClientMimeType(): void
     {
         $content = 'test';
         $originalFileName = 'test.txt';
-        $mimeType = 'text/plain';
 
         $file = new ComponentFile(__DIR__ . '/../../Fixtures/testFile/test.txt');
 
@@ -193,7 +191,7 @@ class HandleFileContentTest extends CustomizeFormDataProcessorTestCase
         $data = [
             'originalFilename' => $originalFileName,
             'content'          => base64_encode($content),
-            'mimeType'         => $mimeType
+            'mimeType'         => 'text/html'
         ];
 
         $this->fileManager->expects(self::once())
@@ -210,9 +208,6 @@ class HandleFileContentTest extends CustomizeFormDataProcessorTestCase
 
         $handledData = $this->context->getData();
         self::assertEquals($originalFileName, $handledData['originalFilename']);
-        self::assertEquals(
-            new UploadedFile($file->getPathname(), $originalFileName, $mimeType),
-            $handledData['content']
-        );
+        self::assertSame($file, $handledData['content']);
     }
 }

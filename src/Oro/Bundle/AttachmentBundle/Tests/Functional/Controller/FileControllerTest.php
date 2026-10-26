@@ -7,6 +7,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistryInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadFileData;
+use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadFileMimeTypeData;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadImageData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
@@ -21,7 +22,7 @@ class FileControllerTest extends WebTestCase
     {
         $this->initClient([], self::generateBasicAuthHeader());
 
-        $this->loadFixtures([LoadFileData::class, LoadImageData::class]);
+        $this->loadFixtures([LoadFileData::class, LoadImageData::class, LoadFileMimeTypeData::class]);
     }
 
     #[\Override]
@@ -75,6 +76,7 @@ class FileControllerTest extends WebTestCase
         self::assertResponseContentTypeEquals($result, 'application/force-download');
         self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
         self::assertResponseHeader($result, 'Content-Disposition', 'attachment');
+        self::assertResponseHeader($result, 'Content-Security-Policy', 'sandbox');
         self::assertResponseHeader($result, 'Content-Length', $file->getFileSize());
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -98,18 +100,86 @@ class FileControllerTest extends WebTestCase
         self::assertResponseStatusCodeEquals($result, 200);
     }
 
-    public function testGetFileReturnsFile(): void
+    /**
+     * @dataProvider getFileServesInlineTypeDataProvider
+     */
+    public function testGetFileServesInlineType(string $fileReference, string $expectedContentType): void
     {
         /** @var File $file */
-        $file = $this->getReference(LoadFileData::FILE_1);
+        $file = $this->getReference($fileReference);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
             ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_GET);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
-        self::assertResponseContentTypeEquals($result, 'text/plain; charset=UTF-8');
+
+        self::assertResponseStatusCodeEquals($result, 200);
+        self::assertResponseContentTypeEquals($result, $expectedContentType);
         self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
         self::assertResponseHeader($result, 'Content-Length', $file->getFileSize());
+        self::assertResponseHeaderNotExists($result, 'Content-Disposition');
+        self::assertResponseHeaderNotExists($result, 'Content-Security-Policy');
+    }
+
+    public function getFileServesInlineTypeDataProvider(): array
+    {
+        return [
+            'text stays inline' => [
+                'fileReference' => LoadFileData::FILE_1,
+                'expectedContentType' => 'text/plain; charset=utf-8',
+            ],
+            'uppercase type with charset parameter is reduced to the media type' => [
+                'fileReference' => LoadFileMimeTypeData::FILE_TEXT_UPPERCASE_WITH_CHARSET,
+                'expectedContentType' => 'text/plain; charset=utf-8',
+            ],
+        ];
+    }
+
+    /**
+     * A file whose type is outside the inline list keeps its media type but is served as a download
+     * under the sandbox policy, so an opened URL cannot execute it in the application origin.
+     * A file without a valid type is served as a binary download.
+     *
+     * @dataProvider getFileForcesDownloadForNonInlineTypeDataProvider
+     */
+    public function testGetFileForcesDownloadForNonInlineType(
+        string $fileReference,
+        string $expectedContentType,
+        string $expectedContentDisposition
+    ): void {
+        /** @var File $file */
+        $file = $this->getReference($fileReference);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_GET);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
         self::assertResponseStatusCodeEquals($result, 200);
+        self::assertResponseContentTypeEquals($result, $expectedContentType);
+        self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        self::assertResponseHeader($result, 'Content-Length', $file->getFileSize());
+        self::assertResponseHeader($result, 'Content-Disposition', $expectedContentDisposition);
+        self::assertResponseHeader($result, 'Content-Security-Policy', 'sandbox');
+    }
+
+    public function getFileForcesDownloadForNonInlineTypeDataProvider(): array
+    {
+        return [
+            'html' => [
+                'fileReference' => LoadFileMimeTypeData::FILE_HTML,
+                'expectedContentType' => 'text/html; charset=utf-8',
+                'expectedContentDisposition' => 'attachment;filename="file_mime_type_html.txt"',
+            ],
+            'svg' => [
+                'fileReference' => LoadFileMimeTypeData::FILE_SVG,
+                'expectedContentType' => 'image/svg+xml',
+                'expectedContentDisposition' => 'attachment;filename="file_mime_type_svg.txt"',
+            ],
+            'control characters in the filename are stripped' => [
+                'fileReference' => LoadFileMimeTypeData::FILE_FILENAME_WITH_CONTROL_CHARS,
+                'expectedContentType' => 'text/html; charset=utf-8',
+                'expectedContentDisposition' => 'attachment;filename="probe.html"',
+            ],
+        ];
     }
 
     public function testGetResizedAttachmentImageReturns404WhenFileNotExists(): void
@@ -327,6 +397,34 @@ class FileControllerTest extends WebTestCase
         self::assertNotEquals(0, $result->headers->getCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, $file->getMimeType());
         self::assertResponseStatusCodeEquals($result, 200);
+    }
+
+    public function testGetResizedAttachmentImageForSvgIsSandboxed(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_SVG);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getResizedImageUrl($file, 42, 142, '');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseStatusCodeEquals($result, 200);
+        self::assertResponseContentTypeEquals($result, 'image/svg+xml');
+        self::assertResponseHeader($result, 'Content-Security-Policy', 'sandbox');
+    }
+
+    public function testGetFilteredImageForSvgIsSandboxed(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_SVG);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getFilteredImageUrl($file, 'original', '');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertResponseStatusCodeEquals($result, 200);
+        self::assertResponseContentTypeEquals($result, 'image/svg+xml');
+        self::assertResponseHeader($result, 'Content-Security-Policy', 'sandbox');
     }
 
     public function testGetResizedAttachmentImageStoresImageUnderDecodedPath(): void

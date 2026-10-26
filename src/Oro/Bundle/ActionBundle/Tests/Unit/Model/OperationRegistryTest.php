@@ -263,13 +263,18 @@ class OperationRegistryTest extends TestCase
         string $operationName,
         ?string $expected,
         ?OperationFindCriteria $criteria = null,
-        array $filterResult = []
+        array $filterResult = [],
+        array $applications = []
     ): void {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn(
                 [
-                    'operation1' => $this->createOperationConfig(['label' => 'Label1', 'entities' => ['stdClass']])
+                    'operation1' => $this->createOperationConfig([
+                        'label' => 'Label1',
+                        'entities' => ['stdClass'],
+                        'applications' => $applications
+                    ])
                 ]
             );
 
@@ -296,6 +301,20 @@ class OperationRegistryTest extends TestCase
             'valid operation name' => [
                 'operationName' => 'operation1',
                 'expected' => 'operation1'
+            ],
+            'valid operation name and valid application without criteria' => [
+                'operationName' => 'operation1',
+                'expected' => 'operation1',
+                'criteria' => null,
+                'filterResult' => [],
+                'applications' => ['default']
+            ],
+            'valid operation name and invalid application without criteria' => [
+                'operationName' => 'operation1',
+                'expected' => null,
+                'criteria' => null,
+                'filterResult' => [],
+                'applications' => ['commerce']
             ],
             'with filter criteria and operation not found' => [
                 'operationName' => 'operation1',

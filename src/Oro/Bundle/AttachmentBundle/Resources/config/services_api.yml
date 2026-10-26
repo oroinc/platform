@@ -11,12 +11,20 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_entity_config.config_manager'
 
+    oro_attachment.api.form.file_validation_target_registrar:
+        class: Oro\Bundle\AttachmentBundle\Api\Form\FileValidationTargetRegistrar
+        arguments:
+            - '@oro_attachment.provider.file_validation_target_registry'
+        tags:
+            - { name: kernel.reset, method: clear }
+
     oro_attachment.api.form.type.file_entity:
         class: Oro\Bundle\AttachmentBundle\Api\Form\Type\FileEntityType
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
             - '@translator'
+            - '@oro_attachment.api.form.file_validation_target_registrar'
         tags:
             - { name: oro.api.form.type, alias: Oro\Bundle\AttachmentBundle\Api\Form\Type\FileEntityType }
 
@@ -27,6 +35,7 @@ services:
             - '@oro_api.entity_loader'
             - '@translator'
             - '@oro_attachment.api.form.type.multi_file_entity.options_processor'
+            - '@oro_attachment.api.form.file_validation_target_registrar'
         tags:
             - { name: oro.api.form.type, alias: Oro\Bundle\AttachmentBundle\Api\Form\Type\MultiFileEntityType }
 
@@ -131,7 +140,7 @@ services:
             - '@oro_attachment.validator.file_config_validator'
             - '@translator'
         tags:
-            - { name: oro.api.processor, action: customize_form_data, event: pre_submit|post_validate, class: Oro\Bundle\AttachmentBundle\Entity\File }
+            - { name: oro.api.processor, action: customize_form_data, event: pre_submit, class: Oro\Bundle\AttachmentBundle\Entity\File }
 
     oro_attachment.api.link_file_to_parent_entity:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\LinkFileToParentEntity

@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Handles submitted content of File entity.
@@ -16,7 +15,6 @@ class HandleFileContent implements ProcessorInterface
 {
     private const CONTENT_FIELD_NAME = 'content';
     private const ORIGINAL_FILE_NAME_FIELD_NAME = 'originalFilename';
-    private const MIME_TYPE_FIELD_NAME = 'mimeType';
 
     private FileManager $fileManager;
 
@@ -60,18 +58,10 @@ class HandleFileContent implements ProcessorInterface
             FormUtil::addFormError($context->getForm(), 'Cannot decode content encoded with MIME base64.');
             $data[self::CONTENT_FIELD_NAME] = null;
         } else {
-            $file = $this->fileManager->writeToTemporaryFile(
+            $data[self::CONTENT_FIELD_NAME] = $this->fileManager->writeToTemporaryFile(
                 $decodedContent,
                 $data[self::ORIGINAL_FILE_NAME_FIELD_NAME]
             );
-            if (!empty($data[self::MIME_TYPE_FIELD_NAME])) {
-                $file = new UploadedFile(
-                    $file->getPathname(),
-                    $data[self::ORIGINAL_FILE_NAME_FIELD_NAME],
-                    $data[self::MIME_TYPE_FIELD_NAME]
-                );
-            }
-            $data[self::CONTENT_FIELD_NAME] = $file;
         }
 
         $context->setData($data);

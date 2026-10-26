@@ -55,3 +55,7 @@ Oro\Bundle\EntityExtendBundle\Entity\EnumOption:
             - NotBlank: ~
             - Length:
                 max: 255
+        priority:
+            - Range:
+                min: -2147483648
+                max: 2147483647

@@ -71,6 +71,56 @@ class TranslationCreateTest extends RestJsonApiTestCase
         );
     }
 
+    public function testTryToCreateTranslationWithTooLongTranslatedValue(): void
+    {
+        $response = $this->post(
+            ['entity' => 'translations'],
+            [
+                'data' => [
+                    'type' => 'translations',
+                    'attributes' => [
+                        'domain' => 'test_domain',
+                        'key' => 'test.trans1',
+                        'languageCode' => 'en_US',
+                        'translatedValue' => str_repeat('a', 255)
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'length constraint',
+                'detail' => 'This value is too long. It should have 254 characters or less.',
+                'source' => ['pointer' => '/data/attributes/translatedValue']
+            ],
+            $response
+        );
+    }
+
+    public function testCreateTranslationWithMaximumTranslatedValueLength(): void
+    {
+        $data = [
+            'data' => [
+                'type' => 'translations',
+                'attributes' => [
+                    'domain' => 'test_domain',
+                    'key' => 'test.trans1',
+                    'languageCode' => 'en_US',
+                    'translatedValue' => str_repeat('a', 254)
+                ]
+            ]
+        ];
+        $response = $this->post(
+            ['entity' => 'translations'],
+            $data
+        );
+
+        $this->assertResponseContains($data, $response);
+    }
+
     public function testUpdateNotExistingTranslation(): void
     {
         $response = $this->post(

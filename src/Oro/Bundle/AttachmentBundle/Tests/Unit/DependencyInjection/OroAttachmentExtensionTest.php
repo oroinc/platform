@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\OroAttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
@@ -29,6 +30,7 @@ class OroAttachmentExtensionTest extends TestCase
                 'oro_attachment.debug_images' => true,
                 'oro_attachment.upload_file_mime_types' => [],
                 'oro_attachment.upload_image_mime_types' => [],
+                'oro_attachment.inline_mime_types' => Configuration::DEFAULT_INLINE_MIME_TYPES,
                 'oro_attachment.processors_allowed' => true,
                 'oro_attachment.png_quality' => 100,
                 'oro_attachment.jpeg_quality' => 85,

@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
@@ -379,6 +380,34 @@ class ConfigManager
                 $withHidden
             );
         }
+    }
+
+    /**
+     * Finds field configurations by an indexed configuration value.
+     *
+     * @return ConfigInterface[]
+     */
+    public function findFieldConfigsByIndexedValue(string $scope, string $code, string $value): array
+    {
+        $indexedValues = $this->getEntityManager()->getRepository(ConfigModelIndexValue::class)->findBy([
+            'scope' => $scope,
+            'code' => $code,
+            'value' => $value
+        ]);
+
+        $configs = [];
+        foreach ($indexedValues as $indexedValue) {
+            $field = $indexedValue->getField();
+            if (null !== $field) {
+                $configs[] = $this->getFieldConfig(
+                    $scope,
+                    $field->getEntity()->getClassName(),
+                    $field->getFieldName()
+                );
+            }
+        }
+
+        return $configs;
     }
 
     /**

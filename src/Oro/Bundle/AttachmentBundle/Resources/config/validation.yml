@@ -1,4 +1,7 @@
 Oro\Bundle\AttachmentBundle\Entity\Attachment:
+    constraints:
+        - Oro\Bundle\AttachmentBundle\Validator\Constraints\AttachmentFileTargetConfig:
+            groups: [api]
     properties:
         file:
             - NotBlank: ~
@@ -29,7 +32,12 @@ Oro\Bundle\AttachmentBundle\Entity\File:
         externalUrl:
             - Length:
                   max: 1024
+            - Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileParentFieldConfig:
+                groups: [api]
         originalFilename:
             - Oro\Bundle\AttachmentBundle\Validator\Constraints\FilenameWithoutPath: ~
             - Length:
                   max: 255
+        file:
+            - Oro\Bundle\AttachmentBundle\Validator\Constraints\FileParentFieldConfig:
+                groups: [api]

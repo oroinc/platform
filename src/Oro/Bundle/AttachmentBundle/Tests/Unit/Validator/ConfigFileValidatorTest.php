@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
+use Oro\Bundle\AttachmentBundle\Model\FileValidationTarget;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileMimeType;
@@ -77,6 +78,73 @@ class ConfigFileValidatorTest extends TestCase
             ->willReturn($constraintViolationList);
 
         self::assertSame($constraintViolationList, $this->configValidator->validate($symfonyFile, $dataClass));
+    }
+
+    public function testGetConstraintsWhenSymfonyFileAndNoDataClass(): void
+    {
+        $mimeTypes = ['sample/type1'];
+        $this->fileConstraintsProvider->expects(self::once())
+            ->method('getMimeTypes')
+            ->willReturn($mimeTypes);
+        $this->fileConstraintsProvider->expects(self::once())
+            ->method('getMaxSize')
+            ->willReturn(100);
+        $this->fileConstraintsProvider->expects(self::never())
+            ->method('getAllowedMimeTypesForEntity');
+        $this->fileConstraintsProvider->expects(self::never())
+            ->method('getMaxSizeForEntity');
+
+        self::assertEquals(
+            [
+                new Sequentially([
+                    'constraints' => [
+                        new SymfonyFileConstraint(
+                            [
+                                'maxSize' => 100,
+                                'mimeTypes' => $mimeTypes,
+                                'mimeTypesMessage' => 'oro.attachment.mimetypes.invalid_mime_type',
+                            ]
+                        ),
+                    ],
+                ]),
+            ],
+            $this->configValidator->getConstraints(
+                $this->createMock(SymfonyFile::class),
+                FileValidationTarget::system()
+            )
+        );
+    }
+
+    public function testGetConstraintsWhenExternalFileAndNoDataClass(): void
+    {
+        $mimeTypes = ['sample/type1'];
+        $this->fileConstraintsProvider->expects(self::once())
+            ->method('getMimeTypes')
+            ->willReturn($mimeTypes);
+        $this->fileConstraintsProvider->expects(self::never())
+            ->method('getAllowedMimeTypesForEntity');
+
+        $regexp = '/sample-regexp/';
+        $this->fileConstraintsProvider->expects(self::any())
+            ->method('getExternalFileAllowedUrlsRegExp')
+            ->willReturn($regexp);
+
+        self::assertEquals(
+            [
+                new Sequentially([
+                    'constraints' => [
+                        new ExternalFileUrl(
+                            [
+                                'allowedUrlsRegExp' => $regexp,
+                                'emptyRegExpMessage' => 'oro.attachment.external_file.empty_regexp',
+                            ]
+                        ),
+                        new ExternalFileMimeType(['mimeTypes' => $mimeTypes]),
+                    ],
+                ]),
+            ],
+            $this->configValidator->getConstraints(new ExternalFile(''), FileValidationTarget::system())
+        );
     }
 
     public function testValidateWhenExternalFileAndNoFieldName(): void
@@ -222,6 +290,56 @@ class ConfigFileValidatorTest extends TestCase
             ->willReturn($constraintViolationList);
 
         self::assertSame($constraintViolationList, $this->configValidator->validateExternalFileUrl($url));
+    }
+
+    public function testValidateWhenFieldNameWithoutDataClass(): void
+    {
+        $this->expectExceptionObject(
+            new \InvalidArgumentException('The field name cannot be specified without the entity class.')
+        );
+
+        $this->validator->expects(self::never())
+            ->method('validate');
+
+        $this->configValidator->validate($this->createMock(SymfonyFile::class), '', 'sampleField');
+    }
+
+    public function testValidateWhenNoDataClassAndNoFieldName(): void
+    {
+        $this->fileConstraintsProvider->expects(self::once())
+            ->method('getMimeTypes')
+            ->willReturn(['sample/type1']);
+        $this->fileConstraintsProvider->expects(self::once())
+            ->method('getMaxSize')
+            ->willReturn(100);
+        $this->fileConstraintsProvider->expects(self::never())
+            ->method('getAllowedMimeTypesForEntity');
+        $this->fileConstraintsProvider->expects(self::never())
+            ->method('getMaxSizeForEntity');
+
+        $symfonyFile = $this->createMock(SymfonyFile::class);
+        $constraintViolationList = $this->createMock(ConstraintViolationList::class);
+        $this->validator->expects(self::once())
+            ->method('validate')
+            ->with(
+                $symfonyFile,
+                [
+                    new Sequentially([
+                        'constraints' => [
+                            new SymfonyFileConstraint(
+                                [
+                                    'maxSize' => 100,
+                                    'mimeTypes' => ['sample/type1'],
+                                    'mimeTypesMessage' => 'oro.attachment.mimetypes.invalid_mime_type',
+                                ]
+                            ),
+                        ],
+                    ]),
+                ]
+            )
+            ->willReturn($constraintViolationList);
+
+        self::assertSame($constraintViolationList, $this->configValidator->validate($symfonyFile, ''));
     }
 
     public function testValidateNotSupportedType(): void

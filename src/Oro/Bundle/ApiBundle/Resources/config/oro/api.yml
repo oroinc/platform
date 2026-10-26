@@ -1,5 +1,12 @@
 api:
     entity_aliases:
+        # The base entity is used by legacy EV_* resources and is not a standalone API resource.
+        Oro\Bundle\EntityExtendBundle\Entity\EnumOption:
+            alias: enumoptionentity
+            plural_alias: enumoptionentities
+        Oro\Bundle\ApiBundle\Model\EnumOption:
+            alias: enumoption
+            plural_alias: enumoptions
         Oro\Bundle\ApiBundle\Model\EntityIdentifier:
             alias:        entityidentifier
             plural_alias: entityidentifiers
@@ -42,6 +49,72 @@ api:
             # this entity does not have own API resource
             # it is defined in the config to be able to use enum options in API
             actions: false
+
+        Oro\Bundle\ApiBundle\Model\EnumOption:
+            documentation_resource: '@OroApiBundle/Resources/doc/api/enum_option.md'
+            disable_inclusion: false
+            upsert: false
+            fields:
+                enumCode:
+                    exclude: false
+                    form_options:
+                        mapped: false
+                optionId:
+                    exclude: false
+                    property_path: internalId
+                    form_options:
+                        mapped: false
+                name:
+                    exclude: true
+                names:
+                    target_class: Oro\Bundle\TranslationBundle\Entity\TranslationKey
+                    target_type: collection
+                    property_path: _
+                    depends_on: [ id ]
+                    form_options:
+                        mapped: false
+            filters:
+                fields:
+                    id:
+                        data_type: string
+                        allow_array: true
+                    enumCode:
+                        data_type: string
+                        allow_array: true
+                    optionId:
+                        data_type: string
+                        exclude: false
+                        property_path: internalId
+                        allow_array: true
+                    priority:
+                        data_type: integer
+                    default:
+                        data_type: boolean
+            sorters:
+                fields:
+                    optionId: ~
+                    priority: ~
+            actions:
+                get_list:
+                    exclude: false
+                    acl_resource: oro_entityconfig_manage
+                get:
+                    exclude: false
+                    acl_resource: oro_entityconfig_manage
+                create:
+                    exclude: false
+                    acl_resource: oro_entityconfig_manage
+                update:
+                    exclude: false
+                    acl_resource: oro_entityconfig_manage
+                delete:
+                    exclude: false
+                    acl_resource: oro_entityconfig_manage
+                delete_list: false
+                update_list: false
+            subresources:
+                names:
+                    exclude: true
 
         Oro\Bundle\ApiBundle\Entity\AsyncOperation:
             documentation_resource: '@OroApiBundle/Resources/doc/api/async_operation.md'

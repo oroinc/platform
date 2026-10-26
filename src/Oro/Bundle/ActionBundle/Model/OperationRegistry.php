@@ -123,11 +123,18 @@ class OperationRegistry
             }
         }
 
-        if (
-            $operation && $criteria &&
-            (!$this->isApplicable($this->configuration[$name], $criteria) || !$this->filter([$operation], $criteria))
-        ) {
-            $operation = null;
+        if ($operation) {
+            if ($criteria) {
+                $isApplicable = $this->isApplicable($this->configuration[$name], $criteria);
+            } else {
+                $isApplicable = $this->applicationProvider->isApplicationsValid(
+                    (array)($this->configuration[$name]['applications'] ?? [])
+                );
+            }
+
+            if (!$isApplicable || ($criteria && !$this->filter([$operation], $criteria))) {
+                $operation = null;
+            }
         }
 
         return $operation;

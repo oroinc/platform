@@ -14,6 +14,9 @@ api:
                 uuid:
                     form_options:
                         mapped: false
+                mimeType:
+                    form_options:
+                        mapped: false
                 filename:
                     exclude: true
                 extension:

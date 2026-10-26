@@ -80,7 +80,11 @@ class FormSubmitTemplateResponseProcessorTest extends TestCase
 
         $this->processor->process($context);
 
-        $this->assertEquals(new Response('content1'), $context->getResult());
+        $response = $context->getResult();
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('content1', $response->getContent());
         $this->assertTrue($context->isProcessed());
     }
 
@@ -110,7 +114,9 @@ class FormSubmitTemplateResponseProcessorTest extends TestCase
 
         $response = $context->getResult();
 
-        $this->assertEquals(new Response('content2'), $response);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('content2', $response->getContent());
         $this->assertTrue($context->isProcessed());
     }
 
@@ -154,7 +160,9 @@ class FormSubmitTemplateResponseProcessorTest extends TestCase
 
         $response = $context->getResult();
 
-        $this->assertEquals(new Response('content3'), $response);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('content3', $response->getContent());
         $this->assertTrue($context->isProcessed());
     }
 
