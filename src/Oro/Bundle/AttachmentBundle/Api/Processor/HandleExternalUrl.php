@@ -5,9 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Api\Processor;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
-use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -19,8 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Validates that the specified external URL matches the URLs allowed in the system configuration.
- * Creates {@see ExternalFile} model from the specified external URL.
- * Handles a valid {@see ExternalFile} model to {@see File::setFile}.
+ * Creates {@see \Oro\Bundle\AttachmentBundle\Model\ExternalFile} model from the specified external URL.
  */
 class HandleExternalUrl implements ProcessorInterface
 {
@@ -45,15 +42,7 @@ class HandleExternalUrl implements ProcessorInterface
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
-
-        switch ($context->getEvent()) {
-            case CustomizeFormDataContext::EVENT_PRE_SUBMIT:
-                $this->processPreSubmit($context);
-                break;
-            case CustomizeFormDataContext::EVENT_POST_VALIDATE:
-                $this->processPostValidate($context);
-                break;
-        }
+        $this->processPreSubmit($context);
     }
 
     private function processPreSubmit(CustomizeFormDataContext $context): void
@@ -107,36 +96,6 @@ class HandleExternalUrl implements ProcessorInterface
             );
         }
         $context->setData($data);
-    }
-
-    private function processPostValidate(CustomizeFormDataContext $context): void
-    {
-        $form = $context->getForm();
-        if (!$form->isValid()) {
-            return;
-        }
-
-        /** @var File $file */
-        $file = $context->getData();
-        if (null === $file->getParentEntityClass()) {
-            return;
-        }
-
-        $externalFile = $file->getFile();
-        if (!$externalFile instanceof ExternalFile) {
-            return;
-        }
-
-        $violations = $this->configFileValidator->validate(
-            $externalFile,
-            $file->getParentEntityClass(),
-            $file->getParentEntityFieldName()
-        );
-        if ($violations->count()) {
-            $this->addExternalUrlFieldValidationErrors($form, $violations);
-        } else {
-            $file->setFile($externalFile);
-        }
     }
 
     private function addExternalUrlFieldValidationErrors(

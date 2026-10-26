@@ -40,6 +40,7 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $container->setParameter('oro_attachment.debug_images', $config['debug_images']);
         $container->setParameter('oro_attachment.upload_file_mime_types', $config['upload_file_mime_types']);
         $container->setParameter('oro_attachment.upload_image_mime_types', $config['upload_image_mime_types']);
+        $container->setParameter('oro_attachment.inline_mime_types', $config['inline_mime_types']);
         $container->setParameter('oro_attachment.processors_allowed', $config['processors_allowed']);
         $container->setParameter('oro_attachment.png_quality', $config['png_quality']);
         $container->setParameter('oro_attachment.jpeg_quality', $config['jpeg_quality']);

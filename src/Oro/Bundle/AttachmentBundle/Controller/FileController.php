@@ -11,6 +11,7 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,29 +26,27 @@ class FileController extends AbstractController
 {
     public const int CACHE_CONTROL_DEFAULT_MAX_AGE = 3600;
 
+    private const string CONTROL_CHARACTERS_PATTERN = '/[\x00-\x1F\x7F]/';
+
     public function getFileAction(int $id, string $filename, string $action, Request $request): Response
     {
         $file = $this->getFileById($id);
         $this->unlockSession($request);
         $this->assertValidFilename($file, $filename);
 
-        $response = new Response();
+        $mimeType = MimeTypesConverter::convertToMediaType((string)$file->getMimeType());
+        $isInline = FileUrlProviderInterface::FILE_ACTION_GET === $action
+            && \in_array($mimeType, $this->getParameter('oro_attachment.inline_mime_types'), true);
+
+        $response = new Response($this->getFileManager()->getContent($file));
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
-
-        if (FileUrlProviderInterface::FILE_ACTION_GET === $action) {
-            $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
-        } else {
-            $response->headers->set('Content-Type', 'application/force-download');
-
-            $contentDisposition = 'attachment';
-            if ($file->getOriginalFilename()) {
-                $contentDisposition .= sprintf(';filename="%s"', addslashes($file->getOriginalFilename()));
-            }
-            $response->headers->set('Content-Disposition', $contentDisposition);
-        }
-
+        $response->headers->set('Content-Type', $this->getContentType($action, $mimeType));
         $response->headers->set('Content-Length', $file->getFileSize());
-        $response->setContent($this->getFileManager()->getContent($file));
+
+        if (!$isInline) {
+            $response->headers->set('Content-Disposition', $this->getAttachmentContentDisposition($file));
+            $response->headers->set('Content-Security-Policy', 'sandbox');
+        }
 
         return $response;
     }
@@ -98,6 +97,7 @@ class FileController extends AbstractController
             $response->headers->set('Content-Length', strlen($binary->getContent()));
             $response->headers->set('Cache-Control', sprintf('max-age=%d, public', $imageMaxLifetime));
             $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, true);
+            $response->headers->set('Content-Security-Policy', 'sandbox');
 
             return $response;
         }
@@ -144,6 +144,7 @@ class FileController extends AbstractController
                 'Content-Type' => $binary->getMimeType(),
                 AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER => true,
                 'Cache-Control' => 'no-cache, no-store, must-revalidate, max-age=0',
+                'Content-Security-Policy' => 'sandbox',
             ]
         );
 
@@ -220,6 +221,29 @@ class FileController extends AbstractController
         }
 
         throw $this->createNotFoundException('File not found');
+    }
+
+    /**
+     * The get action keeps the media type of the file, a file without a valid media type is served as binary data.
+     */
+    private function getContentType(string $action, string $mimeType): string
+    {
+        if (FileUrlProviderInterface::FILE_ACTION_GET !== $action) {
+            return 'application/force-download';
+        }
+
+        return MimeTypesConverter::isMediaType($mimeType) ? $mimeType : 'application/octet-stream';
+    }
+
+    private function getAttachmentContentDisposition(File $file): string
+    {
+        $contentDisposition = 'attachment';
+        $originalFilename = preg_replace(self::CONTROL_CHARACTERS_PATTERN, '', (string)$file->getOriginalFilename());
+        if ($originalFilename) {
+            $contentDisposition .= sprintf(';filename="%s"', addslashes($originalFilename));
+        }
+
+        return $contentDisposition;
     }
 
     private function unlockSession(Request $request): void

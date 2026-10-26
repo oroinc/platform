@@ -143,6 +143,8 @@ Delete a set of attachment records.
 
 ### file
 
+The file of the attachment. The MIME type of an uploaded or an external file, and the size of uploaded file content, must be allowed by the attachment configuration of the attachment target entity; otherwise the request is rejected.
+
 #### create
 
 {@inheritdoc}

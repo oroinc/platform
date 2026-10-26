@@ -36,7 +36,7 @@ class ExternalFileMimeTypeValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'scalar');
         }
 
-        if (!in_array(strtolower($value), $constraint->mimeTypes, false)) {
+        if (!$this->isMimeTypeAllowed(strtolower($value), $constraint->mimeTypes)) {
             $this->context
                 ->buildViolation($constraint->message)
                 ->setParameter('{{ type }}', $this->formatValue($value))
@@ -44,5 +44,21 @@ class ExternalFileMimeTypeValidator extends ConstraintValidator
                 ->setCode(ExternalFileMimeType::INVALID_MIME_TYPE_ERROR)
                 ->addViolation();
         }
+    }
+
+    private function isMimeTypeAllowed(string $mimeType, array $allowedMimeTypes): bool
+    {
+        foreach ($allowedMimeTypes as $allowedMimeType) {
+            if ($mimeType === $allowedMimeType) {
+                return true;
+            }
+
+            $isGroupWildcard = \strlen($allowedMimeType) > 2 && str_ends_with($allowedMimeType, '/*');
+            if ($isGroupWildcard && str_starts_with($mimeType, substr($allowedMimeType, 0, -1))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

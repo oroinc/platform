@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\ExternalFileFactoryStub;
 
 /**
  * @dbIsolationPerTest
@@ -13,6 +15,10 @@ class AttachmentTest extends RestJsonApiTestCase
 {
     private const string BLANK_FILE_CONTENT = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
         . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
+    private const string SVG_FILE_PATH = __DIR__ . '/../../DataFixtures/files/image.svg';
+    private const string INVALID_MIME_TYPE_MESSAGE = 'The MIME type of the file is invalid ("%s").'
+        . ' Allowed MIME types are "image/*".';
+    private const string ATTACHMENT_EXTERNAL_FILE_URLS_REGEXP = 'oro_attachment.external_file_allowed_urls_regexp';
 
     #[\Override]
     protected function setUp(): void
@@ -21,6 +27,13 @@ class AttachmentTest extends RestJsonApiTestCase
         $this->loadFixtures([
             '@OroAttachmentBundle/Tests/Functional/Api/DataFixtures/attachment_data.yml'
         ]);
+    }
+
+    #[\Override]
+    protected function tearDown(): void
+    {
+        $this->restoreConfigValues();
+        parent::tearDown();
     }
 
     private function getTargetId(Attachment $attachment): ?int
@@ -148,6 +161,216 @@ class AttachmentTest extends RestJsonApiTestCase
         $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentId);
         self::assertEquals('Comment for test attachment', $attachment->getComment());
         self::assertEquals($department1Id, $this->getTargetId($attachment));
+    }
+
+    public function testTryToCreateWithIncludedFileContentNotAllowedForTargetEntity(): void
+    {
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type' => 'attachments',
+                    'relationships' => [
+                        'file' => [
+                            'data' => ['type' => 'files', 'id' => 'file'],
+                        ],
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>'],
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'file',
+                        'attributes' => [
+                            'originalFilename' => 'test.txt',
+                            'content' => base64_encode('plain text content'),
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'file constraint',
+                'detail' => sprintf(self::INVALID_MIME_TYPE_MESSAGE, 'text/plain'),
+                'source' => ['pointer' => '/data/relationships/file/data']
+            ],
+            $response
+        );
+    }
+
+    public function testCreateWithIncludedFileContentAllowedForTargetEntityOnly(): void
+    {
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type' => 'attachments',
+                    'relationships' => [
+                        'file' => [
+                            'data' => ['type' => 'files', 'id' => 'file'],
+                        ],
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>'],
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'file',
+                        'attributes' => [
+                            'originalFilename' => 'image.svg',
+                            'content' => base64_encode(file_get_contents(self::SVG_FILE_PATH)),
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $attachment = $this->getEntityManager()->find(Attachment::class, (int)$this->getResourceId($response));
+
+        self::assertSame('image/svg+xml', $attachment->getFile()->getMimeType());
+        self::assertSame(Attachment::class, $attachment->getFile()->getParentEntityClass());
+        self::assertSame($attachment->getId(), $attachment->getFile()->getParentEntityId());
+        self::assertSame('file', $attachment->getFile()->getParentEntityFieldName());
+    }
+
+    public function testTryToCreateWithIncludedExternalFileNotAllowedForTargetEntity(): void
+    {
+        $this->setConfigValue(self::ATTACHMENT_EXTERNAL_FILE_URLS_REGEXP, '^http://example\\.org');
+
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type' => 'attachments',
+                    'relationships' => [
+                        'file' => [
+                            'data' => ['type' => 'files', 'id' => 'file'],
+                        ],
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>'],
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'file',
+                        'attributes' => ['externalUrl' => ExternalFileFactoryStub::FILE_A_TEST_URL]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'external file mime type constraint',
+                'detail' => sprintf(self::INVALID_MIME_TYPE_MESSAGE, 'text/plain'),
+                'source' => ['pointer' => '/data/relationships/file/data']
+            ],
+            $response
+        );
+    }
+
+    public function testCreateWithIncludedExternalFileAllowedForTargetEntity(): void
+    {
+        $this->setConfigValue(self::ATTACHMENT_EXTERNAL_FILE_URLS_REGEXP, '^http://example\\.org');
+
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type' => 'attachments',
+                    'relationships' => [
+                        'file' => [
+                            'data' => ['type' => 'files', 'id' => 'file'],
+                        ],
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>'],
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'file',
+                        'attributes' => ['externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL]
+                    ]
+                ]
+            ]
+        );
+
+        $attachment = $this->getEntityManager()->find(Attachment::class, (int)$this->getResourceId($response));
+
+        self::assertSame(ExternalFileFactoryStub::IMAGE_A_TEST_URL, $attachment->getFile()->getExternalUrl());
+    }
+
+    public function testTryToCreateWithIncludedFileWithParentIsAnotherAttachment(): void
+    {
+        /** @var Attachment $anotherAttachment */
+        $anotherAttachment = $this->getReference('attachment3');
+        $anotherAttachmentId = $anotherAttachment->getId();
+        $anotherAttachmentFileId = $anotherAttachment->getFile()->getId();
+
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type' => 'attachments',
+                    'relationships' => [
+                        'file' => [
+                            'data' => ['type' => 'files', 'id' => 'file'],
+                        ],
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>'],
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'file',
+                        'attributes' => [
+                            'originalFilename' => 'blank.png',
+                            'content' => self::BLANK_FILE_CONTENT,
+                            'parentFieldName' => 'file',
+                        ],
+                        'relationships' => [
+                            'parent' => [
+                                'data' => ['type' => 'attachments', 'id' => (string)$anotherAttachmentId],
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'form constraint',
+                'detail' => 'The parent of a new file should be omitted or should be the entity and the field'
+                    . ' the file is added to.',
+                'source' => ['pointer' => '/data/relationships/file/data']
+            ],
+            $response
+        );
+
+        $em = $this->getEntityManager();
+        $em->clear();
+        $anotherAttachment = $em->find(Attachment::class, $anotherAttachmentId);
+        self::assertSame($anotherAttachmentFileId, $anotherAttachment->getFile()->getId());
+        self::assertNotNull($em->find(File::class, $anotherAttachmentFileId));
     }
 
     public function testTryToCreateWithoutTarget(): void

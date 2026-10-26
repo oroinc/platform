@@ -8,6 +8,7 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class Configuration implements ConfigurationInterface
 {
@@ -20,6 +21,22 @@ class Configuration implements ConfigurationInterface
 
     /** Bytes in one MB. Used to calculate exact bytes in certain MB amount. */
     public const BYTES_MULTIPLIER = 1048576;
+
+    public const array DEFAULT_INLINE_MIME_TYPES = [
+        'image/gif',
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'application/pdf',
+        'text/plain',
+        'text/csv',
+    ];
+
+    private const string RENDERABLE_MEDIA_TYPE_PATTERN =
+        '#^(text/(html|xml|xsl|cache-manifest|x-component|x-scriptlet|htc)'
+        . '|application/(xml|x-shockwave-flash|hta)'
+        . '|[^/]+/[^/]*\+xml'
+        . '|[^/]+/(x-)?(java|ecma|vb|live|j)script)$#D';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
@@ -76,8 +93,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(WebpConfiguration::ENABLED_IF_SUPPORTED)
                 ->end()
             ->end();
-        $this->appendCleanupOptions($rootNode->children());
-        $this->appendMetadataServiceOptions($rootNode->children());
+        $this->appendOptionGroups($rootNode->children());
 
         SettingsBuilder::append(
             $rootNode,
@@ -120,6 +136,59 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         return $treeBuilder;
+    }
+
+    /**
+     * @param string[] $mimeTypes
+     *
+     * @return string[]
+     *
+     * @throws InvalidConfigurationException if a MIME type is invalid or can be rendered as a page by a browser
+     */
+    private function normalizeInlineMimeTypes(array $mimeTypes): array
+    {
+        $normalized = [];
+        foreach ($mimeTypes as $mimeType) {
+            $mediaType = MimeTypesConverter::convertToMediaType((string)$mimeType);
+            if (!MimeTypesConverter::isMediaType($mediaType)) {
+                throw new InvalidConfigurationException(sprintf(
+                    'The value "%s" is not a valid MIME type for "oro_attachment.inline_mime_types".',
+                    $mimeType
+                ));
+            }
+            if (1 === preg_match(self::RENDERABLE_MEDIA_TYPE_PATTERN, $mediaType)) {
+                throw new InvalidConfigurationException(sprintf(
+                    'The MIME type "%s" cannot be opened in the browser, as it can run scripts.'
+                        . ' It is not allowed in "oro_attachment.inline_mime_types".',
+                    $mimeType
+                ));
+            }
+            $normalized[$mediaType] = $mediaType;
+        }
+
+        return array_values($normalized);
+    }
+
+    private function appendOptionGroups(NodeBuilder $node): void
+    {
+        $this->appendInlineMimeTypesOption($node);
+        $this->appendCleanupOptions($node);
+        $this->appendMetadataServiceOptions($node);
+    }
+
+    private function appendInlineMimeTypesOption(NodeBuilder $node): void
+    {
+        $node->arrayNode('inline_mime_types')
+            ->info(
+                'The MIME types of the stored files that the "get" file action opens in the browser.'
+                    . ' Files of any other type are served as a download.'
+            )
+            ->prototype('scalar')->end()
+            ->defaultValue(self::DEFAULT_INLINE_MIME_TYPES)
+            ->validate()
+                ->always(fn (array $mimeTypes) => $this->normalizeInlineMimeTypes($mimeTypes))
+            ->end()
+        ->end();
     }
 
     private function appendCleanupOptions(NodeBuilder $node): void

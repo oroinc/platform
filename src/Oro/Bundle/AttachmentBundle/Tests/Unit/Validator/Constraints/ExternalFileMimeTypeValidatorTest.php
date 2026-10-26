@@ -94,4 +94,54 @@ class ExternalFileMimeTypeValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
+
+    public function testNoViolationWhenMimeTypeMatchesGroupWildcard(): void
+    {
+        $externalFile = new ExternalFile('http://example.org/image.png', 'image.png', 0, 'image/png');
+        $constraint = new ExternalFileMimeType(['mimeTypes' => ['application/pdf', 'image/*']]);
+
+        $this->validator->validate($externalFile, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testViolationWhenMimeTypeDoesNotMatchGroupWildcard(): void
+    {
+        $externalFile = new ExternalFile('http://example.org/file.txt', 'file.txt', 0, 'text/plain');
+        $constraint = new ExternalFileMimeType(['mimeTypes' => ['image/*']]);
+
+        $this->validator->validate($externalFile, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ type }}', '"text/plain"')
+            ->setParameter('{{ types }}', '"image/*"')
+            ->setCode(ExternalFileMimeType::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testViolationWhenMimeTypeOfAnotherGroupStartsWithTheSameLetters(): void
+    {
+        $constraint = new ExternalFileMimeType(['mimeTypes' => ['image/*']]);
+
+        $this->validator->validate('imagex/png', $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ type }}', '"imagex/png"')
+            ->setParameter('{{ types }}', '"image/*"')
+            ->setCode(ExternalFileMimeType::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testViolationWhenWildcardHasNoGroupAndMimeTypeStartsWithSlash(): void
+    {
+        $constraint = new ExternalFileMimeType(['mimeTypes' => ['/*']]);
+
+        $this->validator->validate('/png', $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ type }}', '"/png"')
+            ->setParameter('{{ types }}', '"/*"')
+            ->setCode(ExternalFileMimeType::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
 }

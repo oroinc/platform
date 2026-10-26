@@ -518,6 +518,41 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
+    oro_attachment.provider.file_validation_target_registry:
+        class: Oro\Bundle\AttachmentBundle\Provider\FileValidationTargetRegistry
+        tags:
+            - { name: kernel.reset, method: clear }
+
+    oro_attachment.provider.file_validation_target:
+        class: Oro\Bundle\AttachmentBundle\Provider\FileValidationTargetProvider
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_attachment.provider.file_validation_target_registry'
+
+    oro_attachment.validator.file_parent_field_config:
+        class: Oro\Bundle\AttachmentBundle\Validator\Constraints\FileParentFieldConfigValidator
+        arguments:
+            - '@oro_attachment.validator.file_config_validator'
+            - '@oro_attachment.provider.file_validation_target'
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_attachment.validator.external_file_parent_field_config:
+        class: Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileParentFieldConfigValidator
+        arguments:
+            - '@oro_attachment.validator.file_config_validator'
+            - '@oro_attachment.provider.file_validation_target'
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_attachment.validator.attachment_file_target_config:
+        class: Oro\Bundle\AttachmentBundle\Validator\Constraints\AttachmentFileTargetConfigValidator
+        arguments:
+            - '@oro_attachment.validator.file_config_validator'
+            - '@oro_attachment.provider.file_validation_target'
+        tags:
+            - { name: validator.constraint_validator }
+
     Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfigValidator:
         arguments:
             - '@oro_attachment.provider.multiple_files_constraints'

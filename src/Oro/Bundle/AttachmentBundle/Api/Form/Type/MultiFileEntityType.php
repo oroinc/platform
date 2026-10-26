@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use Oro\Bundle\AttachmentBundle\Api\Form\FileValidationTargetRegistrar;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Symfony\Component\Form\AbstractType;
@@ -31,7 +32,8 @@ class MultiFileEntityType extends AbstractType
         private readonly DoctrineHelper $doctrineHelper,
         private readonly EntityLoader $entityLoader,
         private readonly TranslatorInterface $translator,
-        private readonly MultiFileEntityOptionProcessorInterface $optionProcessor
+        private readonly MultiFileEntityOptionProcessorInterface $optionProcessor,
+        private readonly FileValidationTargetRegistrar $targetRegistrar
     ) {
     }
 
@@ -55,6 +57,9 @@ class MultiFileEntityType extends AbstractType
                 /** @var ?File $file */
                 try {
                     $file = $entityToIdTransformer->reverseTransform($submittedDataItem);
+                    if (null !== $file) {
+                        $this->targetRegistrar->register($file, $form);
+                    }
                 } catch (TransformationFailedException $e) {
                     FormUtil::addNamedFormError(
                         $form,

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use Oro\Bundle\AttachmentBundle\Api\Form\FileValidationTargetRegistrar;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -27,7 +28,8 @@ class FileEntityType extends AbstractType
     public function __construct(
         private readonly DoctrineHelper $doctrineHelper,
         private readonly EntityLoader $entityLoader,
-        private readonly TranslatorInterface $translator
+        private readonly TranslatorInterface $translator,
+        private readonly FileValidationTargetRegistrar $targetRegistrar
     ) {
     }
 
@@ -48,6 +50,9 @@ class FileEntityType extends AbstractType
             /** @var ?File $file */
             try {
                 $file = $entityToIdTransformer->reverseTransform($event->getData());
+                if (null !== $file) {
+                    $this->targetRegistrar->register($file, $form);
+                }
             } catch (TransformationFailedException $e) {
                 FormUtil::addNamedFormError(
                     $form,

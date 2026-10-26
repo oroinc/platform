@@ -535,6 +535,13 @@ class AttachmentCustomFieldTypeTest extends RestJsonApiTestCase
         ];
         $expectedData = $this->updateResponseContent($expectedData, $response);
         $this->assertResponseContains($expectedData, $response);
+
+        $ownerId = (int)$this->getResourceId($response);
+        $fileId = (int)json_decode($response->getContent(), true)['included'][0]['id'];
+        $file = $this->getEntityManager()->find(File::class, $fileId);
+        self::assertSame(TestAttachmentOwner::class, $file->getParentEntityClass());
+        self::assertSame($ownerId, $file->getParentEntityId());
+        self::assertSame('test_multi_files', $file->getParentEntityFieldName());
     }
 
     /**
@@ -1394,6 +1401,221 @@ class AttachmentCustomFieldTypeTest extends RestJsonApiTestCase
                 'source' => ['pointer' => '/data/relationships/test_file/data/id']
             ],
             $response
+        );
+    }
+
+    public function testTryToUpdateWithMultiImageFieldWhenContentIsNotAllowedForField(): void
+    {
+        $entityType = $this->getEntityType(TestAttachmentOwner::class);
+        $entityId = $this->getReference('entity1')->id;
+
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entityId],
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'id' => (string)$entityId,
+                    'relationships' => [
+                        'test_multi_images' => [
+                            'data' => [
+                                ['type' => 'files', 'id' => 'new_file', 'meta' => ['sortOrder' => 1]]
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'new_file',
+                        'attributes' => [
+                            'originalFilename' => 'test.txt',
+                            'content' => base64_encode('plain text content')
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'file constraint',
+                'detail' => 'The MIME type of the file is invalid ("text/plain").',
+                'source' => ['pointer' => '/included/0/attributes/content']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToCreateWithFileWhenContentIsNotAllowedForField(): void
+    {
+        $entityType = $this->getEntityType(TestAttachmentOwner::class);
+
+        $response = $this->post(
+            ['entity' => $entityType],
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'attributes' => [
+                        'name' => 'New Entity',
+                    ],
+                    'relationships' => [
+                        'test_file' => [
+                            'data' => ['type' => 'files', 'id' => 'new_file']
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'new_file',
+                        'attributes' => [
+                            'mimeType' => 'text/plain',
+                            'originalFilename' => 'test.txt',
+                            'content' => base64_encode('<html><body>content</body></html>')
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'file constraint',
+                'detail' => 'The MIME type of the file is invalid ("text/html").',
+                'source' => ['pointer' => '/included/0/attributes/content']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToUpdateWithSameNewFileInSeveralFields(): void
+    {
+        $entityType = $this->getEntityType(TestAttachmentOwner::class);
+        $entityId = $this->getReference('entity1')->id;
+        $imageIdBefore = $this->getEntityManager()->getConnection()
+            ->fetchOne('SELECT test_image_id FROM test_api_attachment_owner WHERE id = ?', [$entityId]);
+
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entityId],
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'id' => (string)$entityId,
+                    'relationships' => [
+                        'test_image' => [
+                            'data' => ['type' => 'files', 'id' => 'new_file']
+                        ],
+                        'test_multi_files' => [
+                            'data' => [
+                                ['type' => 'files', 'id' => 'new_file', 'meta' => ['sortOrder' => 1]]
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'new_file',
+                        'attributes' => [
+                            'originalFilename' => 'test.txt',
+                            'content' => base64_encode('plain text content')
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationErrors(
+            [
+                [
+                    'title' => 'form constraint',
+                    'detail' => 'A new file cannot be used in several fields.',
+                    'source' => ['pointer' => '/data/relationships/test_multi_files/data/0']
+                ],
+                [
+                    'title' => 'file constraint',
+                    'detail' => 'The MIME type of the file is invalid ("text/plain"). Allowed MIME types are '
+                        . '"image/gif", "image/jpeg", "image/png", "image/webp".',
+                    'source' => ['pointer' => '/included/0/attributes/content']
+                ]
+            ],
+            $response
+        );
+        self::assertEquals(
+            $imageIdBefore,
+            $this->getEntityManager()->getConnection()
+                ->fetchOne('SELECT test_image_id FROM test_api_attachment_owner WHERE id = ?', [$entityId])
+        );
+    }
+
+    public function testTryToUpdateWithIncludedFileWithParentOfAnotherEntity(): void
+    {
+        $entityType = $this->getEntityType(TestAttachmentOwner::class);
+        $entityId = $this->getReference('entity1')->id;
+        $userId = $this->getReference('user')->getId();
+        $avatarIdBefore = $this->getEntityManager()->getConnection()
+            ->fetchOne('SELECT avatar_id FROM oro_user WHERE id = ?', [$userId]);
+
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entityId],
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'id' => (string)$entityId,
+                    'relationships' => [
+                        'test_file' => [
+                            'data' => ['type' => 'files', 'id' => 'new_file']
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => 'files',
+                        'id' => 'new_file',
+                        'attributes' => [
+                            'originalFilename' => 'test.txt',
+                            'content' => base64_encode('plain text content'),
+                            'parentFieldName' => 'avatar'
+                        ],
+                        'relationships' => [
+                            'parent' => [
+                                'data' => ['type' => 'users', 'id' => (string)$userId]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationErrors(
+            [
+                [
+                    'title' => 'form constraint',
+                    'detail' => 'The parent of a new file should be omitted or should be the entity and the field '
+                        . 'the file is added to.',
+                    'source' => ['pointer' => '/data/relationships/test_file/data']
+                ],
+                [
+                    'title' => 'file constraint',
+                    'detail' => 'The MIME type of the file is invalid ("text/plain"). Allowed MIME types are '
+                        . '"image/gif", "image/jpeg", "image/png", "image/webp".',
+                    'source' => ['pointer' => '/included/0/attributes/content']
+                ]
+            ],
+            $response
+        );
+        self::assertEquals(
+            $avatarIdBefore,
+            $this->getEntityManager()->getConnection()
+                ->fetchOne('SELECT avatar_id FROM oro_user WHERE id = ?', [$userId])
         );
     }
 
