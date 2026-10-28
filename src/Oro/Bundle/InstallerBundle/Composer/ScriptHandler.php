@@ -10,6 +10,7 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Script\Event;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Process;
 
 /**
@@ -27,7 +28,7 @@ class ScriptHandler
 
     private const string PACKAGE_JSON = 'package.json';
     private const string PNPM_LOCK = 'pnpm-lock.yaml';
-    private const string PNPM_WORKSPACE = 'pnpm-workspace.yaml';
+    private const string NODE_MODULES = 'node_modules';
 
     /**
      * Working directory used when composer is invoked with the dev.json manifest.
@@ -63,36 +64,28 @@ class ScriptHandler
         }
 
         $isDev = self::isDevManifest($event);
-        $pkgPath = $isDev ? self::DEV_ASSETS_DIR . '/' . self::PACKAGE_JSON : self::PACKAGE_JSON;
-        $lockPath = $isDev ? self::DEV_ASSETS_DIR . '/' . self::PNPM_LOCK : self::PNPM_LOCK;
         $workDir = $isDev ? self::DEV_ASSETS_DIR : '';
+        $pkgPath = Path::join($workDir, self::PACKAGE_JSON);
 
         $filesystem = static::getFilesystem();
         $name = self::writeNpmPackageJson($filesystem, $pkgPath, $npmAssets);
 
         $isVerbose = $event->getIO()->isVerbose();
-        $hasMonorepoWorkspace = $filesystem->exists('../../' . self::PNPM_WORKSPACE);
 
-        if (!$filesystem->exists($lockPath) && !($isDev && $hasMonorepoWorkspace)) {
-            self::pnpmInstall($event->getIO(), $options['process-timeout'], $isVerbose, $workDir);
-
-            return;
+        if ($isDev) {
+            self::pnpmInstallDevWorkspace($event->getIO(), $options['process-timeout'], $isVerbose, $name);
+            self::linkDevNodeModules($filesystem);
+        } elseif ($filesystem->exists(self::PNPM_LOCK)) {
+            self::pnpmCi($event->getIO(), $options['process-timeout'], $isVerbose);
+        } else {
+            self::pnpmInstall($event->getIO(), $options['process-timeout'], $isVerbose);
         }
+    }
 
-        if ($hasMonorepoWorkspace) {
-            self::pnpmInstallMonorepo(
-                $event->getIO(),
-                $options['process-timeout'],
-                $isVerbose,
-                $name,
-                $workDir
-            );
-
-            return;
-        }
-
-        // Installs assets using lock file.
-        self::pnpmCi($event->getIO(), $options['process-timeout'], $isVerbose, $workDir);
+    private static function linkDevNodeModules(Filesystem $filesystem): void
+    {
+        $filesystem->remove(self::NODE_MODULES);
+        $filesystem->symlink(Path::join(self::DEV_ASSETS_DIR, self::NODE_MODULES), self::NODE_MODULES);
     }
 
     private static function writeNpmPackageJson(Filesystem $filesystem, string $pkgPath, array $npmAssets): string
@@ -126,7 +119,7 @@ class ScriptHandler
     public static function updateAssets(Event $event): void
     {
         $isDev = self::isDevManifest($event);
-        $lockPath = $isDev ? self::DEV_ASSETS_DIR . '/' . self::PNPM_LOCK : self::PNPM_LOCK;
+        $lockPath = $isDev ? Path::join(self::DEV_ASSETS_DIR, self::PNPM_LOCK) : self::PNPM_LOCK;
 
         static::getFilesystem()->remove($lockPath);
 
@@ -338,31 +331,18 @@ class ScriptHandler
     }
 
     /**
-     * Runs "pnpm install" and "pnpm run build" in the monorepo root.
-     *
-     * In dev.json mode this is two-phase: (1) copy npm-package into dev/ and build those members
-     * there in isolation (own node_modules, so vite & co. link correctly), then (2) install the
-     * app with --dir dev + --modules-dir so node_modules lands in the app (webpack layout) and the
-     * members link to the dev/npm-package copy. In composer.json mode it is a single install
-     * followed by the sub-dependency build.
+     * Runs "pnpm install" and "pnpm run build" in the dev directory.
      */
-    private static function pnpmInstallMonorepo(
+    private static function pnpmInstallDevWorkspace(
         IOInterface $inputOutput,
         int $timeout = 60,
         bool $verbose = false,
-        string $packageName = '',
-        string $workDir = ''
+        string $packageName = ''
     ): void {
         $logLevel = $verbose ? 'info' : 'error';
-        $monorepoRoot = dirname(getcwd(), 2);
+        $workspaceOptions = ['--dir', self::DEV_ASSETS_DIR];
 
-        $devDir = getcwd() . DIRECTORY_SEPARATOR . $workDir;
-
-        if ($packageName !== '' && $workDir !== '') {
-            self::installDevNpmPackageMembers($inputOutput, $timeout, $logLevel, $packageName, $devDir, $monorepoRoot);
-        }
-
-        $pnpmInstallCmd = ['pnpm', 'install', '--prefer-offline', '--ignore-script', '--loglevel', $logLevel];
+        $pnpmInstallCmd = ['pnpm', 'install', '--prefer-offline', '--ignore-scripts', '--loglevel', $logLevel];
 
         if ($packageName !== '') {
             /**
@@ -373,29 +353,13 @@ class ScriptHandler
             $pnpmInstallCmd[] = $packageName . '...';
         }
 
-        if ($workDir !== '') {
-            // dev.json phase 2: run the install as if started in dev/ (--dir) so --modules-dir
-            // ../node_modules resolves inside the app (app/node_modules, the webpack layout)
-            // rather than the repository parent, and pin the lockfile to dev/. codemirror & co.
-            // link to the dev/npm-package copy built in phase 1.
-            $pnpmInstallCmd[] = '--modules-dir';
-            $pnpmInstallCmd[] = '../node_modules';
-            $pnpmInstallCmd[] = '--lockfile-dir';
-            $pnpmInstallCmd[] = $devDir;
-            $pnpmInstallCmd[] = '--dir';
-            $pnpmInstallCmd[] = $devDir;
-        }
+        array_push($pnpmInstallCmd, ...$workspaceOptions);
 
-        if (static::runProcess($inputOutput, $pnpmInstallCmd, $timeout, $monorepoRoot) !== 0) {
+        if (static::runProcess($inputOutput, $pnpmInstallCmd, $timeout) !== 0) {
             throw new \RuntimeException('Failed to install pnpm assets in monorepo');
         }
 
-        if ($workDir !== '') {
-            // dev.json: npm-package members were already built in phase 1.
-            return;
-        }
-
-        self::buildApplicationSubDependencies($inputOutput, $timeout, $logLevel, $packageName, $monorepoRoot);
+        self::buildApplicationSubDependencies($inputOutput, $timeout, $logLevel, $packageName, $workspaceOptions);
     }
 
     private static function buildApplicationSubDependencies(
@@ -403,7 +367,7 @@ class ScriptHandler
         int $timeout,
         string $logLevel,
         string $packageName,
-        string $monorepoRoot
+        array $workspaceOptions
     ): void {
         if ($packageName === '') {
             return;
@@ -411,6 +375,7 @@ class ScriptHandler
 
         $pnpmBuildDepsCmd = [
             'pnpm',
+            ...$workspaceOptions,
             '-r',
             '--loglevel',
             $logLevel,
@@ -421,70 +386,22 @@ class ScriptHandler
             'build',
         ];
 
-        if (static::runProcess($inputOutput, $pnpmBuildDepsCmd, $timeout, $monorepoRoot) !== 0) {
+        if (static::runProcess($inputOutput, $pnpmBuildDepsCmd, $timeout) !== 0) {
             throw new \RuntimeException('Failed to build sub dependencies for application');
-        }
-    }
-
-    private static function installDevNpmPackageMembers(
-        IOInterface $inputOutput,
-        int $timeout,
-        string $logLevel,
-        string $packageName,
-        string $devDir,
-        string $monorepoRoot
-    ): void {
-        $devNpmPackage = $devDir . DIRECTORY_SEPARATOR . 'npm-package';
-        $filesystem = static::getFilesystem();
-        $filesystem->remove($devNpmPackage);
-        $filesystem->mirror($monorepoRoot . DIRECTORY_SEPARATOR . 'npm-package', $devNpmPackage);
-
-        $membersInstallCmd = [
-            'pnpm', 'install', '--prefer-offline', '--ignore-script', '--loglevel', $logLevel,
-            '--filter', $packageName . '^...', '--dir', $devDir, '--lockfile-dir', $devDir,
-        ];
-        if (static::runProcess($inputOutput, $membersInstallCmd, $timeout, $monorepoRoot) !== 0) {
-            throw new \RuntimeException('Failed to install npm-package members');
-        }
-
-        $membersBuildCmd = [
-            'pnpm', '--dir', $devDir, '-r', '--loglevel', $logLevel,
-            '--filter', $packageName . '^...', '--if-present', 'run', 'build',
-        ];
-        if (static::runProcess($inputOutput, $membersBuildCmd, $timeout, $monorepoRoot) !== 0) {
-            throw new \RuntimeException('Failed to build npm-package members');
         }
     }
 
     /**
      * Runs "pnpm install", updates pnpm-lock.yaml, installs assets to "node_modules/".
-     *
-     * In dev.json mode ($workDir !== ''):
-     * - --dir + --lockfile-dir redirect both the install scope and the lockfile into dev/;
-     * - --modules-dir ../node_modules hoists node_modules into the composer cwd so the
-     *   layout matches what oro:assets:build later validates against.
      */
-    private static function pnpmInstall(
-        IOInterface $inputOutput,
-        int $timeout = 60,
-        bool $verbose = false,
-        string $workDir = ''
-    ): void {
+    private static function pnpmInstall(IOInterface $inputOutput, int $timeout = 60, bool $verbose = false): void
+    {
         $logLevel = $verbose ? 'info' : 'error';
         $pnpmInstallCmd = [
             'pnpm', 'install',
-            '--no-frozen-lockfile', '--ignore-script',
+            '--no-frozen-lockfile', '--ignore-scripts',
             '--loglevel', $logLevel,
         ];
-
-        if ($workDir !== '') {
-            $pnpmInstallCmd[] = '--dir';
-            $pnpmInstallCmd[] = $workDir;
-            $pnpmInstallCmd[] = '--lockfile-dir';
-            $pnpmInstallCmd[] = $workDir;
-            $pnpmInstallCmd[] = '--modules-dir';
-            $pnpmInstallCmd[] = '../node_modules';
-        }
 
         if (static::runProcess($inputOutput, $pnpmInstallCmd, $timeout) !== 0) {
             throw new \RuntimeException('Failed to generate pnpm-lock.yaml');
@@ -526,29 +443,11 @@ class ScriptHandler
 
     /**
      * Runs "pnpm install", installs assets to "node_modules/" using only pnpm-lock.yaml.
-     *
-     * In dev.json mode ($workDir !== ''):
-     * - --dir + --lockfile-dir redirect both the install scope and the lockfile into dev/;
-     * - --modules-dir ../node_modules hoists node_modules into the composer cwd so the
-     *   layout matches what oro:assets:build later validates against.
      */
-    private static function pnpmCi(
-        IOInterface $inputOutput,
-        int $timeout = 60,
-        bool $verbose = false,
-        string $workDir = ''
-    ): void {
+    private static function pnpmCi(IOInterface $inputOutput, int $timeout = 60, bool $verbose = false): void
+    {
         $logLevel = $verbose ? 'info' : 'error';
         $npmCiCmd = ['pnpm', 'install', '--frozen-lockfile', '--loglevel', $logLevel];
-
-        if ($workDir !== '') {
-            $npmCiCmd[] = '--dir';
-            $npmCiCmd[] = $workDir;
-            $npmCiCmd[] = '--lockfile-dir';
-            $npmCiCmd[] = $workDir;
-            $npmCiCmd[] = '--modules-dir';
-            $npmCiCmd[] = '../node_modules';
-        }
 
         if (static::runProcess($inputOutput, $npmCiCmd, $timeout) !== 0) {
             throw new \RuntimeException('Failed to install pnpm assets');

@@ -28,10 +28,6 @@ use Symfony\Component\Filesystem\Filesystem;
  * - isDevManifest detection (env / configSource)
  * - error propagation for each pnpm branch
  * - executePost*PackageScripts (collection of the oro scripts of the installed packages)
- *
- * The cwd placeholder convention used by dataProviders:
- *   'MONOREPO_ROOT' → $this->monorepoRoot (parent of parent of project cwd)
- *   null            → null (pnpm inherits cwd from the composer process)
  */
 class ScriptHandlerTest extends TestCase
 {
@@ -44,18 +40,9 @@ class ScriptHandlerTest extends TestCase
     /** Cmd-prefix shared by every pnpm invocation; tests append the per-branch tail. */
     private const array PNPM_BASE = ['pnpm', 'install'];
 
-    private string $monorepoRoot;
-    private string $projectDir;
-
     #[\Override]
     protected function setUp(): void
     {
-        // Whatever the actual cwd is at test time — production reads it via the same
-        // getcwd() call inside pnpmInstallMonorepo, so the values are guaranteed to
-        // line up. No chdir/mkdir needed; the package.json / lock paths are mocked.
-        $this->projectDir = (string) getcwd();
-        $this->monorepoRoot = dirname($this->projectDir, 2);
-
         TestableScriptHandler::reset();
         putenv('COMPOSER');
     }
@@ -74,124 +61,60 @@ class ScriptHandlerTest extends TestCase
     /**
      * @dataProvider installAssetsComposerCases
      * @param list<list<string>> $expectedCmds
-     * @param list<string|null> $expectedCwdTokens
      */
-    public function testInstallAssetsComposerJson(
-        bool $pkgExists,
-        bool $lockExists,
-        bool $wsExists,
-        array $expectedCmds,
-        array $expectedCwdTokens,
-    ): void {
+    public function testInstallAssetsComposerJson(bool $pkgExists, bool $lockExists, array $expectedCmds): void
+    {
         $this->stubExistingPackageJson($pkgExists, self::ROOT_PKG_NAME);
 
         $fs = $this->makeFilesystemMock([
             'package.json' => $pkgExists,
             'pnpm-lock.yaml' => $lockExists,
-            '../../pnpm-workspace.yaml' => $wsExists,
         ]);
         $fs->expects(self::once())
             ->method('dumpFile')
             ->with('package.json', self::callback($this->assertPackageJsonPayload($pkgExists, self::ROOT_PKG_NAME)));
+        $fs->expects(self::never())
+            ->method('symlink');
 
         TestableScriptHandler::$filesystem = $fs;
         putenv('COMPOSER=composer.json');
 
         TestableScriptHandler::installAssets($this->makeEvent());
 
-        $this->assertInvocations($expectedCmds, $expectedCwdTokens);
+        $this->assertInvocations($expectedCmds);
     }
 
     public static function installAssetsComposerCases(): array
     {
         $logLevel = 'error';
 
-        $monorepoInstall = [
-            ...self::PNPM_BASE,
-            '--prefer-offline',
-            '--ignore-script',
-            '--loglevel',
-            $logLevel,
-            '--filter',
-            self::ROOT_PKG_NAME . '...',
-        ];
-        $monorepoBuild = [
-            'pnpm',
-            '-r',
-            '--loglevel',
-            $logLevel,
-            '--filter',
-            self::ROOT_PKG_NAME . '^...',
-            '--if-present',
-            'run',
-            'build',
-        ];
-        $monorepoNoName = [
-            ...self::PNPM_BASE,
-            '--prefer-offline',
-            '--ignore-script',
-            '--loglevel',
-            $logLevel,
-        ]; // no --filter when packageJson was created fresh (no `name`)
         $frozen = [...self::PNPM_BASE, '--frozen-lockfile', '--loglevel', $logLevel];
         $noFrozen = [
             ...self::PNPM_BASE,
-            '--no-frozen-lockfile', '--ignore-script',
+            '--no-frozen-lockfile', '--ignore-scripts',
             '--loglevel', $logLevel,
         ];
 
         return [
-            'pkg + lock + ws → monorepo install + build' => [
+            'pkg + lock → pnpmCi' => [
                 'pkgExists' => true,
                 'lockExists' => true,
-                'wsExists' => true,
-                'expectedCmds' => [$monorepoInstall, $monorepoBuild],
-                'expectedCwdTokens' => ['MONOREPO_ROOT', 'MONOREPO_ROOT'],
-            ],
-            'pkg + lock + no ws → pnpmCi' => [
-                'pkgExists' => true,
-                'lockExists' => true,
-                'wsExists' => false,
                 'expectedCmds' => [$frozen],
-                'expectedCwdTokens' => [null],
             ],
             'pkg + no lock → pnpmInstall' => [
                 'pkgExists' => true,
                 'lockExists' => false,
-                'wsExists' => false,
                 'expectedCmds' => [$noFrozen],
-                'expectedCwdTokens' => [null],
             ],
-            // prod safety: a missing lock is generated with the plain install even when the
-            // monorepo workspace is present — only the dev manifest diverts generation to the
-            // monorepo path, so composer.json behaviour is unchanged.
-            'pkg + no lock + ws → pnpmInstall (prod: ws does not divert generation)' => [
-                'pkgExists' => true,
-                'lockExists' => false,
-                'wsExists' => true,
-                'expectedCmds' => [$noFrozen],
-                'expectedCwdTokens' => [null],
-            ],
-            'no pkg + lock + ws → monorepo install only (no name → no filter, build skipped)' => [
+            'no pkg + lock → pnpmCi' => [
                 'pkgExists' => false,
                 'lockExists' => true,
-                'wsExists' => true,
-                'expectedCmds' => [$monorepoNoName],
-                'expectedCwdTokens' => ['MONOREPO_ROOT'],
-            ],
-            'no pkg + lock + no ws → pnpmCi' => [
-                'pkgExists' => false,
-                'lockExists' => true,
-                'wsExists' => false,
                 'expectedCmds' => [$frozen],
-                'expectedCwdTokens' => [null],
             ],
             'no pkg + no lock → pnpmInstall' => [
                 'pkgExists' => false,
                 'lockExists' => false,
-                'wsExists' => false,
                 'expectedCmds' => [$noFrozen],
-                'expectedCwdTokens' => [null],
             ],
         ];
     }
@@ -203,59 +126,50 @@ class ScriptHandlerTest extends TestCase
     /**
      * @dataProvider installAssetsDevCases
      * @param list<list<string>> $expectedCmds
-     * @param list<string|null> $expectedCwdTokens
      */
-    public function testInstallAssetsDevJson(
-        bool $pkgExists,
-        bool $lockExists,
-        bool $wsExists,
-        array $expectedCmds,
-        array $expectedCwdTokens,
-    ): void {
+    public function testInstallAssetsDevJson(bool $pkgExists, array $expectedCmds): void
+    {
         $this->stubExistingPackageJson($pkgExists, self::DEV_PKG_NAME);
 
         $fs = $this->makeFilesystemMock([
             'dev/package.json' => $pkgExists,
-            'dev/pnpm-lock.yaml' => $lockExists,
-            '../../pnpm-workspace.yaml' => $wsExists,
         ]);
         $fs->expects(self::once())
             ->method('dumpFile')
             ->with('dev/package.json', self::callback($this->assertPackageJsonPayload($pkgExists, self::DEV_PKG_NAME)));
+        $fs->expects(self::once())
+            ->method('symlink')
+            ->with('dev/node_modules', 'node_modules');
+        $fs->expects(self::never())
+            ->method('mirror');
 
         TestableScriptHandler::$filesystem = $fs;
         putenv('COMPOSER=dev.json');
 
         TestableScriptHandler::installAssets($this->makeEvent());
 
-        $this->assertInvocations($expectedCmds, $expectedCwdTokens);
+        $this->assertInvocations($expectedCmds);
     }
 
     public static function installAssetsDevCases(): array
     {
         $ll = 'error';
-        $devLockDir = 'PROJECT_DEV';  // resolved to $this->projectDir . '/dev' at runtime
 
-        // pnpmInstallMonorepo for dev — phase 1: install the dev/npm-package copy's members
-        // (no --modules-dir). The copy itself is made via Filesystem (not a recorded process).
-        $monorepoDevMembersInstall = [
+        $devInstall = [
             ...self::PNPM_BASE,
             '--prefer-offline',
-            '--ignore-script',
+            '--ignore-scripts',
             '--loglevel',
             $ll,
             '--filter',
-            self::DEV_PKG_NAME . '^...',
+            self::DEV_PKG_NAME . '...',
             '--dir',
-            $devLockDir,
-            '--lockfile-dir',
-            $devLockDir,
+            'dev',
         ];
-        // phase 1: build the copied npm-package members from source (in dev/)
-        $monorepoDevMembersBuild = [
+        $devMembersBuild = [
             'pnpm',
             '--dir',
-            $devLockDir,
+            'dev',
             '-r',
             '--loglevel',
             $ll,
@@ -265,157 +179,64 @@ class ScriptHandlerTest extends TestCase
             'run',
             'build',
         ];
-        // phase 2: app install with the webpack layout (--modules-dir) and --dir dev
-        $monorepoDev = [
+        $devInstallNoName = [
             ...self::PNPM_BASE,
             '--prefer-offline',
-            '--ignore-script',
-            '--loglevel',
-            $ll,
-            '--filter',
-            self::DEV_PKG_NAME . '...',
-            '--modules-dir',
-            '../node_modules',
-            '--lockfile-dir',
-            $devLockDir,
-            '--dir',
-            $devLockDir,
-        ];
-        // dev-no-pkg → minimal pkg (no name) → no --filter, build skipped
-        $monorepoDevNoName = [
-            ...self::PNPM_BASE,
-            '--prefer-offline',
-            '--ignore-script',
-            '--loglevel',
-            $ll,
-            '--modules-dir',
-            '../node_modules',
-            '--lockfile-dir',
-            $devLockDir,
-            '--dir',
-            $devLockDir,
-        ];
-        // pnpmCi for dev: --frozen-lockfile --dir dev --lockfile-dir dev --modules-dir ../node_modules
-        $frozenDev = [
-            ...self::PNPM_BASE,
-            '--frozen-lockfile',
+            '--ignore-scripts',
             '--loglevel',
             $ll,
             '--dir',
             'dev',
-            '--lockfile-dir',
-            'dev',
-            '--modules-dir',
-            '../node_modules',
-        ];
-        // pnpmInstall for dev: --no-frozen-lockfile --ignore-script + dir/lockfile/modules
-        $noFrozenDev = [
-            ...self::PNPM_BASE,
-            '--no-frozen-lockfile',
-            '--ignore-script',
-            '--loglevel',
-            $ll,
-            '--dir',
-            'dev',
-            '--lockfile-dir',
-            'dev',
-            '--modules-dir',
-            '../node_modules',
         ];
 
         return [
-            'dev pkg + lock + ws → monorepo members install + build + app install' => [
+            'dev pkg → workspace install + members build' => [
                 'pkgExists' => true,
-                'lockExists' => true,
-                'wsExists' => true,
-                'expectedCmds' => [$monorepoDevMembersInstall, $monorepoDevMembersBuild, $monorepoDev],
-                'expectedCwdTokens' => ['MONOREPO_ROOT', 'MONOREPO_ROOT', 'MONOREPO_ROOT'],
+                'expectedCmds' => [$devInstall, $devMembersBuild],
             ],
-            'dev pkg + lock + no ws → pnpmCi(dev)' => [
-                'pkgExists' => true,
-                'lockExists' => true,
-                'wsExists' => false,
-                'expectedCmds' => [$frozenDev],
-                'expectedCwdTokens' => [null],
-            ],
-            'dev pkg + no lock → pnpmInstall(dev)' => [
-                'pkgExists' => true,
-                'lockExists' => false,
-                'wsExists' => false,
-                'expectedCmds' => [$noFrozenDev],
-                'expectedCwdTokens' => [null],
-            ],
-            // The fix: with the monorepo workspace present, a missing dev lock is generated
-            // through the SAME copy/two-phase pipeline that the frozen install later consumes,
-            // so the generated lock carries the workspace importers and frozen does not fail.
-            'dev pkg + no lock + ws → monorepo generates lock (gen == consume)' => [
-                'pkgExists' => true,
-                'lockExists' => false,
-                'wsExists' => true,
-                'expectedCmds' => [$monorepoDevMembersInstall, $monorepoDevMembersBuild, $monorepoDev],
-                'expectedCwdTokens' => ['MONOREPO_ROOT', 'MONOREPO_ROOT', 'MONOREPO_ROOT'],
-            ],
-            'no dev pkg + lock + ws → monorepo without --filter' => [
+            'no dev pkg → workspace install without --filter, build skipped' => [
                 'pkgExists' => false,
-                'lockExists' => true,
-                'wsExists' => true,
-                'expectedCmds' => [$monorepoDevNoName],
-                'expectedCwdTokens' => ['MONOREPO_ROOT'],
+                'expectedCmds' => [$devInstallNoName],
             ],
         ];
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // updateAssets — dev.json (swap of installAssets fork-1)
+    // updateAssets — dev.json
     // ──────────────────────────────────────────────────────────────────────────
 
-    /** @dataProvider updateAssetsDevCases */
-    public function testUpdateAssetsDevJson(bool $pkgExists): void
+    /**
+     * @dataProvider updateAssetsDevCases
+     * @param list<list<string>> $expectedCmds
+     */
+    public function testUpdateAssetsDevJson(bool $pkgExists, array $expectedCmds): void
     {
         $this->stubExistingPackageJson($pkgExists, self::DEV_PKG_NAME);
 
         $fs = $this->makeFilesystemMock([
             'dev/package.json' => $pkgExists,
-            'dev/pnpm-lock.yaml' => false, // after remove() it is always missing
-            '../../pnpm-workspace.yaml' => false,
         ]);
-        $fs->expects(self::once())->method('remove')->with('dev/pnpm-lock.yaml');
+        $fs->expects(self::exactly(2))
+            ->method('remove')
+            ->withConsecutive(['dev/pnpm-lock.yaml'], ['node_modules']);
         $fs->expects(self::once())
             ->method('dumpFile')
             ->with('dev/package.json', self::callback($this->assertPackageJsonPayload($pkgExists, self::DEV_PKG_NAME)));
+        $fs->expects(self::once())
+            ->method('symlink')
+            ->with('dev/node_modules', 'node_modules');
 
         TestableScriptHandler::$filesystem = $fs;
         putenv('COMPOSER=dev.json');
 
         TestableScriptHandler::updateAssets($this->makeEvent());
 
-        // After remove → installAssets always lands on pnpmInstall(dev) branch.
-        $this->assertInvocations(
-            [
-                [
-                    ...self::PNPM_BASE,
-                    '--no-frozen-lockfile',
-                    '--ignore-script',
-                    '--loglevel',
-                    'error',
-                    '--dir',
-                    'dev',
-                    '--lockfile-dir',
-                    'dev',
-                    '--modules-dir',
-                    '../node_modules',
-                ],
-            ],
-            [null],
-        );
+        $this->assertInvocations($expectedCmds);
     }
 
     public static function updateAssetsDevCases(): array
     {
-        return [
-            'dev pkg exists' => ['pkgExists' => true],
-            'dev pkg missing → minimal created' => ['pkgExists' => false],
-        ];
+        return self::installAssetsDevCases();
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -431,7 +252,6 @@ class ScriptHandlerTest extends TestCase
         $fs = $this->makeFilesystemMock([
             $expectedPkgPath => false,
             self::lockPathFor($expectedPkgPath) => false,
-            '../../pnpm-workspace.yaml' => false,
         ]);
         $fs->expects(self::once())->method('dumpFile')->with($expectedPkgPath, self::anything());
 
@@ -479,18 +299,17 @@ class ScriptHandlerTest extends TestCase
      */
     public function testErrorPropagation(
         string $manifest,
+        bool $pkgExists,
         bool $lockExists,
-        bool $wsExists,
         array $exitCodes,
         string $expectedMessage,
     ): void {
         $pkgPath = $manifest === 'dev.json' ? 'dev/package.json' : 'package.json';
-        $lockPath = self::lockPathFor($pkgPath);
+        $this->stubExistingPackageJson($pkgExists, self::DEV_PKG_NAME);
 
         $fs = $this->makeFilesystemMock([
-            $pkgPath => false,  // skip pkg branch; minimal created
-            $lockPath => $lockExists,
-            '../../pnpm-workspace.yaml' => $wsExists,
+            $pkgPath => $pkgExists,
+            'pnpm-lock.yaml' => $lockExists,
         ]);
         $fs->method('dumpFile'); // allow but don't assert content here
 
@@ -509,34 +328,31 @@ class ScriptHandlerTest extends TestCase
         return [
             'pnpmInstall fails (composer, no lock)' => [
                 'manifest' => 'composer.json',
+                'pkgExists' => false,
                 'lockExists' => false,
-                'wsExists' => false,
                 'exitCodes' => [1],
                 'expectedMessage' => 'Failed to generate pnpm-lock.yaml',
             ],
-            'pnpmInstallMonorepo install fails (composer, lock + ws)' => [
+            'pnpmCi fails (composer, lock)' => [
                 'manifest' => 'composer.json',
+                'pkgExists' => false,
                 'lockExists' => true,
-                'wsExists' => true,
-                'exitCodes' => [1],
-                'expectedMessage' => 'Failed to install pnpm assets in monorepo',
-            ],
-            // The build step in pnpmInstallMonorepo runs whenever packageJson->name != '' (both modes).
-            // Here pkg is missing → minimal pkg has no name → no build call. So we cannot trigger
-            // 'Failed to build sub dependencies for application' from this test setup. Skipped.
-            'pnpmCi fails (composer, lock, no ws)' => [
-                'manifest' => 'composer.json',
-                'lockExists' => true,
-                'wsExists' => false,
                 'exitCodes' => [1],
                 'expectedMessage' => 'Failed to install pnpm assets',
             ],
-            'pnpmInstall fails (dev, no lock)' => [
+            'workspace install fails (dev)' => [
                 'manifest' => 'dev.json',
+                'pkgExists' => false,
                 'lockExists' => false,
-                'wsExists' => false,
                 'exitCodes' => [1],
-                'expectedMessage' => 'Failed to generate pnpm-lock.yaml',
+                'expectedMessage' => 'Failed to install pnpm assets in monorepo',
+            ],
+            'members build fails (dev)' => [
+                'manifest' => 'dev.json',
+                'pkgExists' => true,
+                'lockExists' => false,
+                'exitCodes' => [0, 1],
+                'expectedMessage' => 'Failed to build sub dependencies for application',
             ],
         ];
     }
@@ -556,17 +372,14 @@ class ScriptHandlerTest extends TestCase
 
         $fs = $this->makeFilesystemMock([
             'dev/package.json' => true,
-            'dev/pnpm-lock.yaml' => true,
-            '../../pnpm-workspace.yaml' => true,
         ]);
         TestableScriptHandler::$filesystem = $fs;
         putenv('COMPOSER=dev.json');
 
         TestableScriptHandler::installAssets($this->makeEvent('/abs/dev.json', $configuredTimeout));
 
-        // The dev monorepo path runs members-install + members-build + app-install.
         self::assertSame(
-            array_fill(0, 3, $expectedTimeout),
+            array_fill(0, 2, $expectedTimeout),
             array_column(TestableScriptHandler::$invocations, 'timeout'),
             'process-timeout must reach every pnpm helper as an int'
         );
@@ -773,34 +586,13 @@ class ScriptHandlerTest extends TestCase
 
     /**
      * @param list<list<string>> $expectedCmds
-     * @param list<string|null>  $expectedCwds
      */
-    private function assertInvocations(array $expectedCmds, array $expectedCwds): void
+    private function assertInvocations(array $expectedCmds): void
     {
-        $expectedCmds = array_map(fn (array $cmd) => $this->resolveTokens($cmd), $expectedCmds);
-        $expectedCwds = $this->resolveTokens($expectedCwds);
-
         $actualCmds = array_column(TestableScriptHandler::$invocations, 'cmd');
         $actualCwds = array_column(TestableScriptHandler::$invocations, 'cwd');
         self::assertSame($expectedCmds, $actualCmds, 'pnpm command lines mismatch');
-        self::assertSame($expectedCwds, $actualCwds, 'pnpm cwds mismatch');
-    }
-
-    /**
-     * Substitutes placeholder tokens (used by dataProviders since they cannot know the
-     * temp dir at provider time) for their runtime values. null is passed through.
-     * @template T of string|null
-     * @param list<T> $items
-     * @return list<T>
-     */
-    private function resolveTokens(array $items): array
-    {
-        $resolver = [
-            'MONOREPO_ROOT' => $this->monorepoRoot,
-            'PROJECT_DEV' => $this->projectDir . '/dev',
-        ];
-
-        return array_map(static fn ($v) => is_string($v) && isset($resolver[$v]) ? $resolver[$v] : $v, $items);
+        self::assertSame(array_fill(0, count($expectedCmds), null), $actualCwds, 'pnpm cwds mismatch');
     }
 
     private static function lockPathFor(string $pkgPath): string

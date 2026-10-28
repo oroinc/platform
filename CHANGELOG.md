@@ -277,6 +277,10 @@ The current file describes significant changes in the code that may affect the u
 * Changed `\Oro\Bundle\UserBundle\Entity\AbstractUser::$confirmationToken` so it is not available in email templates and is marked immutable, and therefore cannot be enabled from the Entity Management UI. `\Oro\Bundle\UserBundle\Migrations\Schema\v7_1_0_3\DisableFieldsInEmailTemplates` applies the same to an existing installation.
 * Changed the sanitize rules of the `oro_user` table: `confirmation_token` is replaced with an `md5` value now, so a database dump produced by `php bin/console oro:sanitize:dump-sql` carries no usable password reset token. A dump produced by any other means is unaffected.
 
+#### InstallerBundle
+* Changed `\Oro\Bundle\InstallerBundle\Composer\ScriptHandler::installAssets()` for PNPM 12: with `dev.json`, `node_modules` is a symbolic link to `dev/node_modules`, and the monorepo `npm-package` packages are linked directly instead of being copied into `dev/npm-package`.
+* Changed `\Oro\Bundle\InstallerBundle\Composer\ScriptHandler::installAssets()` so that it no longer runs pnpm from the directory two levels above the application when that directory has a `pnpm-workspace.yaml`. With `composer.json`, pnpm always runs in the application directory; with `dev.json`, it installs the `dev` directory, whose `pnpm-workspace.yaml` lists the local packages to link and build.
+
 ### Removed
 
 #### DataAuditBundle
