@@ -29,3 +29,7 @@ Resources
   * [OroCommerce, OroCRM and OroPlatform Documentation](https://doc.oroinc.com)
   * [Contributing](https://doc.oroinc.com/community/contribute/)
   * [Reporting a Security Issue](https://doc.oroinc.com/community/report-issues/security/)
+
+## License
+
+[MIT](LICENSE) Copyright (c) 2026 Oro Inc.
