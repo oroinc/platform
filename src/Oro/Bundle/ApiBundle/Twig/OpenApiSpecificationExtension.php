@@ -63,7 +63,7 @@ class OpenApiSpecificationExtension extends AbstractExtension implements Service
     public function getOpenApiEntities(?array $entityTypes, string $view): string
     {
         if (!$entityTypes) {
-            return $this->getTranslator()->trans('All');
+            return $this->escape($this->getTranslator()->trans('All'));
         }
 
         $docViewDetector = $this->getDocViewDetector();
@@ -78,6 +78,8 @@ class OpenApiSpecificationExtension extends AbstractExtension implements Service
                 $docViewDetector->setView($previousView);
             }
         }
+
+        $entityNames = array_map($this->escape(...), $entityNames);
 
         return '<span class="nowrap">' . implode('</span>; <span class="nowrap">', $entityNames) . '</span>';
     }
@@ -132,5 +134,10 @@ class OpenApiSpecificationExtension extends AbstractExtension implements Service
         }
 
         return $entityNames;
+    }
+
+    private function escape(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }
