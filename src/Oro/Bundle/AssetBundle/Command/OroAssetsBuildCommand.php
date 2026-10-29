@@ -35,6 +35,18 @@ class OroAssetsBuildCommand extends Command
         OutputInterface::VERBOSITY_DEBUG => 'verbose',
     ];
 
+    /** @see https://webpack.js.org/configuration/stats/#stats-presets */
+    protected const WEBPACK_STATS_PRESETS = [
+        'none',
+        'summary',
+        'errors-only',
+        'errors-warnings',
+        'minimal',
+        'normal',
+        'detailed',
+        'verbose',
+    ];
+
     /** @see https://webpack.js.org/configuration/dev-server/#devserverstats- */
     protected const WEBPACK_DEV_SERVER_VERBOSITY_MAP = [
         OutputInterface::VERBOSITY_QUIET => 'none',
@@ -220,6 +232,9 @@ HELP
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Fails on an invalid ORO_WEBPACK_STATS before the cache warmup and the pnpm install.
+        $this->getStatsPreset();
+
         $kernel = $this->getKernel();
         $io = new SymfonyStyle($input, $output);
 
@@ -279,6 +294,27 @@ HELP
     }
 
     /**
+     * ORO_WEBPACK_STATS sets the webpack stats preset apart from the verbosity, for example when "composer -vvv" runs
+     * the command and passes its verbosity to it.
+     */
+    private function getStatsPreset(): ?string
+    {
+        $statsPreset = trim((string)getenv('ORO_WEBPACK_STATS'));
+        if ('' === $statsPreset) {
+            return null;
+        }
+        if (!\in_array($statsPreset, self::WEBPACK_STATS_PRESETS, true)) {
+            throw new \InvalidArgumentException(sprintf(
+                'ORO_WEBPACK_STATS="%s" is not a webpack stats preset. Use one of: %s.',
+                $statsPreset,
+                implode(', ', self::WEBPACK_STATS_PRESETS)
+            ));
+        }
+
+        return $statsPreset;
+    }
+
+    /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -300,7 +336,10 @@ HELP
         }
 
         // Handle the verbosity level. Options are different for the webpack and webpack-dev-server
-        if ($input->getOption('hot')) {
+        $statsPreset = $this->getStatsPreset();
+        if (null !== $statsPreset) {
+            $verbosity = $statsPreset;
+        } elseif ($input->getOption('hot')) {
             $verbosity = self::WEBPACK_DEV_SERVER_VERBOSITY_MAP[$output->getVerbosity()];
         } else {
             $verbosity = self::WEBPACK_VERBOSITY_MAP[$output->getVerbosity()];

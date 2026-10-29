@@ -7,12 +7,14 @@ use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
 use Oro\Bundle\AssetBundle\Command\OroAssetsBuildCommand;
 use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Process\Process;
 
@@ -111,5 +113,70 @@ class OroAssetsBuildCommandTest extends TestCase
             ->willReturn(true);
 
         $this->command->run($inputMock, $outputMock);
+    }
+
+    /**
+     * @dataProvider statsPresetDataProvider
+     */
+    public function testBuildCommandStatsPreset(string|false $envValue, int $verbosity, ?string $expectedStats): void
+    {
+        $this->withStatsEnv($envValue, function () use ($verbosity, $expectedStats) {
+            $command = $this->buildCommand($verbosity);
+
+            $statsArguments = array_values(array_filter(
+                $command,
+                static fn (string $argument) => str_starts_with($argument, 'stats=')
+            ));
+            self::assertSame(null === $expectedStats ? [] : ['stats=' . $expectedStats], $statsArguments);
+        });
+    }
+
+    public function statsPresetDataProvider(): array
+    {
+        return [
+            'verbosity without the variable' => [false, OutputInterface::VERBOSITY_DEBUG, 'verbose'],
+            'empty variable keeps the verbosity' => ['', OutputInterface::VERBOSITY_DEBUG, 'verbose'],
+            'variable overrides the verbosity' => ['normal', OutputInterface::VERBOSITY_DEBUG, 'normal'],
+            'variable without verbosity' => [' minimal ', OutputInterface::VERBOSITY_NORMAL, 'minimal'],
+            'variable turns the stats off' => ['none', OutputInterface::VERBOSITY_DEBUG, 'none'],
+            'normal verbosity without the variable' => [false, OutputInterface::VERBOSITY_NORMAL, null],
+        ];
+    }
+
+    public function testBuildCommandWithInvalidStatsPreset(): void
+    {
+        $this->withStatsEnv('noisy', function () {
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('ORO_WEBPACK_STATS="noisy" is not a webpack stats preset.');
+
+            $this->buildCommand(OutputInterface::VERBOSITY_NORMAL);
+        });
+    }
+
+    private function buildCommand(int $verbosity): array
+    {
+        $input = $this->createMock(InputInterface::class);
+        $input->expects(self::any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['hot', false],
+                ['no-debug', true],
+                ['env', 'prod'],
+            ]);
+        $output = new OutputStub();
+        $output->setVerbosity($verbosity);
+
+        return ReflectionUtil::callMethod($this->command, 'buildCommand', [$input, $output]);
+    }
+
+    private function withStatsEnv(string|false $value, callable $callback): void
+    {
+        $previous = getenv('ORO_WEBPACK_STATS');
+        putenv(false === $value ? 'ORO_WEBPACK_STATS' : 'ORO_WEBPACK_STATS=' . $value);
+        try {
+            $callback();
+        } finally {
+            putenv(false === $previous ? 'ORO_WEBPACK_STATS' : 'ORO_WEBPACK_STATS=' . $previous);
+        }
     }
 }
