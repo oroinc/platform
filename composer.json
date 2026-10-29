@@ -159,9 +159,6 @@
         "playwright-php/playwright": "^1.4",
         "playwright-php/playwright-mink": "^1.0"
     },
-    "conflict": {
-        "symfony/doctrine-bridge": ">=7.4.21"
-    },
     "provide": {
         "psr/http-factory-implementation": "^1.0"
     },

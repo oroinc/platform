@@ -310,6 +310,9 @@ The current file describes significant changes in the code that may affect the u
 * Removed unused Twig templates `@OroUser/Email/invite.html.twig`, `@OroUser/Email/layout.html.twig`, `@OroUser/Email/reset.html.twig`.
 * Removed `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE` and `UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE` constants together with the `resetUnavailable` and `resetUnavailableMessage` variables of the `@OroUser/Reset/checkEmail_form.html.twig` template and the `oro.user.password.reset_password.unavailable.title` and `oro.user.password.reset_password.unavailable.message` translations. The reason why the reset password email is not sent is written to the log only, because exposing it to an unauthenticated visitor discloses that the submitted value belongs to an existing account.
 
+#### PlatformBundle
+* Removed `Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UndoLazyEntityManagerPass`: the entity managers are lazy in the test environment, the same as in the other environments. With `symfony/doctrine-bridge` 7.4.21 and later, a closed entity manager that is not lazy cannot be reset.
+
 ## 7.0.0 (2026-03-31)
 [Show detailed list of changes](incompatibilities-7-0.md)
 

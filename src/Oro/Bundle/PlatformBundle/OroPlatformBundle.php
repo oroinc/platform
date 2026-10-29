@@ -45,7 +45,6 @@ class OroPlatformBundle extends Bundle
                 RegisterEventListenersAndSubscribersPass::class
             );
         }
-        $container->addCompilerPass(new Compiler\UndoLazyEntityManagerPass());
         $container->addCompilerPass(new Compiler\JmsSerializerPass());
         $container->addCompilerPass(new Compiler\TwigServiceLocatorPass());
         $container->addCompilerPass(new Compiler\DoctrineTagMethodPass());
