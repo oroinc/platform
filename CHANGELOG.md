@@ -44,6 +44,9 @@ The current file describes significant changes in the code that may affect the u
 * Added `CorsSettings::addAllowedOrigins(array $origins): void` method to append extra allowed origins to the existing list at runtime (deduplicated).
 * Added `CorsSettings::enableCredentials(): void` method to enable credential support in CORS responses at runtime.
 
+#### AssetBundle
+* Added the `ORO_WEBPACK_STATS` environment variable to `oro:assets:build`: the webpack stats preset, for example `normal`, apart from the verbosity of the command. `oro:assets:install` and `composer` pass their verbosity to `oro:assets:build`, so with `composer -vvv` webpack no longer prints the `verbose` stats when the variable is set.
+
 #### AttachmentBundle
 * Added `Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator::getConstraints()` that accepts a `Oro\Bundle\AttachmentBundle\Model\FileValidationTarget` and returns the constraints used to check whether a file is allowed to be uploaded to an entity field or attached to an entity.
 * Added the `Oro\Bundle\AttachmentBundle\Validator\Constraints\FileParentFieldConfig` and `Oro\Bundle\AttachmentBundle\Validator\Constraints\AttachmentFileTargetConfig` validation constraints, applied to `File::$file` and `Attachment` in the `api` validation group only. `AttachmentFileTargetConfig` validates both an uploaded file and an external file of an attachment against the attachment configuration of its target entity.
