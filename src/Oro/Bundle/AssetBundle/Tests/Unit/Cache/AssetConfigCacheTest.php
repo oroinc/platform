@@ -13,8 +13,6 @@ class AssetConfigCacheTest extends TestCase
 {
     use TempDirExtension;
 
-    private const WEBPACK_DEV_SERVER_OPTIONS = ['webpack_dev_server_options'];
-
     public function testWarmUp(): void
     {
         $bundles = [
@@ -31,7 +29,7 @@ class AssetConfigCacheTest extends TestCase
             ->method('getEnabledThemes')
             ->willReturn([]);
 
-        $warmer = new AssetConfigCache($kernel, self::WEBPACK_DEV_SERVER_OPTIONS, $manager);
+        $warmer = new AssetConfigCache($kernel, $manager);
         $tempDir = $this->getTempDir('cache');
         $warmer->warmUp($tempDir);
         $file = $tempDir . '/asset-config.json';

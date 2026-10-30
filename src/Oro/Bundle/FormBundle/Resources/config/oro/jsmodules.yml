@@ -8,6 +8,12 @@ aliases:
     oro/select2-grid-component$: oroform/js/app/components/select2-grid-component
     oro/select2-relation-component$: oroform/js/app/components/select2-relation-component
     oro/select2-tree-autocomplete-component$: oroform/js/app/components/select2-tree-autocomplete-component
+    tinymce$: hugerte
+    tinymce/icons: hugerte/icons
+    tinymce/models: hugerte/models
+    tinymce/plugins: hugerte/plugins
+    tinymce/skins: hugerte/skins
+    tinymce/themes: hugerte/themes
     tinymce/tinymce$: oroform/js/extend/tinymce
     xregexp$: xregexp/xregexp-all
 app-modules:
@@ -87,3 +93,7 @@ map:
         jquery.validate: oroform/js/extend/validate
     oroform/js/extend/validate:
         jquery.validate: jquery.validate
+shim:
+    hugerte:
+        expose:
+            - tinymce,tinyMCE

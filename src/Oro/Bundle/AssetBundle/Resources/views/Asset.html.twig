@@ -1,9 +1,5 @@
 {% macro css(src, extra_attributes) %}
-    {% if webpack_hmr_enabled() %}
-        <script src="{{ asset(src|webpack_asset) }}" {{ oro_integrity(asset(src|webpack_asset)) }}></script>
-    {% else %}
-        <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}" {{ oro_integrity(asset(src)) }}>
-    {% endif %}
+    <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}" {{ oro_integrity(asset(src)) }}>
 {% endmacro %}
 
 {% macro js(src) %}

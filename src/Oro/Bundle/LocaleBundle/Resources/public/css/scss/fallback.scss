@@ -41,7 +41,7 @@
     }
 }
 
-.tox-tinymce {
+.tox-hugerte {
     &.disabled {
         button {
             opacity: $mce-tinymce-opacity;
@@ -64,7 +64,7 @@
         border-top: $fallback-item-border;
     }
 
-    .tox-tinymce {
+    .tox-hugerte {
         &:not(.tox-fullscreen) {
             max-width: $fallback-item-mce-tinymce-max-width;
         }

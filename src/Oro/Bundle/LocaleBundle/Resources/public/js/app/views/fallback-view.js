@@ -130,7 +130,7 @@ const FallbackView = BaseView.extend({
             .on('change', this.cloneValueToChildrenEvent.bind(this))
             .on('keyup', this.cloneValueToChildrenEvent.bind(this));
 
-        this.$el.find(this.options.selectors.itemValue).find('.tox-tinymce').each(function() {
+        this.$el.find(this.options.selectors.itemValue).find('.tox-hugerte').each(function() {
             tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
                 .on('change', function() {
                     $(this.targetElm).trigger('change');
@@ -291,7 +291,7 @@ const FallbackView = BaseView.extend({
         const $$elementContainer = $element.closest(this.options.selectors.itemValue);
 
         let editor;
-        if ($$elementContainer.find('.tox-tinymce').length > 0) {
+        if ($$elementContainer.find('.tox-hugerte').length > 0) {
             editor = tinyMCE.get($$elementContainer.find('textarea').attr('id'));
         }
 
