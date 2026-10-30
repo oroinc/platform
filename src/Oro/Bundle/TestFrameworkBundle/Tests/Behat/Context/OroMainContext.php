@@ -65,6 +65,7 @@ class OroMainContext extends MinkContext implements
 
     public const SKIP_WAIT_PATTERN = '/' .
         '^(?:|I )should see .+ flash message$|' .
+        '^(?:|I )should see flash message matching regexp .+$|' .
         '^(?:|I )should see .+ flash message and I close it$|' .
         '^(?:|I )should see .+ error message$|' .
         '^(?:|I )should see success message with number of records were deleted$|' .
@@ -396,6 +397,39 @@ class OroMainContext extends MinkContext implements
                 'Expected "%s" message didn\'t appear',
                 $title
             )
+        );
+    }
+
+    /**
+     * Example: Then I should see flash message matching regexp ~User #\d+ disabled\.~
+     *
+     * @Then /^(?:|I )should see flash message matching regexp (?P<pattern>.+)$/
+     */
+    public function iShouldSeeFlashMessageMatchingRegexp(
+        string $pattern,
+        string $flashMessageElement = 'Flash Message',
+        int $timeLimit = 30
+    ): void {
+        $pattern = $this->fixStepArgument($pattern);
+        $flashMessage = $this->spin(
+            function (OroMainContext $context) use ($pattern, $flashMessageElement) {
+                foreach ($context->findAllElements($flashMessageElement) as $flashMessage) {
+                    if (!$flashMessage->isValid() || !$flashMessage->isVisible()) {
+                        continue;
+                    }
+                    if (preg_match($pattern, $flashMessage->getText())) {
+                        return $flashMessage;
+                    }
+                }
+
+                return null;
+            },
+            $timeLimit
+        );
+
+        self::assertNotNull(
+            $flashMessage,
+            sprintf('Expected message matching "%s" didn\'t appear', $pattern)
         );
     }
 

@@ -139,7 +139,7 @@ Feature: Localized email notification for user
     And follow "More actions"
     And follow "Reset password"
     And I confirm reset password
-    Then I should see "Password reset request has been sent to test@test.com." flash message
+    Then I should see flash message matching regexp ~Password reset request has been sent to user #\d+\.~
     And Email should contains the following:
       | To      | test@test.com                 |
       | Subject | German Reset Password Subject |

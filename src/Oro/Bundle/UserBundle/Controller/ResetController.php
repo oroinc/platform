@@ -99,7 +99,14 @@ class ResetController extends AbstractController
         if ($resetPasswordSuccess) {
             $flashBag->add(
                 'success',
-                $translator->trans('oro.user.password.force_reset.success.message', ['%email%' => $user->getEmail()])
+                $translator->trans(
+                    'oro.user.password.force_reset.success.message',
+                    [
+                        '%id%' => $user->getId(),
+                        // Left for backward compatibility with old translations that use %email%.
+                        '%email%' => $user->getId(),
+                    ]
+                )
             );
 
             if ($this->getUser() instanceof AbstractUser && $this->getUser()->getId() === $user->getId()) {
@@ -111,7 +118,14 @@ class ResetController extends AbstractController
 
         $flashBag->add(
             'error',
-            $translator->trans('oro.user.password.force_reset.failure.message', ['%email%' => $user->getEmail()])
+            $translator->trans(
+                'oro.user.password.force_reset.failure.message',
+                [
+                    '%id%' => $user->getId(),
+                    // Left for backward compatibility with old translations that use %email%.
+                    '%email%' => $user->getId(),
+                ]
+            )
         );
 
         return $params;
