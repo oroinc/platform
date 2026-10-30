@@ -23,7 +23,7 @@ Feature: User Grid Views
   Scenario: Prepare data for "Cannot login" view
     Given I click "Reset password" on row "charlie@example.com" in grid
     And I confirm reset password
-    Then I should see "Password reset request has been sent to charlie@example.com." flash message
+    Then I should see flash message matching regexp ~Password reset request has been sent to user #\d+\.~
 
   Scenario: Check view switch works correctly
     Given there is 2 records in grid

@@ -248,6 +248,7 @@ services:
             - ['setAttribute', ['video', 'poster', 'URI']]
             # iframe
             - ['setAttribute', ['iframe', 'allow', 'Text']]
+            - ['setAttribute', ['iframe', 'referrerpolicy', 'Enum#no-referrer,no-referrer-when-downgrade,origin,origin-when-cross-origin,same-origin,strict-origin,strict-origin-when-cross-origin,unsafe-url']]
             # Set Custom Elements
             - ['setElement', ['button', 'Block', 'Flow', 'Common', true]]
             - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]

@@ -28,7 +28,7 @@ Feature: Reset user password
     When I click "Reset password" on row "charlie" in grid
     Then should see "User charlie will receive the email to reset password and will be disabled from login." in confirmation dialogue
     When I click "Reset" in confirmation dialogue
-    Then I should see "Password reset request has been sent to charlie@example.com." flash message
+    Then I should see flash message matching regexp ~Password reset request has been sent to user #\d+\.~
     And Email should contains the following:
       | Subject | Please reset your password                                               |
       | To      | charlie@example.com                                                      |

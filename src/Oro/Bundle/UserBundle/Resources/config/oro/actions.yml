@@ -170,7 +170,7 @@ operations:
 
     user_enable:
         label: oro.user.action.enable.label
-        acl_resource: oro_user_user_update
+        acl_resource: [oro_user_user_update, $.data]
         routes:
             - oro_user_view
             - oro_user_index
@@ -220,7 +220,7 @@ operations:
 
     user_disable:
         label: oro.user.action.disable.label
-        acl_resource: oro_user_user_update
+        acl_resource: [oro_user_user_update, $.data]
         routes:
             - oro_user_view
             - oro_user_index
@@ -293,7 +293,9 @@ action_groups:
                         message: oro.user.password.force_reset.success.message
                         type: 'success'
                         message_parameters:
-                            'email': $.data.email
+                            'id': $.data.id
+                            # Left for backward compatibility with old translations that use %email%.
+                            'email': $.data.id
             - '@tree':
                 conditions:
                     '@and':
@@ -303,7 +305,9 @@ action_groups:
                         message: oro.user.password.force_reset.failure.message
                         type: 'error'
                         message_parameters:
-                            'email': $.data.email
+                            'id': $.data.id
+                            # Left for backward compatibility with old translations that use %email%.
+                            'email': $.data.id
 
     enableUser:
         parameters:
@@ -316,7 +320,9 @@ action_groups:
                 message: oro.user.action.enable.success
                 type: 'success'
                 message_parameters:
-                    'username': $.data.username
+                    'id': $.data.id
+                    # Left for backward compatibility with old translations that use %username%.
+                    'username': $.data.id
             - '@tree':
                 conditions:
                     '@equal': [$.data.auth_status.internalId, 'expired']
@@ -337,4 +343,6 @@ action_groups:
                 message: oro.user.action.disable.success
                 type: 'success'
                 message_parameters:
-                    'username': $.data.username
+                    'id': $.data.id
+                    # Left for backward compatibility with old translations that use %username%.
+                    'username': $.data.id

@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-.tox-tinymce {
+.tox-hugerte {
     max-width: 100%;
     /* stylelint-disable declaration-no-important */
     border-radius: $input-field-border-radius !important;
@@ -9,7 +9,7 @@
 }
 
 .narrow-text-field {
-    .tox-tinymce:not(.tox-fullscreen) {
+    .tox-hugerte:not(.tox-fullscreen) {
         // stylelint-disable-next-line declaration-no-important
         width: $field-width !important;
         min-height: 300px;
@@ -31,4 +31,79 @@
 
 .tox .tox-statusbar__text-container {
     overflow: hidden;
+}
+
+.tox.tox-hugerte {
+    .tox-tbtn:focus,
+    .tox-tbtn:hover {
+        background: $tinymce-control-highlight-background;
+    }
+
+    .tox-tbtn:active {
+        background: $tinymce-control-pressed-background;
+    }
+
+    .tox-tbtn--disabled,
+    .tox-tbtn--disabled:hover,
+    .tox-tbtn:disabled,
+    .tox-tbtn:disabled:hover {
+        background: $tinymce-control-disabled-background;
+    }
+
+    .tox-tbtn--enabled,
+    .tox-tbtn--enabled:hover,
+    .tox-tbtn--active {
+        background: $tinymce-control-pressed-background;
+    }
+
+    .tox-split-button:hover {
+        box-shadow: 0 0 0 1px $tinymce-control-highlight-background inset;
+    }
+
+    .tox-split-button:focus {
+        background: $tinymce-control-highlight-background;
+    }
+
+    .tox-split-button.tox-tbtn--disabled:hover,
+    .tox-split-button.tox-tbtn--disabled:focus,
+    .tox-split-button.tox-tbtn--disabled .tox-tbtn:hover,
+    .tox-split-button.tox-tbtn--disabled .tox-tbtn:focus {
+        background: $tinymce-control-disabled-background;
+    }
+
+    .tox-tbtn:focus::after,
+    .tox-split-button:focus::after {
+        content: none;
+    }
+}
+
+.tox.tox-silver-sink {
+    .tox-collection--list .tox-collection__item--active,
+    .tox-collection--toolbar .tox-collection__item--active,
+    .tox-collection--toolbar .tox-collection__item--active:hover,
+    .tox-collection--grid .tox-collection__item--active:not(.tox-collection__item--state-disabled),
+    .tox-swatches__picker-btn:hover {
+        background-color: $tinymce-control-highlight-background;
+    }
+
+    .tox-collection--list .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+        color: $tinymce-control-text-color;
+    }
+
+    .tox-collection__item-accessory {
+        color: $tinymce-control-muted-text-color;
+    }
+
+    .tox-collection--toolbar .tox-collection__item--active:focus::after,
+    .tox-collection--grid .tox-collection__item--active:not(.tox-collection__item--state-disabled):focus::after {
+        content: none;
+    }
+
+    .tox-tooltip__body {
+        color: $tinymce-tooltip-color;
+        font-size: $tinymce-tooltip-font-size;
+        font-weight: $tinymce-tooltip-font-weight;
+        padding: $tinymce-tooltip-padding;
+        box-shadow: $tinymce-tooltip-box-shadow;
+    }
 }

@@ -14,7 +14,8 @@ class HtmlTagProviderTest extends WebTestCase
      */
     private array $allowedElements = [
         '@[id|style|class]',
-        'iframe[allowfullscreen|frameborder|height|marginheight|marginwidth|name|scrolling|src|width|allow|title]',
+        'iframe[allowfullscreen|frameborder|height|marginheight|marginwidth|name|scrolling|src|width|allow|title'
+            . '|referrerpolicy]',
         'table[cellspacing|cellpadding|border|align|width]',
         'thead[align|valign]',
         'tbody[align|valign]',

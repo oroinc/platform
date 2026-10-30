@@ -166,8 +166,8 @@ oro:
                 popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
                 popup.question: Are you sure you want to proceed?
                 popup.button: Reset
-                success.message: Password reset request has been sent to %email%.
-                failure.message: Password reset request to %email% has failed.
+                success.message: 'Password reset request has been sent to user #%id%.'
+                failure.message: 'Password reset request to user #%id% has failed.'
                 mass_action.success: Password reset completed successfully. %count% emails sent.
                 mass_action.failure: Mass reset action has failed.
         password_re.label:           Re-enter password
@@ -396,10 +396,10 @@ oro:
         action:
             enable:
                 label: Enable user
-                success: 'User %username% enabled.'
+                success: 'User #%id% enabled.'
             disable:
                 label: Disable user
-                success: 'User %username% disabled.'
+                success: 'User #%id% disabled.'
             password_management:
                 label: Manage passwords
                 description: Reset or change passwords of other users

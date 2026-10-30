@@ -204,6 +204,10 @@
     }
 }
 
+.validation-failed__text {
+    white-space: pre-line;
+}
+
 .floating-error-message {
     $arrow-height: 6px;
 
@@ -234,6 +238,8 @@
     }
 
     .content {
+        white-space: pre-line;
+
         @include fa-icon($fa-var-times, before, true) {
             position: absolute;
             left: 9px;

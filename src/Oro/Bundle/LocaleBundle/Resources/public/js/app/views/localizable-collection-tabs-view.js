@@ -112,7 +112,7 @@ const LocalizableCollectionTabsView = BaseView.extend({
     bindEvents: function() {
         const self = this;
 
-        this.$el.find(this.options.selectors.itemValue).find('.tox-tinymce').each(function() {
+        this.$el.find(this.options.selectors.itemValue).find('.tox-hugerte').each(function() {
             tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
                 .on('change', function() {
                     $(this.targetElm).trigger('change');

@@ -47,15 +47,6 @@ class OroAssetsBuildCommand extends Command
         'verbose',
     ];
 
-    /** @see https://webpack.js.org/configuration/dev-server/#devserverstats- */
-    protected const WEBPACK_DEV_SERVER_VERBOSITY_MAP = [
-        OutputInterface::VERBOSITY_QUIET => 'none',
-        OutputInterface::VERBOSITY_NORMAL => false,
-        OutputInterface::VERBOSITY_DEBUG => 'verbose',
-        OutputInterface::VERBOSITY_VERY_VERBOSE => 'normal',
-        OutputInterface::VERBOSITY_VERBOSE => 'minimal',
-    ];
-
     private const ADMIN_ORO_THEME = 'admin.oro';
 
     private AssetCommandProcessFactory $nodeProcessFactory;
@@ -112,12 +103,6 @@ class OroAssetsBuildCommand extends Command
         $this
             ->addArgument('theme', InputArgument::OPTIONAL, 'Theme name')
             ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Continue to watch for changes after initial build')
-            ->addOption('hot', null, InputOption::VALUE_NONE, 'Turn on hot module replacement')
-            ->addOption('key', null, InputOption::VALUE_REQUIRED, 'SSL certificate key PEM file path')
-            ->addOption('cert', null, InputOption::VALUE_REQUIRED, 'SSL certificate PEM file path')
-            ->addOption('cacert', null, InputOption::VALUE_REQUIRED, 'SSL certificate cacert PEM file path')
-            ->addOption('pfx', null, InputOption::VALUE_REQUIRED, 'Path to SSL certificate .pfx file')
-            ->addOption('pfxPassphrase', null, InputOption::VALUE_REQUIRED, 'Passphrase to the .pfx file')
             ->addOption('force-warmup', 'f', InputOption::VALUE_NONE, 'Warm up the asset-config.json cache')
             ->addOption('pnpm-install', 'i', InputOption::VALUE_NONE, 'Reinstall pnpm dependencies')
             ->addOption('skip-css', null, InputOption::VALUE_NONE, 'Skip build of CSS assets')
@@ -159,16 +144,6 @@ and rebuild the necessary assets automatically when any changes are detected:
 <comment>Note:</comment> When using the <info>--watch</info> option you should restart the command after
 you modify the assets configuration in <comment>assets.yml</comment> files, or it will not
 be able to detect the changes otherwise.
-
-The <info>--hot</info> option turns on the hot module replacement feature. It allows all styles
-to be updated at runtime without the need for a full page refresh:
-
-  <info>php %command.full_name% --hot</info>
-
-The <info>--key</info>, <info>--cert</info>, <info>--cacert</info>, <info>--pfx</info> and <info>--pfxPassphrase</info> options can be used
-with <info>--hot</info> option to allow the hot module replacement to work over HTTPS:
-
-  <info>php %command.full_name% --hot --key=<path> --cert=<path> --cacert=<path> --pfx=<path> --pfxPassphrase=<passphrase></info>
 
 The <info>--force-warmup</info> option can be used to warm up the <comment>asset-config.json</comment> cache:
 
@@ -212,9 +187,6 @@ HELP
             ->addUsage('--watch admin.oro')
             ->addUsage('-w')
             ->addUsage('-w blank')
-            ->addUsage('--hot')
-            ->addUsage('--hot blank')
-            ->addUsage('--hot --key=<path> --cert=<path> --cacert=<path> --pfx=<path> --pfxPassphrase=<passphrase>')
             ->addUsage('--force-warmup')
             ->addUsage('--pnpm-install')
             ->addUsage('--skip-css')
@@ -253,7 +225,7 @@ HELP
         $output->writeln('<info>Building assets.</info>');
         $this->handleAssets($input, $output);
 
-        if (!$input->getOption('hot') && !$input->getOption('watch')) {
+        if (!$input->getOption('watch')) {
             $io->success('All assets were successfully built.');
         }
 
@@ -263,16 +235,12 @@ HELP
     /** @SuppressWarnings(PHPMD.UnusedLocalVariable) */
     protected function buildAssets(InputInterface $input, OutputInterface $output): void
     {
-        $buildTimeout = $this->buildTimeout;
-        if ($input->getOption('hot')) {
-            $buildTimeout = null;
-        }
         $command = $this->buildCommand($input, $output);
 
         $process = $this->nodeProcessFactory->create(
             $command,
             $this->getKernel()->getProjectDir(),
-            $buildTimeout
+            $this->buildTimeout
         );
         $output->writeln($process->getCommandLine());
 
@@ -322,12 +290,6 @@ HELP
     {
         $command = ['run', 'webpack', '--'];
 
-        if ($input->getOption('hot')) {
-            $command[] = '--hot';
-
-            $this->mapSslOptions($input, $command);
-        }
-
         if (true === $input->getOption('no-debug') || 'prod' === $input->getOption('env')) {
             $command[] = '--mode=production';
         }
@@ -339,8 +301,6 @@ HELP
         $statsPreset = $this->getStatsPreset();
         if (null !== $statsPreset) {
             $verbosity = $statsPreset;
-        } elseif ($input->getOption('hot')) {
-            $verbosity = self::WEBPACK_DEV_SERVER_VERBOSITY_MAP[$output->getVerbosity()];
         } else {
             $verbosity = self::WEBPACK_VERBOSITY_MAP[$output->getVerbosity()];
         }
@@ -377,16 +337,6 @@ HELP
         }
 
         return $command;
-    }
-
-    protected function mapSslOptions(InputInterface $input, array &$command): void
-    {
-        foreach (['key', 'cert', 'cacert', 'pfx', 'pfxPassphrase'] as $optionName) {
-            $optionValue = $input->getOption($optionName);
-            if ($optionValue) {
-                $command[] = "--{$optionName}={$optionValue}";
-            }
-        }
     }
 
     /**

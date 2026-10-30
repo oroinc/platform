@@ -22,14 +22,5 @@ class OroAssetExtensionTest extends TestCase
         self::assertIsString($container->getParameter('oro_asset.pnpm_path'));
         self::assertNull($container->getParameter('oro_asset.build_timeout'));
         self::assertNull($container->getParameter('oro_asset.pnpm_install_timeout'));
-        self::assertSame(
-            [
-                'enable_hmr' => '%kernel.debug%',
-                'host' => 'localhost',
-                'port' => 8081,
-                'https' => false
-            ],
-            $container->getParameter('oro_asset.webpack_dev_server_options')
-        );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Controller;
 
+use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Handler\OperationFormHandler;
 use Oro\Bundle\ActionBundle\Model\Operation;
@@ -11,6 +12,7 @@ use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -51,6 +53,8 @@ class WidgetController extends AbstractController
             $result = $handler->process($operationName, $request, $request->getSession()->getFlashBag());
         } catch (OperationNotFoundException $e) {
             throw $this->createNotFoundException($e->getMessage(), $e);
+        } catch (ForbiddenOperationException $e) {
+            throw new AccessDeniedHttpException($e->getMessage(), $e);
         }
 
         return $result instanceof Response ? $result : $this->render($this->getFormTemplate($result), $result);

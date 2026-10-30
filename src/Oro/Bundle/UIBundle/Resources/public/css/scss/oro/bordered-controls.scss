@@ -566,7 +566,7 @@
     }
 
     > .control-group-container:not([style*='display: none']):not(
-    :has(~ .control-group-container:not([style*='display: none']))) {
+        :has(~ .control-group-container:not([style*='display: none']))) {
         .control-group:last-child {
             border-bottom: 0;
         }

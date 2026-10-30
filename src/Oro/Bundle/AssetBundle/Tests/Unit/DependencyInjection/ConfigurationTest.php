@@ -55,12 +55,6 @@ class ConfigurationTest extends TestCase
                     'pnpm_path' => 'pnpm',
                     'build_timeout' => null,
                     'pnpm_install_timeout' => null,
-                    'webpack_dev_server' => [
-                        'enable_hmr' => '%kernel.debug%',
-                        'host' => 'localhost',
-                        'port' => 8081,
-                        'https' => false,
-                    ],
                     'external_resources' => [],
                     'settings' => [
                         'resolved' => true,
@@ -78,12 +72,6 @@ class ConfigurationTest extends TestCase
                     'pnpm_path' => '/usr/local/bin/pnpm',
                     'build_timeout' => 300,
                     'pnpm_install_timeout' => null,
-                    'webpack_dev_server' => [
-                        'enable_hmr' => true,
-                        'host' => 'http://example.local',
-                        'port' => 65000,
-                        'https' => true,
-                    ],
                     'external_resources' => [
                         'test1' => [
                             'link' => 'http://example.local/test1.js',
@@ -103,12 +91,6 @@ class ConfigurationTest extends TestCase
                     'pnpm_path' => '/usr/local/bin/pnpm',
                     'build_timeout' => 300,
                     'pnpm_install_timeout' => null,
-                    'webpack_dev_server' => [
-                        'enable_hmr' => true,
-                        'host' => 'http://example.local',
-                        'port' => 65000,
-                        'https' => true,
-                    ],
                     'external_resources' => [
                         'test1' => [
                             'link' => 'http://example.local/test1.js',

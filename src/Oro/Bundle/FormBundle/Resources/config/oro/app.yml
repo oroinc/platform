@@ -36,6 +36,7 @@ oro_form:
                         - width
                         - allow
                         - title
+                        - referrerpolicy
                 table:
                     attributes:
                         - cellspacing
