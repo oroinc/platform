@@ -24,6 +24,10 @@
         background: $validation-failed-icon-url;
         margin: $validation-failed-icon-offset;
     }
+
+    &__text {
+        white-space: pre-line;
+    }
 }
 
 .validation-failed,

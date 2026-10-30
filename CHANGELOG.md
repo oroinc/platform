@@ -226,6 +226,7 @@ The current file describes significant changes in the code that may affect the u
 * Changed the constructor of `\Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType`, `\Oro\Bundle\FormBundle\Form\DataTransformer\EntitySelectOrCreateDataTransformerFactory` was added as the sixth argument.
 * Added the `acl_protected` option to the `oro_entity_create_or_select_inline` form type, set it to `true` to load entities with the `VIEW` permission applied. It is `false` by default because the allowed values of most of the entity selects are restricted by their autocomplete search handler or validated by a dedicated constraint, and these restrictions are not equivalent to the `VIEW` permission.
 * Changed the `invalid_message` option default of the `oro_entity_create_or_select_inline` form type to the `oro.form.entity_create_or_select_inline.invalid` translation key.
+* Changed the back-office `oroform/templates/error-template.html` and `oroform/templates/floating-error-message.html` templates to escape messages like the storefront ones. Pass validation messages to these templates and to the `showLabel()` and `showErrors()` methods of the form validator as plain text, and separate several messages with a line break (`\n`) instead of `<br>`.
 
 #### MessageQueueBundle
 * Changed `Oro\Component\MessageQueue\Transport\MessageConsumerInterface::receive()` and `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer::receive()` `$timeout` argument type from `int` to `int|float` to allow fractional (sub-second) receive timeouts.

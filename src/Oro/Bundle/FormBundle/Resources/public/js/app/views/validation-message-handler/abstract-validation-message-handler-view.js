@@ -78,7 +78,7 @@ const AbstractValidationMessageHandlerView = BaseView.extend({
             this.popper = null;
         }
 
-        const message = _.escape(this.label.text());
+        const message = this.label.text().trim();
 
         if (message.length) {
             const messageEl = $(this.template({content: message}));

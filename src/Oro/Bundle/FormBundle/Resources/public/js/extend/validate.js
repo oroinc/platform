@@ -290,9 +290,9 @@ _.extend($.validator.prototype, {
                     const text = [];
 
                     $label.each(function() {
-                        text.push(_.escape($(this).text()));
+                        text.push($(this).text().trim());
                     });
-                    this.showLabel(element, text.join('<br>'));
+                    this.showLabel(element, text.join('\n'));
                     $label.remove();
                 }
 
